@@ -7,7 +7,6 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { Header } from './features/header/Header';
 import { Footer } from './features/footer/Footer';
-import { About } from './features/about/About';
 // Redux
 import { Provider } from "react-redux";
 import store from "./store";
@@ -21,7 +20,6 @@ root.render(
         <Header />
         <Routes>
           <Route active path="/" element={<App />}></Route>
-          <Route path="about" element={<About />}></Route>
         </Routes>
         <Footer />
       </BrowserRouter>
