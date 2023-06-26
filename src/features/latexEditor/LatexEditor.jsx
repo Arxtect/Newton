@@ -1,14 +1,14 @@
 import AceEditor from "react-ace";
 import "ace-builds/src-noconflict/mode-latex";
 import "ace-builds/src-noconflict/theme-github";
+import "ace-builds/src-noconflict/theme-monokai";
 import "ace-builds/src-noconflict/ext-language_tools";
 
-
-export const LatexEditor = ({handleChange, sourceCode}) => {
+export const LatexEditor = ({ handleChange, sourceCode }) => {
   return (
     <AceEditor
       mode="latex"
-      theme="github"
+      theme="monokai" //monokai
       name="aceEditor"
       height="100%"
       width="100%"
