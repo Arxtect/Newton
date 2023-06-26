@@ -18,6 +18,6 @@ export const LatexEditor = ({ handleChange, sourceCode }) => {
       onChange={handleChange}
       value={sourceCode}
       className="border border-black"
-    />
+    ></AceEditor>
   );
 };

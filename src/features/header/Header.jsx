@@ -1,4 +1,5 @@
 import { Link, NavLink } from "react-router-dom";
+// import Button from "@mui/material/Button";
 
 export const Header = () => {
   return (
@@ -9,7 +10,10 @@ export const Header = () => {
       <nav>
         <ul className="list-none inline-flex justify-around items-center gap-12 text-xl text-center">
           <li>
-            <NavLink to="/">App</NavLink>
+            <NavLink to="/">
+              App
+              {/* <Button variant="contained">App</Button> */}
+            </NavLink>
           </li>
         </ul>
       </nav>
