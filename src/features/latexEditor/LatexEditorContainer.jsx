@@ -1,4 +1,5 @@
 // Hooks
+import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 // Components
 import { LatexEditor } from "./LatexEditor";
@@ -10,6 +11,7 @@ import {
   selectFullSourceCode,
   selectShowFullSourceCode,
 } from "./latexEditorSlice";
+import demo from "./demo";
 
 export const LatexEditorContainer = () => {
   const body = useSelector(selectBody);
@@ -27,6 +29,10 @@ export const LatexEditorContainer = () => {
       dispatch(setBody(editorValue));
     }
   };
+
+  useEffect(() => {
+    handleChange(demo);
+  }, []);
 
   return (
     <LatexEditor
