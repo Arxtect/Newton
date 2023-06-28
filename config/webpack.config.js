@@ -577,16 +577,23 @@ module.exports = function (webpackEnv) {
       new CopyWebpackPlugin({
         patterns: [
           {
-            from: "src/features/latexCompilation/swiftlatex/swiftlatexxetex.wasm",
+            from: "src/features/latexCompilation/swiftlatex/swiftlatexdvipdfm.wasm",
             to: "static/media",
           },
         ],
       }),
-
       new CopyWebpackPlugin({
         patterns: [
           {
             from: "node_modules/ace-builds/src-min-noconflict/mode-latex.js",
+            to: "static/js",
+          },
+        ],
+      }),
+      new CopyWebpackPlugin({
+        patterns: [
+          {
+            from: "node_modules/ace-builds/src-min-noconflict/theme-textmate.js",
             to: "static/js",
           },
         ],
