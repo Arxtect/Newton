@@ -2,9 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
+/* @layer base {
   body {
-    @apply container mx-auto w-[90%];
+    @apply container mx-auto w-[100%];
   }
 
   header a {
@@ -41,4 +41,6 @@
   #about p {
     @apply text-xl mb-4;
   }
-}
+} */
+
+
