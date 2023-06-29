@@ -42,6 +42,13 @@ First you have to upload the image file from your computer using the upload link
 
 Note that your figure will automatically be placed in the most appropriate place for it, given the surrounding text and taking into account other figures or tables that may be close by. You can find out more about adding images to your documents in this help article on \\href{https://www.overleaf.com/learn/how-to/Including_images_on_Overleaf}{including images on Overleaf}.
 
+
+\\begin{figure}
+\\centering
+\\includegraphics[width=0.25\\linewidth]{frog.jpg}
+\\caption{\\label{fig:frog}This frog was uploaded via the file-tree menu.}
+\\end{figure}
+
 \\subsection{How to add Tables}
 
 Use the table and tabular environments for basic tables --- see Table~\\ref{tab:widgets}, for example. For more information, please see this help article on \\href{https://www.overleaf.com/learn/latex/tables}{tables}. 
@@ -110,4 +117,4 @@ We hope you find Overleaf useful, and do take a look at our \\href{https://www.o
 
 \\end{document}`;
 
-export default latexCode
+export default latexCode;

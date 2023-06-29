@@ -1,3 +1,8 @@
+/*
+ * @Description:
+ * @Author: Devin
+ * @Date: 2023-06-26 09:57:49
+ */
 // Hooks
 import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
@@ -20,6 +25,7 @@ export const LatexEditorContainer = () => {
   const dispatch = useDispatch();
 
   const handleChange = (editorValue) => {
+    console.log(editorValue, "12312");
     if (showFullSource) {
       let [newPreamble, newBody] = editorValue.split("\\begin{document}");
       newBody = newBody.split("\\end{document}")[0].trim();

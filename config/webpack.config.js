@@ -622,7 +622,14 @@ module.exports = function (webpackEnv) {
           },
         ],
       }),
-
+      new CopyWebpackPlugin({
+        patterns: [
+          {
+            from: "src/features/latexEditor/frog.jpg",
+            to: "static/media",
+          },
+        ],
+      }),
       new HtmlWebpackPlugin(
         Object.assign(
           {},
