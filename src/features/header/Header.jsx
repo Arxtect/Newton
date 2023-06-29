@@ -18,7 +18,7 @@ export const Header = () => {
   return (
     <header className="flex justify-between items-center mb-3">
       <Box sx={{ flexGrow: 1 }}>
-        <AppBar position="static" className="bg-primary">
+        <AppBar position="static">
           <Toolbar>
             <IconButton
               size="large"
@@ -30,9 +30,9 @@ export const Header = () => {
               <MenuIcon />
             </IconButton>
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              <div className="text-black font-light	">LaTeX</div>
+              <div className="text-black font-medium">LaTeX</div>
             </Typography>
-            <Button className="text-black font-normal	">Login</Button>
+            <Button className="text-black font-normal">Login</Button>
           </Toolbar>
         </AppBar>
       </Box>

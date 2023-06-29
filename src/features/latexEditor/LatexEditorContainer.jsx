@@ -31,7 +31,10 @@ export const LatexEditorContainer = () => {
   };
 
   useEffect(() => {
-    handleChange(demo);
+    let [newPreamble, newBody] = demo.split("\\begin{document}");
+    newBody = newBody.split("\\end{document}")[0].trim();
+    dispatch(setPreamble(newPreamble + "\\begin{document}\n\n"));
+    dispatch(setBody(newBody));
   }, []);
 
   return (

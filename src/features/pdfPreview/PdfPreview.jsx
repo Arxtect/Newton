@@ -14,7 +14,7 @@ export const PdfPreview = () => {
   const showCompilerLog = useSelector(selectShowCompilerLog);
 
   const formattedCompilerLog = (
-    <p className="min-h-[80vh] max-h-[80vh] border border-black p-2 font-mono overflow-y-scroll">
+    <p className="min-h-[85vh] max-h-[100vh] border border-black p-2 font-mono overflow-y-scroll">
       <b>Compiler Log:</b>
       <br />
       <br />
@@ -26,7 +26,7 @@ export const PdfPreview = () => {
       src={pdfUrl}
       width="100%"
       type="application/pdf"
-      className="min-h-[80vh] border border-black"
+      className="min-h-[85vh] border border-black"
     ></embed>
   );
 
