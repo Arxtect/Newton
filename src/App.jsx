@@ -23,7 +23,7 @@ const App = () => {
 
   // The actual app
   return (
-    <main>
+    <main className="max-w-[99vw] m-[auto]">
       <ButtonBarContainer />
       <SplitPane>
         <LatexEditorContainer />

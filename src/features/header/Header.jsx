@@ -16,23 +16,23 @@ import { Menu as MenuIcon } from "@mui/icons-material";
 
 export const Header = () => {
   return (
-    <header className="flex justify-between items-center mb-4">
+    <header className="flex justify-between items-center mb-3">
       <Box sx={{ flexGrow: 1 }}>
         <AppBar position="static" className="bg-primary">
           <Toolbar>
             <IconButton
               size="large"
               edge="start"
-              color="inherit"
+              color="primary"
               aria-label="menu"
               sx={{ mr: 2 }}
             >
               <MenuIcon />
             </IconButton>
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              <div>LaTeX</div>
+              <div className="text-black font-light	">LaTeX</div>
             </Typography>
-            <Button color="inherit">Login</Button>
+            <Button className="text-black font-normal	">Login</Button>
           </Toolbar>
         </AppBar>
       </Box>
