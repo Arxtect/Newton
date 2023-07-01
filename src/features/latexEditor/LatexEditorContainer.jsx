@@ -37,6 +37,10 @@ export const LatexEditorContainer = () => {
     dispatch(setBody(newBody));
   }, []);
 
+  useEffect(() => {
+    console.log("body", body);
+  }, [body]);
+
   return (
     <LatexEditor
       handleChange={handleChange}

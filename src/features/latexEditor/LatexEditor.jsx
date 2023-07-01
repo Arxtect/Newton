@@ -21,6 +21,9 @@ import ReactQuill, { Quill } from "react-quill";
 import QuillCursors from "quill-cursors";
 import "react-quill/dist/quill.core.css";
 import "react-quill/dist/quill.snow.css";
+import "react-quill/dist/quill.bubble.css";
+import hljs from "highlight.js";
+import "highlight.js/styles/github.css";
 
 //yjs
 import { routerQuery, getRandomColor } from "../../util";
@@ -49,7 +52,7 @@ export const LatexEditor = ({ handleChange, sourceCode }) => {
   // const { yText, undoManager } = useYText({ name: LATEX_NAME, doc });
   // const [fragments, setFragments] = useState([]);
 
-  // const body = useSelector(selectBody);
+  const body = useSelector(selectBody);
   // const fullSourceCode = useSelector(selectFullSourceCode);
   // const showFullSource = useSelector(selectShowFullSourceCode);
 
@@ -169,9 +172,8 @@ export const LatexEditor = ({ handleChange, sourceCode }) => {
     // const container = document.getElementById("editor");
     // const quillEditor = new QuillEditor(container);
     const ydoc = new Ydoc();
-    console.log(latexRef.current.editor.selection, Quill, "213");
     // ydoc.bindEditor(quillEditor.load());
-    ydoc.bindEditor(latexRef.current.editor);
+    // ydoc.bindEditor(latexRef.current.editor);
     window.ydoc = ydoc;
   }, []);
 
@@ -203,18 +205,20 @@ export const LatexEditor = ({ handleChange, sourceCode }) => {
           },
         }}
         theme="snow"
-        ref={latexRef}
+        // ref={latexRef}
         style={{ height: " 78.8vh" }}
         value={sourceCode}
         onChange={handleChange}
-        formats={[
-          "math-latex",
-          "math-latex",
-          "bold",
-          "italic",
-          "underline",
-          "strike",
-        ]}
+        formats={["latex"]}
+        // readOnly={true}
+        // formats={[
+        //   "math-latex",
+        //   "math-latex",
+        //   "bold",
+        //   "italic",
+        //   "underline",
+        //   "strike",
+        // ]}
       ></ReactQuill>
     </div>
   );
