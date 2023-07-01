@@ -30,26 +30,6 @@ export const LatexEditorContainer = () => {
     }
   };
 
-  // const handleChange = useCallback(
-  //   (editorValue) => {
-  //     let sourceCode = showFullSource ? fullSourceCode : body;
-  //     // console.log(sourceCode, "123", sourceCode != editorValue);
-  //     if (sourceCode != editorValue) {
-  //       let [newPreamble, newBody] = editorValue?.split("\\begin{document}");
-  //       newBody = newBody?.split("\\end{document}")[0].trim();
-  //       dispatch(setPreamble(newPreamble + "\\begin{document}\n\n"));
-  //       dispatch(setBody(newBody));
-  //     } else {
-  //       dispatch(setBody(editorValue));
-  //     }
-  //   },
-  //   [showFullSource, body, fullSourceCode]
-  // );
-
-  // useEffect(() => {
-  //   console.log(body, "fullSourceCode");
-  // }, [body]);
-
   useEffect(() => {
     let [newPreamble, newBody] = demo.split("\\begin{document}");
     newBody = newBody.split("\\end{document}")[0].trim();
