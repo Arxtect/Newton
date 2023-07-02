@@ -3,7 +3,7 @@
  * @Author: Devin
  * @Date: 2023-06-26 09:57:49
  */
-import { useEffect, useRef, useState } from "react";
+import React, { useLayoutEffect, useRef, useState } from "react";
 import AceEditor from "react-ace";
 import "ace-builds/src-noconflict/mode-latex";
 import "ace-builds/src-noconflict/theme-github";
@@ -26,16 +26,17 @@ import { WebsocketProvider } from "y-websocket";
 
 import latexSyncToYText from "./latexSyncToYText";
 import useYText from "../..//useHooks/useYText";
+import { AceBinding } from "./y-ace";
 
 //constants
-const LATEX_NAME = "<lat2ex->11111111111->";
-const ROOM_NAME = "latex-12111211123121s1ss";
+const LATEX_NAME = "<laa->";
+const ROOM_NAME = "lat211saa";
 
 const doc = new Y.Doc();
 // @ts-ignore
 window.doc = doc;
 
-export const LatexEditor = ({ handleChange, sourceCode }) => {
+const LatexEditor = ({ handleChange, sourceCode }) => {
   const latexRef = useRef(null);
   const { yText, undoManager } = useYText({ name: LATEX_NAME, doc });
   const [fragments, setFragments] = useState([]);
@@ -44,8 +45,7 @@ export const LatexEditor = ({ handleChange, sourceCode }) => {
   const fullSourceCode = useSelector(selectFullSourceCode);
   const showFullSource = useSelector(selectShowFullSourceCode);
 
-  useEffect(() => {
-    if (window.yText) return;
+  useLayoutEffect(() => {
     const db = new IndexeddbPersistence("latexDemo", doc);
     // db.on("synced", (idbPersistence) => {
     //   if (latexRef.current) {
@@ -65,68 +65,48 @@ export const LatexEditor = ({ handleChange, sourceCode }) => {
       }
     });
 
-    const { awareness } = wsProvider;
-    awareness.setLocalState({
-      user: {
-        name:
-          routerQuery().username ?? `游客${Date.now().toString().slice(-5)}`,
-        color: getRandomColor(),
-        id: doc.clientID,
-      },
-      selectionRange: [0, 0],
-    });
-    awareness.on("change", (changes) => {
-      let currentStates = Array.from(awareness.getStates().values());
-      const text = yText.toString();
-      let _fragments = [];
-      let lastPosition = 0;
-      if (currentStates.length > 1) {
-        currentStates = currentStates.sort(
-          (state1, state2) =>
-            state1.selectionRange[0] - state2.selectionRange[0]
-        );
+    window.wsProvider = wsProvider;
+    console.log(window.wsProvider, "321");
+
+    const type = doc.getText(ROOM_NAME);
+
+    const binding = new AceBinding(
+      type,
+      latexRef.current.editor,
+      wsProvider.awareness
+    );
+
+    window.binding = binding;
+
+    let user = {
+      name: "user:" + Math.random().toString(36).substring(7),
+      color: "#" + Math.floor(Math.random() * 16777215).toString(16),
+    };
+
+    // Define user name and user name
+    wsProvider.awareness.setLocalStateField("user", user);
+
+    wsProvider.awareness.on("change", function () {
+      let userCount = wsProvider.awareness.getStates().size;
+      let userIcon = "👤 ";
+      if (userCount > 1) {
+        userIcon = "👥 ";
       }
-      currentStates.forEach((state) => {
-        const { selectionRange, user } = state;
-        if (selectionRange && user.id !== doc.clientID) {
-          const [cursorPosition, end] = selectionRange;
-          if (cursorPosition === lastPosition) {
-            return;
-          }
-          const content = text.slice(lastPosition, cursorPosition);
-          lastPosition = cursorPosition;
-          _fragments.push(
-            <div className="fake-content hidden" key={user.id}>
-              {content}
-            </div>
-          );
-          _fragments.push(
-            <span
-              className="cursor"
-              key={`${user.id}-cursor`}
-              // @ts-ignore
-              style={{ "--cursor-color": user.color }}
-            >
-              <div className="cursor-label">{user.name}</div>
-            </span>
-          );
-        }
-      });
-      setFragments(_fragments);
+      document.getElementById("users").innerHTML =
+        userIcon + userCount + " users";
     });
-    let unlisten = () => {};
-    if (latexRef.current.editor) {
-      unlisten = latexSyncToYText({
-        yText,
-        latex: latexRef.current.editor,
-        undoManager,
-        awareness,
-        handleChange,
-      });
-    }
+
+    // if (latexRef.current.editor) {
+    //   unlisten = latexSyncToYText({
+    //     yText,
+    //     latex: latexRef.current.editor,
+    //     undoManager,
+    //     awareness,
+    //     handleChange,
+    //   });
+    // }
     return () => {
       wsProvider.destroy();
-      unlisten && unlisten();
     };
   }, []);
 
@@ -147,6 +127,9 @@ export const LatexEditor = ({ handleChange, sourceCode }) => {
         ref={latexRef}
       ></AceEditor>
       {/* <div className="input overlay">{fragments}</div> */}
+      <div id="users"></div>
     </div>
   );
 };
+
+export default React.memo(LatexEditor);

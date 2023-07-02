@@ -2,7 +2,7 @@
 import { useEffect, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 // Components
-import { LatexEditor } from "./LatexEditor";
+import LatexEditor from "./LatexEditor";
 // Redux
 import {
   setPreamble,
@@ -30,12 +30,13 @@ export const LatexEditorContainer = () => {
     }
   };
 
-  useEffect(() => {
-    let [newPreamble, newBody] = demo.split("\\begin{document}");
-    newBody = newBody.split("\\end{document}")[0].trim();
-    dispatch(setPreamble(newPreamble + "\\begin{document}\n\n"));
-    dispatch(setBody(newBody));
-  }, []);
+  // useEffect(() => {
+  //   if (body) return;
+  //   let [newPreamble, newBody] = demo.split("\\begin{document}");
+  //   newBody = newBody.split("\\end{document}")[0].trim();
+  //   dispatch(setPreamble(newPreamble + "\\begin{document}\n\n"));
+  //   dispatch(setBody(newBody));
+  // }, []);
 
   return (
     <LatexEditor
