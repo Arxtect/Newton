@@ -45,6 +45,7 @@ export const LatexEditor = ({ handleChange, sourceCode }) => {
   const showFullSource = useSelector(selectShowFullSourceCode);
 
   useEffect(() => {
+    if (window.yText) return;
     const db = new IndexeddbPersistence("latexDemo", doc);
     // db.on("synced", (idbPersistence) => {
     //   if (latexRef.current) {
@@ -115,45 +116,19 @@ export const LatexEditor = ({ handleChange, sourceCode }) => {
     });
     let unlisten = () => {};
     if (latexRef.current.editor) {
-      const [yDoc, _yText, unlistens] = latexSyncToYText({
+      unlisten = latexSyncToYText({
         yText,
         latex: latexRef.current.editor,
         undoManager,
         awareness,
         handleChange,
       });
-      unlisten = unlistens;
-      //   yDoc.transact(() => {
-      //     // if (range[0] !== range[1]) {
-      //     //   const deleteLength = range[1] - range[0];
-      //     //   yText.delete(range[0], deleteLength);
-      //     // }
-      //     // _yText.insert(range[0], lines[0] || "");
-      //     //假设yText已经被初始化为了一个Y.Text实例
-
-      //     let length = _yText.toString()?.length;
-      //     console.log(_yText.toString()?.length, "123");
-
-      //     new Promise((resolve, reject) => {
-      //       _yText.delete(0, length);
-      //       resolve();
-      //     }).then(() => {
-      //       console.log(_yText.toString(), "de");
-      //       //在位置插入新内容
-      //       _yText.insert(0, sourceCode);
-      //     });
-      //   }, yDoc.clientID);
     }
     return () => {
       wsProvider.destroy();
-      unlisten();
+      unlisten && unlisten();
     };
   }, []);
-
-  // useEffect(() => {
-  //   console.log("sourceCode", sourceCode);
-
-  // }, [body]);
 
   return (
     <div>
@@ -171,7 +146,7 @@ export const LatexEditor = ({ handleChange, sourceCode }) => {
         className="border border-black"
         ref={latexRef}
       ></AceEditor>
-      <div className="input overlay">{fragments}</div>
+      {/* <div className="input overlay">{fragments}</div> */}
     </div>
   );
 };

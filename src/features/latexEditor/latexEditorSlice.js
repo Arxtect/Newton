@@ -5,7 +5,7 @@ const options = {
   initialState: {
     preamble: '',
     body: '',
-    end: '',
+    end: '\n\n\\end{document}',
     showFullSourceCode: false
   },
   reducers: {

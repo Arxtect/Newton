@@ -42,6 +42,7 @@ function latexSyncToYText({
     );
     if (origin instanceof WebsocketProvider) {
       handleChange(yText.toString());
+      undoManager.undo();
       console.log(yText.toString(), "yText.toString()");
       // handleChange(yText.toString() || "");
       // const absPos1 = Y.createAbsolutePositionFromRelativePosition(
@@ -76,11 +77,12 @@ function latexSyncToYText({
         let length = yText.toString().length;
         new Promise((resolve, reject) => {
           yText.delete(0, length);
+          undoManager.redo();
           resolve();
         }).then(() => {
-          console.log(yText.toString(), "de", getVal());
+          console.log(yText.toString(), "de");
           //在位置插入新内容
-          yText.insert(0, getVal());
+          // yText.insert(0, getVal());
         });
 
         //在位置插入新内容
@@ -89,6 +91,7 @@ function latexSyncToYText({
       yDoc.transact(() => {
         let length = yText.toString().length;
         yText.delete(0, length);
+        undoManager.undo();
         yText.insert(0, getVal());
       }, yDoc.clientID);
     } else if (action === "historyUndo") {
