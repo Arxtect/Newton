@@ -22,8 +22,8 @@ import { AceBinding } from "./y-ace";
 import demo from "./demo";
 import { useSelector, useDispatch } from "react-redux";
 //constants
-const LATEX_NAME = "<laa111-111>";
-const ROOM_NAME = "lat211ss111saa";
+const LATEX_NAME = "latex-demo";
+const ROOM_NAME = "latex-demo";
 
 const doc = new Y.Doc();
 // @ts-ignore
