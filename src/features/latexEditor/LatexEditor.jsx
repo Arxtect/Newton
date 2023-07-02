@@ -9,17 +9,9 @@ import "ace-builds/src-noconflict/mode-latex";
 import "ace-builds/src-noconflict/theme-github";
 import "ace-builds/src-noconflict/theme-monokai";
 import "ace-builds/src-noconflict/ext-language_tools";
-import { useSelector, useDispatch } from "react-redux";
-import {
-  setPreamble,
-  setBody,
-  selectBody,
-  selectFullSourceCode,
-  selectShowFullSourceCode,
-} from "./latexEditorSlice";
-
 //yjs
 import { routerQuery, getRandomColor } from "../../util";
+import { setBody } from "./latexEditorSlice";
 import * as Y from "yjs";
 import { IndexeddbPersistence } from "y-indexeddb";
 import { WebsocketProvider } from "y-websocket";
@@ -27,10 +19,11 @@ import { WebsocketProvider } from "y-websocket";
 import latexSyncToYText from "./latexSyncToYText";
 import useYText from "../..//useHooks/useYText";
 import { AceBinding } from "./y-ace";
-
+import demo from "./demo";
+import { useSelector, useDispatch } from "react-redux";
 //constants
-const LATEX_NAME = "<laa->";
-const ROOM_NAME = "lat211saa";
+const LATEX_NAME = "<laa111-111>";
+const ROOM_NAME = "lat211ss111saa";
 
 const doc = new Y.Doc();
 // @ts-ignore
@@ -40,10 +33,7 @@ const LatexEditor = ({ handleChange, sourceCode }) => {
   const latexRef = useRef(null);
   const { yText, undoManager } = useYText({ name: LATEX_NAME, doc });
   const [fragments, setFragments] = useState([]);
-
-  const body = useSelector(selectBody);
-  const fullSourceCode = useSelector(selectFullSourceCode);
-  const showFullSource = useSelector(selectShowFullSourceCode);
+  const dispatch = useDispatch();
 
   useLayoutEffect(() => {
     const db = new IndexeddbPersistence("latexDemo", doc);
@@ -91,6 +81,8 @@ const LatexEditor = ({ handleChange, sourceCode }) => {
       let userIcon = "👤 ";
       if (userCount > 1) {
         userIcon = "👥 ";
+      } else {
+        dispatch(setBody(demo));
       }
       document.getElementById("users").innerHTML =
         userIcon + userCount + " users";
