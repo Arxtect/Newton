@@ -10,13 +10,7 @@ import "ace-builds/src-noconflict/theme-github";
 import "ace-builds/src-noconflict/theme-monokai";
 import "ace-builds/src-noconflict/ext-language_tools";
 import { useSelector, useDispatch } from "react-redux";
-import {
-  setPreamble,
-  setBody,
-  selectBody,
-  selectFullSourceCode,
-  selectShowFullSourceCode,
-} from "./latexEditorSlice";
+import { setBody, selectBody } from "./latexEditorSlice";
 import ReactQuill, { Quill } from "react-quill";
 import QuillCursors from "quill-cursors";
 import "react-quill/dist/quill.core.css";
@@ -38,8 +32,8 @@ import QuillEditor from "./quill";
 import Ydoc from "./ydoc";
 
 //constants
-const LATEX_NAME = "<lat2ex->11111111111->";
-const ROOM_NAME = "latex-12111211123121s1ss";
+const LATEX_NAME = "latex-quill";
+const ROOM_NAME = "room-quill";
 
 const doc = new Y.Doc();
 // @ts-ignore
@@ -47,12 +41,13 @@ window.doc = doc;
 
 Quill.register("modules/cursors", QuillCursors);
 
-export const LatexEditor = ({ handleChange, sourceCode }) => {
+export const LatexEditor = ({ sourceCode }) => {
   const latexRef = useRef(null);
+  const dispatch = useDispatch();
   // const { yText, undoManager } = useYText({ name: LATEX_NAME, doc });
-  // const [fragments, setFragments] = useState([]);
+  const [fragments, setFragments] = useState([]);
 
-  const body = useSelector(selectBody);
+  // const body = useSelector(selectBody);
   // const fullSourceCode = useSelector(selectFullSourceCode);
   // const showFullSource = useSelector(selectShowFullSourceCode);
 
@@ -162,10 +157,12 @@ export const LatexEditor = ({ handleChange, sourceCode }) => {
   //   };
   // }, []);
 
-  // useEffect(() => {
-  //   console.log("sourceCode", sourceCode);
-
-  // }, [body]);
+  const handleChange = (value) => {
+    if (!latexRef.current) return;
+    const text = latexRef.current.editor.getText();
+    console.log(text, "text");
+    dispatch(setBody(text));
+  };
 
   useEffect(() => {
     if (!latexRef.current || window.ydoc) return;
@@ -173,7 +170,7 @@ export const LatexEditor = ({ handleChange, sourceCode }) => {
     // const quillEditor = new QuillEditor(container);
     const ydoc = new Ydoc();
     // ydoc.bindEditor(quillEditor.load());
-    // ydoc.bindEditor(latexRef.current.editor);
+    ydoc.bindEditor(latexRef.current.editor);
     window.ydoc = ydoc;
   }, []);
 
@@ -205,9 +202,9 @@ export const LatexEditor = ({ handleChange, sourceCode }) => {
           },
         }}
         theme="snow"
-        // ref={latexRef}
+        ref={latexRef}
         style={{ height: " 78.8vh" }}
-        value={sourceCode}
+        // value={sourceCode}
         onChange={handleChange}
         formats={["latex"]}
         // readOnly={true}

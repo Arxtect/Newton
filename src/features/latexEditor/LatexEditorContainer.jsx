@@ -5,46 +5,47 @@ import { useSelector, useDispatch } from "react-redux";
 import { LatexEditor } from "./LatexEditor";
 // Redux
 import {
-  setPreamble,
+  // setPreamble,
   setBody,
   selectBody,
-  selectFullSourceCode,
-  selectShowFullSourceCode,
+  // selectFullSourceCode,
+  // selectShowFullSourceCode,
 } from "./latexEditorSlice";
 import demo from "./demo";
 
 export const LatexEditorContainer = () => {
   const body = useSelector(selectBody);
-  const fullSourceCode = useSelector(selectFullSourceCode);
-  const showFullSource = useSelector(selectShowFullSourceCode);
+  // const fullSourceCode = useSelector(selectFullSourceCode);
+  // const showFullSource = useSelector(selectShowFullSourceCode);
   const dispatch = useDispatch();
 
-  const handleChange = (editorValue) => {
-    if (showFullSource) {
-      let [newPreamble, newBody] = editorValue.split("\\begin{document}");
-      newBody = newBody.split("\\end{document}")[0].trim();
-      dispatch(setPreamble(newPreamble + "\\begin{document}\n\n"));
-      dispatch(setBody(newBody));
-    } else {
-      dispatch(setBody(editorValue));
-    }
-  };
+  // const handleChange = (editorValue) => {
+  //   // if (showFullSource) {
+  //   //   let [newPreamble, newBody] = editorValue.split("\\begin{document}");
+  //   //   newBody = newBody.split("\\end{document}")[0].trim();
+  //   //   dispatch(setPreamble(newPreamble + "\\begin{document}\n\n"));
+  //   //   dispatch(setBody(newBody));
+  //   // } else {
+  //   dispatch(setBody(editorValue));
+  //   // }
+  // };
 
-  useEffect(() => {
-    let [newPreamble, newBody] = demo.split("\\begin{document}");
-    newBody = newBody.split("\\end{document}")[0].trim();
-    dispatch(setPreamble(newPreamble + "\\begin{document}\n\n"));
-    dispatch(setBody(newBody));
-  }, []);
+  // useEffect(() => {
+  //   let [newPreamble, newBody] = demo.split("\\begin{document}");
+  //   newBody = newBody.split("\\end{document}")[0].trim();
+  //   dispatch(setPreamble(newPreamble + "\\begin{document}\n\n"));
+  //   dispatch(setBody(newBody));
+  // }, []);
 
-  useEffect(() => {
-    console.log("body", body);
-  }, [body]);
+  // useEffect(() => {
+  //   console.log("body", body);
+  // }, [body]);
 
   return (
     <LatexEditor
-      handleChange={handleChange}
-      sourceCode={showFullSource ? fullSourceCode : body}
+      // handleChange={handleChange}
+      // sourceCode={showFullSource ? fullSourceCode : body}
+      sourceCode={body}
     />
   );
 };

@@ -41,7 +41,7 @@ class QuillEditor {
                     userOnly: true
                 }
             },
-            placeholder: 'just type anything...',
+            placeholder: 'latex ediotr...',
             theme: 'snow'
         });
     }
