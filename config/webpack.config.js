@@ -565,6 +565,9 @@ module.exports = function (webpackEnv) {
       ].filter(Boolean),
     },
     plugins: [
+      // new webpack.ProvidePlugin({
+      //   "window.hljs": "highlight.js",
+      // }),
       // Generates an `index.html` file with the <script> injected.
       new CopyWebpackPlugin({
         patterns: [

@@ -17,6 +17,7 @@ import store from "./store";
 import { lazy, Suspense } from "react";
 import "./styles/globals.scss";
 
+
 const App = lazy(() => import("./App"));
 
 const root = ReactDOM.createRoot(document.getElementById("root"));

@@ -3,7 +3,7 @@ import { QuillBinding } from "y-quill";
 import { WebsocketProvider } from "y-websocket";
 
 const YJS_SERVER = 'ws://10.10.99.98:9000';
-const ROOM = 'late1x-quill';
+const ROOM = 'late1x-quill-dev';
 
 class Ydoc {
     #ydoc = new Y.Doc();
