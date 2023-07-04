@@ -588,6 +588,14 @@ module.exports = function (webpackEnv) {
       new CopyWebpackPlugin({
         patterns: [
           {
+            from: "src/assets",
+            to: "assets",
+          },
+        ],
+      }),
+      new CopyWebpackPlugin({
+        patterns: [
+          {
             from: "node_modules/ace-builds/src-min-noconflict/mode-latex.js",
             to: "static/js",
           },

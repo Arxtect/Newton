@@ -18,6 +18,7 @@ import QuillCursors from "quill-cursors";
 import "react-quill/dist/quill.core.css";
 import "react-quill/dist/quill.snow.css";
 import "react-quill/dist/quill.bubble.css";
+import CodeSyntax from "./codeSyntax";
 
 //yjs
 import { routerQuery, getRandomColor } from "../../util";
@@ -30,7 +31,6 @@ import useYText from "../..//useHooks/useYText";
 
 import QuillEditor from "./quill";
 import Ydoc from "./ydoc";
-import { document } from "postcss";
 
 //constants
 const LATEX_NAME = "latex-quill";
@@ -40,7 +40,10 @@ const doc = new Y.Doc();
 // @ts-ignore
 window.doc = doc;
 
+const Delta = Quill.import("delta"); // 导入 Delta 对象
+
 Quill.register("modules/cursors", QuillCursors);
+// Quill.register("modules/syntax", CodeSyntax, false);
 
 export const LatexEditor = ({ sourceCode }) => {
   const latexRef = useRef(null);
@@ -161,43 +164,41 @@ export const LatexEditor = ({ sourceCode }) => {
   const handleChange = (value) => {
     if (!latexRef.current) return;
     const text = latexRef.current.editor.getText();
-    // console.log(text, "text");
     dispatch(setBody(text));
   };
 
   useEffect(() => {
     if (!latexRef.current || window.ydoc) return;
 
-    const codeBlocks = window.document.getElementsByClassName("ql-editor")[0];
     // const container = document.getElementById("editor");
     // const quillEditor = new QuillEditor(container);
     const ydoc = new Ydoc();
     // ydoc.bindEditor(quillEditor.load());
     ydoc.bindEditor(latexRef.current.editor);
     console.log(latexRef.current.editor, "latexRef.current.editor");
-
-    window.hljs.highlightElement(codeBlocks);
-
     window.ydoc = ydoc;
   }, []);
 
-  const formats = [
-    "header",
-    "font",
-    "size",
-    "bold",
-    "italic",
-    "underline",
-    "strike",
-    "blockquote",
-    "list",
-    "bullet",
-    "indent",
-    "link",
-    "image",
-    "video",
-    "code-block",
-  ];
+  const formats = ["code-block"];
+
+  const formatAllContentToCodeBlock = () => {
+    const editor = latexRef.current.getEditor();
+    const length = editor.getLength();
+    const content = editor.getText();
+    const delta = editor.getContents();
+
+    const codeBlockDelta = new Delta()
+      .retain(length)
+      .format("code-block", true);
+    const newDelta = delta.compose(codeBlockDelta);
+
+    editor.updateContents(newDelta);
+    editor.blur(); // 确保编辑器失去焦点以便继续操作
+
+    // 或者使用以下方法，根据需求选择其中一种方式：
+    // editor.setContents(newDelta);
+    // editor.setSelection(null);
+  };
 
   return (
     <div>
@@ -219,29 +220,31 @@ export const LatexEditor = ({ sourceCode }) => {
       {/* {fragments} */}
       {/* </div> */}
       <ReactQuill
-        placeholder="just type anything..."
+        placeholder="latex editor..."
         modules={{
           syntax: true,
-          // syntax: {
-          //   highlight: (text) => {
-          //     console.log(window.hljs.highlight("latex", text), "highlighted");
-          //     const highlighted = window.hljs.highlight("latex", text).value;
-          //     return highlighted;
-          //   },
-          // },
           cursors: true,
           history: {
             userOnly: true,
           },
+          toolbar: [["code-block"]],
+          keyboard: {
+            bindings: {
+              formatAllContentToCodeBlock: {
+                key: "S",
+                shortKey: true,
+                handler: formatAllContentToCodeBlock,
+              },
+            },
+          },
         }}
         theme="bubble"
         ref={latexRef}
-        style={{ height: " 78.8vh" }}
+        style={{ height: "84.8vh", border: " 1px solid" }}
         // value={sourceCode}
         onChange={handleChange}
         // formats={formats}
         readOnly={false}
-        // formats={["latex"]}
       ></ReactQuill>
     </div>
   );

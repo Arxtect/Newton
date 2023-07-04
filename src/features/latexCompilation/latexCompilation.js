@@ -19,7 +19,7 @@ export const initializeLatexEngines = async () => {
     await dviEngine.loadEngine();
     // Set the engine status to be ready
     store.dispatch(setReadyEngineStatus());
-  } catch (e) {}
+  } catch (e) { }
 }
 
 export const compileLatex = async (latexCode) => {
@@ -46,12 +46,17 @@ export const compileLatex = async (latexCode) => {
   if (xetexCompilation.status === 0) {
     // Create a temporary main.xdv file from the XeTeX compilation result
     dviEngine.writeMemFSFile("main.xdv", xetexCompilation.pdf);
+
+    let downloadReq = await fetch('assets/frog.jpg');
+    let imageBlob = await downloadReq.arrayBuffer();
+    dviEngine.writeMemFSFile("troll.jpg", new Uint8Array(imageBlob));
+
     // Associate the DviPdfMx engine with this main.xdv file
     dviEngine.setEngineMainFile("main.xdv");
     // Compile the main.tex file
     let dviCompilation = await dviEngine.compilePDF();
     // Create a blob out of the resulting PDF
-    const pdfBlob = new Blob([dviCompilation.pdf], {type : 'application/pdf'});
+    const pdfBlob = new Blob([dviCompilation.pdf], { type: 'application/pdf' });
     // Create a temporary URL to this PDF blob
     store.dispatch(setCompiledPdfUrl(URL.createObjectURL(pdfBlob)));
     store.dispatch(setShowCompilerLog(false));
