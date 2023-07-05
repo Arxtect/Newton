@@ -21,19 +21,19 @@ const App = lazy(() => import("./App"));
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  // <React.StrictMode>
-  <Provider store={store}>
-    <BrowserRouter>
-      <Header />
-      <Suspense fallback={<div>Loading...</div>}>
-        <Routes>
-          <Route active path="/" element={<App />}></Route>
-        </Routes>
-      </Suspense>
-      <Footer />
-    </BrowserRouter>
-  </Provider>
-  // </React.StrictMode>
+  <React.StrictMode>
+    <Provider store={store}>
+      <BrowserRouter>
+        <Header />
+        <Suspense fallback={<div>Loading...</div>}>
+          <Routes>
+            <Route active path="/" element={<App />}></Route>
+          </Routes>
+        </Suspense>
+        <Footer />
+      </BrowserRouter>
+    </Provider>
+  </React.StrictMode>
 );
 
 reportWebVitals();

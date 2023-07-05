@@ -1,11 +1,11 @@
-let latexCode = `\\documentclass{article}
+const latexCode = `\\documentclass{article}
 
 % Language setting
-% Replace \`english' with e.g. \`spanish' to change the document language
+% Replace 'english' with e.g. 'spanish' to change the document language
 \\usepackage[english]{babel}
 
 % Set page size and margins
-% Replace \`letterpaper' with \`a4paper' for UK/EU standard size
+% Replace 'letterpaper' with 'a4paper' for UK/EU standard size
 \\usepackage[letterpaper,top=2cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
 
 % Useful packages
@@ -85,10 +85,10 @@ You can make lists with automatic numbering \\dots
 
 \\subsection{How to write Mathematics}
 
-\\LaTeX{} is great at typesetting mathematics. Let $X_1, X_2, \\ldots, X_n$ be a sequence of independent and identically distributed random variables with $\\text{E}[X_i] = \\mu$ and $\\text{Var}[X_i] = \\sigma^2 < \\infty$, and let
+\\LaTeX{} is great at typesetting mathematics. Let \$X_1, X_2, \\ldots, X_n\$ be a sequence of independent and identically distributed random variables with \$\\text{E}[X_i] = \\mu\$ and \$\\text{Var}[X_i] = \\sigma^2 < \\infty\$, and let
 \\[S_n = \\frac{X_1 + X_2 + \\cdots + X_n}{n}
       = \\frac{1}{n}\\sum_{i}^{n} X_i\\]
-denote their mean. Then as $n$ approaches infinity, the random variables $\\sqrt{n}(S_n - \\mu)$ converge in distribution to a normal $\\mathcal{N}(0, \\sigma^2)$.
+denote their mean. Then as \$n\$ approaches infinity, the random variables \$\\sqrt{n}(S_n - \\mu)\$ converge in distribution to a normal \$\\mathcal{N}(0, \\sigma^2)\$.
 
 
 \\subsection{How to change the margins and paper size}
