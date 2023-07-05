@@ -22,8 +22,8 @@ import { AceBinding } from "./y-ace";
 import demo from "./demo";
 import { useSelector, useDispatch } from "react-redux";
 //constants
-const LATEX_NAME = "latex-demo";
-const ROOM_NAME = "latex-demo";
+const LATEX_NAME = "latex-demo1";
+const ROOM_NAME = "latex-demo1";
 
 const doc = new Y.Doc();
 // @ts-ignore
@@ -82,7 +82,7 @@ const LatexEditor = ({ handleChange, sourceCode }) => {
       if (userCount > 1) {
         userIcon = "👥 ";
       } else {
-        dispatch(setBody(demo));
+        // dispatch(setBody(demo));
       }
       document.getElementById("users").innerHTML =
         userIcon + userCount + " users";
