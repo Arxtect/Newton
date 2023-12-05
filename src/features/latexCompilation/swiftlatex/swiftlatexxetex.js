@@ -5,7 +5,7 @@ var Module = {};
 self.memlog = "";
 self.initmem = undefined;
 self.mainfile = "main.tex";
-self.texlive_endpoint = "http://10.10.99.98:5001/";
+self.texlive_endpoint = "http://206.190.239.91:5000/";
 Module["print"] = function (a) {
   self.memlog += a + "\n";
 };
