@@ -117,4 +117,4 @@ We hope you find Overleaf useful, and do take a look at our \\href{https://www.o
 
 \\end{document}`;
 
-export default latexCode
+export default latexCode;

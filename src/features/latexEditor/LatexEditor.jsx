@@ -44,7 +44,7 @@ const LatexEditor = ({ handleChange, sourceCode }) => {
     // });
 
     const wsProvider = new WebsocketProvider(
-      "ws://10.10.99.98:9000",
+      "ws://206.190.239.91:9000",
       ROOM_NAME,
       doc,
       { connect: true }

@@ -59,6 +59,7 @@ export const compileLatex = async (latexCode) => {
     "nsim.eps",
     "SREP-19-29377-T.dvi",
     "SREP-19-29377-T.ps",
+    "frog.jpg",
   ];
 
   for (let i = 0; i < list.length; i++) {
