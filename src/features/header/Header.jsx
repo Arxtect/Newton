@@ -30,7 +30,7 @@ export const Header = () => {
               <MenuIcon />
             </IconButton>
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              <div className="text-black font-medium">LaTeX</div>
+              <div className="text-black font-medium">arXtect</div>
             </Typography>
             <Button className="text-black font-normal">Login</Button>
           </Toolbar>
