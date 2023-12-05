@@ -51,14 +51,14 @@ export const compileLatex = async (latexCode) => {
   xetexEngine.writeMemFSFile("main.tex", latexCode);
 
   const list = [
-    "eg.eps",
-    "fancyplot.eps",
-    "exp.eps",
-    "expfig.eps",
-    "fsim.eps",
-    "nsim.eps",
-    "SREP-19-29377-T.dvi",
-    "SREP-19-29377-T.ps",
+    // "eg.eps",
+    // "fancyplot.eps",
+    // "exp.eps",
+    // "expfig.eps",
+    // "fsim.eps",
+    // "nsim.eps",
+    // "SREP-19-29377-T.dvi",
+    // "SREP-19-29377-T.ps",
     "frog.jpg",
   ];
 
