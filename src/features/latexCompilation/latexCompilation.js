@@ -6,7 +6,7 @@
 // SwiftLaTeX engines
 import { DvipdfmxEngine } from "./swiftlatex/DvipdfmxEngine";
 import { XeTeXEngine } from "./swiftlatex/XeTeXEngine";
-import { convertEPStoJPEG } from "./convertEps";
+import { getJPEGDataUrl } from "./convertEps";
 
 // Redux store and actions
 import store from "../../store";
@@ -51,14 +51,14 @@ export const compileLatex = async (latexCode) => {
   xetexEngine.writeMemFSFile("main.tex", latexCode);
 
   const list = [
-    "eg.eps",
-    "fancyplot.eps",
-    "exp.eps",
-    "expfig.eps",
-    "fsim.eps",
-    "nsim.eps",
-    "SREP-19-29377-T.dvi",
-    "SREP-19-29377-T.ps",
+    // "eg.eps",
+    // "fancyplot.eps",
+    // "exp.eps",
+    // "expfig.eps",
+    // "fsim.eps",
+    // "nsim.eps",
+    // "SREP-19-29377-T.dvi",
+    // "SREP-19-29377-T.ps",
     "frog.jpg",
   ];
 
@@ -87,7 +87,7 @@ export const compileLatex = async (latexCode) => {
     for (let i = 0; i < list.length; i++) {
       let downloadReq;
       if (list[i].includes("eps")) {
-        const res = await convertEPStoJPEG(`/assets/article/${list[i]}`);
+        const res = await getJPEGDataUrl(`/assets/article/${list[i]}`);
         console.log(res, "res");
         downloadReq = await fetch(res);
       } else {
