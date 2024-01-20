@@ -17,7 +17,7 @@ import logo from '../../assets/logo.png';
 
 export const Header = () => {
   return (
-    <header className="flex justify-between items-center mb-3">
+    <header className="flex justify-between items-center">
       <Box sx={{ flexGrow: 1 }}>
         <AppBar position="static">
           <Toolbar>

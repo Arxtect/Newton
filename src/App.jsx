@@ -10,12 +10,27 @@ import IconButton from '@mui/material/IconButton';
 const App = () => {
 
   return (
-    <div className="max-w-[99vw] m-[auto]">
+    <div className="max-w-[100vw] m-[auto]">
+      <div className="h-[calc(100vh-64px)]">
+        <div className="presentation-slide relative bg-white rounded-lg overflow-hidden h-full">
+          <img src="./assets/arXtect.png" alt="arXtect: Shape the Future of Scholarly Publishing" className="w-full h-full" />
+          <div className="absolute bottom-5 w-full left-0 text-center">
+            <h1 className="text-4xl font-bold  text-white">arXtect: Shape the Future of Scholarly Publishing</h1>
+          </div>
+        </div>
+      </div>
+      {/* Introduction */}
+      <div className="bg-white p-8">
+        <h1 className="text-4xl font-bold py-8">Introduction</h1>
+        <div className="flex justify-center items-center text-lg ">
+          "Arxtect: Revolutionizing Academic Publishing - This cutting-edge platform combines a scalable LaTeX editor with a decentralized approach, offering token-based incentives for peer review and citations. It integrates a social networking aspect to foster community collaboration and employs advanced AI to enhance academic writing. Experience a new era in efficient, incentivized, and collaborative academic research and publication with Arxtect."
+        </div>
+      </div>
       {/* Solution */}
       <div className="bg-white p-8">
         <h1 className="text-4xl font-bold">Solution</h1>
         <div className="flex justify-center items-center">
-          <div className="flex flex-col md:flex-row items-center justify-between p-8">
+          <div className="flex flex-col md:flex-row items-center justify-between px-8">
             <div className="md:w-1/2 pr-[80px]">
               <p className="text-lg mb-[70px]">
                 A decentralized ecosystem that actively involves authors, editors, and reviewers, which introduces innovative new revenue models for scholarly publishing.
@@ -138,7 +153,7 @@ const App = () => {
         </div>
       </div>
       {/* Editor  */}
-      <div className="container p-8 bg-white">
+      <div className=" p-8 bg-white">
         <h1 className="text-4xl font-bold mb-10">Editor (Newton)</h1>
 
         <div className="flex flex-row">
@@ -184,6 +199,83 @@ const App = () => {
           </div>
         </div>
       </div>
+      {/* Market */}
+      <div className="bg-white p-8">
+        <h1 className="text-3xl font-bold my-6">Market</h1>
+        <div className="flex flex-row justify-between">
+          <div className="w-1/3  px-8 py-4">
+            <img src="./assets/Market1.png" alt="Bar chart representing Market Size with Music, Scholarly Publishing, and SVoD categories" className="mb-4" />
+          </div>
+          <div className="w-1/3  px-8 py-4">
+            <img src="./assets/Market2.png" alt="Bar chart representing Profit Margin @2022 with Spotify, RELX (Elsevier), and Netflix categories" className="mb-4" />
+          </div>
+          <div className="w-1/3  px-8 py-4">
+            <img src="./assets/Market3.png" alt="Bar chart representing Market Cap @2022 with Spotify, RELX (Elsevier), and Netflix categories" className="mb-4" />
+          </div>
+        </div>
+        <ul className="list-disc pl-6 mt-6">
+          <li className="mb-2">Scholarly publishing has a market size as large as music industry and ⅓ of Subscription Video on Demand (SVoD)</li>
+          <li className="mb-2">The profit margin in scholarly publishing significantly exceeds that of the music industry and SVoD services, resulting in scholarly publishing and SVoD having comparable net incomes.</li>
+          <li>If the Price-to-Earnings ratio (PE) is consistent, then there should be a company in the scholarly publishing sector with a valuation comparable to Netflix's, which is around $195 billion.</li>
+        </ul>
+      </div>
+      {/* Timeline  */}
+      <div className=" p-8">
+        <h1 className="text-3xl font-bold mb-6">Timeline</h1>
+        <div className="grid grid-cols-4 gap-4 mb-4 ml-6">
+          <div>
+            <h2 className="text-xl font-semibold mb-2">Editor:</h2>
+            <ul className="list-disc ml-8">
+              <li>WASM</li>
+              <li>Collaborative</li>
+              <li>AI assistance</li>
+              <li>ID system</li>
+            </ul>
+          </div>
+          <div>
+            <h2 className="text-xl font-semibold mb-2">Network:</h2>
+            <ul className="list-disc ml-8">
+              <li>Preprint</li>
+              <li>Profile system</li>
+              <li>Interactive</li>
+              <li>Community</li>
+            </ul>
+          </div>
+          <div>
+            <h2 className="text-xl font-semibold mb-2">Publish:</h2>
+            <ul className="list-disc ml-8">
+              <li>Submission</li>
+              <li>Review</li>
+              <li>Tokenization</li>
+              <li>Go public</li>
+            </ul>
+          </div>
+          <div>
+            <h2 className="text-xl font-semibold mb-2">Optimization:</h2>
+            <ul className="list-disc ml-8">
+              <li>AI tools</li>
+              <li>SocialFi</li>
+              <li>Publishing system</li>
+              <li>Community</li>
+            </ul>
+          </div>
+        </div>
+        <div className="relative">
+          <img src="./assets/timeline.png" className="w-full" alt="" />
+          <div className="grid grid-cols-4 gap-4">
+            <span className="relative z-10 px-4 bg-white  text-center">2023</span>
+            <span className="relative z-10 px-4 bg-white  text-center">2024 Q1</span>
+            <span className="relative z-10 px-4 bg-white  text-center">2024 Q2</span>
+            <span className="relative z-10 px-4 bg-white  text-center">2024 Q3</span>
+          </div>
+        </div>
+        <div className="grid grid-cols-4 gap-4 mt-4">
+          <div className="bg-gray-700 text-white p-4 text-center">Reputation system</div>
+          <div className="bg-gray-700 text-white p-4 text-center">Smart Manuscript</div>
+          <div className="bg-gray-700 text-white p-4 text-center">DeFi</div>
+          <div className="bg-gray-700 text-white p-4 text-center ">Fund/Award raising</div>
+        </div>
+      </div>
       {/* Business Model */}
       <div className="bg-white p-8">
         <h1 className="text-4xl font-bold mb-10">Business Model</h1>
@@ -224,33 +316,33 @@ const App = () => {
         </div>
       </div>
       {/* Pioneers */}
-      <div className="container p-8 bg-white">
+      <div className=" p-8 bg-white">
         <h1 className="text-4xl font-bold mb-10">Pioneers</h1>
         <div className="flex">
           <div className="w-1/2">
             <div className="flex items-center mb-4">
-              <img src="https://placehold.co/100x100" alt="Pixelated avatar of a person wearing a hat" className="mr-4" />
+              <img src="./assets/Pioneers2.png" alt="Pixelated avatar of a person wearing a hat" className="mr-4  w-[100px] h-[100px]" />
               <div>
                 <h2 className="font-bold">G. Chew, PhD</h2>
                 <p>Serial entrepreneur, mentor@Havard Blockchain Accelerator & Berkeley Blockchain Xcelerator Stanford-affiliated researcher more 6 yrs experience in Web3, Stanford University</p>
               </div>
             </div>
             <div className="flex items-center mb-4">
-              <img src="https://placehold.co/100x100" alt="Pixelated avatar of a person with green background" className="mr-4" />
+              <img src="./assets/Pioneers3.png" alt="Pixelated avatar of a person with green background" className="mr-4  w-[100px] h-[100px]" />
               <div>
                 <h2 className="font-bold">A. Ong</h2>
                 <p>Serial entrepreneur, software architect and Sr. SWE WASM, database, backend services Snowflake, Amazon, UW-Madison</p>
               </div>
             </div>
             <div className="flex items-center mb-4">
-              <img src="https://placehold.co/100x100" alt="Animated avatar of a person with purple hair" className="mr-4" />
+              <img src="./assets/Pioneers4.png" alt="Animated avatar of a person with purple hair" className="mr-4  w-[100px] h-[100px]" />
               <div>
                 <h2 className="font-bold">A. Lee</h2>
                 <p>Serial entrepreneur Operation, Business development JP Morgan, UChicago</p>
               </div>
             </div>
             <div className="flex items-center">
-              <img src="https://placehold.co/100x100" alt="Cartoon avatar of a person with an orange background" className="mr-4" />
+              <img src="./assets/Pioneers5.png" alt="Cartoon avatar of a person with an orange background" className="mr-4 w-[100px] h-[100px]" />
               <div>
                 <h2 className="font-bold">Z. Chang</h2>
                 <p>Serial entrepreneur, investor Product design DHVC, Stanford University</p>
