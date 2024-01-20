@@ -20,6 +20,7 @@ import {
   setCompilerLog,
   setShowCompilerLog,
 } from "../pdfPreview/pdfPreviewSlice";
+import { loadFileNames, initDB, getFileContent } from '../../util'
 
 // Global LaTeX engine objects
 const xetexEngine = new XeTeXEngine(),
@@ -34,8 +35,9 @@ export const initializeLatexEngines = async () => {
     await dviEngine.loadEngine();
     // Set the engine status to be ready
     store.dispatch(setReadyEngineStatus());
-  } catch (e) {}
+  } catch (e) { }
 };
+
 
 export const compileLatex = async (latexCode) => {
   // Make sure both engines are ready for compilation
@@ -50,23 +52,34 @@ export const compileLatex = async (latexCode) => {
   // Create a temporary main.tex file
   xetexEngine.writeMemFSFile("main.tex", latexCode);
 
-  const list = [
-    // "eg.eps",
-    // "fancyplot.eps",
-    // "exp.eps",
-    // "expfig.eps",
-    // "fsim.eps",
-    // "nsim.eps",
-    // "SREP-19-29377-T.dvi",
-    // "SREP-19-29377-T.ps",
-    "frog.jpg",
-  ];
+  // const list = [
+  //   // "eg.eps",
+  //   // "fancyplot.eps",
+  //   // "exp.eps",
+  //   // "expfig.eps",
+  //   // "fsim.eps",
+  //   // "nsim.eps",
+  //   // "SREP-19-29377-T.dvi",
+  //   // "SREP-19-29377-T.ps",
+  //   "frog.jpg",
+  // ];
 
+  // for (let i = 0; i < list.length; i++) {
+  //   let downloadReq = await fetch(`/assets/article/${list[i]}`);
+  //   let imageBlob = await downloadReq.arrayBuffer();
+
+  //   xetexEngine.writeMemFSFile(`${list[i]}`, new Uint8Array(imageBlob));
+  // }
+  console.log(xetexEngine.isReady());
+
+  let list = await loadFileNames();
   for (let i = 0; i < list.length; i++) {
-    let downloadReq = await fetch(`/assets/article/${list[i]}`);
-    let imageBlob = await downloadReq.arrayBuffer();
+    if (latexCode.includes(list[i])) {
+      let downloadReq = await getFileContent(list[i]);
+      let imageBlob = await downloadReq.arrayBuffer();
 
-    xetexEngine.writeMemFSFile(`${list[i]}`, new Uint8Array(imageBlob));
+      xetexEngine.writeMemFSFile(`${list[i]}`, new Uint8Array(imageBlob));
+    }
   }
 
   // Associate the XeTeX engine with this main.tex file
@@ -85,17 +98,12 @@ export const compileLatex = async (latexCode) => {
     dviEngine.writeMemFSFile("main.xdv", xetexCompilation.pdf);
 
     for (let i = 0; i < list.length; i++) {
-      let downloadReq;
-      if (list[i].includes("eps")) {
-        const res = await getJPEGDataUrl(`/assets/article/${list[i]}`);
-        console.log(res, "res");
-        downloadReq = await fetch(res);
-      } else {
-        downloadReq = await fetch(`/assets/article/${list[i]}`);
-      }
+      if (latexCode.includes(list[i])) {
+        let downloadReq = await getFileContent(list[i]);
+        let imageBlob = await downloadReq.arrayBuffer();
 
-      let imageBlob = await downloadReq.arrayBuffer();
-      dviEngine.writeMemFSFile(`${list[i]}`, new Uint8Array(imageBlob));
+        dviEngine.writeMemFSFile(`${list[i]}`, new Uint8Array(imageBlob));
+      }
     }
 
     let dviCompilation = await dviEngine.compilePDF();

@@ -1,6 +1,6 @@
 import { Button as MuiButton } from "@mui/material";
 
-export const Button = ({ onClick, sticky = false, children }) => {
+export const Button = ({ onClick, sticky = false, children,...res}) => {
   // Base classes
   // const baseClasses =
   //   "inline-block py-2 px-5 font-bold text-black border-2 border-black";
@@ -14,6 +14,7 @@ export const Button = ({ onClick, sticky = false, children }) => {
     <MuiButton
       variant="outlined"
       onClick={onClick}
+      {...res}
       // className={`${baseClasses} ${dynamicClasses}`}
     >
       {children}
