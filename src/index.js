@@ -18,6 +18,7 @@ import { lazy, Suspense } from "react";
 import "./styles/globals.scss";
 
 const App = lazy(() => import("./App"));
+const Arxtect = lazy(() => import("./views/arxtect"));
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -28,6 +29,7 @@ root.render(
         <Suspense fallback={<div>Loading...</div>}>
           <Routes>
             <Route active path="/" element={<App />}></Route>
+            <Route active path="/arxtect" element={<Arxtect />}></Route>
           </Routes>
         </Suspense>
         <Footer />

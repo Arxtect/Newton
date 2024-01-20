@@ -13,6 +13,7 @@ import {
   IconButton,
 } from "@mui/material";
 import { Menu as MenuIcon } from "@mui/icons-material";
+import logo from '../../assets/logo.png';
 
 export const Header = () => {
   return (
@@ -29,9 +30,12 @@ export const Header = () => {
             >
               <MenuIcon />
             </IconButton>
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              <div className="text-black font-medium">arXtect</div>
+            <Typography variant="h6" component="div" className="flex items-center" sx={{ flexGrow: 1 }}>
+              <img src={logo} alt="logo" className="h-12" />
+              {/* <div className="text-black font-medium">arXtect</div> */}
             </Typography>
+            <Button className="text-black font-normal mr-4"> <Link to="/">Home</Link></Button>
+            <Button className="text-black font-normal  mr-4"> <Link to="/arxtect">ArXtect</Link></Button>
             <Button className="text-black font-normal">Login</Button>
           </Toolbar>
         </AppBar>

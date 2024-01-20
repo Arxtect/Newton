@@ -703,13 +703,13 @@ function handleException(e) {
 function ___assert_fail(condition, filename, line, func) {
   abort(
     "Assertion failed: " +
-      UTF8ToString(condition) +
-      ", at: " +
-      [
-        filename ? UTF8ToString(filename) : "unknown filename",
-        line,
-        func ? UTF8ToString(func) : "unknown function",
-      ]
+    UTF8ToString(condition) +
+    ", at: " +
+    [
+      filename ? UTF8ToString(filename) : "unknown filename",
+      line,
+      func ? UTF8ToString(func) : "unknown function",
+    ]
   );
 }
 var PATH = {
@@ -853,8 +853,8 @@ var PATH_FS = {
 };
 var TTY = {
   ttys: [],
-  init: function () {},
-  shutdown: function () {},
+  init: function () { },
+  shutdown: function () { },
   register: function (dev, ops) {
     TTY.ttys[dev] = { input: [], output: [], ops: ops };
     FS.registerDevice(dev, TTY.stream_ops);
@@ -1139,7 +1139,7 @@ var MEMFS = {
         var new_node;
         try {
           new_node = FS.lookupNode(new_dir, new_name);
-        } catch (e) {}
+        } catch (e) { }
         if (new_node) {
           for (var i in new_node.contents) {
             throw new FS.ErrnoError(55);
@@ -1507,7 +1507,7 @@ var FS = {
     try {
       var node = FS.lookupNode(dir, name);
       return 20;
-    } catch (e) {}
+    } catch (e) { }
     return FS.nodePermissions(dir, "wx");
   },
   mayDelete: (dir, name, isdir) => {
@@ -1653,8 +1653,8 @@ var FS = {
     if (FS.syncFSRequests > 1) {
       err(
         "warning: " +
-          FS.syncFSRequests +
-          " FS.syncfs operations in flight at once, probably just doing extra work"
+        FS.syncFSRequests +
+        " FS.syncfs operations in flight at once, probably just doing extra work"
       );
     }
     var mounts = FS.getMounts(FS.root.mount);
@@ -1832,7 +1832,7 @@ var FS = {
     var new_node;
     try {
       new_node = FS.lookupNode(new_dir, new_name);
-    } catch (e) {}
+    } catch (e) { }
     if (old_node === new_node) {
       return;
     }
@@ -2052,7 +2052,7 @@ var FS = {
       try {
         var lookup = FS.lookupPath(path, { follow: !(flags & 131072) });
         node = lookup.node;
-      } catch (e) {}
+      } catch (e) { }
     }
     var created = false;
     if (flags & 64) {
@@ -2435,7 +2435,7 @@ var FS = {
     try {
       var lookup = FS.lookupPath(path, { follow: !dontResolveLastLink });
       path = lookup.path;
-    } catch (e) {}
+    } catch (e) { }
     var ret = {
       isRoot: false,
       exists: false,
@@ -2473,7 +2473,7 @@ var FS = {
       var current = PATH.join2(parent, part);
       try {
         FS.mkdir(current);
-      } catch (e) {}
+      } catch (e) { }
       parent = current;
     }
     return current;
@@ -2798,8 +2798,8 @@ var FS = {
   DB_VERSION: 20,
   DB_STORE_NAME: "FILE_DATA",
   saveFilesToDB: (paths, onload, onerror) => {
-    onload = onload || (() => {});
-    onerror = onerror || (() => {});
+    onload = onload || (() => { });
+    onerror = onerror || (() => { });
     var indexedDB = FS.indexedDB();
     try {
       var openRequest = indexedDB.open(FS.DB_NAME(), FS.DB_VERSION);
@@ -2838,8 +2838,8 @@ var FS = {
     openRequest.onerror = onerror;
   },
   loadFilesFromDB: (paths, onload, onerror) => {
-    onload = onload || (() => {});
-    onerror = onerror || (() => {});
+    onload = onload || (() => { });
+    onerror = onerror || (() => { });
     var indexedDB = FS.indexedDB();
     try {
       var openRequest = indexedDB.open(FS.DB_NAME(), FS.DB_VERSION);
@@ -2937,13 +2937,13 @@ var SYSCALLS = {
     (tempI64 = [
       stat.size >>> 0,
       ((tempDouble = stat.size),
-      +Math.abs(tempDouble) >= 1
-        ? tempDouble > 0
-          ? (Math.min(+Math.floor(tempDouble / 4294967296), 4294967295) | 0) >>>
+        +Math.abs(tempDouble) >= 1
+          ? tempDouble > 0
+            ? (Math.min(+Math.floor(tempDouble / 4294967296), 4294967295) | 0) >>>
             0
-          : ~~+Math.ceil((tempDouble - +(~~tempDouble >>> 0)) / 4294967296) >>>
+            : ~~+Math.ceil((tempDouble - +(~~tempDouble >>> 0)) / 4294967296) >>>
             0
-        : 0),
+          : 0),
     ]),
       (HEAP32[(buf + 40) >> 2] = tempI64[0]),
       (HEAP32[(buf + 44) >> 2] = tempI64[1]);
@@ -2958,13 +2958,13 @@ var SYSCALLS = {
     (tempI64 = [
       stat.ino >>> 0,
       ((tempDouble = stat.ino),
-      +Math.abs(tempDouble) >= 1
-        ? tempDouble > 0
-          ? (Math.min(+Math.floor(tempDouble / 4294967296), 4294967295) | 0) >>>
+        +Math.abs(tempDouble) >= 1
+          ? tempDouble > 0
+            ? (Math.min(+Math.floor(tempDouble / 4294967296), 4294967295) | 0) >>>
             0
-          : ~~+Math.ceil((tempDouble - +(~~tempDouble >>> 0)) / 4294967296) >>>
+            : ~~+Math.ceil((tempDouble - +(~~tempDouble >>> 0)) / 4294967296) >>>
             0
-        : 0),
+          : 0),
     ]),
       (HEAP32[(buf + 80) >> 2] = tempI64[0]),
       (HEAP32[(buf + 84) >> 2] = tempI64[1]);
@@ -3249,7 +3249,7 @@ function emscripten_realloc_buffer(size) {
     wasmMemory.grow((size - buffer.byteLength + 65535) >>> 16);
     updateGlobalBufferAndViews(wasmMemory.buffer);
     return 1;
-  } catch (e) {}
+  } catch (e) { }
 }
 function _emscripten_resize_heap(requestedSize) {
   var oldSize = HEAPU8.length;
@@ -3321,13 +3321,13 @@ function _fd_seek(fd, offset_low, offset_high, whence, newOffset) {
     (tempI64 = [
       stream.position >>> 0,
       ((tempDouble = stream.position),
-      +Math.abs(tempDouble) >= 1
-        ? tempDouble > 0
-          ? (Math.min(+Math.floor(tempDouble / 4294967296), 4294967295) | 0) >>>
+        +Math.abs(tempDouble) >= 1
+          ? tempDouble > 0
+            ? (Math.min(+Math.floor(tempDouble / 4294967296), 4294967295) | 0) >>>
             0
-          : ~~+Math.ceil((tempDouble - +(~~tempDouble >>> 0)) / 4294967296) >>>
+            : ~~+Math.ceil((tempDouble - +(~~tempDouble >>> 0)) / 4294967296) >>>
             0
-        : 0),
+          : 0),
     ]),
       (HEAP32[newOffset >> 2] = tempI64[0]),
       (HEAP32[(newOffset + 4) >> 2] = tempI64[1]);
