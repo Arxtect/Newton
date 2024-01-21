@@ -260,3 +260,7 @@ textarea:-webkit-autofill:focus {
 .MuiPaper-root {
   background-color: var(--second) !important;
 }
+
+body{
+  overflow-x: hidden;
+}

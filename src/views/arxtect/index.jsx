@@ -23,7 +23,7 @@ const Arxtect = () => {
 
   // The actual app
   return (
-    <main className="max-w-[99vw] m-[auto]">
+    <main className="max-w-[99vw] m-[auto] mt-2">
       <ButtonBarContainer />
       <SplitPane>
         <LatexEditorContainer />

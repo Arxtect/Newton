@@ -16,6 +16,8 @@ import { Provider } from "react-redux";
 import store from "./store";
 import { lazy, Suspense } from "react";
 import "./styles/globals.scss";
+import CircularProgress from '@mui/material/CircularProgress';
+
 
 const App = lazy(() => import("./App"));
 const Arxtect = lazy(() => import("./views/arxtect"));
@@ -26,12 +28,15 @@ root.render(
     <Provider store={store}>
       <BrowserRouter>
         <Header />
-        <Suspense fallback={<div>Loading...</div>}>
-          <Routes>
-            <Route active path="/" element={<App />}></Route>
-            <Route active path="/arxtect" element={<Arxtect />}></Route>
-          </Routes>
-        </Suspense>
+        <div className="overflow-scroll">
+          <Suspense fallback={<CircularProgress />}>
+            <Routes>
+              <Route active path="/" element={<App />}></Route>
+              <Route active path="/arxtect" element={<Arxtect />}></Route>
+            </Routes>
+          </Suspense>
+        </div>
+
         <Footer />
       </BrowserRouter>
     </Provider>

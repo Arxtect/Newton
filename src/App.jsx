@@ -21,7 +21,7 @@ const App = () => {
       </div>
       {/* Introduction */}
       <div className="bg-white p-8">
-        <h1 className="text-4xl font-bold py-8">Introduction</h1>
+        <h1 className="text-4xl font-bold my-[70px]">Introduction</h1>
         <div className="flex justify-center items-center text-lg ">
           "Arxtect: Revolutionizing Academic Publishing - This cutting-edge platform combines a scalable LaTeX editor with a decentralized approach, offering token-based incentives for peer review and citations. It integrates a social networking aspect to foster community collaboration and employs advanced AI to enhance academic writing. Experience a new era in efficient, incentivized, and collaborative academic research and publication with Arxtect."
         </div>
@@ -61,7 +61,7 @@ const App = () => {
       </div>
       {/* Technology */}
       <div className="bg-white p-8">
-        <h1 className="text-4xl font-bold mb-10">Technology</h1>
+        <h1 className="text-4xl font-bold  mb-[70px]">Technology</h1>
         <div className="flex justify-between">
           <div className="w-1/3 bg-white p-6 shadow-xl border border-gray-300">
             <h2 className="text-3xl font-bold mb-4 text-gray-800">Web3.0</h2>
@@ -127,7 +127,7 @@ const App = () => {
       </div>
       {/* Products */}
       <div className="bg-white p-8">
-        <h1 className="text-4xl font-bold mb-10">Products</h1>
+        <h1 className="text-4xl font-bold mb-[70px]">Products</h1>
 
         <div className="flex justify-center items-center my-6">
           <div className="flex divide-x w-full">
@@ -154,7 +154,7 @@ const App = () => {
       </div>
       {/* Editor  */}
       <div className=" p-8 bg-white">
-        <h1 className="text-4xl font-bold mb-10">Editor (Newton)</h1>
+        <h1 className="text-4xl font-bold d mb-[70px]">Editor (Newton)</h1>
 
         <div className="flex flex-row">
 
@@ -201,7 +201,7 @@ const App = () => {
       </div>
       {/* Market */}
       <div className="bg-white p-8">
-        <h1 className="text-3xl font-bold my-6">Market</h1>
+        <h1 className="text-3xl font-bold mb-[70px]">Market</h1>
         <div className="flex flex-row justify-between">
           <div className="w-1/3  px-8 py-4">
             <img src="./assets/Market1.png" alt="Bar chart representing Market Size with Music, Scholarly Publishing, and SVoD categories" className="mb-4" />
@@ -221,7 +221,7 @@ const App = () => {
       </div>
       {/* Timeline  */}
       <div className=" p-8">
-        <h1 className="text-3xl font-bold mb-6">Timeline</h1>
+        <h1 className="text-3xl font-bold  mb-[70px]">Timeline</h1>
         <div className="grid grid-cols-4 gap-4 mb-4 ml-6">
           <div>
             <h2 className="text-xl font-semibold mb-2">Editor:</h2>
@@ -278,7 +278,7 @@ const App = () => {
       </div>
       {/* Business Model */}
       <div className="bg-white p-8">
-        <h1 className="text-4xl font-bold mb-10">Business Model</h1>
+        <h1 className="text-4xl font-bold  mb-[70px]">Business Model</h1>
         <div className="grid grid-cols-3 gap-4">
           <div className="bg-gray-800 text-white p-4">
             <h2 className="text-lg font-bold mb-3">01</h2>
@@ -317,7 +317,7 @@ const App = () => {
       </div>
       {/* Pioneers */}
       <div className=" p-8 bg-white">
-        <h1 className="text-4xl font-bold mb-10">Pioneers</h1>
+        <h1 className="text-4xl font-bold mb-[70px]">Pioneers</h1>
         <div className="flex">
           <div className="w-1/2">
             <div className="flex items-center mb-4">
