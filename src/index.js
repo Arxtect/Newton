@@ -18,7 +18,7 @@ import { lazy, Suspense } from "react";
 import "./styles/globals.scss";
 import CircularProgress from "@mui/material/CircularProgress";
 
-const App = lazy(() => import("./App"));
+const Home = lazy(() => import("./views/home"));
 const Arxtect = lazy(() => import("./views/arxtect"));
 const GitText = lazy(() => import("./views/git-test"));
 
@@ -31,7 +31,7 @@ root.render(
         <div className="overflow-scroll">
           <Suspense fallback={<CircularProgress />}>
             <Routes>
-              <Route active path="/" element={<App />}></Route>
+              <Route active path="/" element={<Home />}></Route>
               <Route active path="/arxtect" element={<Arxtect />}></Route>
               <Route active path="/git-test" element={<GitText />}></Route>
             </Routes>

@@ -5,15 +5,16 @@
  */
 // Hooks
 import React, { useLayoutEffect } from "react";
-import FileSystem from "./file_system";
+// import FileSystem from "./file_system";
+import GitDemo from "./gitdemo"
 
 const useGit = () => {
-  const git = React.useMemo(() => {}, []);
+  const git = React.useMemo(() => { }, []);
   return git;
 };
 
 const GitTest = () => {
-  const debug = (git) => {};
+  const debug = (git) => { };
   const [fileName, setFileName] = React.useState("hello.js");
   const git = useGit();
   const [text, setText] = React.useState("");
@@ -38,13 +39,14 @@ const GitTest = () => {
   // The actual app
   return (
     <main className="max-w-[99vw] m-[auto] mt-2">
-      <FileSystem
+      <GitDemo></GitDemo>
+      {/* <FileSystem
         className="w-1/5 h-screen overflow-scroll"
         fs={fs}
         onClick={fileChange}
         currentFile={fileName}
         onCreateFile={createFile}
-      />
+      /> */}
     </main>
   );
 };
