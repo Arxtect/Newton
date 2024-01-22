@@ -9898,6 +9898,11 @@ wasm-dce@^1.0.0:
     babylon "^7.0.0-beta.39"
     webassembly-interpreter "0.0.30"
 
+wasm-git@^0.0.12:
+  version "0.0.12"
+  resolved "https://registry.yarnpkg.com/wasm-git/-/wasm-git-0.0.12.tgz#109bcc5e3ffab5ad6b95e94e8129632542d9ab06"
+  integrity sha512-ndWCiX8or7f/4DgtBfkXE1mEmVG7mDUDuXvffW2DC3vSOVy3VycFbffcvkKZVF2kZtiwB1XI3lB7kIKbSNBWrw==
+
 wasm-loader@^1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/wasm-loader/-/wasm-loader-1.3.0.tgz#a123a6b6c9a9dac60de38449703be3537742e155"

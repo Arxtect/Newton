@@ -16,11 +16,11 @@ import { Provider } from "react-redux";
 import store from "./store";
 import { lazy, Suspense } from "react";
 import "./styles/globals.scss";
-import CircularProgress from '@mui/material/CircularProgress';
-
+import CircularProgress from "@mui/material/CircularProgress";
 
 const App = lazy(() => import("./App"));
 const Arxtect = lazy(() => import("./views/arxtect"));
+const GitText = lazy(() => import("./views/git-test"));
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -33,6 +33,7 @@ root.render(
             <Routes>
               <Route active path="/" element={<App />}></Route>
               <Route active path="/arxtect" element={<Arxtect />}></Route>
+              <Route active path="/git-test" element={<GitText />}></Route>
             </Routes>
           </Suspense>
         </div>
