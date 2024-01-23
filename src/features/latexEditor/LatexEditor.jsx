@@ -29,6 +29,11 @@ const doc = new Y.Doc();
 // @ts-ignore
 window.doc = doc;
 
+const host = window.location.hostname;
+// const host = "206.190.239.91";
+const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+const wsUrl = `${wsProtocol}//${host}/websockets`;
+
 const LatexEditor = ({ handleChange, sourceCode }) => {
   const latexRef = useRef(null);
   const { yText, undoManager } = useYText({ name: LATEX_NAME, doc });
@@ -43,12 +48,9 @@ const LatexEditor = ({ handleChange, sourceCode }) => {
     //   }
     // });
 
-    const wsProvider = new WebsocketProvider(
-      "wss://arxtect.com/websockets",
-      ROOM_NAME,
-      doc,
-      { connect: true }
-    );
+    const wsProvider = new WebsocketProvider(wsUrl, ROOM_NAME, doc, {
+      connect: true,
+    });
     wsProvider.on("status", (event) => {
       if (event.status === "connected") {
       } else {
