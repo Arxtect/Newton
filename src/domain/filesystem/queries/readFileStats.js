@@ -1,0 +1,32 @@
+import fs from "fs";
+import * as git from "isomorphic-git";
+import orderBy from "lodash/orderBy";
+import path from "path";
+import pify from "pify";
+
+export async function readFileStats(projectRoot, dirpath) {
+  const filenames = await pify(fs.readdir)(dirpath);
+
+  const relpath = path.relative(projectRoot, dirpath);
+
+  const mat = await git.statusMatrix({
+    dir: projectRoot,
+    pattern: relpath.length > 0 ? path.join(relpath, "*") : "*",
+  });
+
+  const indexedFiles = mat.map((x) => path.join(dirpath, x[0]));
+
+  const ret = await Promise.all(
+    filenames.map(async (name) => {
+      const childPath = path.join(dirpath, name);
+      const stat = await pify(fs.stat)(childPath);
+
+      return {
+        name,
+        type: stat.isDirectory() ? "dir" : "file",
+        ignored: !indexedFiles.includes(childPath),
+      };
+    })
+  );
+  return orderBy(ret, [(s) => s.type + "" + s.name]);
+}

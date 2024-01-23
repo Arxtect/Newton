@@ -21,6 +21,29 @@ import {
   setShowCompilerLog,
 } from "../pdfPreview/pdfPreviewSlice";
 import { loadFileNames, initDB, getFileContent } from '../../util'
+const LATEX_FILE_EXTENSIONS = [
+  ".tex",
+  ".cls",
+  ".sty",
+  ".bib",
+  ".aux",
+  ".log",
+  ".toc",
+  ".lof",
+  ".lot",
+  ".idx",
+  ".ind",
+  ".ilg",
+  ".glo",
+  ".gls",
+  ".ist",
+  ".acn",
+  ".acr",
+  ".alg",
+  ".glg",
+  ".glsdefs",
+  ".xdy"
+]
 
 // Global LaTeX engine objects
 const xetexEngine = new XeTeXEngine(),
@@ -74,11 +97,27 @@ export const compileLatex = async (latexCode) => {
 
   let list = await loadFileNames();
   for (let i = 0; i < list.length; i++) {
-    if (latexCode.includes(list[i])) {
+    // 去掉文件名的后缀
+    let fileNameWithoutExtension = list[i].split('.')[0];
+
+    // 检查latexCode是否包含文件名（无后缀）或者文件名的前缀
+    if (latexCode.includes(fileNameWithoutExtension)) {
       let downloadReq = await getFileContent(list[i]);
       let imageBlob = await downloadReq.arrayBuffer();
 
       xetexEngine.writeMemFSFile(`${list[i]}`, new Uint8Array(imageBlob));
+      if (LATEX_FILE_EXTENSIONS.some(ext => list[i].endsWith(ext))) {
+        let fileContent = await downloadReq.text();
+        for (let j = 0; j < list.length; j++) {
+          let fileNameWithoutExtensions = list[j].split('.')[0];
+          // 检查latexCode是否包含文件名（无后缀）或者文件名的前缀
+          if (i !== j && fileContent.includes(fileNameWithoutExtensions)) {
+            let nestedDownloadReq = await getFileContent(list[j]);
+            let nestedImageBlob = await nestedDownloadReq.arrayBuffer();
+            xetexEngine.writeMemFSFile(list[j], new Uint8Array(nestedImageBlob));
+          }
+        }
+      }
     }
   }
 
@@ -98,11 +137,25 @@ export const compileLatex = async (latexCode) => {
     dviEngine.writeMemFSFile("main.xdv", xetexCompilation.pdf);
 
     for (let i = 0; i < list.length; i++) {
-      if (latexCode.includes(list[i])) {
+      let fileNameWithoutExtension = list[i].split('.')[0];
+      // 检查latexCode是否包含文件名（无后缀）或者文件名的前缀
+      if (latexCode.includes(fileNameWithoutExtension)) {
         let downloadReq = await getFileContent(list[i]);
         let imageBlob = await downloadReq.arrayBuffer();
 
         dviEngine.writeMemFSFile(`${list[i]}`, new Uint8Array(imageBlob));
+        if (LATEX_FILE_EXTENSIONS.some(ext => list[i].endsWith(ext))) {
+          let fileContent = await downloadReq.text();
+          for (let j = 0; j < list.length; j++) {
+            let fileNameWithoutExtensions = list[j].split('.')[0];
+            // 检查latexCode是否包含文件名（无后缀）或者文件名的前缀
+            if (i !== j && fileContent.includes(fileNameWithoutExtensions)) {
+              let nestedDownloadReq = await getFileContent(list[j]);
+              let nestedImageBlob = await nestedDownloadReq.arrayBuffer();
+              dviEngine.writeMemFSFile(list[j], new Uint8Array(nestedImageBlob));
+            }
+          }
+        }
       }
     }
 

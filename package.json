@@ -81,7 +81,13 @@
     "y-indexeddb": "^9.0.11",
     "y-protocols": "^1.0.5",
     "y-websocket": "^1.5.0",
-    "yjs": "^13.6.6"
+    "yjs": "^13.6.6",
+    "delay": "4.0.1",
+    "isomorphic-git": "0.37.0",
+    "browserfs": "1.4.3",
+    "pify": "4.0.0",
+    "diff3": "0.0.3",
+    "lodash": "4.17.11"
   },
   "scripts": {
     "start": "node scripts/start.js",

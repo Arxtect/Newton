@@ -13,21 +13,25 @@ const FileUpload = () => {
 
   // 处理文件上传
   const handleUpload = async (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
+    const uploadedFiles = event.target.files;
+    if (uploadedFiles.length === 0) return;
 
     const db = await initDB();
-    const tx = db.transaction("files", "readwrite");
-    await tx.store.put({ name: file.name, content: file });
-    await tx.done;
-    setSnackbarMessage(`upload success：${file.name}`);
-    setSnackbarOpen(true);
+
+    for (const file of uploadedFiles) {
+      const tx = db.transaction("files", "readwrite");
+      await tx.store.put({ name: file.name, content: file });
+      await tx.done;
+      setSnackbarMessage(`upload success：${file.name}`);
+      setSnackbarOpen(true);
+    }
     loadFileNamesList();
   };
 
   const handleCloseSnackbar = () => {
     setSnackbarOpen(false);
   };
+
   // 组件挂载时加载文件名称列表
   useEffect(() => {
     loadFileNamesList();
@@ -50,8 +54,8 @@ const FileUpload = () => {
     <div className="flex">
       <div className="mr-2">
         <input
-          accept="image/*"
           type="file"
+          multiple
           onChange={handleUpload}
           style={{ display: "none" }}
           id="upload-button"
@@ -78,11 +82,22 @@ const FileUpload = () => {
                   key={index}
                   className="flex justify-between items-center mb-2"
                 >
-                  <span>
+                  <span
+                    style={{
+                      display: '-webkit-box',
+                      WebkitBoxOrient: 'vertical',
+                      WebkitLineClamp: 2,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'normal',
+                      width: '80%'
+                    }}
+                  >
                     {index + 1}、{fileName}
                   </span>
                   <Button
-                    className="ml-2 h-7"
+                    className="h-7"
+                    style={{ width: '20%' }}
                     onClick={() => deleteFile(fileName)}
                   >
                     delete

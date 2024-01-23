@@ -22,14 +22,12 @@ class AceCursors {
     this.aceID = this.ace.container.id;
 
     this.marker.update = function (html, markerLayer, session, config) {
-      console.log(html, markerLayer, session, config, 'config')
       let start = config.firstRow,
         end = config.lastRow;
       let cursors = this.cursors;
 
       for (let i = 0; i < cursors.length; i++) {
         let pos = this.cursors[i];
-        console.log(pos, '123')
         if (pos.row < start) {
           let el = document.getElementById(
             this.self.aceID + "_cursor_" + pos.id
@@ -54,7 +52,6 @@ class AceCursors {
             document.getElementsByClassName("ace_gutter")[0].offsetWidth;
           let height = config.lineHeight;
           let width = config.characterWidth;
-          console.log(screenPos, '123')
           let top = markerLayer.$getTop(screenPos.row, config) - config.offset;
           let left =
             markerLayer.$padding + aceGutter + screenPos.column * width;
@@ -327,7 +324,6 @@ export class AceBinding {
     this.ace
       .getSession()
       .selection.on("changeCursor", () => {
-        console.log('12312')
         this._cursorObserver()
       });
 
@@ -337,7 +333,6 @@ export class AceBinding {
   }
 
   destroy() {
-    console.log("destroyed");
     this.type.unobserve(this._typeObserver);
     this.ace.off("change", this._aceObserver);
     if (this.awareness) {

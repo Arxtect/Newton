@@ -106,11 +106,13 @@ module.exports = function (proxy, allowedHost) {
         target: "http://206.190.239.91:9008",
         changeOrigin: true,
         ws: true,
+        pathRewrite: { "^/websockets": "" }
       },
       "/latex": {
         target: "http://206.190.239.91:5000",
         changeOrigin: true,
-      },
+        pathRewrite: { "^/latex": "" }
+      }
     },
     onBeforeSetupMiddleware(devServer) {
       // Keep `evalSourceMapMiddleware`
