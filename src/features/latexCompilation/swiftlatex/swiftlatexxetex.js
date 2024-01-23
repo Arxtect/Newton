@@ -6,7 +6,7 @@ self.memlog = "";
 self.initmem = undefined;
 self.mainfile = "main.tex";
 // self.texlive_endpoint = "/latex/";
-self.texlive_endpoint = "https://arxtect.com/latex";
+self.texlive_endpoint = "https://arxtect.com/latex/";
 Module["print"] = function (a) {
   self.memlog += a + "\n";
 };

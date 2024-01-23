@@ -5,7 +5,7 @@ var Module = {};
 self.memlog = "";
 self.mainfile = "main.tex";
 // self.texlive_endpoint = "/latex/";
-self.texlive_endpoint = "https://arxtect.com/latex";
+self.texlive_endpoint = "https://arxtect.com/latex/";
 Module["print"] = function (a) {
   self.memlog += a + "\n";
   console.log(a);
