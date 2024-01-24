@@ -32,8 +32,8 @@ window.doc = doc;
 // const host = window.location.hostname;
 const host = "206.190.239.91:9008";
 const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-// const wsUrl = `${wsProtocol}//${host}/websockets`;
-const wsUrl = "wss://arxtect.com/websockets"
+const wsUrl = `${wsProtocol}//${host}/websockets`;
+// const wsUrl = "wss://arxtect.com/websockets"
 
 const LatexEditor = ({ handleChange, sourceCode }) => {
   const latexRef = useRef(null);

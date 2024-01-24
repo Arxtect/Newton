@@ -6,7 +6,6 @@
 // SwiftLaTeX engines
 import { DvipdfmxEngine } from "./swiftlatex/DvipdfmxEngine";
 import { XeTeXEngine } from "./swiftlatex/XeTeXEngine";
-import { getJPEGDataUrl } from "./convertEps";
 
 // Redux store and actions
 import store from "../../store";
@@ -20,7 +19,7 @@ import {
   setCompilerLog,
   setShowCompilerLog,
 } from "../pdfPreview/pdfPreviewSlice";
-import { loadFileNames, initDB, getFileContent } from '../../util'
+import { loadFileNames, initDB, getFileContent } from "../../util";
 const LATEX_FILE_EXTENSIONS = [
   ".tex",
   ".cls",
@@ -42,8 +41,8 @@ const LATEX_FILE_EXTENSIONS = [
   ".alg",
   ".glg",
   ".glsdefs",
-  ".xdy"
-]
+  ".xdy",
+];
 
 // Global LaTeX engine objects
 const xetexEngine = new XeTeXEngine(),
@@ -58,9 +57,10 @@ export const initializeLatexEngines = async () => {
     await dviEngine.loadEngine();
     // Set the engine status to be ready
     store.dispatch(setReadyEngineStatus());
-  } catch (e) { }
+  } catch (e) {
+    console.log(e);
+  }
 };
-
 
 export const compileLatex = async (latexCode) => {
   // Make sure both engines are ready for compilation
@@ -75,30 +75,30 @@ export const compileLatex = async (latexCode) => {
   // Create a temporary main.tex file
   xetexEngine.writeMemFSFile("main.tex", latexCode);
 
-  // const list = [
-  //   // "eg.eps",
-  //   // "fancyplot.eps",
-  //   // "exp.eps",
-  //   // "expfig.eps",
-  //   // "fsim.eps",
-  //   // "nsim.eps",
-  //   // "SREP-19-29377-T.dvi",
-  //   // "SREP-19-29377-T.ps",
-  //   "frog.jpg",
-  // ];
+  const lists = [
+    // "eg.eps",
+    // "fancyplot.eps",
+    // "exp.eps",
+    // "expfig.eps",
+    // "fsim.eps",
+    // "nsim.eps",
+    // "SREP-19-29377-T.dvi",
+    // "SREP-19-29377-T.ps",
+    "lmmono9-regular.otf",
+  ];
 
-  // for (let i = 0; i < list.length; i++) {
-  //   let downloadReq = await fetch(`/assets/article/${list[i]}`);
-  //   let imageBlob = await downloadReq.arrayBuffer();
+  for (let i = 0; i < lists.length; i++) {
+    let downloadReq = await fetch(`/assets/${lists[i]}`);
+    let imageBlob = await downloadReq.arrayBuffer();
 
-  //   xetexEngine.writeMemFSFile(`${list[i]}`, new Uint8Array(imageBlob));
-  // }
+    xetexEngine.writeMemFSFile(`${lists[i]}`, new Uint8Array(imageBlob));
+  }
   console.log(xetexEngine.isReady());
 
   let list = await loadFileNames();
   for (let i = 0; i < list.length; i++) {
     // 去掉文件名的后缀
-    let fileNameWithoutExtension = list[i].split('.')[0];
+    let fileNameWithoutExtension = list[i].split(".")[0];
 
     // 检查latexCode是否包含文件名（无后缀）或者文件名的前缀
     if (latexCode.includes(fileNameWithoutExtension)) {
@@ -106,15 +106,18 @@ export const compileLatex = async (latexCode) => {
       let imageBlob = await downloadReq.arrayBuffer();
 
       xetexEngine.writeMemFSFile(`${list[i]}`, new Uint8Array(imageBlob));
-      if (LATEX_FILE_EXTENSIONS.some(ext => list[i].endsWith(ext))) {
+      if (LATEX_FILE_EXTENSIONS.some((ext) => list[i].endsWith(ext))) {
         let fileContent = await downloadReq.text();
         for (let j = 0; j < list.length; j++) {
-          let fileNameWithoutExtensions = list[j].split('.')[0];
+          let fileNameWithoutExtensions = list[j].split(".")[0];
           // 检查latexCode是否包含文件名（无后缀）或者文件名的前缀
           if (i !== j && fileContent.includes(fileNameWithoutExtensions)) {
             let nestedDownloadReq = await getFileContent(list[j]);
             let nestedImageBlob = await nestedDownloadReq.arrayBuffer();
-            xetexEngine.writeMemFSFile(list[j], new Uint8Array(nestedImageBlob));
+            xetexEngine.writeMemFSFile(
+              list[j],
+              new Uint8Array(nestedImageBlob)
+            );
           }
         }
       }
@@ -137,22 +140,25 @@ export const compileLatex = async (latexCode) => {
     dviEngine.writeMemFSFile("main.xdv", xetexCompilation.pdf);
 
     for (let i = 0; i < list.length; i++) {
-      let fileNameWithoutExtension = list[i].split('.')[0];
+      let fileNameWithoutExtension = list[i].split(".")[0];
       // 检查latexCode是否包含文件名（无后缀）或者文件名的前缀
       if (latexCode.includes(fileNameWithoutExtension)) {
         let downloadReq = await getFileContent(list[i]);
         let imageBlob = await downloadReq.arrayBuffer();
 
         dviEngine.writeMemFSFile(`${list[i]}`, new Uint8Array(imageBlob));
-        if (LATEX_FILE_EXTENSIONS.some(ext => list[i].endsWith(ext))) {
+        if (LATEX_FILE_EXTENSIONS.some((ext) => list[i].endsWith(ext))) {
           let fileContent = await downloadReq.text();
           for (let j = 0; j < list.length; j++) {
-            let fileNameWithoutExtensions = list[j].split('.')[0];
+            let fileNameWithoutExtensions = list[j].split(".")[0];
             // 检查latexCode是否包含文件名（无后缀）或者文件名的前缀
             if (i !== j && fileContent.includes(fileNameWithoutExtensions)) {
               let nestedDownloadReq = await getFileContent(list[j]);
               let nestedImageBlob = await nestedDownloadReq.arrayBuffer();
-              dviEngine.writeMemFSFile(list[j], new Uint8Array(nestedImageBlob));
+              dviEngine.writeMemFSFile(
+                list[j],
+                new Uint8Array(nestedImageBlob)
+              );
             }
           }
         }
