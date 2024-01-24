@@ -10,6 +10,9 @@ import {
   revokeCompiledPdfUrl,
   compileLatex,
 } from "../latexCompilation/latexCompilation";
+import {
+ toggleCompilerLog,
+} from "../pdfPreview/pdfPreviewSlice.js";
 
 export const ButtonBarContainer = () => {
   // Select the URL of the PDF, the source code, and whether to show all of it
@@ -28,11 +31,17 @@ export const ButtonBarContainer = () => {
 
   // const toggleVisibility = () => dispatch(toggleSourceCode());
   const compile = () => compileLatex(sourceCode);
+  
+  const showLog = () => {
+    dispatch(toggleCompilerLog())
+  }
+
 
   return (
     <ButtonBar
       // toggleVisibility={toggleVisibility}
       compile={compile}
+      showLog={showLog}
       // showFullSourceCode={showFullSourceCode}
     />
   );

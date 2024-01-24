@@ -42,6 +42,8 @@ const LATEX_FILE_EXTENSIONS = [
   ".glg",
   ".glsdefs",
   ".xdy",
+  ".bst",
+  ".eps"
 ];
 
 // Global LaTeX engine objects

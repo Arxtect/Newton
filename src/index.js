@@ -5,7 +5,7 @@
  */
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { HashRouter, Route, Routes } from "react-router-dom"; // Use HashRouter
 // Styles and components
 import "./index.css";
 import reportWebVitals from "./reportWebVitals";
@@ -26,20 +26,20 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
     <Provider store={store}>
-      <BrowserRouter>
+      <HashRouter> {/* Replace BrowserRouter with HashRouter */}
         <Header />
         <div className="overflow-scroll">
           <Suspense fallback={<CircularProgress />}>
             <Routes>
-              <Route active path="/" element={<Home />}></Route>
-              <Route active path="/arxtect" element={<Arxtect />}></Route>
-              <Route active path="/git-test" element={<GitText />}></Route>
+              <Route path="/" element={<Home />}></Route>
+              <Route path="/arxtect" element={<Arxtect />}></Route>
+              <Route path="/git-test" element={<GitText />}></Route>
             </Routes>
           </Suspense>
         </div>
 
         <Footer />
-      </BrowserRouter>
+      </HashRouter>
     </Provider>
   </React.StrictMode>
 );
