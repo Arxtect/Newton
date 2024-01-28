@@ -13,7 +13,6 @@ import Pathname from "./Pathname"
 
 import { readFileStats } from "../../../domain/filesystem/queries/readFileStats"
 
-
 const DirectoryLineContent = ({
     dirpath,
     depth,
@@ -36,6 +35,7 @@ const DirectoryLineContent = ({
     const [hovered, setHovered] = useState(false);
 
     useEffect(() => {
+        console.log(loading, 'loading')
         let unmounted = false;
 
         const updateChildren = async () => {
@@ -69,7 +69,8 @@ const DirectoryLineContent = ({
     const handleMouseLeave = () => setHovered(false);
 
     // Function to handle click event and toggle directory open/close
-    const handleClick = () => {
+    const handleClick = (e) => {
+        // e.preventDefault();
         if (!loading) {
             setOpened(!opened);
         }
@@ -108,7 +109,7 @@ const DirectoryLineContent = ({
                         onDropByOther={() => setOpened(true)}
                     >
                         <div style={{ display: "flex", flexDirection: "row" }}>
-                            <div style={{ flex: 1 }}>
+                            <div style={{ flex: 1 }} className="flex">
                                 {/* Replace Prefix and Pathname with your actual implementation */}
                                 <Prefix depth={depth} />
                                 {opened ? (
@@ -129,19 +130,18 @@ const DirectoryLineContent = ({
                                     onClickFile={(event) => {
                                         event.stopPropagation();
                                         setOpened(true);
-                                        startFileCreating({ fileCreatingDir: dirpath });
+                                        startFileCreating(dirpath);
                                     }}
                                     onClickDir={(event) => {
                                         event.stopPropagation();
                                         setOpened(true);
-                                        startDirCreating({ dirCreatingDir: dirpath });
+                                        startDirCreating(dirpath);
                                     }}
                                     onClickRemove={(event) => handleDeleteDirectory(event, dirpath)}
                                 />
                             )}
                         </div>
                     </Draggable>
-                    <AddFile parentDir={dirpath} />
                     {opened && (
                         <>
                             {isFileCreating && (
@@ -179,6 +179,7 @@ const DirectoryLine = (props) => {
 }
 
 const LinkedLines = ({ dirpath, root, depth, fileList, editingFilepath }) => {
+    console.log(fileList, 'fileList')
     return (
         <>
             {fileList.map((f) => {
@@ -221,22 +222,22 @@ const HoveredMenu = ({
     onClickDir,
     onClickRemove
 }) => (
-    <div style={{ minWidth: "30px" }}>
-        <Tooltip content="Create new file" position="top">
-            <Icon
-                icon="document"
-                onClick={(event) => onClickFile(event)}
-            />
-        </Tooltip>
+    <div style={{ minWidth: "30px" }} className="flex">
+        {/* <Tooltip content="Create new file" position="top"> */}
+        <Icon
+            icon="document"
+            onClick={(event) => onClickFile(event)}
+        />
+        {/* </Tooltip> */}
 
-        <Tooltip content="Create new dir" position="top">
-            <Icon
-                icon="folder-new"
-                data-tip
-                data-for="new-dir"
-                onClick={(event) => onClickDir(event)}
-            />
-        </Tooltip>
+        {/* <Tooltip content="Create new dir" position="top"> */}
+        <Icon
+            icon="folder-new"
+            data-tip
+            data-for="new-dir"
+            onClick={(event) => onClickDir(event)}
+        />
+        {/* </Tooltip> */}
 
         {basename !== ".git" && dirpath !== root && (
             <Tooltip content="Delete" position="top">

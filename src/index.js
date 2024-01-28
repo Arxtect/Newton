@@ -22,6 +22,22 @@ const Home = lazy(() => import("./views/home"));
 const Arxtect = lazy(() => import("./views/arxtect"));
 const GitText = lazy(() => import("./views/git-test"));
 
+async function loadBrowserFS() {
+  return new Promise(resolve => {
+    const BrowserFS = require("browserfs")
+    BrowserFS.install(window)
+    BrowserFS.configure({ fs: "IndexedDB", options: {} }, (err) => {
+      if (err) {
+        throw err
+      }
+
+      resolve()
+    })
+  })
+}
+
+await loadBrowserFS()
+
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>

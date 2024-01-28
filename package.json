@@ -43,6 +43,7 @@
     "file-loader": "^6.2.0",
     "file-type": "^18.5.0",
     "fs-extra": "^10.0.0",
+    "hard-reducer": "^2.4.1",
     "html-webpack-plugin": "^5.5.0",
     "https-browserify": "^1.0.0",
     "idb": "^8.0.0",
@@ -97,7 +98,8 @@
     "y-indexeddb": "^9.0.11",
     "y-protocols": "^1.0.5",
     "y-websocket": "^1.5.0",
-    "yjs": "^13.6.6"
+    "yjs": "^13.6.6",
+    "zustand": "^4.5.0"
   },
   "scripts": {
     "start": "node scripts/start.js",
