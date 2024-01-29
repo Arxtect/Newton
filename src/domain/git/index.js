@@ -20,3 +20,4 @@ export * from "./queries/isFastForward"
 export * from "./queries/listBranches"
 export * from "./queries/listGitFiles"
 export * from "./queries/updateStatusMatrix"
+

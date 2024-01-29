@@ -91,9 +91,9 @@ const FileLine = ({
                         }}
                         className="flex items-center space-x-2 cursor-pointer" // Tailwind classes for styling
                     >
-                        {range(depth).map((_, k) => (
+                        {/* {range(depth).map((_, k) => (
                             <span key={k} className="w-4 inline-block"></span> // Tailwind classes for spacing
-                        ))}
+                        ))} */}
                         <Icon icon="document" />
                         <Pathname ignoreGit={ignoreGit}>{basename}</Pathname>
                     </div>

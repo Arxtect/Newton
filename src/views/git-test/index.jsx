@@ -6,8 +6,9 @@
 // Hooks
 import React, { useLayoutEffect, useEffect } from "react";
 import RootDirectory from "./components/RootDirectory"
-import { mkdir } from "../../domain/filesystem"
+import { mkdir, readDirectoryTree } from "../../domain/filesystem"
 import useFileStore from '../../domain/filesystem/fileReduces/fileActions'
+
 
 const GitTest = () => {
 
@@ -23,7 +24,7 @@ const GitTest = () => {
     startFileCreating,
     startDirCreating,
     deleteDirectory,
-    editingFilepath } = useFileStore((state) => ({
+    editingFilepath, loadFile } = useFileStore((state) => ({
       touchCounter: state.touchCounter,
       isFileCreating: state.fileCreatingDir,
       isDirCreating: state.dirCreatingDir,
@@ -31,8 +32,17 @@ const GitTest = () => {
       startFileCreating: state.startFileCreating,
       startDirCreating: state.startDirCreating,
       deleteDirectory: state.deleteDirectory,
-      editingFilepath: state.editingFilepath,
+      editingFilepath: state.filepath,
+      loadFile: state.loadFile
     }));
+
+  useEffect(() => {
+    readDirectoryTree('test').then(tree => {
+      console.log(tree);
+    }).catch(error => {
+      console.error('读取目录树时出错:', error);
+    });
+  }, [])
 
   return (
     <main className="max-w-[20vw] m-[auto] mt-2">
@@ -53,6 +63,7 @@ const GitTest = () => {
         deleteDirectory={deleteDirectory}
         editingFilepath={editingFilepath}
         open={true}
+        loadFile={loadFile}
       />
     </main>
   );

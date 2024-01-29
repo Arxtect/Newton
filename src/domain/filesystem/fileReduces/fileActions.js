@@ -1,4 +1,4 @@
-import create from 'zustand';
+import { create } from 'zustand';
 import * as FS from '../index';
 import extToFileType from './extToFileType'
 import path from 'path'
@@ -31,6 +31,7 @@ const useFileStore = create((set, get) => ({
             lastSavedValue: fileContent.toString(),
             changed: false,
         });
+        console.log(fileContent, 'fileContent');
     },
     saveFileState: async (value) => {
         set((state) => ({

@@ -7,3 +7,5 @@ export * from "./queries/getFileRecursively"
 export * from "./queries/readDirectories"
 export * from "./queries/readFile"
 export * from "./queries/readFileStats"
+
+export * from "./commands/getAllFiles"
