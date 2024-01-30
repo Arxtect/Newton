@@ -179,10 +179,10 @@ const useFileStore = create((set, get) => ({
     get().loadFile({ filepath });
   },
   cancelFileCreating: () => {
-    console.log("cancelFileCreating");
+    set({ fileCreatingDir: null });
   },
   cancelDirCreating: () => {
-    console.log("cancelDirCreating");
+    set({ dirCreatingDir: null });
   },
   finishDirCreating: async ({ dirpath }) => {
     await FS.mkdir(dirpath);

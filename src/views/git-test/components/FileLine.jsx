@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Icon, Menu, MenuItem } from "@mui/material";
 import fs from "fs";
 import path from "path";
@@ -12,6 +12,9 @@ import ContextMenu from "@mui/material/Menu";
 import ContextMenuItem from "@mui/material/MenuItem";
 import ContextMenuTrigger from "@mui/material/IconButton";
 import useFileStore from "../../../domain/filesystem/fileReduces/fileActions";
+import { ListItemIcon } from "@mui/material";
+
+import HoverMenu from "./HoverMenu";
 
 const Container = ({ selected, children }) => {
   // Define the base classes for the component
@@ -32,12 +35,17 @@ const FileLine = ({
   fileMoved,
   endRenaming,
   pushScene,
-  ignoreGit, // Assuming this is also a prop that needs to be passed down
+  ignoreGit,
 }) => {
-  const { editingFilepath, currentSelectDir } = useFileStore((state) => ({
-    editingFilepath: state.filepath,
-    currentSelectDir: state.currentSelectDir,
-  }));
+  const [hovered, setHovered] = useState(false);
+
+  const { deleteFile, editingFilepath, currentSelectDir } = useFileStore(
+    (state) => ({
+      editingFilepath: state.filepath,
+      currentSelectDir: state.currentSelectDir,
+      deleteFile: state.deleteFile,
+    })
+  );
   const basename = path.basename(filepath);
 
   const handleRenameConfirm = async (value) => {
@@ -47,6 +55,9 @@ const FileLine = ({
     endRenaming();
     fileMoved({ fromPath: filepath, destPath });
   };
+  const handleMouseOver = () => setHovered(true);
+
+  const handleMouseLeave = () => setHovered(false);
 
   if (renamingPathname === filepath) {
     return (
@@ -61,7 +72,7 @@ const FileLine = ({
     );
   }
   return (
-    <ContextMenuTrigger id="file" className="block p-[0px] w-full h-full mt-2">
+    <div id="file" className="block p-[0px] w-full h-full">
       <Draggable
         pathname={filepath}
         type="file"
@@ -87,15 +98,36 @@ const FileLine = ({
             className="flex items-center cursor-pointer" // Tailwind classes for styling
             style={{
               padding: "0px",
-              paddingLeft: `${depth * 15}px`,
+              paddingLeft: `${depth * 8 + 24}px`,
             }}
+            onMouseOver={handleMouseOver}
+            onMouseLeave={handleMouseLeave}
           >
-            <FileIcon />
+            <ListItemIcon
+              style={{
+                minWidth: "unset",
+              }}
+            >
+              <FileIcon />
+            </ListItemIcon>
             <Pathname ignoreGit={ignoreGit}>{basename}</Pathname>
+            {hovered && (
+              <HoverMenu
+                dirpath={filepath}
+                onDelete={(e) => {
+                  e.stopPropagation();
+                  deleteFile({ filename: filepath });
+                }}
+                onRename={(e) => {
+                  e.stopPropagation();
+                  // onRename(e);
+                }}
+              />
+            )}
           </div>
         </Container>
       </Draggable>
-    </ContextMenuTrigger>
+    </div>
   );
 };
 
