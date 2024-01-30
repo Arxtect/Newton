@@ -5,44 +5,53 @@
  */
 // Hooks
 import React, { useLayoutEffect, useEffect } from "react";
-import RootDirectory from "./components/RootDirectory"
-import { mkdir, readDirectoryTree } from "../../domain/filesystem"
-import useFileStore from '../../domain/filesystem/fileReduces/fileActions'
-
+import RootDirectory from "./components/RootDirectory";
+import { mkdir, readDirectoryTree } from "../../domain/filesystem";
+import useFileStore from "../../domain/filesystem/fileReduces/fileActions";
 
 const GitTest = () => {
-
   const createProject = async () => {
-    await mkdir('test')
-  }
+    await mkdir("test");
+  };
 
-  useEffect(() => { createProject() }, [])
-  const { touchCounter,
+  useEffect(() => {
+    createProject();
+  }, []);
+  const {
+    touchCounter,
     isFileCreating,
     isDirCreating,
     fileMoved,
     startFileCreating,
     startDirCreating,
     deleteDirectory,
-    editingFilepath, loadFile } = useFileStore((state) => ({
-      touchCounter: state.touchCounter,
-      isFileCreating: state.fileCreatingDir,
-      isDirCreating: state.dirCreatingDir,
-      fileMoved: state.fileMoved,
-      startFileCreating: state.startFileCreating,
-      startDirCreating: state.startDirCreating,
-      deleteDirectory: state.deleteDirectory,
-      editingFilepath: state.filepath,
-      loadFile: state.loadFile
-    }));
+    editingFilepath,
+    loadFile,
+    currentSelectDir,
+    changeCurrentSelectDir,
+  } = useFileStore((state) => ({
+    touchCounter: state.touchCounter,
+    isFileCreating: state.fileCreatingDir,
+    isDirCreating: state.dirCreatingDir,
+    fileMoved: state.fileMoved,
+    startFileCreating: state.startFileCreating,
+    startDirCreating: state.startDirCreating,
+    deleteDirectory: state.deleteDirectory,
+    editingFilepath: state.filepath,
+    loadFile: state.loadFile,
+    currentSelectDir: state.currentSelectDir,
+    changeCurrentSelectDir: state.changeCurrentSelectDir,
+  }));
 
   useEffect(() => {
-    readDirectoryTree('test').then(tree => {
-      console.log(tree);
-    }).catch(error => {
-      console.error('读取目录树时出错:', error);
-    });
-  }, [])
+    readDirectoryTree("test")
+      .then((tree) => {
+        console.log(tree);
+      })
+      .catch((error) => {
+        console.error("读取目录树时出错:", error);
+      });
+  }, []);
 
   return (
     <main className="max-w-[20vw] m-[auto] mt-2">
@@ -50,9 +59,9 @@ const GitTest = () => {
         // key={props.currentProjectRoot}
         // root={props.currentProjectRoot}
         // dirpath={props.currentProjectRoot}
-        key={'test'}
-        root={'test'}
-        dirpath={'test'}
+        key={"test"}
+        root={"test"}
+        dirpath={"test"}
         depth={0}
         touchCounter={touchCounter}
         isFileCreating={isFileCreating}
@@ -64,6 +73,8 @@ const GitTest = () => {
         editingFilepath={editingFilepath}
         open={true}
         loadFile={loadFile}
+        currentSelectDir={currentSelectDir}
+        changeCurrentSelectDir={changeCurrentSelectDir}
       />
     </main>
   );

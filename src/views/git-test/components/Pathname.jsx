@@ -1,12 +1,11 @@
-import React from 'react';
+import React from "react";
 
 const Pathname = ({ ignoreGit, children }) => {
-    const style = {
-        color: ignoreGit ? "#aaa" : "inherit",
-        // Add more styles or Tailwind classes as needed
-    };
+  const classNames = `font-normal text-base leading-6 tracking-wider ml-1 ${
+    ignoreGit ? "text-gray-500" : "text-[var(--black)]"
+  }`;
 
-    return <span style={style}>{children}</span>;
+  return <span className={classNames}>{children}</span>;
 };
 
 export default Pathname;
