@@ -17,35 +17,37 @@ import store from "./store";
 import { lazy, Suspense } from "react";
 import "./styles/globals.scss";
 import CircularProgress from "@mui/material/CircularProgress";
-import * as git from "isomorphic-git"
-import fs from "fs"
+import * as git from "isomorphic-git";
+import fs from "fs";
 
 const Home = lazy(() => import("./views/home"));
 const Arxtect = lazy(() => import("./views/arxtect"));
 const GitText = lazy(() => import("./views/git-test"));
 
 async function loadBrowserFS() {
-  return new Promise(resolve => {
-    const BrowserFS = require("browserfs")
-    git.plugins.set("fs", fs)
-    BrowserFS.install(window)
+  return new Promise((resolve) => {
+    const BrowserFS = require("browserfs");
+    git.plugins.set("fs", fs);
+    BrowserFS.install(window);
     BrowserFS.configure({ fs: "IndexedDB", options: {} }, (err) => {
       if (err) {
-        throw err
+        throw err;
       }
 
-      resolve()
-    })
-  })
+      resolve();
+    });
+  });
 }
 
-await loadBrowserFS()
+await loadBrowserFS();
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
     <Provider store={store}>
-      <HashRouter> {/* Replace BrowserRouter with HashRouter */}
+      <HashRouter>
+        {" "}
+        {/* Replace BrowserRouter with HashRouter */}
         <Header />
         <div className="overflow-scroll">
           <Suspense fallback={<CircularProgress />}>
@@ -56,7 +58,6 @@ root.render(
             </Routes>
           </Suspense>
         </div>
-
         <Footer />
       </HashRouter>
     </Provider>

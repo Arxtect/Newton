@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
+import fs from "fs";
 import path from "path";
+import pify from "pify";
 import { Icon, Tooltip } from "@blueprintjs/core";
 import { ContextMenuProvider } from "react-contexify";
 import range from "lodash/range";
@@ -10,16 +12,15 @@ import Draggable from "./Draggable";
 import FileLine from "./FileLine";
 import Pathname from "./Pathname";
 import HoverMenu from "./HoverMenu";
-import SortableTree from "react-sortable-tree";
-import FileExplorerTheme from "react-sortable-tree-theme-file-explorer";
 import { List, ListItem, ListItemText, ListItemIcon } from "@mui/material";
 import {
   Folder as FolderIcon,
   FolderOpen as FolderOpenIcon,
-  InsertDriveFile as FileIcon,
   ChevronRight as ChevronRightIcon,
   ExpandMore as ExpandMoreIcon,
 } from "@mui/icons-material";
+import FileIcon from "@mui/icons-material/InsertDriveFile";
+import { Box, TextField } from "@mui/material";
 
 import { readFileStats } from "../../../domain/filesystem/queries/readFileStats";
 
@@ -84,8 +85,15 @@ const DirectoryLineContent = ({
   loadFile,
   currentSelectDir,
   changeCurrentSelectDir,
+  renamingPathname,
+  startRenaming,
+  endRenaming,
+  preRenamingDirpath,
+  changePreRenamingDirpath,
 }) => {
-  const [opened, setOpened] = useState(open);
+  const [opened, setOpened] = useState(
+    preRenamingDirpath == dirpath ? true : open
+  );
   const [fileList, setFileList] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -126,7 +134,6 @@ const DirectoryLineContent = ({
     if (!loading) {
       setOpened(!opened);
       changeCurrentSelectDir(dirpath);
-      console.log(dirpath, "di22rpath");
     }
   };
 
@@ -147,13 +154,57 @@ const DirectoryLineContent = ({
   const basename = path.basename(relpath);
   const ignoreGit = relpath === ".git" || p_ignoreGit || false;
 
+  const [value, setValue] = useState(path.basename(dirpath));
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [inputRef.current]);
+
+  const handleChange = (event) => {
+    setValue(event.target.value);
+  };
+
+  const handleBlur = () => {
+    endRenaming();
+  };
+  const handleRename = () => {
+    startRenaming({ pathname: dirpath });
+  };
+
+  const handleKeyDown = (ev) => {
+    if (ev.key === "Escape") {
+      endRenaming();
+    } else if (ev.key === "Enter") {
+      if (!value || value == "") {
+        endRenaming();
+        return;
+      }
+      handleDirRenameConfirm(value);
+    }
+  };
+  const handleDirRenameConfirm = async (value) => {
+    const parentDir = path.dirname(dirpath);
+    const newDirPath = path.join(parentDir, value);
+    if (opened) {
+      changePreRenamingDirpath({ dirpath: newDirPath });
+    }
+    try {
+      // Rename the directory
+      await pify(fs.rename)(dirpath, newDirPath);
+
+      endRenaming();
+      fileMoved({ fromPath: dirpath, destPath: newDirPath });
+    } catch (error) {
+      console.error("Error renaming directory:", error);
+    }
+  };
+
   return (
     <List className="p-0">
-      <div
-        onMouseOver={handleMouseOver}
-        onMouseLeave={handleMouseLeave}
-        onClick={handleClick}
-      >
+      <div onMouseOver={handleMouseOver} onMouseLeave={handleMouseLeave}>
         <Draggable
           pathname={dirpath}
           type="dir"
@@ -184,32 +235,58 @@ const DirectoryLineContent = ({
             <ListItemIcon style={{ minWidth: "unset" }}>
               {opened ? <FolderOpenIcon /> : <FolderIcon />}
             </ListItemIcon>
-            <Pathname ignoreGit={ignoreGit}>
-              {basename || `${dirpath}`}
-            </Pathname>
-            {hovered && (
-              <HoverMenu
-                basename={basename}
-                dirpath={basename}
-                root={basename}
-                onAddFile={(event) => {
-                  event.stopPropagation();
-                  setOpened(true);
-                  startFileCreating(dirpath);
+            {renamingPathname === dirpath ? (
+              <TextField
+                className="tailwind-classes-for-input"
+                variant="outlined"
+                size="small"
+                value={value}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                onKeyDown={handleKeyDown}
+                onFocus={(e) => {
+                  e.stopPropagation();
                 }}
-                onAddFolder={(event) => {
-                  event.stopPropagation();
-                  setOpened(true);
-                  startDirCreating(dirpath);
-                }}
-                onDelete={(event) => {
-                  event.stopPropagation();
-                  handleDeleteDirectory(event, dirpath);
-                }}
-                onRename={(event) => {
-                  event.stopPropagation();
+                onClick={(e) => e.stopPropagation()}
+                inputRef={inputRef}
+                sx={{
+                  "& .MuiInputBase-input": {
+                    height: "24px",
+                    padding: "0 6px",
+                  },
                 }}
               />
+            ) : (
+              <React.Fragment>
+                <Pathname ignoreGit={ignoreGit}>
+                  {basename || `${dirpath}`}
+                </Pathname>
+                {hovered && (
+                  <HoverMenu
+                    basename={basename}
+                    dirpath={basename}
+                    root={basename}
+                    onAddFile={(event) => {
+                      event.stopPropagation();
+                      setOpened(true);
+                      startFileCreating(dirpath);
+                    }}
+                    onAddFolder={(event) => {
+                      event.stopPropagation();
+                      setOpened(true);
+                      startDirCreating(dirpath);
+                    }}
+                    onDelete={(event) => {
+                      event.stopPropagation();
+                      handleDeleteDirectory(event, dirpath);
+                    }}
+                    onRename={(event) => {
+                      event.stopPropagation();
+                      handleRename(event);
+                    }}
+                  />
+                )}
+              </React.Fragment>
             )}
           </ListItem>
         </Draggable>
@@ -246,6 +323,11 @@ const DirectoryLineContent = ({
           loadFile={loadFile}
           currentSelectDir={currentSelectDir}
           changeCurrentSelectDir={changeCurrentSelectDir}
+          renamingPathname={renamingPathname}
+          startRenaming={startRenaming}
+          endRenaming={endRenaming}
+          preRenamingDirpath={preRenamingDirpath}
+          changePreRenamingDirpath={changePreRenamingDirpath}
         />
       )}
     </List>

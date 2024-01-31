@@ -20,6 +20,7 @@ const useFileStore = create((set, get) => ({
   currentProjectRoot: "/playground",
   touchCounter: 0,
   currentSelectDir: "",
+  preRenamingDirpath: "",
 
   // Actions
   setAutosave: (autosave) => set({ autosave }),
@@ -215,6 +216,16 @@ const useFileStore = create((set, get) => ({
 
   fileMoved: async ({ fromPath, destPath }) => {
     get().startUpdate({ changedPath: [fromPath, destPath] });
+  },
+  startRenaming: ({ pathname }) => {
+    set({ renamingPathname: pathname });
+  },
+  endRenaming: () => {
+    set({ renamingPathname: null });
+  },
+  changePreRenamingDirpath: ({ dirpath }) => {
+    console.log(dirpath, "changePreRenamingDirpath");
+    set({ preRenamingDirpath: dirpath });
   },
 }));
 

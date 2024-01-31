@@ -29,6 +29,11 @@ const GitTest = () => {
     loadFile,
     currentSelectDir,
     changeCurrentSelectDir,
+    renamingPathname,
+    startRenaming,
+    endRenaming,
+    preRenamingDirpath,
+    changePreRenamingDirpath,
   } = useFileStore((state) => ({
     touchCounter: state.touchCounter,
     isFileCreating: state.fileCreatingDir,
@@ -41,6 +46,11 @@ const GitTest = () => {
     loadFile: state.loadFile,
     currentSelectDir: state.currentSelectDir,
     changeCurrentSelectDir: state.changeCurrentSelectDir,
+    renamingPathname: state.renamingPathname,
+    startRenaming: state.startRenaming,
+    endRenaming: state.endRenaming,
+    preRenamingDirpath: state.preRenamingDirpath,
+    changePreRenamingDirpath: state.changePreRenamingDirpath,
   }));
 
   useEffect(() => {
@@ -75,6 +85,11 @@ const GitTest = () => {
         loadFile={loadFile}
         currentSelectDir={currentSelectDir}
         changeCurrentSelectDir={changeCurrentSelectDir}
+        startRenaming={startRenaming}
+        endRenaming={endRenaming}
+        renamingPathname={renamingPathname}
+        preRenamingDirpath={preRenamingDirpath}
+        changePreRenamingDirpath={changePreRenamingDirpath}
       />
     </main>
   );
