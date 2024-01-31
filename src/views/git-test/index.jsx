@@ -8,6 +8,12 @@ import React, { useLayoutEffect, useEffect } from "react";
 import RootDirectory from "./components/RootDirectory";
 import { mkdir, readDirectoryTree } from "../../domain/filesystem";
 import useFileStore from "../../domain/filesystem/fileReduces/fileActions";
+import { IconButton } from "@mui/material";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
+import Tooltip from "@mui/material/Tooltip";
+import UpLoadFile from "../../domain/filesystem/commands/upLoadFile";
+import FileUploader from "./upload.jsx";
 
 const GitTest = () => {
   const createProject = async () => {
@@ -65,6 +71,34 @@ const GitTest = () => {
 
   return (
     <main className="max-w-[20vw] m-[auto] mt-2">
+      <FileUploader></FileUploader>
+      <div className="flex justify-end items-center">
+        <div className="flex gap-2">
+          <Tooltip title="uplaod">
+            <IconButton
+              size="small"
+              className="text-gray-700"
+              onClick={() => {
+                /* handle export logic */
+              }}
+            >
+              <CloudUploadIcon fontSize="inherit" />
+            </IconButton>
+          </Tooltip>
+
+          <Tooltip title="uplaod">
+            <IconButton
+              size="small"
+              className="text-gray-700"
+              onClick={() => {
+                /* handle export logic */
+              }}
+            >
+              <CloudDownloadIcon fontSize="inherit" />
+            </IconButton>
+          </Tooltip>
+        </div>
+      </div>
       <RootDirectory
         // key={props.currentProjectRoot}
         // root={props.currentProjectRoot}
