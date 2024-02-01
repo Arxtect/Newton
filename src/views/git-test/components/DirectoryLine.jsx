@@ -161,7 +161,7 @@ const DirectoryLineContent = ({
     if (inputRef.current) {
       inputRef.current.focus();
     }
-  }, [inputRef.current]);
+  }, [inputRef.current, renamingPathname]);
 
   const handleChange = (event) => {
     setValue(event.target.value);
@@ -244,9 +244,6 @@ const DirectoryLineContent = ({
                 onChange={handleChange}
                 onBlur={handleBlur}
                 onKeyDown={handleKeyDown}
-                onFocus={(e) => {
-                  e.stopPropagation();
-                }}
                 onClick={(e) => e.stopPropagation()}
                 inputRef={inputRef}
                 sx={{

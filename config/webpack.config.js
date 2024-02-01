@@ -303,13 +303,13 @@ module.exports = function (webpackEnv) {
         modules.additionalModulePaths || []
       ),
       fallback: {
-      "stream": require.resolve("stream-browserify"),
-      "http": require.resolve("stream-http"),
-      "https": require.resolve("https-browserify"),
-      "querystring": require.resolve("querystring-es3"),
-      "url": require.resolve("url/"),
-      "util": require.resolve("util/")
-    },
+        stream: require.resolve("stream-browserify"),
+        http: require.resolve("stream-http"),
+        https: require.resolve("https-browserify"),
+        querystring: require.resolve("querystring-es3"),
+        url: require.resolve("url/"),
+        util: require.resolve("util/"),
+      },
       // These are the reasonable defaults supported by the Node ecosystem.
       // We also include JSX as a common component filename extension to support
       // some tools, although we do not recommend using it, see:
@@ -334,7 +334,7 @@ module.exports = function (webpackEnv) {
         path: "browserfs/dist/shims/path.js",
         processGlobal: "browserfs/dist/shims/process.js",
         bufferGlobal: "browserfs/dist/shims/bufferGlobal.js",
-        bfsGlobal: require.resolve("browserfs")
+        bfsGlobal: require.resolve("browserfs"),
       },
       plugins: [
         // Prevents users from importing files from outside of src/ (or node_modules/).
@@ -582,7 +582,7 @@ module.exports = function (webpackEnv) {
       new webpack.ProvidePlugin({
         BrowserFS: "bfsGlobal",
         process: "processGlobal",
-        Buffer: "bufferGlobal"
+        Buffer: "bufferGlobal",
       }),
       // Generates an `index.html` file with the <script> injected.
       new CopyWebpackPlugin({

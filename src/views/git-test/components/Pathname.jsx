@@ -1,3 +1,8 @@
+/*
+ * @Description: 
+ * @Author: Devin
+ * @Date: 2024-01-26 10:17:19
+ */
 import React from "react";
 
 const Pathname = ({ ignoreGit, children }) => {
@@ -5,7 +10,18 @@ const Pathname = ({ ignoreGit, children }) => {
     ignoreGit ? "text-gray-500" : "text-[var(--black)]"
   }`;
 
-  return <span className={classNames}>{children}</span>;
+  const style = {
+    maxWidth: "80%",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+  };
+
+  return (
+    <span className={classNames} style={style} title={children}>
+      {children}
+    </span>
+  );
 };
 
 export default Pathname;

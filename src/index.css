@@ -47,3 +47,8 @@
 .css-78trlr-MuiButtonBase-root-MuiIconButton-root:hover {
   background-color: transparent !important;
 }
+
+#root{
+  height: 100%;
+    width: 100%;
+}

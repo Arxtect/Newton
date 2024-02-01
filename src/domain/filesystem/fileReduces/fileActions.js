@@ -34,7 +34,7 @@ const useFileStore = create((set, get) => ({
       changed: false,
       currentSelectDir: "",
     });
-    console.log(filepath, "fileContent");
+    console.log(fileContent, "fileContent");
   },
   changeCurrentSelectDir: (dirpath) => {
     set({ currentSelectDir: dirpath });
@@ -85,6 +85,7 @@ const useFileStore = create((set, get) => ({
         lastSavedValue: value,
         changed: false,
       });
+      get().updateFileContent(state.filepath, value);
     } else {
       set({
         value,

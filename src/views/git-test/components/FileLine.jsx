@@ -44,6 +44,7 @@ const FileLine = ({
       editingFilepath: state.filepath,
       currentSelectDir: state.currentSelectDir,
       deleteFile: state.deleteFile,
+      renamingPathname:state.renamingPathname
     }));
   const basename = path.basename(filepath);
 
@@ -75,6 +76,7 @@ const FileLine = ({
     endRenaming();
   };
   const handleRename = () => {
+    console.log(filepath, renamingPathname, "filepath");
     startRenaming({ pathname: filepath });
   };
 

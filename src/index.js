@@ -49,16 +49,14 @@ root.render(
         {" "}
         {/* Replace BrowserRouter with HashRouter */}
         <Header />
-        <div className="overflow-scroll">
-          <Suspense fallback={<CircularProgress />}>
-            <Routes>
-              <Route path="/" element={<Home />}></Route>
-              <Route path="/arxtect" element={<Arxtect />}></Route>
-              <Route path="/git-test" element={<GitText />}></Route>
-            </Routes>
-          </Suspense>
-        </div>
-        <Footer />
+        <Suspense fallback={<CircularProgress />}>
+          <Routes>
+            <Route path="/" element={<Home />}></Route>
+            <Route path="/arxtect" element={<Arxtect />}></Route>
+            <Route path="/git-test" element={<GitText />}></Route>
+          </Routes>
+        </Suspense>
+        {/* <Footer /> */}
       </HashRouter>
     </Provider>
   </React.StrictMode>

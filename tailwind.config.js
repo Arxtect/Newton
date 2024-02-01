@@ -1,3 +1,8 @@
+/*
+ * @Description: 
+ * @Author: Devin
+ * @Date: 2024-01-25 12:25:23
+ */
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
@@ -9,6 +14,25 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    function ({ addUtilities }) {
+      const newUtilities = {
+        ".border-gradient-top": {
+          "@apply border-t relative": {},
+          "&:after": {
+            content: '""',
+            position: "absolute",
+            left: 0,
+            top: 0,
+            width: "100%",
+            height: "1px",
+            background:
+              "linear-gradient(to right, #yourStartColor, #yourEndColor)",
+          },
+        },
+      };
+      addUtilities(newUtilities, ["responsive", "hover"]);
+    },
+  ],
   important: true,
 };

@@ -1,11 +1,8 @@
-/*
- * @Description:
- * @Author: Devin
- * @Date: 2024-01-30 10:20:30
- */
 import fs from "fs";
 import path from "path";
 import pify from "pify";
+import JSZip from "jszip";
+import { saveAs } from "file-saver";
 
 const fsPify = {
   readdir: pify(fs.readdir),
@@ -47,4 +44,27 @@ export async function readDirectoryTree(rootpath) {
   }
 
   return readDirRecursive(rootpath);
+}
+
+
+export async function downloadDirectoryAsZip(rootpath) {
+  const directoryTree = await readDirectoryTree(rootpath);
+  const zip = new JSZip();
+
+  function addFilesToZip(dir, zipFolder) {
+    dir.files.forEach(file => {
+      zipFolder.file(file.path.replace(rootpath, ''), file.content);
+    });
+
+    dir.directories.forEach(subDir => {
+      const subFolder = zipFolder.folder(subDir.path.replace(rootpath, ''));
+      addFilesToZip(subDir, subFolder);
+    });
+  }
+
+  addFilesToZip(directoryTree, zip);
+
+  zip.generateAsync({ type: "blob" }).then(function (blob) {
+    saveAs(blob, "files.zip");
+  });
 }

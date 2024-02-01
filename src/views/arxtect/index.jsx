@@ -13,6 +13,8 @@ import { initializeLatexEngines } from "../../features/latexCompilation/latexCom
 import { SplitPane } from "../../components/SplitPane";
 import { ButtonBarContainer } from "../../features/buttonBar/ButtonBarContainer";
 import useSwitchTheme from "../../useHooks/useSwitchTheme";
+import ResizeSlider from "./resizeSlider";
+import "./index.css";
 
 const Arxtect = () => {
   useSwitchTheme();
@@ -21,14 +23,18 @@ const Arxtect = () => {
     initializeLatexEngines();
   }, []);
 
+  
+
   // The actual app
   return (
-    <main className="max-w-[99vw] m-[auto] mt-2">
-      <ButtonBarContainer />
-      <SplitPane>
-        <LatexEditorContainer />
-        <PdfPreview />
-      </SplitPane>
+    <main className="max-w-[99vw]">
+      <ResizeSlider>
+        <ButtonBarContainer />
+        <SplitPane>
+          <LatexEditorContainer />
+          <PdfPreview />
+        </SplitPane>
+      </ResizeSlider>
     </main>
   );
 };

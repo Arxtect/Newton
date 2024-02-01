@@ -3,21 +3,47 @@
  * @Author: Devin
  * @Date: 2024-01-31 18:28:07
  */
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import UpLoadFile from "../../domain/filesystem/commands/upLoadFile";
-
-const FileUploader = () => {
-  const [file, setFile] = useState(null);
-
+import { IconButton, Tooltip } from "@mui/material";
+import UploadFileIcon from "@mui/icons-material/UploadFile";
+import path from "path";
+const FileUploader = ({ reload, filepath, currentSelectDir, ...props }) => {
   const handleFileChange = (event) => {
-    setFile(event.target.files[0]);
-    console.log(event.target.files[0], "event.target.files[0]");
-    UpLoadFile(event.target.files[0], "test");
+    const currentPath = currentSelectDir
+      ? currentSelectDir
+      : path.dirname(filepath);
+    console.log(currentPath, "currentPath");
+    const fileList = event.target.files;
+    const filesArray = Array.from(fileList);
+    UpLoadFile(filesArray, currentPath, reload);
+  };
+
+  const fileUploaderRef = useRef(null);
+
+  const handleButtonClick = () => {
+    fileUploaderRef.current.click();
   };
 
   return (
-    <div>
-      <input type="file" onChange={handleFileChange} />
+    <div {...props} className="position-relative">
+      <Tooltip title="upload file">
+        <IconButton
+          className="text-gray-700"
+          onClick={() => {
+            handleButtonClick();
+          }}
+        >
+          <UploadFileIcon />
+        </IconButton>
+      </Tooltip>
+      <input
+        type="file"
+        multiple
+        onChange={handleFileChange}
+        style={{ position: "absolute", opacity: "0" }}
+        ref={fileUploaderRef}
+      />
     </div>
   );
 };
