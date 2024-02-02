@@ -8,7 +8,7 @@ import { DvipdfmxEngine } from "./swiftlatex/DvipdfmxEngine";
 import { XeTeXEngine } from "./swiftlatex/XeTeXEngine";
 
 // Redux store and actions
-import store from "../../store";
+import store from "@/store";
 import {
   setReadyEngineStatus,
   setBusyEngineStatus,
@@ -19,7 +19,13 @@ import {
   setCompilerLog,
   setShowCompilerLog,
 } from "../pdfPreview/pdfPreviewSlice";
-import { loadFileNames, initDB, getFileContent } from "../../util";
+import { loadFileNames, initDB, getFileContent } from "@/util";
+
+import { getAllFileNames } from "@/domain/filesystem";
+import path from "path";
+import fs from "fs";
+import pify from "pify";
+
 const LATEX_FILE_EXTENSIONS = [
   ".tex",
   ".cls",
@@ -43,8 +49,14 @@ const LATEX_FILE_EXTENSIONS = [
   ".glsdefs",
   ".xdy",
   ".bst",
-  ".eps"
+  ".eps",
 ];
+
+const fsPify = {
+  readdir: pify(fs.readdir),
+  stat: pify(fs.stat),
+  readFile: pify(fs.readFile),
+};
 
 // Global LaTeX engine objects
 const xetexEngine = new XeTeXEngine(),
@@ -64,7 +76,7 @@ export const initializeLatexEngines = async () => {
   }
 };
 
-export const compileLatex = async (latexCode) => {
+export const compileLatex = async (latexCode, currentProject) => {
   // Make sure both engines are ready for compilation
   if (!xetexEngine.isReady() || !dviEngine.isReady()) {
     console.log("Engine not ready yet!");
@@ -77,49 +89,45 @@ export const compileLatex = async (latexCode) => {
   // Create a temporary main.tex file
   xetexEngine.writeMemFSFile("main.tex", latexCode);
 
-  const lists = [
-    // "eg.eps",
-    // "fancyplot.eps",
-    // "exp.eps",
-    // "expfig.eps",
-    // "fsim.eps",
-    // "nsim.eps",
-    // "SREP-19-29377-T.dvi",
-    // "SREP-19-29377-T.ps",
-    "lmmono9-regular.otf",
-  ];
+  // const lists = [
+  // "eg.eps",
+  // "fancyplot.eps",
+  // "exp.eps",
+  // "expfig.eps",
+  // "fsim.eps",
+  // "nsim.eps",
+  // "SREP-19-29377-T.dvi",
+  // "SREP-19-29377-T.ps",
+  //   "lmmono9-regular.otf",
+  // ];
 
-  for (let i = 0; i < lists.length; i++) {
-    let downloadReq = await fetch(`/assets/${lists[i]}`);
-    let imageBlob = await downloadReq.arrayBuffer();
+  // for (let i = 0; i < lists.length; i++) {
+  //   let downloadReq = await fetch(`/assets/${lists[i]}`);
+  //   let imageBlob = await downloadReq.arrayBuffer();
 
-    xetexEngine.writeMemFSFile(`${lists[i]}`, new Uint8Array(imageBlob));
-  }
-  console.log(xetexEngine.isReady());
+  //   xetexEngine.writeMemFSFile(`${lists[i]}`, new Uint8Array(imageBlob));
+  // }
+  let list = await getAllFileNames(currentProject);
 
-  let list = await loadFileNames();
   for (let i = 0; i < list.length; i++) {
     // 去掉文件名的后缀
-    let fileNameWithoutExtension = list[i].split(".")[0];
+    let filename = path.basename(list[i]);
+    let fileNameWithoutExtension = filename.split(".")[0];
 
     // 检查latexCode是否包含文件名（无后缀）或者文件名的前缀
     if (latexCode.includes(fileNameWithoutExtension)) {
-      let downloadReq = await getFileContent(list[i]);
-      let imageBlob = await downloadReq.arrayBuffer();
+      let imageBlob = await fsPify.readFile(list[i], "utf8");
 
-      xetexEngine.writeMemFSFile(`${list[i]}`, new Uint8Array(imageBlob));
-      if (LATEX_FILE_EXTENSIONS.some((ext) => list[i].endsWith(ext))) {
-        let fileContent = await downloadReq.text();
+      xetexEngine.writeMemFSFile(`${filename}`, imageBlob);
+      if (LATEX_FILE_EXTENSIONS.some((ext) => filename.endsWith(ext))) {
+        let fileContent = await imageBlob.toString();
         for (let j = 0; j < list.length; j++) {
-          let fileNameWithoutExtensions = list[j].split(".")[0];
+          let newFilename = path.basename(list[j]);
+          let fileNameWithoutExtensions = newFilename.split(".")[0];
           // 检查latexCode是否包含文件名（无后缀）或者文件名的前缀
           if (i !== j && fileContent.includes(fileNameWithoutExtensions)) {
-            let nestedDownloadReq = await getFileContent(list[j]);
-            let nestedImageBlob = await nestedDownloadReq.arrayBuffer();
-            xetexEngine.writeMemFSFile(
-              list[j],
-              new Uint8Array(nestedImageBlob)
-            );
+            let nestedImageBlob = await fsPify.readFile(list[j], "utf8");
+            xetexEngine.writeMemFSFile(newFilename, nestedImageBlob);
           }
         }
       }
@@ -131,7 +139,6 @@ export const compileLatex = async (latexCode) => {
   // Compile the main.tex file
   let xetexCompilation = await xetexEngine.compileLaTeX();
   // Print the compilation log
-  console.log(xetexCompilation.log);
   store.dispatch(setCompilerLog(xetexCompilation.log));
 
   // On successfull first compilation continue with the second one
@@ -142,25 +149,24 @@ export const compileLatex = async (latexCode) => {
     dviEngine.writeMemFSFile("main.xdv", xetexCompilation.pdf);
 
     for (let i = 0; i < list.length; i++) {
-      let fileNameWithoutExtension = list[i].split(".")[0];
+      // 去掉文件名的后缀
+      let filename = path.basename(list[i]);
+      let fileNameWithoutExtension = filename.split(".")[0];
+
       // 检查latexCode是否包含文件名（无后缀）或者文件名的前缀
       if (latexCode.includes(fileNameWithoutExtension)) {
-        let downloadReq = await getFileContent(list[i]);
-        let imageBlob = await downloadReq.arrayBuffer();
+        let imageBlob = await fsPify.readFile(list[i], "utf8");
 
-        dviEngine.writeMemFSFile(`${list[i]}`, new Uint8Array(imageBlob));
-        if (LATEX_FILE_EXTENSIONS.some((ext) => list[i].endsWith(ext))) {
-          let fileContent = await downloadReq.text();
+        dviEngine.writeMemFSFile(`${filename}`, imageBlob);
+        if (LATEX_FILE_EXTENSIONS.some((ext) => filename.endsWith(ext))) {
+          let fileContent = await imageBlob.toString();
           for (let j = 0; j < list.length; j++) {
-            let fileNameWithoutExtensions = list[j].split(".")[0];
+            let newFilename = path.basename(list[j]);
+            let fileNameWithoutExtensions = newFilename.split(".")[0];
             // 检查latexCode是否包含文件名（无后缀）或者文件名的前缀
             if (i !== j && fileContent.includes(fileNameWithoutExtensions)) {
-              let nestedDownloadReq = await getFileContent(list[j]);
-              let nestedImageBlob = await nestedDownloadReq.arrayBuffer();
-              dviEngine.writeMemFSFile(
-                list[j],
-                new Uint8Array(nestedImageBlob)
-              );
+              let nestedImageBlob = await fsPify.readFile(list[j], "utf8");
+              dviEngine.writeMemFSFile(newFilename, nestedImageBlob);
             }
           }
         }

@@ -22,7 +22,7 @@ import {
 import FileIcon from "@mui/icons-material/InsertDriveFile";
 import { Box, TextField } from "@mui/material";
 
-import { readFileStats } from "../../../domain/filesystem/queries/readFileStats";
+import { readFileStats } from "domain/filesystem";
 
 const LinkedLines = ({
   dirpath,
@@ -264,23 +264,20 @@ const DirectoryLineContent = ({
                     dirpath={basename}
                     root={basename}
                     onAddFile={(event) => {
-                      event.stopPropagation();
                       setOpened(true);
                       startFileCreating(dirpath);
                     }}
                     onAddFolder={(event) => {
-                      event.stopPropagation();
                       setOpened(true);
                       startDirCreating(dirpath);
                     }}
                     onDelete={(event) => {
-                      event.stopPropagation();
                       handleDeleteDirectory(event, dirpath);
                     }}
                     onRename={(event) => {
-                      event.stopPropagation();
                       handleRename(event);
                     }}
+                    depth={depth}
                   />
                 )}
               </React.Fragment>

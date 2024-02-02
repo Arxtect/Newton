@@ -12,7 +12,7 @@ import { Box, TextField } from "@mui/material";
 import ContextMenu from "@mui/material/Menu";
 import ContextMenuItem from "@mui/material/MenuItem";
 import ContextMenuTrigger from "@mui/material/IconButton";
-import useFileStore from "../../../domain/filesystem/fileReduces/fileActions";
+import { useFileStore } from "store";
 
 import HoverMenu from "./HoverMenu";
 
@@ -44,7 +44,7 @@ const FileLine = ({
       editingFilepath: state.filepath,
       currentSelectDir: state.currentSelectDir,
       deleteFile: state.deleteFile,
-      renamingPathname:state.renamingPathname
+      renamingPathname: state.renamingPathname,
     }));
   const basename = path.basename(filepath);
 

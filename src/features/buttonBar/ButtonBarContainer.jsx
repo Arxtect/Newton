@@ -3,22 +3,25 @@ import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 // Components
 import { ButtonBar } from "./ButtonBar";
-// Redux
-// import { selectFullSourceCode, selectShowFullSourceCode, toggleSourceCode } from "../latexEditor/latexEditorSlice";
-import { selectBody } from "../latexEditor/latexEditorSlice";
 import {
   revokeCompiledPdfUrl,
   compileLatex,
 } from "../latexCompilation/latexCompilation";
-import {
- toggleCompilerLog,
-} from "../pdfPreview/pdfPreviewSlice.js";
+import { toggleCompilerLog } from "../pdfPreview/pdfPreviewSlice.js";
+import { useFileStore } from "store";
 
 export const ButtonBarContainer = () => {
   // Select the URL of the PDF, the source code, and whether to show all of it
   const pdfUrl = useSelector((state) => state.pdfPreview);
-  const sourceCode = useSelector(selectBody);
-  // const showFullSourceCode = useSelector(selectShowFullSourceCode);
+
+  const { sourceCode, changeValue, currentProjectRoot } = useFileStore(
+    (state) => ({
+      sourceCode: state.value,
+      changeValue: state.changeValue,
+      currentProjectRoot: state.currentProjectRoot,
+    })
+  );
+
   const dispatch = useDispatch();
 
   // Revoke the PDF URL every 30000 milliseconds
@@ -30,12 +33,11 @@ export const ButtonBarContainer = () => {
   }, [pdfUrl]);
 
   // const toggleVisibility = () => dispatch(toggleSourceCode());
-  const compile = () => compileLatex(sourceCode);
-  
-  const showLog = () => {
-    dispatch(toggleCompilerLog())
-  }
+  const compile = () => compileLatex(sourceCode, currentProjectRoot);
 
+  const showLog = () => {
+    dispatch(toggleCompilerLog());
+  };
 
   return (
     <ButtonBar

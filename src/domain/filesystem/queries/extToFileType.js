@@ -9,9 +9,7 @@ const EXT_TO_FILETYPE_MAP = {
     ".ts": "typescript"
 };
 
-function extToFileType(filepath) {
+export function extToFileType(filepath) {
     const ext = path.extname(filepath);
     return EXT_TO_FILETYPE_MAP[ext] || "text";
 }
-
-export default extToFileType

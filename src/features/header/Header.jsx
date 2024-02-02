@@ -13,7 +13,7 @@ import {
   IconButton,
 } from "@mui/material";
 import { Menu as MenuIcon } from "@mui/icons-material";
-import logo from "../../assets/logo.png";
+import logo from "@/assets/logo.png";
 
 export const Header = () => {
   return (

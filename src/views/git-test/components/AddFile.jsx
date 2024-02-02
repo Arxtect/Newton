@@ -3,7 +3,8 @@ import { Box, TextField } from "@mui/material";
 import FileIcon from "@mui/icons-material/InsertDriveFile"; // Assuming you have a FileIcon component
 
 import path from "path";
-import useFileStore from "../../../domain/filesystem/fileReduces/fileActions";
+import { useFileStore } from "store";
+
 import { ListItemIcon } from "@mui/material";
 
 const AddFile = ({ parentDir, depth }) => {

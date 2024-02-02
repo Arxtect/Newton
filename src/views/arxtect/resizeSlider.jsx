@@ -92,7 +92,7 @@ const ResizeSlider = ({ children }) => {
                   position="right"
                   testId="tooltip"
                 >
-                  <Component {...props} style={{ marginTop: "-22px" }} />
+                  <Component {...props} style={{ top: "50%" }} />
                 </Tooltip>
               ),
             },

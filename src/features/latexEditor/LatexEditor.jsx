@@ -10,14 +10,14 @@ import "ace-builds/src-noconflict/theme-github";
 import "ace-builds/src-noconflict/theme-monokai";
 import "ace-builds/src-noconflict/ext-language_tools";
 //yjs
-import { routerQuery, getRandomColor } from "../../util";
+import { routerQuery, getRandomColor } from "@/util";
 import { setBody } from "./latexEditorSlice";
 import * as Y from "yjs";
 import { IndexeddbPersistence } from "y-indexeddb";
 import { WebsocketProvider } from "y-websocket";
 
 import latexSyncToYText from "./latexSyncToYText";
-import useYText from "../..//useHooks/useYText";
+import useYText from "@/useHooks/useYText";
 import { AceBinding } from "./y-ace";
 import demo from "./demo";
 import { useSelector, useDispatch } from "react-redux";

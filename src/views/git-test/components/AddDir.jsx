@@ -6,7 +6,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Box, TextField } from "@mui/material";
 import FolderIcon from "@mui/icons-material/Folder";
-import useFileStore from "../../../domain/filesystem/fileReduces/fileActions";
+import { useFileStore } from "store";
+
 import path from "path";
 import { ListItemIcon } from "@mui/material";
 

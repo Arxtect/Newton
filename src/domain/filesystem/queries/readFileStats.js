@@ -1,3 +1,8 @@
+/*
+ * @Description: 
+ * @Author: Devin
+ * @Date: 2024-01-25 13:51:21
+ */
 // import fs from "fs";
 // import * as git from "isomorphic-git";
 // import orderBy from "lodash/orderBy";
@@ -42,7 +47,6 @@ export async function readFileStats(projectRoot, dirpath) {
   const stat = pify(fs.stat);
 
   const filenames = await readdir(dirpath);
-  console.log(filenames, 'filenames')
 
   const ret = await Promise.all(
     filenames.map(async (name) => {

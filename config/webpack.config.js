@@ -335,6 +335,9 @@ module.exports = function (webpackEnv) {
         processGlobal: "browserfs/dist/shims/process.js",
         bufferGlobal: "browserfs/dist/shims/bufferGlobal.js",
         bfsGlobal: require.resolve("browserfs"),
+        "@": path.join(__dirname, "..", "src"),
+        domain: path.join(__dirname, "..", "src/domain"),
+        store: path.join(__dirname, "..", "src/store/index"),
       },
       plugins: [
         // Prevents users from importing files from outside of src/ (or node_modules/).

@@ -1,18 +1,18 @@
 /*
  * @Description:
  * @Author: Devin
- * @Date: 2023-06-26 09:57:49
+ * @Date: 2024-01-25 13:51:21
  */
 // Hooks
-import { useLayoutEffect } from "react";
+import React, { useLayoutEffect, useEffect } from "react";
 // Components
-import { LatexEditorContainer } from "../../features/latexEditor/LatexEditorContainer";
-import { PdfPreview } from "../../features/pdfPreview/PdfPreview";
+import { LatexEditorContainer } from "@/features/latexEditor/LatexEditorContainer";
+import { PdfPreview } from "@/features/pdfPreview/PdfPreview";
 // Redux
-import { initializeLatexEngines } from "../../features/latexCompilation/latexCompilation";
-import { SplitPane } from "../../components/SplitPane";
-import { ButtonBarContainer } from "../../features/buttonBar/ButtonBarContainer";
-import useSwitchTheme from "../../useHooks/useSwitchTheme";
+import { initializeLatexEngines } from "@/features/latexCompilation/latexCompilation";
+import { SplitPane } from "@/components/SplitPane";
+import { ButtonBarContainer } from "@/features/buttonBar/ButtonBarContainer";
+import useSwitchTheme from "@/useHooks/useSwitchTheme";
 import ResizeSlider from "./resizeSlider";
 import "./index.css";
 
@@ -23,7 +23,9 @@ const Arxtect = () => {
     initializeLatexEngines();
   }, []);
 
-  
+  useEffect(() => {
+    console.log("1111");
+  }, []);
 
   // The actual app
   return (
@@ -39,4 +41,4 @@ const Arxtect = () => {
   );
 };
 
-export default Arxtect;
+export default React.memo(Arxtect);

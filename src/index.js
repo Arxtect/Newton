@@ -19,6 +19,8 @@ import "./styles/globals.scss";
 import CircularProgress from "@mui/material/CircularProgress";
 import * as git from "isomorphic-git";
 import fs from "fs";
+import { findAllProject } from "domain/filesystem";
+import { useFileStore } from "store";
 
 const Home = lazy(() => import("./views/home"));
 const Arxtect = lazy(() => import("./views/arxtect"));
@@ -40,6 +42,10 @@ async function loadBrowserFS() {
 }
 
 await loadBrowserFS();
+let projectLists = await findAllProject(".");
+if (projectLists.length == 0) {
+  useFileStore.getState().createProject("arxtect");
+}
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(

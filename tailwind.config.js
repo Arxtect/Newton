@@ -1,5 +1,5 @@
 /*
- * @Description: 
+ * @Description:
  * @Author: Devin
  * @Date: 2024-01-25 12:25:23
  */
@@ -11,6 +11,9 @@ module.exports = {
       colors: {
         link: "#13678a",
         primary: "#e7f8ff",
+      },
+      height: {
+        "minus-125": "calc(100vh - 125px)",
       },
     },
   },

@@ -1,3 +1,8 @@
+/*
+ * @Description:
+ * @Author: Devin
+ * @Date: 2024-01-30 20:24:29
+ */
 import React, { useState } from "react";
 import AddBoxIcon from "@mui/icons-material/AddBox"; // For creating files
 import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder"; // For creating directories
@@ -14,11 +19,8 @@ const HoverMenu = ({
   onAddFolder,
   onDelete,
   onRename,
+  depth,
 }) => {
-  const handleTooltipOpen = (e) => {
-    onDelete(e);
-  };
-
   return (
     <div className="relative ml-auto group">
       <div className="absolute inset-0 flex items-center justify-end space-x-1 ">
@@ -27,6 +29,7 @@ const HoverMenu = ({
             <IconButton
               size="small"
               onClick={(e) => {
+                e.stopPropagation();
                 onAddFile(e);
               }}
             >
@@ -39,6 +42,7 @@ const HoverMenu = ({
             <IconButton
               size="small"
               onClick={(e) => {
+                e.stopPropagation();
                 onAddFolder(e);
               }}
             >
@@ -47,11 +51,12 @@ const HoverMenu = ({
           </Tooltip>
         )}
         {/* basename !== ".git" && dirpath !== root && */}
-        {onDelete && (
+        {onDelete && depth != 0 && (
           <Tooltip title="delete">
             <IconButton
               size="small"
               onClick={(e) => {
+                e.stopPropagation();
                 onDelete(e);
               }}
             >
@@ -64,6 +69,7 @@ const HoverMenu = ({
             <IconButton
               size="small"
               onClick={(e) => {
+                e.stopPropagation();
                 onRename(e);
               }}
             >

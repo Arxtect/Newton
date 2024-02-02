@@ -1,7 +1,7 @@
 import * as git from "isomorphic-git";
 import difference from "lodash/difference";
 import uniq from "lodash/uniq";
-import { getFilesRecursively } from "../../filesystem/queries/getFileRecursively";
+import { getFilesRecursively } from "@/filesystem/queries/getFileRecursively";
 
 export async function getTrackingStatus(projectRoot) {
   const trackedByHead = await git.listFiles({

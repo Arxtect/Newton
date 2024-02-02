@@ -3,8 +3,8 @@
  * @Author: Devin
  * @Date: 2024-01-25 12:25:23
  */
-import { SplitPane } from "../../components/SplitPane";
-import { Button, CustomSplitButton } from "../../components/Button";
+import { SplitPane } from "@/components/SplitPane";
+import { Button, CustomSplitButton } from "@/components/Button";
 import { EngineStatus } from "../engineStatus/EngineStatus";
 import FileUpload from "../../components/FileUpload";
 import { useSelector, useDispatch } from "react-redux";
