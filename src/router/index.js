@@ -10,11 +10,13 @@ const Register = lazy(() => import("@//views/register"));
 const Verifyemail = lazy(() => import("@//views/verifyemail"));
 const ResetPasswordPage = lazy(() => import("@//views/resetPasswordPage"));
 const ForgotPassword = lazy(() => import("@//views/forgotPassword"));
+const Einstein = lazy(() => import("@//views/einstein"));
 
 // Routes that require a header (and possibly a footer)
 export const headerRoutes = [
   { path: "/", component: Home, withHeader: true },
   { path: "/arxtect", component: Arxtect, withHeader: true },
+  { path: "/einstein", component: Einstein, withHeader: true },
   // { path: "/git-test", component: GitText, withHeader: true },
   // Add more routes as needed
 ];

@@ -17,7 +17,7 @@ import { IconButton, Tooltip } from "@mui/material";
 import IosShareIcon from "@mui/icons-material/IosShare";
 import MoreMenu from "./components/moreMenu.js";
 
-import FileUploader from "./upload.jsx";
+import { FileUploader, FolderUploader } from "./upload.jsx";
 import DropdownFormWithIcon from "./components/DropdownFormWithIcon.jsx";
 
 const GitTest = () => {
@@ -99,7 +99,7 @@ const GitTest = () => {
             deleteProject={deleteProject}
             projectLists={allProject}
           ></MoreMenu>
-          <Tooltip title="export project">
+          {/* <Tooltip title="export project">
             <IconButton
               className="text-gray-700"
               onClick={() => {
@@ -108,7 +108,12 @@ const GitTest = () => {
             >
               <IosShareIcon fontSize="inherit" />
             </IconButton>
-          </Tooltip>
+          </Tooltip> */}
+          <FolderUploader
+            reload={repoChanged}
+            filepath={filepath}
+            currentSelectDir={currentSelectDir}
+          ></FolderUploader>
           <FileUploader
             reload={repoChanged}
             filepath={filepath}

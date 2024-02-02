@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { toast } from "react-toastify";
+import { downloadDirectoryAsZip } from "domain/filesystem";
 
 const MoreMenu = ({
   reload,
@@ -72,6 +73,11 @@ const MoreMenu = ({
     setDeleteDialogOpen(false);
   };
 
+  const handleExportProject = () => {
+    downloadDirectoryAsZip(currentProject);
+    handleClose();
+  };
+
   return (
     <>
       <Tooltip title="more">
@@ -87,6 +93,7 @@ const MoreMenu = ({
       >
         <MenuItem onClick={handleCreateProject}>Create Project</MenuItem>
         <MenuItem onClick={handleDeleteProject}>Delete Project</MenuItem>
+        <MenuItem onClick={handleExportProject}>Export Project</MenuItem>
       </Menu>
 
       {/* Create Project Dialog */}

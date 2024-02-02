@@ -52,3 +52,8 @@
   height: 100%;
     width: 100%;
 }
+body {
+  padding-right:0 !important;
+  overflow:auto !important;
+  overflow-x: hidden !important;
+}

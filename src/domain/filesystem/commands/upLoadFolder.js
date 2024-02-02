@@ -8,6 +8,20 @@ const mkdir = pify(fs.mkdir);
 const readdir = pify(fs.readdir);
 const stat = pify(fs.stat);
 
+// 递归创建目录
+const ensureDir = async (dirpath) => {
+  const parentDir = path.dirname(dirpath);
+  if (parentDir !== dirpath) {
+    await ensureDir(parentDir);
+  }
+
+  try {
+    await mkdir(dirpath);
+  } catch (error) {
+    if (error.code !== "EEXIST") throw error;
+  }
+};
+
 // 处理二进制文件上传
 const writeInBrowser = async (file, dirpath, reload) => {
   try {
@@ -19,8 +33,11 @@ const writeInBrowser = async (file, dirpath, reload) => {
       reader.readAsArrayBuffer(file);
     });
 
-    const filename = file.name;
+    const filename = file.webkitRelativePath || file.name;
     const browserPath = path.join(dirpath, filename);
+
+    // 确保目录存在
+    await ensureDir(path.dirname(browserPath));
 
     // 使用 Buffer 写入文件内容
     await writeFile(browserPath, Buffer.from(data));
@@ -30,10 +47,10 @@ const writeInBrowser = async (file, dirpath, reload) => {
   }
 };
 
-const uploadFile = async (fileList, dirpath, reload) => {
+const uploadFolder = async (fileList, dirpath, reload) => {
   for (const file of fileList) {
     await writeInBrowser(file, dirpath, reload);
   }
 };
 
-export { uploadFile };
+export { uploadFolder };
