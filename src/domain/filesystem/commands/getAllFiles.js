@@ -20,9 +20,10 @@ export async function readDirectoryTree(rootpath) {
     const filesPromises = entryStats.map((stat, index) => {
       if (stat.isFile()) {
         const filePath = path.join(currentPath, entries[index]);
-        return fsPify.readFile(filePath, "utf8").then((content) => ({
+        // 不指定编码，以便得到 Buffer 对象
+        return fsPify.readFile(filePath).then((content) => ({
           path: filePath,
-          content,
+          content, // 这里 content 是一个 Buffer
         }));
       }
       return null;

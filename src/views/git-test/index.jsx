@@ -103,7 +103,7 @@ const GitTest = () => {
             <IconButton
               className="text-gray-700"
               onClick={() => {
-                downloadDirectoryAsZip("test");
+                downloadDirectoryAsZip(currentProjectRoot);
               }}
             >
               <IosShareIcon fontSize="inherit" />

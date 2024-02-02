@@ -15,7 +15,7 @@ const ForgotPassword = lazy(() => import("@//views/forgotPassword"));
 export const headerRoutes = [
   { path: "/", component: Home, withHeader: true },
   { path: "/arxtect", component: Arxtect, withHeader: true },
-  { path: "/git-test", component: GitText, withHeader: true },
+  // { path: "/git-test", component: GitText, withHeader: true },
   // Add more routes as needed
 ];
 

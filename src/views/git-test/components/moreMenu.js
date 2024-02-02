@@ -14,6 +14,7 @@ import {
   Box,
 } from "@mui/material";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import { toast } from "react-toastify";
 
 const MoreMenu = ({
   reload,
@@ -45,7 +46,7 @@ const MoreMenu = ({
 
   const handleDeleteProject = () => {
     if (projectLists.length <= 1) {
-      alert("Can't delete all projects，already only one");
+      toast.warning("Can't delete all projects，already only one");
       handleClose();
       return;
     }

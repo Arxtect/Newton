@@ -13,14 +13,22 @@ const mkdir = pify(fs.mkdir);
 const readdir = pify(fs.readdir);
 const stat = pify(fs.stat);
 
-// 上传文件
+// 处理二进制文件上传
 const writeInBrowser = async (file, dirpath, reload) => {
   try {
-    const data = await file.text(); // Read the content of the uploaded file
-    const filename = file.name;
+    // 使用 FileReader 读取文件的二进制内容
+    const data = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsArrayBuffer(file);
+    });
 
+    const filename = file.name;
     const browserPath = path.join(dirpath, filename);
-    await writeFile(browserPath, data);
+
+    // 使用 Buffer 写入文件内容
+    await writeFile(browserPath, Buffer.from(data));
     reload();
   } catch (error) {
     console.error(`failed to upload ${file.name}:`, error);
