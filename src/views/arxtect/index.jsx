@@ -13,7 +13,7 @@ import { initializeLatexEngines } from "@/features/latexCompilation/latexCompila
 import { SplitPane } from "@/components/SplitPane";
 import { ButtonBarContainer } from "@/features/buttonBar/ButtonBarContainer";
 import useSwitchTheme from "@/useHooks/useSwitchTheme";
-import ResizeSlider from "./resizeSlider";
+import { ResizeSlider, ResizeRightSlider } from "./resizeSlider";
 import "./index.css";
 
 const Arxtect = () => {
@@ -34,7 +34,9 @@ const Arxtect = () => {
         <ButtonBarContainer />
         <SplitPane>
           <LatexEditorContainer />
-          <PdfPreview />
+          <ResizeRightSlider>
+            <PdfPreview />
+          </ResizeRightSlider>
         </SplitPane>
       </ResizeSlider>
     </main>

@@ -337,6 +337,7 @@ module.exports = function (webpackEnv) {
         bfsGlobal: require.resolve("browserfs"),
         "@": path.join(__dirname, "..", "src"),
         domain: path.join(__dirname, "..", "src/domain"),
+        services: path.join(__dirname, "..", "src/services/index"),
         store: path.join(__dirname, "..", "src/store/index"),
       },
       plugins: [

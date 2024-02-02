@@ -21,10 +21,9 @@ import * as git from "isomorphic-git";
 import fs from "fs";
 import { findAllProject } from "domain/filesystem";
 import { useFileStore } from "store";
-
-const Home = lazy(() => import("./views/home"));
-const Arxtect = lazy(() => import("./views/arxtect"));
-const GitText = lazy(() => import("./views/git-test"));
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import RouterComponent from "@/router/index";
 
 async function loadBrowserFS() {
   return new Promise((resolve) => {
@@ -50,19 +49,12 @@ if (projectLists.length == 0) {
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
+    <ToastContainer />
     <Provider store={store}>
       <HashRouter>
-        {" "}
-        {/* Replace BrowserRouter with HashRouter */}
-        <Header />
         <Suspense fallback={<CircularProgress />}>
-          <Routes>
-            <Route path="/" element={<Home />}></Route>
-            <Route path="/arxtect" element={<Arxtect />}></Route>
-            <Route path="/git-test" element={<GitText />}></Route>
-          </Routes>
+          <RouterComponent></RouterComponent>
         </Suspense>
-        {/* <Footer /> */}
       </HashRouter>
     </Provider>
   </React.StrictMode>

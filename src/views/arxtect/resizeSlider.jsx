@@ -115,4 +115,34 @@ const ResizeSlider = ({ children }) => {
   );
 };
 
-export default ResizeSlider;
+const ResizeRightSlider = ({ children }) => {
+  return (
+    <RightSidebar
+      width={"100%"}
+      style={{ display: "flex", flexDirection: "row-reverse" }}
+      testId="right-sidebar"
+      data-testid="css-reset"
+      className="bg-[red]"
+      xcss={{ background: "red" }}
+      isFixed={false}
+      overrides={{
+        ResizeButton: {
+          render: (Component, props) => (
+            <Tooltip
+              content={props.isRightSidebarCollapsed ? "Expand" : "Collapse"}
+              hideTooltipOnClick
+              position="left"
+              testId="tooltip"
+            >
+              <Component {...props} style={{ top: "50%" }} />
+            </Tooltip>
+          ),
+        },
+      }}
+    >
+      {children}
+    </RightSidebar>
+  );
+};
+
+export { ResizeSlider, ResizeRightSlider };
