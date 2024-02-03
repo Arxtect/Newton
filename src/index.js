@@ -11,9 +11,6 @@ import "./index.css";
 import reportWebVitals from "./reportWebVitals";
 import { Header } from "./features/header/Header";
 import { Footer } from "./features/footer/Footer";
-// Redux
-import { Provider } from "react-redux";
-import store from "./store";
 import { lazy, Suspense } from "react";
 import "./styles/globals.scss";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -50,13 +47,11 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
     <ToastContainer />
-    <Provider store={store}>
-      <HashRouter>
-        <Suspense fallback={<CircularProgress />}>
-          <RouterComponent></RouterComponent>
-        </Suspense>
-      </HashRouter>
-    </Provider>
+    <HashRouter>
+      <Suspense fallback={<CircularProgress />}>
+        <RouterComponent></RouterComponent>
+      </Suspense>
+    </HashRouter>
   </React.StrictMode>
 );
 

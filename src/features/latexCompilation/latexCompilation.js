@@ -7,18 +7,12 @@
 import { DvipdfmxEngine } from "./swiftlatex/DvipdfmxEngine";
 import { XeTeXEngine } from "./swiftlatex/XeTeXEngine";
 
-// Redux store and actions
-import store from "@/store";
 import {
   setReadyEngineStatus,
   setBusyEngineStatus,
   setErrorEngineStatus,
-} from "../engineStatus/engineStatusSlice";
-import {
-  setCompiledPdfUrl,
-  setCompilerLog,
-  setShowCompilerLog,
-} from "../pdfPreview/pdfPreviewSlice";
+} from "store";
+import { setCompiledPdfUrl, setCompilerLog, setShowCompilerLog } from "store";
 import { loadFileNames, initDB, getFileContent } from "@/util";
 
 import { getAllFileNames } from "@/domain/filesystem";
@@ -70,7 +64,7 @@ export const initializeLatexEngines = async () => {
     // Initialize the DviPdfMx engine
     await dviEngine.loadEngine();
     // Set the engine status to be ready
-    store.dispatch(setReadyEngineStatus());
+    setReadyEngineStatus();
   } catch (e) {
     console.log(e);
   }
@@ -84,7 +78,7 @@ export const compileLatex = async (latexCode, currentProject) => {
   }
 
   // Set the engine status to be busy
-  store.dispatch(setBusyEngineStatus());
+  setBusyEngineStatus();
 
   // Create a temporary main.tex file
   xetexEngine.writeMemFSFile("main.tex", latexCode);
@@ -139,7 +133,7 @@ export const compileLatex = async (latexCode, currentProject) => {
   // Compile the main.tex file
   let xetexCompilation = await xetexEngine.compileLaTeX();
   // Print the compilation log
-  store.dispatch(setCompilerLog(xetexCompilation.log));
+  setCompilerLog(xetexCompilation.log);
 
   // On successfull first compilation continue with the second one
   if (xetexCompilation.status === 0) {
@@ -181,13 +175,13 @@ export const compileLatex = async (latexCode, currentProject) => {
     });
 
     // Create a temporary URL to this PDF blob
-    store.dispatch(setCompiledPdfUrl(URL.createObjectURL(pdfBlob)));
-    store.dispatch(setShowCompilerLog(false));
+    setCompiledPdfUrl(URL.createObjectURL(pdfBlob));
+    setShowCompilerLog(false);
     // After compilation, the engine is ready again
-    store.dispatch(setReadyEngineStatus());
+    setReadyEngineStatus();
   } else {
     // If the compilation failed, reflect it with an error
-    store.dispatch(setErrorEngineStatus());
+    setErrorEngineStatus();
   }
 };
 

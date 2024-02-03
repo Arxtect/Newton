@@ -1,6 +1,5 @@
 // Hooks
 import { useEffect, useCallback } from "react";
-import { useSelector, useDispatch } from "react-redux";
 // Components
 import LatexEditor from "./LatexEditor";
 import { useFileStore } from "store";

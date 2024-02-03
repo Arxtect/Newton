@@ -4,19 +4,17 @@
  * @Date: 2024-01-25 12:25:23
  */
 // Hooks
-import { useSelector } from "react-redux";
-// Redux
-import {
-  selectCompiledPdfUrl,
-  selectCompilerLog,
-  selectShowCompilerLog,
-} from "./pdfPreviewSlice";
+import { useEffect } from "react";
+import { usePdfPreviewStore } from "store";
 
 export const PdfPreview = () => {
-  // Select the URL of the PDF and the source code
-  const pdfUrl = useSelector(selectCompiledPdfUrl);
-  const compilerLog = useSelector(selectCompilerLog);
-  const showCompilerLog = useSelector(selectShowCompilerLog);
+  const { pdfUrl, compilerLog, showCompilerLog, setCompiledPdfUrl } =
+    usePdfPreviewStore((state) => ({
+      pdfUrl: state.pdfUrl,
+      compilerLog: state.compilerLog,
+      showCompilerLog: state.showCompilerLog,
+      setCompiledPdfUrl: state.setCompiledPdfUrl,
+    }));
 
   const formattedCompilerLog = (
     <p className="h-minus-125 border border-black p-2 font-mono overflow-y-scroll">
@@ -34,6 +32,9 @@ export const PdfPreview = () => {
       className="h-minus-125 border border-black"
     ></embed>
   );
+  useEffect(() => {
+    console.log(pdfUrl);
+  }, [pdfUrl]);
 
   return (
     <article>

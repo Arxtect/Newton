@@ -11,7 +11,6 @@ import "ace-builds/src-noconflict/theme-monokai";
 import "ace-builds/src-noconflict/ext-language_tools";
 //yjs
 import { routerQuery, getRandomColor } from "@/util";
-import { setBody } from "./latexEditorSlice";
 import * as Y from "yjs";
 import { IndexeddbPersistence } from "y-indexeddb";
 import { WebsocketProvider } from "y-websocket";
@@ -20,7 +19,6 @@ import latexSyncToYText from "./latexSyncToYText";
 import useYText from "@/useHooks/useYText";
 import { AceBinding } from "./y-ace";
 import demo from "./demo";
-import { useSelector, useDispatch } from "react-redux";
 //constants
 const LATEX_NAME = "latex-demo1";
 const ROOM_NAME = "latex-demo1";
@@ -39,8 +37,6 @@ const LatexEditor = ({ handleChange, sourceCode }) => {
   const latexRef = useRef(null);
   const { yText, undoManager } = useYText({ name: LATEX_NAME, doc });
   const [fragments, setFragments] = useState([]);
-  const dispatch = useDispatch();
-
   // useLayoutEffect(() => {
   //   const db = new IndexeddbPersistence("latexDemo", doc);
   //   // db.on("synced", (idbPersistence) => {

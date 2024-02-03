@@ -7,7 +7,6 @@ import { SplitPane } from "@/components/SplitPane";
 import { Button, CustomSplitButton } from "@/components/Button";
 import { EngineStatus } from "../engineStatus/EngineStatus";
 import FileUpload from "../../components/FileUpload";
-import { useSelector, useDispatch } from "react-redux";
 
 export const ButtonBar = ({
   toggleVisibility,

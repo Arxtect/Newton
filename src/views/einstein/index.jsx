@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Select,
   MenuItem,
@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 import Masonry from "@mui/lab/Masonry";
 import PdfImage from "./pdfImage";
+import { getAllTags, documentSearch } from "services";
 
 const categories = [
   {
@@ -91,9 +92,43 @@ const popularDocuments = [
 const Einstein = () => {
   // State for the selected filter
   const [filter, setFilter] = React.useState("all");
+  const [allTags, setAllTags] = React.useState([]);
+  const [page, setPage] = React.useState(1);
+  const [documentsList, setDocumentsList] = React.useState([]);
+  const [keyword, setKeyword] = React.useState("");
+
+  const handleKeywordChange = (event) => {
+    // 更新 state 以反映输入框的当前值
+    setKeyword(event.target.value);
+  };
 
   const handleFilterChange = (event) => {
     setFilter(event.target.value);
+  };
+
+  const getAllTagsList = async () => {
+    const list = await getAllTags();
+    setAllTags(list.data.tags);
+    console.log(list);
+  };
+
+  useEffect(() => {
+    getAllTagsList();
+    // searchDocuments(page, filter, keyword);
+  }, []);
+
+  const searchDocuments = async (page, filter, keyword) => {
+    let searchCondition = {
+      pageIndex: page,
+      tags: [],
+      keyword: "",
+    };
+    if (filter != "all") {
+      searchCondition.tags = [filter];
+    }
+    let list = await documentSearch(searchCondition);
+    setDocumentsList(list.data.documents);
+    console.log(list.data.documents, "list.data.documents");
   };
 
   // Custom styles to ensure all elements have the same height
@@ -110,7 +145,6 @@ const Einstein = () => {
     ".MuiSelect-select": { height: "32px", lineHeight: "32px" },
   };
 
-  const [page, setPage] = React.useState(1);
   const itemsPerPage = 9; // Adjust based on how many items you want per page
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -122,6 +156,7 @@ const Einstein = () => {
     (page - 1) * itemsPerPage,
     page * itemsPerPage
   );
+
   return (
     <Container>
       <h1 className="text-4xl font-bold mt-10 mb-4">Einstein</h1>
@@ -156,9 +191,13 @@ const Einstein = () => {
             }}
           >
             <MenuItem value="all">All</MenuItem>
-            <MenuItem value="templates">Templa11111tes</MenuItem>
-            <MenuItem value="examples">Examples</MenuItem>
-            <MenuItem value="articles">Articles</MenuItem>
+            {allTags.map((item) => {
+              return (
+                <MenuItem key={item} value={item.Name}>
+                  {item.Name}
+                </MenuItem>
+              );
+            })}
           </Select>
         </FormControl>
         <Box flex={1} ml={2}>
@@ -175,6 +214,8 @@ const Einstein = () => {
               style: { height: "32px" },
             }}
             sx={commonStyles}
+            value={keyword}
+            onChange={handleKeywordChange}
           />
         </Box>
         <Button
@@ -199,11 +240,8 @@ const Einstein = () => {
                   backgroundColor: "#ececec",
                 }}
               /> */}
-              <PdfImage
-                fileUrl={
-                  "http://dev.nas.corp.jancsitech.net:9000/chatcro-test-file/Randomness.pdf-3fda40?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=jancsitech%2F20240202%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20240202T140359Z&X-Amz-Expires=86400&X-Amz-SignedHeaders=host&X-Amz-Signature=e4902c1443b23a21f2a9d2ede7f7f33b2484e93d6a1ce8290a0117884778d7c4"
-                }
-              ></PdfImage>
+              <PdfImage storageKey={"astronomy.pdf-b78c20"}></PdfImage>
+              {/* StorageKey */}
               <div className="px-4">
                 <Typography
                   gutterBottom
@@ -212,6 +250,7 @@ const Einstein = () => {
                     color: "#1f4f33bd", // 设置文字颜色
                     "&:hover": {
                       textDecoration: "underline", // 鼠标悬停时添加下划线
+                      cursor: "pointer",
                     },
                     fontFamily: "Lato,sans-serif",
                     fontSize: "16px",

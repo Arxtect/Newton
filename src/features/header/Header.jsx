@@ -40,8 +40,10 @@ export const Header = () => {
               {/* <div className="text-black font-medium">arXtect</div> */}
             </Typography>
             <Button className="text-black font-normal mr-4">
-              {" "}
               <Link to="/">Home</Link>
+            </Button>
+            <Button className="text-black font-normal mr-4">
+              <Link to="/">Einstein</Link>
             </Button>
             {/* <Button className="text-black font-normal  mr-4"> <Link to="/arxtect">newton demo</Link></Button> */}
             <Button className="text-black font-normal">Login</Button>

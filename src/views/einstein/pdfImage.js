@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { pdfjs } from "react-pdf";
+import { getPreviewPdfUrl } from "services";
+import Skeleton from "@mui/material/Skeleton";
 
 // 设置 pdf.js 的 worker，这是必须的步骤
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
-const PDFThumbnail = ({ fileUrl }) => {
+const PDFThumbnail = ({ storageKey }) => {
   const [pageImage, setPageImage] = useState("");
 
-  useEffect(() => {
-    // 创建 PDF 文档加载任务
+  const getImage = async () => {
+    const response = await getPreviewPdfUrl(storageKey);
+    const fileUrl = response.data.preview;
     const loadingTask = pdfjs.getDocument(fileUrl);
 
     loadingTask.promise.then(
@@ -41,12 +44,18 @@ const PDFThumbnail = ({ fileUrl }) => {
         console.error(reason);
       }
     );
-  }, [fileUrl]);
+  };
+
+  useEffect(() => {
+    getImage();
+  }, [storageKey]);
 
   return (
     <React.Fragment>
-      {pageImage && (
+      {pageImage ? (
         <img src={pageImage} alt="PDF thumbnail" className="v-full" />
+      ) : (
+        <Skeleton variant="rectangular" width="100%" height={250} />
       )}
     </React.Fragment>
   );
