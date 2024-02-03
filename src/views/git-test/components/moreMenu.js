@@ -16,7 +16,14 @@ import {
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { toast } from "react-toastify";
 import { downloadDirectoryAsZip } from "domain/filesystem";
+import PublishDocument from "./publishDocument";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import PublishIcon from "@mui/icons-material/Publish";
+import CreateIcon from "@mui/icons-material/Create";
+import DeleteIcon from "@mui/icons-material/Delete";
+import ExportIcon from "@mui/icons-material/MoveToInbox"; // 假设您想要用这个图标作为导出的图标
 
+import { usePdfPreviewStore } from "store";
 const MoreMenu = ({
   reload,
   filepath,
@@ -31,6 +38,10 @@ const MoreMenu = ({
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [projectName, setProjectName] = useState("");
+
+  const { pdfUrl } = usePdfPreviewStore((state) => ({
+    pdfUrl: state.pdfUrl,
+  }));
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -78,6 +89,21 @@ const MoreMenu = ({
     handleClose();
   };
 
+  const [openPublishDialog, setOpenPublishDialog] = useState(false);
+
+  const handleOpenPublish = () => {
+    // if (!pdfUrl) {
+    //   toast.warning("Please compile first");
+    //   return;
+    // }
+    setOpenPublishDialog(true);
+    handleClose();
+  };
+
+  const handleClosePublish = () => {
+    setOpenPublishDialog(false);
+  };
+
   return (
     <>
       <Tooltip title="more">
@@ -91,9 +117,30 @@ const MoreMenu = ({
         onClose={handleClose}
         style={{ left: "0px", top: "0px" }}
       >
-        <MenuItem onClick={handleCreateProject}>Create Project</MenuItem>
-        <MenuItem onClick={handleDeleteProject}>Delete Project</MenuItem>
-        <MenuItem onClick={handleExportProject}>Export Project</MenuItem>
+        <MenuItem onClick={handleOpenPublish}>
+          <ListItemIcon>
+            <PublishIcon fontSize="small" />
+          </ListItemIcon>
+          Publish Project
+        </MenuItem>
+        <MenuItem onClick={handleCreateProject}>
+          <ListItemIcon>
+            <CreateIcon fontSize="small" />
+          </ListItemIcon>
+          Create Project
+        </MenuItem>
+        <MenuItem onClick={handleDeleteProject}>
+          <ListItemIcon>
+            <DeleteIcon fontSize="small" />
+          </ListItemIcon>
+          Delete Project
+        </MenuItem>
+        <MenuItem onClick={handleExportProject}>
+          <ListItemIcon>
+            <ExportIcon fontSize="small" />
+          </ListItemIcon>
+          Export Project
+        </MenuItem>
       </Menu>
 
       {/* Create Project Dialog */}
@@ -130,6 +177,12 @@ const MoreMenu = ({
           </Button>
         </DialogActions>
       </Dialog>
+
+      <PublishDocument
+        open={openPublishDialog}
+        pdfUrl={pdfUrl}
+        handleClosePublish={handleClosePublish}
+      />
 
       {/* Delete Project Confirmation Dialog */}
       <Dialog open={deleteDialogOpen} onClose={handleCancelDelete}>

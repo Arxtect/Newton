@@ -6,7 +6,7 @@ import Skeleton from "@mui/material/Skeleton";
 // 设置 pdf.js 的 worker，这是必须的步骤
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
-const PDFThumbnail = ({ storageKey }) => {
+const PfdImage = ({ storageKey, height = 250, ...res }) => {
   const [pageImage, setPageImage] = useState("");
 
   const getImage = async () => {
@@ -53,12 +53,12 @@ const PDFThumbnail = ({ storageKey }) => {
   return (
     <React.Fragment>
       {pageImage ? (
-        <img src={pageImage} alt="PDF thumbnail" className="v-full" />
+        <img src={pageImage} alt="PDF thumbnail" className="v-full" {...res} />
       ) : (
-        <Skeleton variant="rectangular" width="100%" height={250} />
+        <Skeleton variant="rectangular" width="100%" height={height} />
       )}
     </React.Fragment>
   );
 };
 
-export default PDFThumbnail;
+export default PfdImage;

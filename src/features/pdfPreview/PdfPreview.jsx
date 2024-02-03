@@ -32,9 +32,7 @@ export const PdfPreview = () => {
       className="h-minus-125 border border-black"
     ></embed>
   );
-  useEffect(() => {
-    console.log(pdfUrl);
-  }, [pdfUrl]);
+
 
   return (
     <article>

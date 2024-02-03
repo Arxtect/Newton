@@ -43,10 +43,12 @@ export const Header = () => {
               <Link to="/">Home</Link>
             </Button>
             <Button className="text-black font-normal mr-4">
-              <Link to="/">Einstein</Link>
+              <Link to="/einstein">Einstein</Link>
             </Button>
             {/* <Button className="text-black font-normal  mr-4"> <Link to="/arxtect">newton demo</Link></Button> */}
-            <Button className="text-black font-normal">Login</Button>
+            <Button className="text-black font-normal">
+              <Link to="/login">Login</Link>
+            </Button>
           </Toolbar>
         </AppBar>
       </Box>

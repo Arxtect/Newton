@@ -3,20 +3,22 @@ import Layout from "./Layout.js";
 import { lazy } from "react";
 
 const Home = lazy(() => import("@/views/home"));
-const Arxtect = lazy(() => import("@//views/arxtect"));
-const GitText = lazy(() => import("@//views/git-test"));
-const Login = lazy(() => import("@//views/login"));
-const Register = lazy(() => import("@//views/register"));
-const Verifyemail = lazy(() => import("@//views/verifyemail"));
-const ResetPasswordPage = lazy(() => import("@//views/resetPasswordPage"));
-const ForgotPassword = lazy(() => import("@//views/forgotPassword"));
-const Einstein = lazy(() => import("@//views/einstein"));
+const Arxtect = lazy(() => import("@/views/arxtect"));
+const GitText = lazy(() => import("@/views/git-test"));
+const Login = lazy(() => import("@/views/login"));
+const Register = lazy(() => import("@/views/register"));
+const Verifyemail = lazy(() => import("@/views/verifyemail"));
+const ResetPasswordPage = lazy(() => import("@/views/resetPasswordPage"));
+const ForgotPassword = lazy(() => import("@/views/forgotPassword"));
+const Einstein = lazy(() => import("@/views/einstein"));
+const DocumentDetails = lazy(() => import("@/views/documentDetails"));
 
 // Routes that require a header (and possibly a footer)
 export const headerRoutes = [
   { path: "/", component: Home, withHeader: true },
   { path: "/arxtect", component: Arxtect, withHeader: true },
   { path: "/einstein", component: Einstein, withHeader: true },
+  { path: "/documentdetails", component: DocumentDetails, withHeader: true },
   // { path: "/git-test", component: GitText, withHeader: true },
   // Add more routes as needed
 ];

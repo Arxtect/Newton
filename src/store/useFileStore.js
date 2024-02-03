@@ -239,7 +239,7 @@ export const useFileStore = create()(
         set({ preRenamingDirpath: dirpath });
       },
       changeCurrentProjectRoot: ({ projectRoot }) => {
-        set({ currentProjectRoot: projectRoot });
+        set({ currentProjectRoot: projectRoot, currentSelectDir: projectRoot });
       },
       createProject: async (newProjectRoot) => {
         let isExists = await FS.existsPath(newProjectRoot);
@@ -247,7 +247,7 @@ export const useFileStore = create()(
         if (!isExists) {
           await FS.mkdir(newProjectRoot);
         }
-        set({ currentProjectRoot: newProjectRoot });
+        get().changeCurrentProjectRoot({ projectRoot: newProjectRoot });
       },
       updateAllProject: (allProject) => {
         set({ allProject });

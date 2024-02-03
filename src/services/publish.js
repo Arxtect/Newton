@@ -67,31 +67,32 @@ export async function getPreviewPdfUrl(storageKey) {
   }
 }
 
-export async function uploadDocument(
+export async function uploadDocument({
   uploadType,
   blobUrl,
   content,
   title,
   tags,
-  fileHash
-) {
+  fileHash,
+}) {
   // Retrieve the Blob from the Blob URL
   const response = await fetch(blobUrl);
   const blob = await response.blob();
 
   // Create a new FormData object
   const formData = new FormData();
-
+  const file = new File([blob], "document.pdf", { type: blob.type });
+  console.log(blob.type, "blob.type");
   // Append the file (as a Blob) and other parameters to the FormData object
   formData.append("upload_type", uploadType);
-  formData.append("file", blob, "document.pdf"); // Assuming you want to name the file 'document.pdf'
+  formData.append("file", file);
   formData.append("content", content);
   formData.append("title", title);
-  formData.append("tags", JSON.stringify(tags)); // Make sure tags is an array before stringifying
+  formData.append("tags", JSON.stringify(tags));
   formData.append("file_hash", fileHash);
 
   // Perform the fetch operation to upload the form data
-  const uploadResponse = await fetch(getApiUrl("/documents/upload"), {
+  const uploadResponse = await fetch(getApiUrl("/upload"), {
     method: "POST",
     body: formData,
   });

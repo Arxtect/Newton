@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Select,
   MenuItem,
@@ -11,36 +11,12 @@ import {
   Container,
   Paper,
   Typography,
+  Checkbox,
   Pagination,
 } from "@mui/material";
 import Masonry from "@mui/lab/Masonry";
-import PdfImage from "./pdfImage";
+import PdfImage from "@/components/pdfImage";
 import { getAllTags, documentSearch } from "services";
-
-const categories = [
-  {
-    title: "Academic Journal",
-    image: "library-shelves",
-    tags: ["Science", "Research"],
-  },
-  {
-    title: "Bibliography",
-    image: "colorful-books-on-shelf",
-    tags: ["History", "Literature"],
-  },
-  { title: "Book", image: "open-book", tags: ["Fiction", "Non-Fiction"] },
-  { title: "Calendar", image: "clock-face", tags: ["Events", "Schedules"] },
-  {
-    title: "Résumé / CV",
-    image: "person-sitting-on-bench",
-    tags: ["Professional", "Jobs"],
-  },
-  {
-    title: "Formal Letter",
-    image: "typewriter-keys",
-    tags: ["Correspondence", "Official"],
-  },
-];
 
 // 假设的文档数据
 const popularDocuments = [
@@ -90,31 +66,41 @@ const popularDocuments = [
 ];
 
 const Einstein = () => {
-  // State for the selected filter
-  const [filter, setFilter] = React.useState("all");
-  const [allTags, setAllTags] = React.useState([]);
   const [page, setPage] = React.useState(1);
   const [documentsList, setDocumentsList] = React.useState([]);
   const [keyword, setKeyword] = React.useState("");
-
+  const [customTags, setCustomTags] = useState([]);
   const handleKeywordChange = (event) => {
     // 更新 state 以反映输入框的当前值
     setKeyword(event.target.value);
   };
 
-  const handleFilterChange = (event) => {
-    setFilter(event.target.value);
+  const [selectedTags, setSelectedTags] = useState([]);
+
+  const handleSelectTag = (event) => {
+    const value = event.target.value;
+    setSelectedTags(typeof value === "string" ? value.split(",") : value);
+  };
+
+  useEffect(() => {
+    setSelectedTags([]);
+  }, []);
+
+  const renderSelectedTags = (selected) => {
+    console.log(selected, "selected");
+    if (selected.length < 2) {
+      return selected.join(", ");
+    }
+    return selected.filter((item) => item !== "All")?.join(", ");
   };
 
   const getAllTagsList = async () => {
     const list = await getAllTags();
-    setAllTags(list.data.tags);
-    console.log(list);
+    setCustomTags(list.data.tags);
   };
 
   useEffect(() => {
     getAllTagsList();
-    // searchDocuments(page, filter, keyword);
   }, []);
 
   const searchDocuments = async (page, filter, keyword) => {
@@ -123,8 +109,11 @@ const Einstein = () => {
       tags: [],
       keyword: "",
     };
-    if (filter != "all") {
-      searchCondition.tags = [filter];
+    if (filter.length > 0) {
+      searchCondition.tags = filter;
+    }
+    if (keyword && keyword !== "") {
+      searchCondition.keyword = keyword;
     }
     let list = await documentSearch(searchCondition);
     setDocumentsList(list.data.documents);
@@ -157,6 +146,13 @@ const Einstein = () => {
     page * itemsPerPage
   );
 
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      // 调用您的搜索函数
+      searchDocuments(1, selectedTags, keyword);
+    }
+  };
   return (
     <Container>
       <h1 className="text-4xl font-bold mt-10 mb-4">Einstein</h1>
@@ -171,33 +167,39 @@ const Einstein = () => {
         mb={4}
       >
         <FormControl
-          variant="outlined"
           size="small"
-          sx={{ width: 150, ...commonStyles }}
+          style={{ width: 150, height: "34px" }}
+          sx={commonStyles}
         >
-          <InputLabel id="filter-select-label">Filters</InputLabel>
+          <InputLabel id="tag-label" className="h-full">
+            Tag
+          </InputLabel>
           <Select
-            labelId="filter-select-label"
-            id="filter-select"
-            value={filter}
-            onChange={handleFilterChange}
-            label="Filters"
-            sx={commonStyles}
-            MenuProps={{
-              ModalProps: {
-                keepMounted: true,
-                disableScrollLock: true,
-              },
+            labelId="tag-label"
+            sx={{ background: "var(--white)", height: "100%" }}
+            variant="outlined"
+            value={selectedTags?.length != 0 ? selectedTags : ["All"]}
+            label="Tag"
+            onChange={handleSelectTag}
+            className="h-full"
+            multiple
+            renderValue={(selected) => {
+              return renderSelectedTags(selected);
             }}
           >
-            <MenuItem value="all">All</MenuItem>
-            {allTags.map((item) => {
-              return (
-                <MenuItem key={item} value={item.Name}>
-                  {item.Name}
-                </MenuItem>
-              );
-            })}
+            {customTags.map((option) => (
+              <MenuItem
+                key={option.Name}
+                value={option.Name}
+                sx={{ padding: "0" }}
+              >
+                <Checkbox
+                  checked={selectedTags.includes(option.Name)}
+                  size="small"
+                />
+                {option.Name}
+              </MenuItem>
+            ))}
           </Select>
         </FormControl>
         <Box flex={1} ml={2}>
@@ -216,6 +218,7 @@ const Einstein = () => {
             sx={commonStyles}
             value={keyword}
             onChange={handleKeywordChange}
+            onKeyDown={handleKeyDown}
           />
         </Box>
         <Button
@@ -223,6 +226,7 @@ const Einstein = () => {
           color="primary"
           size="small"
           sx={{ ...commonStyles, ml: 2 }}
+          onClick={() => searchDocuments(1, selectedTags, keyword)}
         >
           Search
         </Button>
@@ -273,6 +277,7 @@ const Einstein = () => {
                     fontSize: "16px",
                   }}
                   className="my-2"
+                  title={doc.Content}
                 >
                   {doc.Content}
                 </Typography>
@@ -292,15 +297,17 @@ const Einstein = () => {
         ))}
       </Masonry>
 
-      <Box display="flex" justifyContent="flex-start" mt={4} className="pb-5">
-        <Pagination
-          count={pageCount}
-          page={page}
-          onChange={handleChangePage}
-          variant="outlined"
-          shape="rounded"
-        />
-      </Box>
+      {pageCount > 1 && (
+        <Box display="flex" justifyContent="flex-start" mt={4} className="pb-5">
+          <Pagination
+            count={pageCount}
+            page={page}
+            onChange={handleChangePage}
+            variant="outlined"
+            shape="rounded"
+          />
+        </Box>
+      )}
     </Container>
   );
 };
