@@ -17,6 +17,7 @@ import {
 import Masonry from "@mui/lab/Masonry";
 import PdfImage from "@/components/pdfImage";
 import { getAllTags, documentSearch } from "services";
+import { Link, NavLink } from "react-router-dom";
 
 // 假设的文档数据
 const popularDocuments = [
@@ -106,13 +107,14 @@ const Einstein = () => {
   }, []);
 
   const searchDocuments = async (page, filter, keyword) => {
+    console.log(page, filter, keyword, "page, filter, keyword");
     let searchCondition = {
       pageIndex: page,
       tags: [],
       keyword: "",
     };
     if (filter.length > 0) {
-      searchCondition.tags = filter;
+      searchCondition.tags = filter.filter((item) => item !== "All");
     }
     if (keyword && keyword !== "") {
       searchCondition.keyword = keyword;
@@ -258,7 +260,7 @@ const Einstein = () => {
                     lineHeight: 1.5625,
                   }}
                 >
-                  {doc.Title}
+                  <Link to={`/documentdetails?id=${doc.ID}`}> {doc.Title}</Link>
                 </Typography>
 
                 <Typography

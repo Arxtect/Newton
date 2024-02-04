@@ -4,7 +4,7 @@
  * @Date: 2024-02-03 12:43:52
  */
 import { toast } from "react-toastify"; // 假设你已经安装了react-toastify
-
+import { refreshAuth } from "./auth";
 // 辅助函数：生成带有统一前缀的URL
 function getApiUrl(endpoint) {
   return `/api/v1/documents${endpoint}`;
@@ -22,6 +22,7 @@ export async function getAllTags() {
 }
 
 export async function documentSearch(search) {
+  await refreshAuth();
   // Initialize the query parameters as an array of strings
   let queryParams = [];
 
@@ -36,7 +37,7 @@ export async function documentSearch(search) {
 
   // Add tags if it exists and is not an empty array
   if (search?.tags?.length > 0) {
-    queryParams.push(`tags=${encodeURIComponent(search.tags.join(","))}`);
+    search?.tags.map((tag) => queryParams.push(`tags=${tag}`));
   }
 
   // Construct the full URL with the query parameters
@@ -54,6 +55,33 @@ export async function documentSearch(search) {
     return response.json();
   } else {
     throw new Error("get document list failed");
+  }
+}
+
+export async function getDocumentById(documentId) {
+  if (!documentId) {
+    throw new Error("A document ID is required to fetch a document");
+  }
+
+  // Construct the URL with the document ID
+  const url = `${getApiUrl("")}/${encodeURIComponent(documentId)}`;
+
+  // Perform the GET request using the constructed URL
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  // Check if the response is ok (status in the range 200-299)
+  if (response.ok) {
+    return response.json();
+  } else {
+    // If the response is not ok, throw an error with the status text
+    throw new Error(
+      `Failed to get document with ID ${documentId}: ${response.statusText}`
+    );
   }
 }
 
@@ -81,14 +109,19 @@ export async function uploadDocument({
   content,
   title,
   tags,
+  zipFile,
+  currentProjectRoot = "document",
 }) {
+  await refreshAuth();
   // Retrieve the Blob from the Blob URL
   const response = await fetch(blobUrl);
   const blob = await response.blob();
 
   // Create a new FormData object
   const formData = new FormData();
-  const file = new File([blob], "document.pdf", { type: blob.type });
+  const file = new File([blob], `${currentProjectRoot}.pdf`, {
+    type: blob.type,
+  });
   console.log(blob.type, "blob.type");
   // Append the file (as a Blob) and other parameters to the FormData object
   formData.append("upload_type", uploadType);
@@ -96,6 +129,7 @@ export async function uploadDocument({
   formData.append("content", content);
   formData.append("title", title);
   formData.append("tags", JSON.stringify(tags));
+  formData.append("zip", zipFile); // 添加 ZIP 文件
 
   // Perform the fetch operation to upload the form data
   const uploadResponse = await fetch(getApiUrl("/upload"), {

@@ -19,6 +19,7 @@ import { getAllTags, uploadDocument } from "services";
 import { useFileStore } from "store";
 import { toast } from "react-toastify";
 import PreviewPdf from "@/components/previewPdf";
+import { saveZipToBlob } from "domain/filesystem";
 
 const ProductDialog = ({ open, pdfUrl, handleClosePublish }) => {
   const { currentProjectRoot } = useFileStore((state) => ({
@@ -66,21 +67,29 @@ const ProductDialog = ({ open, pdfUrl, handleClosePublish }) => {
       toast.warning("Content, title, and tags must not be empty.");
       return; // 阻止执行后续代码
     }
-
-    // 如果pdfUrl存在，则继续执行上传文档的过程
-    if (pdfUrl) {
-      uploadDocument({
-        uploadType: "1",
-        blobUrl: pdfUrl,
-        content: content,
-        title: title,
-        tags: selectedTags,
-      }).then((res) => {
-        console.log(res);
-        handleClosePublish();
-        toast.success("Publish success");
-      });
-    }
+    // downloadDirectoryAsZip(currentProjectRoot)
+    saveZipToBlob(currentProjectRoot).then((zipFile) => {
+      console.log(zipFile, "zipFile");
+      // 如果pdfUrl存在，则继续执行上传文档的过程
+      if (pdfUrl) {
+        uploadDocument({
+          uploadType: "1",
+          blobUrl: pdfUrl,
+          content: content,
+          title: title,
+          tags: selectedTags,
+          zipFile,
+          currentProjectRoot,
+        }).then((res) => {
+          console.log(res);
+          handleClosePublish();
+          toast.success("Publish success");
+          setTitle("");
+          setContent("");
+          setSelectedTags([]);
+        });
+      }
+    });
   };
 
   const commonStyles = {
@@ -110,7 +119,6 @@ const ProductDialog = ({ open, pdfUrl, handleClosePublish }) => {
     }
     setPreviewOpen(true);
   };
-
 
   return (
     <Dialog

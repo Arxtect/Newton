@@ -271,3 +271,5 @@ export function getInitialState() {
     reloadCounter: 0,
   };
 }
+
+export const { changeCurrentProjectRoot } = useFileStore.getState();

@@ -90,6 +90,7 @@ const DirectoryLineContent = ({
   endRenaming,
   preRenamingDirpath,
   changePreRenamingDirpath,
+  changeCurrentProjectRoot,
 }) => {
   const [opened, setOpened] = useState(
     preRenamingDirpath == dirpath ? true : open
@@ -197,6 +198,9 @@ const DirectoryLineContent = ({
 
       endRenaming();
       fileMoved({ fromPath: dirpath, destPath: newDirPath });
+      if (depth == 0) {
+        changeCurrentProjectRoot({ projectRoot: newDirPath });
+      }
     } catch (error) {
       console.error("Error renaming directory:", error);
     }
@@ -322,6 +326,7 @@ const DirectoryLineContent = ({
           endRenaming={endRenaming}
           preRenamingDirpath={preRenamingDirpath}
           changePreRenamingDirpath={changePreRenamingDirpath}
+          changeCurrentProjectRoot={changeCurrentProjectRoot}
         />
       )}
     </List>

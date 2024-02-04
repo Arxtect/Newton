@@ -143,6 +143,7 @@ const GitTest = () => {
         renamingPathname={renamingPathname}
         preRenamingDirpath={preRenamingDirpath}
         changePreRenamingDirpath={changePreRenamingDirpath}
+        changeCurrentProjectRoot={changeCurrentProjectRoot}
       />
     </main>
   );

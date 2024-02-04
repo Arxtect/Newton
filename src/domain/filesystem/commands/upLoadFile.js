@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import pify from "pify";
+import { uploadZip } from "./uploadZip";
 
 // 将 fs 的方法转换为返回 Promise 的方法
 const writeFile = pify(fs.writeFile);
@@ -32,7 +33,12 @@ const writeInBrowser = async (file, dirpath, reload) => {
 
 const uploadFile = async (fileList, dirpath, reload) => {
   for (const file of fileList) {
-    await writeInBrowser(file, dirpath, reload);
+    console.log(file, "file");
+    if (file.name.endsWith(".zip")) {
+      await uploadZip(file, dirpath, reload); // 处理 ZIP 文件
+    } else {
+      await writeInBrowser(file, dirpath, reload); // 处理普通文件或文件夹
+    }
   }
 };
 

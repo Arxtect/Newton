@@ -45,14 +45,14 @@ if (projectLists.length == 0) {
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <React.StrictMode>
+  <React.Fragment>
     <ToastContainer />
     <HashRouter>
       <Suspense fallback={<CircularProgress />}>
         <RouterComponent></RouterComponent>
       </Suspense>
     </HashRouter>
-  </React.StrictMode>
+  </React.Fragment>
 );
 
 reportWebVitals();

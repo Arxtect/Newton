@@ -13,6 +13,8 @@ import {
   TextField,
   Box,
 } from "@mui/material";
+import { getCookie } from "@/util";
+
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { toast } from "react-toastify";
 import { downloadDirectoryAsZip } from "domain/filesystem";
@@ -92,6 +94,12 @@ const MoreMenu = ({
   const [openPublishDialog, setOpenPublishDialog] = useState(false);
 
   const handleOpenPublish = () => {
+    const cookie = getCookie("mojolicious");
+    console.log(cookie, "cookie");
+    if (!cookie || cookie == "") {
+      toast.warning("Please login");
+      return;
+    }
     // if (!pdfUrl) {
     //   toast.warning("Please compile first");
     //   return;

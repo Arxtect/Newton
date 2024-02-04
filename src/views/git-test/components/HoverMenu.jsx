@@ -58,6 +58,7 @@ const HoverMenu = ({
               onClick={(e) => {
                 e.stopPropagation();
                 onDelete(e);
+               
               }}
             >
               <DeleteIcon fontSize="inherit" />

@@ -27,12 +27,11 @@ export const ButtonBarContainer = () => {
     })
   );
 
-
   // Revoke the PDF URL every 30000 milliseconds
   useEffect(() => {
     const timer = setTimeout(() => {
       revokeCompiledPdfUrl(pdfUrl);
-    }, 30000);
+    }, 300000);
     return () => clearTimeout(timer);
   }, [pdfUrl]);
 

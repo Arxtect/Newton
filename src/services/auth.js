@@ -102,53 +102,55 @@ export async function getMe() {
   }
 }
 
-
 // 验证邮箱
 export async function verifyEmail(verificationCode) {
-  const response = await fetch(getApiUrl(`/auth/verifyemail/${verificationCode}`), {
-    method: 'GET', // 默认为GET，可以省略
-    credentials: 'include',
-  });
+  const response = await fetch(
+    getApiUrl(`/auth/verifyemail/${verificationCode}`),
+    {
+      method: "GET", // 默认为GET，可以省略
+      credentials: "include",
+    }
+  );
 
   if (response.ok) {
     return response.json();
   } else {
-    throw new Error('Email verification failed');
+    throw new Error("Email verification failed");
   }
 }
 
 // 忘记密码
 export async function forgotPassword(email) {
-  const response = await fetch(getApiUrl('/auth/forgotpassword'), {
-    method: 'POST',
+  const response = await fetch(getApiUrl("/auth/forgotpassword"), {
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
-    credentials: 'include',
+    credentials: "include",
     body: JSON.stringify({ email }),
   });
 
   if (response.ok) {
     return response.json();
   } else {
-    throw new Error('Password reset request failed');
+    throw new Error("Password reset request failed");
   }
 }
 
 // 重置密码
 export async function resetPassword({ resetToken, password, passwordConfirm }) {
   const response = await fetch(getApiUrl(`/auth/resetpassword/${resetToken}`), {
-    method: 'PATCH',
+    method: "PATCH",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({ password, passwordConfirm }),
-    credentials: 'include',
+    credentials: "include",
   });
 
   if (response.ok) {
     return response.json();
   } else {
-    throw new Error('Password reset failed');
+    throw new Error("Password reset failed");
   }
 }

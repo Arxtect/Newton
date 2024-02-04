@@ -46,34 +46,45 @@ export async function readDirectoryTree(rootpath) {
 
   return readDirRecursive(rootpath);
 }
+function addFilesToZip(dir, zipFolder, parentDir = "", rootpath = "") {
+  dir.files.forEach((file) => {
+    zipFolder.file(path.basename(file.path), file.content);
+  });
 
+  dir.directories.forEach((subDir) => {
+    // 计算子目录相对于 rootpath 的相对路径
+    const relativeDirPath = path.relative(rootpath, subDir.path);
+    // 计算子目录相对于 parentDir 的相对路径
+    const zipDirPath = parentDir
+      ? path.relative(parentDir, relativeDirPath)
+      : relativeDirPath;
+    const subFolder = zipFolder.folder(zipDirPath);
+    addFilesToZip(subDir, subFolder, relativeDirPath, rootpath); // 递归调用时更新 parentDir
+  });
+}
 export async function downloadDirectoryAsZip(rootpath) {
   const directoryTree = await readDirectoryTree(rootpath);
   console.log(directoryTree, "directoryTree");
   const zip = new JSZip();
 
-  function addFilesToZip(dir, zipFolder, parentDir = "") {
-    dir.files.forEach((file) => {
-      zipFolder.file(path.basename(file.path), file.content);
-    });
-
-    dir.directories.forEach((subDir) => {
-      // 计算子目录相对于 rootpath 的相对路径
-      const relativeDirPath = path.relative(rootpath, subDir.path);
-      // 计算子目录相对于 parentDir 的相对路径
-      const zipDirPath = parentDir
-        ? path.relative(parentDir, relativeDirPath)
-        : relativeDirPath;
-      const subFolder = zipFolder.folder(zipDirPath);
-      addFilesToZip(subDir, subFolder, relativeDirPath); // 递归调用时更新 parentDir
-    });
-  }
-
-  addFilesToZip(directoryTree, zip);
+  addFilesToZip(directoryTree, zip, "", rootpath);
 
   zip.generateAsync({ type: "blob" }).then(function (blob) {
     saveAs(blob, `${rootpath}.zip`);
   });
+}
+
+export async function saveZipToBlob(rootpath) {
+  const directoryTree = await readDirectoryTree(rootpath);
+  const zip = new JSZip();
+  addFilesToZip(directoryTree, zip, "", rootpath);
+  const blob = await zip.generateAsync({ type: "blob" });
+
+  // 将 Blob 转换成 File
+  const file = new File([blob], `${rootpath.split("/").pop()}.zip`, {
+    type: blob.type,
+  });
+  return file;
 }
 
 export async function getAllFileNames(rootpath) {

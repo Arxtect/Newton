@@ -53,4 +53,4 @@ const uploadFolder = async (fileList, dirpath, reload) => {
   }
 };
 
-export { uploadFolder };
+export { uploadFolder, ensureDir };
