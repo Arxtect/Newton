@@ -102,7 +102,7 @@ export const compileLatex = async (latexCode, currentProject) => {
   //   xetexEngine.writeMemFSFile(`${lists[i]}`, new Uint8Array(imageBlob));
   // }
   let list = await getAllFileNames(currentProject);
-
+  console.log(list, "list");
   for (let i = 0; i < list.length; i++) {
     // 去掉文件名的后缀
     let filename = path.basename(list[i]);
@@ -110,7 +110,8 @@ export const compileLatex = async (latexCode, currentProject) => {
 
     // 检查latexCode是否包含文件名（无后缀）或者文件名的前缀
     if (latexCode.includes(fileNameWithoutExtension)) {
-      let imageBlob = await fsPify.readFile(list[i], "utf8");
+      console.log(list[i], "list");
+      let imageBlob = await fsPify.readFile(list[i]);
 
       xetexEngine.writeMemFSFile(`${filename}`, imageBlob);
       if (LATEX_FILE_EXTENSIONS.some((ext) => filename.endsWith(ext))) {
@@ -120,7 +121,7 @@ export const compileLatex = async (latexCode, currentProject) => {
           let fileNameWithoutExtensions = newFilename.split(".")[0];
           // 检查latexCode是否包含文件名（无后缀）或者文件名的前缀
           if (i !== j && fileContent.includes(fileNameWithoutExtensions)) {
-            let nestedImageBlob = await fsPify.readFile(list[j], "utf8");
+            let nestedImageBlob = await fsPify.readFile(list[j]);
             xetexEngine.writeMemFSFile(newFilename, nestedImageBlob);
           }
         }
@@ -149,7 +150,8 @@ export const compileLatex = async (latexCode, currentProject) => {
 
       // 检查latexCode是否包含文件名（无后缀）或者文件名的前缀
       if (latexCode.includes(fileNameWithoutExtension)) {
-        let imageBlob = await fsPify.readFile(list[i], "utf8");
+        console.log(list[i], "list[i]");
+        let imageBlob = await fsPify.readFile(list[i]);
 
         dviEngine.writeMemFSFile(`${filename}`, imageBlob);
         if (LATEX_FILE_EXTENSIONS.some((ext) => filename.endsWith(ext))) {
@@ -159,7 +161,7 @@ export const compileLatex = async (latexCode, currentProject) => {
             let fileNameWithoutExtensions = newFilename.split(".")[0];
             // 检查latexCode是否包含文件名（无后缀）或者文件名的前缀
             if (i !== j && fileContent.includes(fileNameWithoutExtensions)) {
-              let nestedImageBlob = await fsPify.readFile(list[j], "utf8");
+              let nestedImageBlob = await fsPify.readFile(list[j]);
               dviEngine.writeMemFSFile(newFilename, nestedImageBlob);
             }
           }

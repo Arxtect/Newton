@@ -3,12 +3,16 @@
  * @Author: Devin
  * @Date: 2024-02-03 22:20:40
  */
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { Button } from "@mui/material";
 import { Tooltip } from "@mui/material";
 import PdfImage from "@/components/pdfImage";
 import { Container } from "@mui/material";
+import PreviewPdf from "@/components/previewPdf";
+import { toast } from "react-toastify";
+import { getPreviewPdfUrl } from "services";
+import { Document, Page } from "react-pdf";
 
 const DocumentDetails = () => {
   // Fetching the route parameter `id`
@@ -25,6 +29,31 @@ const DocumentDetails = () => {
   const formatDate = (timestamp) => {
     const date = new Date(parseInt(timestamp) * 1000);
     return date.toLocaleString();
+  };
+
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [pdfUrl, setPdfUrl] = useState("1");
+
+  useEffect(() => {
+    // getPdfUrl();
+  }, []);
+
+  const getPdfUrl = async () => {
+    try {
+      const response = await getPreviewPdfUrl(
+        "f13a0e1d-cba6-4635-b327-1283187c017f-astronomy.pdf"
+      );
+      setPdfUrl(response.data.preview);
+    } catch (error) {
+      console.error("Fetching PDF failed:", error);
+    }
+  };
+  const handleOpenPreview = () => {
+    if (!pdfUrl) {
+      toast.warning("document not exist yet");
+      return;
+    }
+    setPreviewOpen(true);
   };
 
   return (
@@ -56,8 +85,9 @@ const DocumentDetails = () => {
             <Button
               variant="outlined"
               color="secondary"
-              href="/latex/templates/example-project/qzykddzqhkwk.pdf"
+              // href="/latex/templates/example-project/qzykddzqhkwk.pdf"
               target="_blank"
+              onClick={handleOpenPreview}
             >
               View PDF
             </Button>
@@ -94,6 +124,15 @@ const DocumentDetails = () => {
           ></PdfImage>
         </div>
       </div>
+      <PreviewPdf
+        dialogStyle={{
+          height: "90vh",
+          width: "70vw",
+        }}
+        open={previewOpen}
+        setOpen={setPreviewOpen}
+        pdfUrl={pdfUrl}
+      />
     </Container>
   );
 };

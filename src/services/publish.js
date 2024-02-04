@@ -22,24 +22,32 @@ export async function getAllTags() {
 }
 
 export async function documentSearch(search) {
-  let body = {
-    pageIndex: search.pageIndex ?? 1,
-    pageSize: search.pageSize ?? 10,
-  };
+  // Initialize the query parameters as an array of strings
+  let queryParams = [];
 
-  // 如果 search.keyword 存在且不为空，则添加到请求体
-  if (search?.keyword || search?.keyword != "") {
-    body = { ...body, keyword: search.keyword };
+  // Add pageIndex and pageSize with default values if they are not provided
+  queryParams.push(`pageIndex=${search.pageIndex ?? 1}`);
+  queryParams.push(`pageSize=${search.pageSize ?? 10}`);
+
+  // Add keyword if it exists and is not an empty string
+  if (search?.keyword && search.keyword !== "") {
+    queryParams.push(`keyword=${encodeURIComponent(search.keyword)}`);
   }
+
+  // Add tags if it exists and is not an empty array
   if (search?.tags?.length > 0) {
-    body = { ...body, tags: search.tags };
+    queryParams.push(`tags=${encodeURIComponent(search.tags.join(","))}`);
   }
-  const response = await fetch(getApiUrl("/list/search"), {
+
+  // Construct the full URL with the query parameters
+  const url = `${getApiUrl("/list/search")}?${queryParams.join("&")}`;
+
+  // Perform the GET request using the constructed URL
+  const response = await fetch(url, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(body),
   });
 
   if (response.ok) {
@@ -73,7 +81,6 @@ export async function uploadDocument({
   content,
   title,
   tags,
-  fileHash,
 }) {
   // Retrieve the Blob from the Blob URL
   const response = await fetch(blobUrl);
@@ -89,7 +96,6 @@ export async function uploadDocument({
   formData.append("content", content);
   formData.append("title", title);
   formData.append("tags", JSON.stringify(tags));
-  formData.append("file_hash", fileHash);
 
   // Perform the fetch operation to upload the form data
   const uploadResponse = await fetch(getApiUrl("/upload"), {

@@ -70,6 +70,8 @@ const Einstein = () => {
   const [documentsList, setDocumentsList] = React.useState([]);
   const [keyword, setKeyword] = React.useState("");
   const [customTags, setCustomTags] = useState([]);
+  const [totalDocuments, setTotalDocuments] = useState(0);
+
   const handleKeywordChange = (event) => {
     // 更新 state 以反映输入框的当前值
     setKeyword(event.target.value);
@@ -117,6 +119,7 @@ const Einstein = () => {
     }
     let list = await documentSearch(searchCondition);
     setDocumentsList(list.data.documents);
+    setTotalDocuments(list.data.total);
     console.log(list.data.documents, "list.data.documents");
   };
 
@@ -134,17 +137,15 @@ const Einstein = () => {
     ".MuiSelect-select": { height: "32px", lineHeight: "32px" },
   };
 
-  const itemsPerPage = 9; // Adjust based on how many items you want per page
+  const itemsPerPage = 10;
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
+    searchDocuments(newPage, selectedTags, keyword);
   };
-  const pageCount = Math.ceil(popularDocuments.length / itemsPerPage);
+
+  const pageCount = Math.ceil(totalDocuments / itemsPerPage);
 
   // Get the documents for the current page
-  const documentsToShow = popularDocuments.slice(
-    (page - 1) * itemsPerPage,
-    page * itemsPerPage
-  );
 
   const handleKeyDown = (event) => {
     if (event.key === "Enter") {
@@ -153,6 +154,9 @@ const Einstein = () => {
       searchDocuments(1, selectedTags, keyword);
     }
   };
+  useEffect(() => {
+    searchDocuments(1, selectedTags, keyword);
+  }, []);
   return (
     <Container>
       <h1 className="text-4xl font-bold mt-10 mb-4">Einstein</h1>
@@ -234,17 +238,10 @@ const Einstein = () => {
       <h2 className="text-3xl font-semibold mb-6 mt-12">Recent</h2>
 
       <Masonry columns={3} spacing={6}>
-        {documentsToShow.map((doc, index) => (
+        {documentsList.map((doc, index) => (
           <Paper key={doc.ID} elevation={3}>
             <Box textAlign="center">
-              {/* <div
-                style={{
-                  width: "100%",
-                  height: `${100 + index * 50}px`,
-                  backgroundColor: "#ececec",
-                }}
-              /> */}
-              <PdfImage storageKey={"astronomy.pdf-b78c20"}></PdfImage>
+              <PdfImage storageKey={doc.StorageKey}></PdfImage>
               {/* StorageKey */}
               <div className="px-4">
                 <Typography
@@ -288,8 +285,9 @@ const Einstein = () => {
                   style={{
                     fontSize: "16px",
                   }}
+                  className="my-2"
                 >
-                  {doc.ID}
+                  {doc?.User?.Name}
                 </Typography>
               </div>
             </Box>
@@ -297,8 +295,8 @@ const Einstein = () => {
         ))}
       </Masonry>
 
-      {pageCount > 1 && (
-        <Box display="flex" justifyContent="flex-start" mt={4} className="pb-5">
+      <Box display="flex" justifyContent="flex-start" mt={4} className="pb-5">
+        {pageCount > 1 && (
           <Pagination
             count={pageCount}
             page={page}
@@ -306,8 +304,8 @@ const Einstein = () => {
             variant="outlined"
             shape="rounded"
           />
-        </Box>
-      )}
+        )}
+      </Box>
     </Container>
   );
 };

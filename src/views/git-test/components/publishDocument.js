@@ -18,6 +18,7 @@ import { AddCircleOutline } from "@mui/icons-material";
 import { getAllTags, uploadDocument } from "services";
 import { useFileStore } from "store";
 import { toast } from "react-toastify";
+import PreviewPdf from "@/components/previewPdf";
 
 const ProductDialog = ({ open, pdfUrl, handleClosePublish }) => {
   const { currentProjectRoot } = useFileStore((state) => ({
@@ -74,7 +75,6 @@ const ProductDialog = ({ open, pdfUrl, handleClosePublish }) => {
         content: content,
         title: title,
         tags: selectedTags,
-        fileHash: "cdasdtronomy7b788f",
       }).then((res) => {
         console.log(res);
         handleClosePublish();
@@ -111,9 +111,6 @@ const ProductDialog = ({ open, pdfUrl, handleClosePublish }) => {
     setPreviewOpen(true);
   };
 
-  const handleClosePreview = () => {
-    setPreviewOpen(false);
-  };
 
   return (
     <Dialog
@@ -233,28 +230,15 @@ const ProductDialog = ({ open, pdfUrl, handleClosePublish }) => {
         <Button onClick={handleClosePublish}>Cancel</Button>
         <Button onClick={handlePublish}>Publish</Button>
       </DialogActions>
-      <Dialog
-        open={previewOpen}
-        onClose={handleClosePreview}
-        maxWidth="lg"
-        fullWidth
-        PaperProps={{
-          style: {
-            height: "90vh",
-            width: "70vw",
-          },
+      <PreviewPdf
+        dialogStyle={{
+          height: "90vh",
+          width: "70vw",
         }}
-      >
-        <DialogContent className="p-0">
-          <embed
-            src={pdfUrl}
-            width="100%"
-            height="100%"
-            type="application/pdf"
-            className="h-full w-full"
-          />
-        </DialogContent>
-      </Dialog>
+        open={previewOpen}
+        setOpen={setPreviewOpen}
+        pdfUrl={pdfUrl}
+      />
     </Dialog>
   );
 };
