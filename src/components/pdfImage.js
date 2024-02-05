@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { pdfjs } from "react-pdf";
 import { getPreviewPdfUrl } from "services";
 import Skeleton from "@mui/material/Skeleton";
+import { getPreViewUrl } from "@/util";
 
 // 设置 pdf.js 的 worker，这是必须的步骤
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
@@ -10,8 +11,10 @@ const PfdImage = ({ storageKey, height = 250, ...res }) => {
   const [pageImage, setPageImage] = useState("");
 
   const getImage = async () => {
-    const response = await getPreviewPdfUrl(storageKey);
-    const fileUrl = response.data.preview;
+    if (!storageKey) return;
+    // const response = await getPreviewPdfUrl(storageKey);
+    // const fileUrl = response.data.preview;
+    const fileUrl = getPreViewUrl(storageKey);
     const loadingTask = pdfjs.getDocument(fileUrl);
 
     loadingTask.promise.then(

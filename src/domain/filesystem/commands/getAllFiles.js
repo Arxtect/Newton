@@ -80,6 +80,7 @@ export async function saveZipToBlob(rootpath) {
   addFilesToZip(directoryTree, zip, "", rootpath);
   const blob = await zip.generateAsync({ type: "blob" });
 
+  console.log(blob.type, " blob.type");
   // 将 Blob 转换成 File
   const file = new File([blob], `${rootpath.split("/").pop()}.zip`, {
     type: blob.type,

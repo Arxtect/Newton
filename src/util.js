@@ -73,7 +73,13 @@ function deleteCookie(name) {
   setCookie(name, "", -1);
 }
 
+function getPreViewUrl(urlId) {
+  console.log(window.location.origin, "window.location.origin");
+  return window.location.origin + `/api/v1/documents/pre/preview/${urlId}`;
+}
+
 export {
+  getPreViewUrl,
   routerQuery,
   getRandomColor,
   loadFileNames,

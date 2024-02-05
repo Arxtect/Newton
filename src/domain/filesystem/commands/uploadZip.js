@@ -12,17 +12,22 @@ const readdir = pify(fs.readdir);
 const stat = pify(fs.stat);
 
 // 处理 ZIP 文件上传
-const uploadZip = async (file, dirpath, reload) => {
+const uploadZip = async (file, dirpath, reload, projectName) => {
   try {
+    let firstFolderName;
     const zip = await JSZip.loadAsync(file); // 使用 JSZip 加载 ZIP 文件
     const zipEntries = Object.keys(zip.files);
-
-    let firstFolderName;
+    if (dirpath == "." && projectName) {
+      await ensureDir(projectName);
+      dirpath = projectName;
+      firstFolderName = projectName;
+    }
 
     for (const zipEntryName of zipEntries) {
       const zipEntry = zip.files[zipEntryName];
+      console.log(zipEntry);
       if (!firstFolderName && zipEntry.dir && zipEntryName.endsWith("/")) {
-        firstFolderName = zipEntryName.replace("/", ""); // 获取文件夹名称
+        firstFolderName = zipEntryName?.replace("/", ""); // 获取文件夹名称
       }
 
       // 构建目标路径
@@ -48,7 +53,10 @@ const uploadZip = async (file, dirpath, reload) => {
       }
     }
     reload();
-    if (dirpath == "." && firstFolderName) {
+    console.log(firstFolderName, zipEntries, "zipEntries");
+
+    if ((dirpath == "." || projectName) && firstFolderName) {
+      console.log(firstFolderName, "firstFolderName");
       changeCurrentProjectRoot({ projectRoot: firstFolderName });
     }
   } catch (error) {

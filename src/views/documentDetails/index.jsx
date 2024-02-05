@@ -14,7 +14,8 @@ import { toast } from "react-toastify";
 import { getPreviewPdfUrl, getDocumentById } from "services";
 import { useFileStore } from "store";
 import { uploadZip } from "domain/filesystem";
-import { useNavigate } from "react-router-dom"; // Import useNavigate hook
+import { useNavigate } from "react-router-dom";
+import { getPreViewUrl } from "@/util";
 
 const DocumentDetails = () => {
   const { repoChanged } = useFileStore((state) => ({
@@ -36,11 +37,13 @@ const DocumentDetails = () => {
     }
     console.log(query.get("id"), "id");
     getDocumentById(query.get("id")).then((res) => {
-      console.log(res, "res");
-      getPdfUrl(res.data.StorageKey);
-      setDocumentInfo(res.data);
+      if (res?.data) {
+        setPdfUrl(getPreViewUrl(res.data.StorageKey));
+        getZipUrl(res.data.StorageZip);
+        setDocumentInfo(res.data);
+      }
     });
-  }, [query]);
+  }, []);
 
   // Function to format the timestamp
   const formatDate = (timestamp) => {
@@ -50,6 +53,7 @@ const DocumentDetails = () => {
 
   const [previewOpen, setPreviewOpen] = useState(false);
   const [pdfUrl, setPdfUrl] = useState("");
+  const [zipUrl, setZipUrl] = useState("");
 
   useEffect(() => {
     // getPdfUrl();
@@ -63,6 +67,14 @@ const DocumentDetails = () => {
       console.error("Fetching PDF failed:", error);
     }
   };
+  const getZipUrl = async (storageKey) => {
+    try {
+      const response = await getPreviewPdfUrl(storageKey);
+      setZipUrl(response.data.preview);
+    } catch (error) {
+      console.error("Fetching PDF failed:", error);
+    }
+  };
   const handleOpenPreview = () => {
     if (!pdfUrl) {
       toast.warning("document not exist yet");
@@ -70,8 +82,12 @@ const DocumentDetails = () => {
     }
     setPreviewOpen(true);
   };
-
-  const downloadZipAndUpload = async (url, dirpath, reload) => {
+  function extractProjectName(zipFileName) {
+    const parts = zipFileName.split(/-|\./);
+    return parts[parts.length - 2];
+  }
+  const downloadZipAndUpload = async (url, dirpath, reload, projectName) => {
+    console.log(url, "url");
     try {
       const response = await fetch(url);
       if (!response.ok)
@@ -79,22 +95,26 @@ const DocumentDetails = () => {
 
       const blob = await response.blob(); // 在浏览器环境中使用
       // 或者使用 response.arrayBuffer() 如果你需要 ArrayBuffer
-
+      projectName = extractProjectName(projectName) || "";
       // 调用 uploadZip 函数，传入下载的文件
-      await uploadZip(blob, dirpath, reload);
+      await uploadZip(blob, dirpath, reload, projectName);
+      navigate("/arxtect");
     } catch (error) {
       console.error(`Failed to download or upload ZIP from ${url}:`, error);
     }
   };
 
   const handleOpenProject = async () => {
-    // const file = documentInfo?.StorageKey;
-    const url =
-      "http://10.10.99.141:9000/chatcro-test-file/321.zip?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=JINUGN0GD2PI17JN7016%2F20240204%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20240204T135222Z&X-Amz-Expires=604800&X-Amz-Security-Token=eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NLZXkiOiJKSU5VR04wR0QyUEkxN0pONzAxNiIsImV4cCI6MTcwNzA1ODMyOSwicGFyZW50IjoiamFuY3NpdGVjaCJ9.u1E508ZtAzCxfmLQ2rTQ8nC3jyCGXJguyKqiwymDJS3GfIEm72urKGAQeiKFXGHQ4Z9tLv4TuZ8sgfUQAw9H5w&X-Amz-SignedHeaders=host&versionId=null&X-Amz-Signature=ad486f418ca0d658bd824f6f3b708d83997742b11dbfa0895c8ef32ebd78e77b";
-
-    downloadZipAndUpload(url, ".", repoChanged).then(() => {
-      navigate("/arxtect");
-    });
+    console.log(zipUrl, "zipUrl");
+    if (!zipUrl || zipUrl == "") {
+      toast.warning("project source not exist yet");
+      return;
+    }
+    try {
+      downloadZipAndUpload(zipUrl, ".", repoChanged, documentInfo?.StorageZip);
+    } catch (error) {
+      toast.error(`get project source failed:${error}`);
+    }
   };
 
   return (
@@ -160,7 +180,7 @@ const DocumentDetails = () => {
         </div>
         <div className="w-full m-auto md:w-1/2 flex justify-center">
           <PdfImage
-            storageKey={"astronomy.pdf-b78c20"}
+            storageKey={documentInfo?.StorageKey}
             height={500}
             className="w-[80%]"
           ></PdfImage>

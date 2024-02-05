@@ -18,53 +18,9 @@ import Masonry from "@mui/lab/Masonry";
 import PdfImage from "@/components/pdfImage";
 import { getAllTags, documentSearch } from "services";
 import { Link, NavLink } from "react-router-dom";
-
-// 假设的文档数据
-const popularDocuments = [
-  {
-    ID: "doc1",
-    Title: "The Expansion of the Universe",
-    Tags: ["Science", "Research"],
-    Content: "A deep dive into cosmic expansion and dark energy.",
-  },
-  {
-    ID: "doc2",
-    Title: "Medieval European History",
-    Tags: ["History"],
-    Content: "An overview of the medieval period in Europe.",
-  },
-  {
-    ID: "doc3",
-    Title: "Creative Writing 101",
-    Tags: ["Literature", "Fiction"],
-    Content: "A beginner's guide to creative writing.",
-  },
-  {
-    ID: "doc4",
-    Title: "Annual Tech Conference 2024",
-    Tags: ["Events", "Schedules"],
-    Content: "Schedule and speaker list for the upcoming tech conference.",
-  },
-  {
-    ID: "doc5",
-    Title: "Professional Resume Template",
-    Tags: ["Professional", "Jobs"],
-    Content: "A template and tips for creating a professional resume.",
-  },
-  {
-    ID: "doc6",
-    Title: "Business Correspondence Essentials",
-    Tags: ["Correspondence", "Official"],
-    Content: "How to write effective business letters and emails.",
-  },
-  {
-    ID: "doc7",
-    Title: "Understanding Astrophysics",
-    Tags: null, // 这个文档没有标签，将会归类到“Popular”
-    Content: "An introductory text to the concepts of astrophysics.",
-  },
-  // ...更多文档...
-];
+import { getCookie } from "@/util";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const Einstein = () => {
   const [page, setPage] = React.useState(1);
@@ -72,6 +28,8 @@ const Einstein = () => {
   const [keyword, setKeyword] = React.useState("");
   const [customTags, setCustomTags] = useState([]);
   const [totalDocuments, setTotalDocuments] = useState(0);
+
+  const navigate = useNavigate();
 
   const handleKeywordChange = (event) => {
     // 更新 state 以反映输入框的当前值
@@ -159,6 +117,17 @@ const Einstein = () => {
   useEffect(() => {
     searchDocuments(1, selectedTags, keyword);
   }, []);
+
+  const handleToEditor = (StorageKey) => {
+    const cookie = getCookie("mojolicious");
+    console.log(cookie, "cookie");
+    if (!cookie || cookie == "") {
+      toast.warning("Please login");
+      return;
+    }
+    navigate(`/documentdetails?id=${StorageKey}`);
+  };
+
   return (
     <Container>
       <h1 className="text-4xl font-bold mt-10 mb-4">Einstein</h1>
@@ -259,8 +228,9 @@ const Einstein = () => {
                     fontSize: "16px",
                     lineHeight: 1.5625,
                   }}
+                  onClick={() => handleToEditor(doc.StorageKey)}
                 >
-                  <Link to={`/documentdetails?id=${doc.ID}`}> {doc.Title}</Link>
+                  {doc.Title}
                 </Typography>
 
                 <Typography

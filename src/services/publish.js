@@ -22,7 +22,6 @@ export async function getAllTags() {
 }
 
 export async function documentSearch(search) {
-  await refreshAuth();
   // Initialize the query parameters as an array of strings
   let queryParams = [];
 
@@ -63,25 +62,27 @@ export async function getDocumentById(documentId) {
     throw new Error("A document ID is required to fetch a document");
   }
 
-  // Construct the URL with the document ID
-  const url = `${getApiUrl("")}/${encodeURIComponent(documentId)}`;
+  try {
+    // Construct the URL with the document ID
+    const url = `${getApiUrl("/drafts")}/${documentId}`;
 
-  // Perform the GET request using the constructed URL
-  const response = await fetch(url, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+    // Perform the GET request using the constructed URL
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
-  // Check if the response is ok (status in the range 200-299)
-  if (response.ok) {
-    return response.json();
-  } else {
-    // If the response is not ok, throw an error with the status text
-    throw new Error(
-      `Failed to get document with ID ${documentId}: ${response.statusText}`
-    );
+    // Check if the response is ok (status in the range 200-299)
+    if (response.ok) {
+      return response.json();
+    } else {
+      // If the response is not ok, throw an error with the status text
+      throw new Error(`${response.statusText}`);
+    }
+  } catch (error) {
+    toast.error(` ${error}`);
   }
 }
 
@@ -130,6 +131,8 @@ export async function uploadDocument({
   formData.append("title", title);
   formData.append("tags", JSON.stringify(tags));
   formData.append("zip", zipFile); // 添加 ZIP 文件
+
+  console.log(zipFile, "zipFile");
 
   // Perform the fetch operation to upload the form data
   const uploadResponse = await fetch(getApiUrl("/upload"), {
