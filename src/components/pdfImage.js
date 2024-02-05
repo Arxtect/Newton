@@ -15,7 +15,12 @@ const PfdImage = ({ storageKey, height = 250, ...res }) => {
     // const response = await getPreviewPdfUrl(storageKey);
     // const fileUrl = response.data.preview;
     const fileUrl = getPreViewUrl(storageKey);
-    const loadingTask = pdfjs.getDocument(fileUrl);
+    const loadingTask = pdfjs.getDocument({
+      url: fileUrl,
+      disableAutoFetch: true,
+      disableStream: true,
+      rangeChunkSize: 1,
+    });
 
     loadingTask.promise.then(
       (pdf) => {
@@ -56,7 +61,7 @@ const PfdImage = ({ storageKey, height = 250, ...res }) => {
   return (
     <React.Fragment>
       {pageImage ? (
-        <img src={pageImage} alt="PDF thumbnail" className="v-full" {...res} />
+        <img src={pageImage} alt="PDF thumbnail" className="w-full" {...res} />
       ) : (
         <Skeleton variant="rectangular" width="100%" height={height} />
       )}

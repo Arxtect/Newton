@@ -5,6 +5,7 @@
  */
 import { toast } from "react-toastify"; // 假设你已经安装了react-toastify
 import { refreshAuth } from "./auth";
+import { setCookie, deleteCookie } from "@/util";
 // 辅助函数：生成带有统一前缀的URL
 function getApiUrl(endpoint) {
   return `/api/v1/documents${endpoint}`;
@@ -77,6 +78,11 @@ export async function getDocumentById(documentId) {
     // Check if the response is ok (status in the range 200-299)
     if (response.ok) {
       return response.json();
+    } else if (response.status === 401) {
+      deleteCookie("mojolicious");
+      toast.error("Login has expired. Please log in again", {
+        position: "top-right",
+      });
     } else {
       // If the response is not ok, throw an error with the status text
       throw new Error(`${response.statusText}`);
@@ -143,6 +149,11 @@ export async function uploadDocument({
   // Check the response status and return the response or throw an error
   if (uploadResponse.ok) {
     return uploadResponse.json();
+  } else if (response.status === 401) {
+    deleteCookie("mojolicious");
+    toast.error("Login has expired. Please log in again", {
+      position: "top-right",
+    });
   } else {
     throw new Error("Document upload failed");
   }

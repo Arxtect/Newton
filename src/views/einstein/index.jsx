@@ -21,6 +21,7 @@ import { Link, NavLink } from "react-router-dom";
 import { getCookie } from "@/util";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { updateDialogLoginOpen } from "@/store";
 
 const Einstein = () => {
   const [page, setPage] = React.useState(1);
@@ -123,6 +124,7 @@ const Einstein = () => {
     console.log(cookie, "cookie");
     if (!cookie || cookie == "") {
       toast.warning("Please login");
+      updateDialogLoginOpen(true);
       return;
     }
     navigate(`/documentdetails?id=${StorageKey}`);

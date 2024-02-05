@@ -21,6 +21,7 @@ import { useFileStore } from "store";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import RouterComponent from "@/router/index";
+import DialogLogin from "@/views/login/dialog-login.js";
 
 async function loadBrowserFS() {
   return new Promise((resolve) => {
@@ -52,6 +53,7 @@ root.render(
         <RouterComponent></RouterComponent>
       </Suspense>
     </HashRouter>
+    <DialogLogin></DialogLogin>
   </React.Fragment>
 );
 

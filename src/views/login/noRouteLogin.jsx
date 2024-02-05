@@ -19,11 +19,11 @@ import { styled } from "@mui/material/styles";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { object, string } from "zod";
 import FormInput from "@/components/FormInput";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { LoadingButton as _LoadingButton } from "@mui/lab";
 import { toast } from "react-toastify";
 import { setCookie } from "@/util";
-import { useUserStore } from "store";
+import { useUserStore, useLoginStore } from "store";
 import * as layoutStyles from "@/styles";
 
 const LoadingButton = styled(_LoadingButton)`
@@ -53,7 +53,7 @@ const loginSchema = object({
     .max(32, "The password cannot exceed 32 characters"),
 });
 
-const LoginPage = ({ isDialog = false, handleClose }) => {
+const NoRouteLogin = ({ handleClose }) => {
   const methods = useForm({
     resolver: zodResolver(loginSchema),
   });
@@ -62,10 +62,6 @@ const LoginPage = ({ isDialog = false, handleClose }) => {
   const [loginError, setLoginError] = useState();
 
   const updateUser = useUserStore((state) => state.updateUser);
-  const navigate = useNavigate();
-  const location = useLocation();
-  // 从 location state 中获取重定向前的路径，如果没有则默认为首页 "/"
-  const from = location.state?.from?.pathname || "/";
 
   const onSubmitHandler = async (values) => {
     setIsSubmitting(true);
@@ -75,7 +71,7 @@ const LoginPage = ({ isDialog = false, handleClose }) => {
       toast.success("You successfully logged in");
       setCookie("mojolicious", data.access_token, 3000000);
       updateUser(data.user);
-      isDialog ? handleClose() : navigate(from, { replace: true });
+      handleClose();
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "login failed";
@@ -87,10 +83,22 @@ const LoginPage = ({ isDialog = false, handleClose }) => {
       setIsSubmitting(false);
     }
   };
+  const { updateDialogLoginOpen } = useLoginStore((state) => ({
+    updateDialogLoginOpen: state.updateDialogLoginOpen,
+  }));
+  const handleRouteClick = (href) => {
+    // updateDialogLoginOpen(false);
+    window.open(href, "_blank", "noopener,noreferrer");
+  };
 
   return (
-    <Container maxWidth={false} sx={layoutStyles.container}>
-      <Box sx={layoutStyles.box}>
+    <Container>
+      <Box
+        sx={{
+          ...layoutStyles.box,
+          padding: "3rem 1rem 1rem 1rem",
+        }}
+      >
         <Typography
           textAlign="center"
           component="h1"
@@ -118,20 +126,14 @@ const LoginPage = ({ isDialog = false, handleClose }) => {
             <Typography
               sx={{ fontSize: "0.9rem", mb: "1rem", textAlign: "right" }}
             >
-              {!isDialog ? (
-                <Link to="/forgotpassword" style={{ color: "var(--primary)" }}>
-                  Forgot Password?
-                </Link>
-              ) : (
-                <a
-                  href="/forgotpassword"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ color: "var(--primary)" }}
-                >
-                  Forgot Password?
-                </a>
-              )}
+              <span
+                onClick={() => handleRouteClick("/#/forgotpassword")}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: "var(--primary)", cursor: "pointer" }}
+              >
+                Forgot Password?
+              </span>
             </Typography>
 
             <LoadingButton
@@ -147,20 +149,14 @@ const LoginPage = ({ isDialog = false, handleClose }) => {
 
             <Typography sx={{ fontSize: "0.9rem", mt: "1rem" }}>
               Need an account?{" "}
-              {!isDialog ? (
-                <Link to="/register" style={{ color: "var(--primary)" }}>
-                  Register
-                </Link>
-              ) : (
-                <a
-                  href="/register"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ color: "var(--primary)" }}
-                >
-                  Register
-                </a>
-              )}
+              <span
+                onClick={() => handleRouteClick("/#/register")}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: "var(--primary)", cursor: "pointer" }}
+              >
+                Register
+              </span>
             </Typography>
           </Box>
         </FormProvider>
@@ -169,4 +165,4 @@ const LoginPage = ({ isDialog = false, handleClose }) => {
   );
 };
 
-export default LoginPage;
+export default NoRouteLogin;

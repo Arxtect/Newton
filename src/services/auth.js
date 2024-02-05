@@ -17,7 +17,14 @@ export async function registerUser(userData) {
     body: JSON.stringify(userData),
   });
 
-  return response.json();
+  if (response.ok) {
+    const data = await response.json();
+    return data;
+  } else {
+    const data = await response.json();
+    console.log(data);
+    throw new Error(`register failed: ${data.message}`);
+  }
 }
 
 // 登录用户
@@ -114,6 +121,11 @@ export async function verifyEmail(verificationCode) {
 
   if (response.ok) {
     return response.json();
+  } else if (response.status === 401) {
+    deleteCookie("mojolicious");
+    toast.error("Login has expired. Please log in again", {
+      position: "top-right",
+    });
   } else {
     throw new Error("Email verification failed");
   }
@@ -129,9 +141,14 @@ export async function forgotPassword(email) {
     credentials: "include",
     body: JSON.stringify({ email }),
   });
-
+  console.log(response, "response");
   if (response.ok) {
     return response.json();
+  } else if (response.status === 401) {
+    deleteCookie("mojolicious");
+    toast.error("Login has expired. Please log in again", {
+      position: "top-right",
+    });
   } else {
     throw new Error("Password reset request failed");
   }
@@ -150,6 +167,11 @@ export async function resetPassword({ resetToken, password, passwordConfirm }) {
 
   if (response.ok) {
     return response.json();
+  } else if (response.status === 401) {
+    deleteCookie("mojolicious");
+    toast.error("Login has expired. Please log in again", {
+      position: "top-right",
+    });
   } else {
     throw new Error("Password reset failed");
   }

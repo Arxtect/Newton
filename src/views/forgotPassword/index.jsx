@@ -49,12 +49,11 @@ const ForgotPasswordPage = () => {
     const { email } = data;
     forgotPassword(email)
       .then((response) => {
-        // Handle success
-        toast.success(response.data.message);
+        toast.success(response.message);
       })
       .catch((error) => {
         // Handle error
-        toast.error(error.response?.data?.message || "An error occurred");
+        toast.error(error || "An error occurred");
       });
   };
 
