@@ -1,6 +1,7 @@
 // 假设你有这些辅助函数
 import { setCookie, deleteCookie } from "@/util";
 import { toast } from "react-toastify"; // 假设你已经安装了react-toastify
+import { updateAccessToken } from "store";
 
 // 辅助函数：生成带有统一前缀的URL
 function getApiUrl(endpoint) {
@@ -40,7 +41,8 @@ export async function loginUser(credentials) {
 
   if (response.ok) {
     const data = await response.json();
-    setCookie("mojolicious", data.access_token, 30000);
+    // setCookie("mojolicious", data.access_token, 30000);
+    updateAccessToken(data.access_token);
     return data;
   } else {
     throw new Error("Login failed");
@@ -60,12 +62,14 @@ export async function refreshAuth() {
     }
 
     const data = await response.json();
-    setCookie("mojolicious", data.access_token, 30000);
+    // setCookie("mojolicious", data.access_token, 30000);
+    updateAccessToken(data.access_token);
   } catch (error) {
-    toast.error("Login has expired. Please log in again", {
-      position: "top-right",
-    });
-    deleteCookie("mojolicious");
+    // toast.error("Login has expired. Please log in again", {
+    //   position: "top-right",
+    // });
+    // deleteCookie("mojolicious");
+    updateAccessToken("");
     setTimeout(() => {
       //   window.location.reload();
     }, 1500);
@@ -80,7 +84,8 @@ export async function logoutUser() {
   });
 
   if (response.ok) {
-    deleteCookie("mojolicious");
+    // deleteCookie("mojolicious");
+    updateAccessToken("");
   } else {
     throw new Error("Logout failed");
   }
@@ -100,10 +105,11 @@ export async function getMe() {
   if (response.ok) {
     return response.json();
   } else if (response.status === 401) {
-    deleteCookie("mojolicious");
-    toast.error("Login has expired. Please log in again", {
-      position: "top-right",
-    });
+    // deleteCookie("mojolicious");
+    updateAccessToken("");
+    // toast.error("Login has expired. Please log in again", {
+    //   position: "top-right",
+    // });
   } else {
     throw new Error("Failed to fetch user information");
   }
@@ -122,7 +128,8 @@ export async function verifyEmail(verificationCode) {
   if (response.ok) {
     return response.json();
   } else if (response.status === 401) {
-    deleteCookie("mojolicious");
+    // deleteCookie("mojolicious");
+    updateAccessToken("");
     toast.error("Login has expired. Please log in again", {
       position: "top-right",
     });
@@ -145,7 +152,8 @@ export async function forgotPassword(email) {
   if (response.ok) {
     return response.json();
   } else if (response.status === 401) {
-    deleteCookie("mojolicious");
+    // deleteCookie("mojolicious");
+    updateAccessToken("");
     toast.error("Login has expired. Please log in again", {
       position: "top-right",
     });
@@ -168,7 +176,8 @@ export async function resetPassword({ resetToken, password, passwordConfirm }) {
   if (response.ok) {
     return response.json();
   } else if (response.status === 401) {
-    deleteCookie("mojolicious");
+    // deleteCookie("mojolicious");
+    updateAccessToken("");
     toast.error("Login has expired. Please log in again", {
       position: "top-right",
     });

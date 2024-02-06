@@ -23,6 +23,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { LoadingButton as _LoadingButton } from "@mui/lab";
 import { toast } from "react-toastify";
 import { setCookie } from "@/util";
+import { updateAccessToken } from "store";
 import { useUserStore } from "store";
 import * as layoutStyles from "@/styles";
 
@@ -73,7 +74,8 @@ const LoginPage = ({ isDialog = false, handleClose }) => {
     try {
       const data = await loginUser(values);
       toast.success("You successfully logged in");
-      setCookie("mojolicious", data.access_token, 3000000);
+      // setCookie("mojolicious", data.access_token, 3000000);
+      updateAccessToken(data.access_token);
       updateUser(data.user);
       isDialog ? handleClose() : navigate(from, { replace: true });
     } catch (error) {

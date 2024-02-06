@@ -20,7 +20,7 @@ import { findAllProject } from "domain/filesystem";
 import { useFileStore } from "store";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import RouterComponent from "@/router/index";
+import AppRouter from "@/router";
 import DialogLogin from "@/views/login/dialog-login.js";
 
 async function loadBrowserFS() {
@@ -48,11 +48,7 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.Fragment>
     <ToastContainer />
-    <HashRouter>
-      <Suspense fallback={<CircularProgress />}>
-        <RouterComponent></RouterComponent>
-      </Suspense>
-    </HashRouter>
+    <AppRouter />
     <DialogLogin></DialogLogin>
   </React.Fragment>
 );

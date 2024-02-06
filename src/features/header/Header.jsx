@@ -4,6 +4,7 @@
  * @Date: 2023-06-26 09:57:49
  */
 import { Link, NavLink } from "react-router-dom";
+import { useEffect, useState } from "react";
 import {
   Button,
   AppBar,
@@ -14,8 +15,30 @@ import {
 } from "@mui/material";
 import { Menu as MenuIcon } from "@mui/icons-material";
 import logo from "@/assets/logo.png";
+import { getMe } from "services";
+import { getCookie } from "@/util";
+import { useUserStore } from "store";
 
 export const Header = () => {
+  const [username, setUsername] = useState("");
+  const { accessToken, updateAccessToken } = useUserStore((state) => ({
+    accessToken: state.accessToken,
+  }));
+
+  useEffect(() => {
+    getMe()
+      .then((res) => {
+        if (res?.data) {
+          setUsername(res.data.user.name);
+        } else {
+          setUsername("");
+        }
+      })
+      .catch((error) => {
+        setUsername("");
+      });
+  }, [accessToken]);
+
   return (
     <header className="flex justify-between items-center">
       <Box sx={{ flexGrow: 1 }}>
@@ -47,7 +70,11 @@ export const Header = () => {
             </Button>
             {/* <Button className="text-black font-normal  mr-4"> <Link to="/arxtect">newton demo</Link></Button> */}
             <Button className="text-black font-normal">
-              <Link to="/login">Login</Link>
+              {accessToken && username ? (
+                username
+              ) : (
+                <Link to="/login">Login</Link>
+              )}
             </Button>
           </Toolbar>
         </AppBar>

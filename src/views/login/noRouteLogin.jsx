@@ -23,7 +23,7 @@ import { Link } from "react-router-dom";
 import { LoadingButton as _LoadingButton } from "@mui/lab";
 import { toast } from "react-toastify";
 import { setCookie } from "@/util";
-import { useUserStore, useLoginStore } from "store";
+import { useUserStore, useLoginStore, updateAccessToken } from "store";
 import * as layoutStyles from "@/styles";
 
 const LoadingButton = styled(_LoadingButton)`
@@ -70,6 +70,7 @@ const NoRouteLogin = ({ handleClose }) => {
       const data = await loginUser(values);
       toast.success("You successfully logged in");
       setCookie("mojolicious", data.access_token, 3000000);
+      updateAccessToken(data.access_token);
       updateUser(data.user);
       handleClose();
     } catch (error) {

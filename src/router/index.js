@@ -1,64 +1,72 @@
-import { HashRouter, Route, Routes } from "react-router-dom";
-import Layout from "./Layout.js";
-import { lazy } from "react";
+import React, { Suspense } from "react";
+import {
+  HashRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import { CircularProgress as Nprogress } from "@mui/material";
+import config from "./config";
 
-const Home = lazy(() => import("@/views/home"));
-const Arxtect = lazy(() => import("@/views/arxtect"));
-const GitText = lazy(() => import("@/views/git-test"));
-const Login = lazy(() => import("@/views/login"));
-const Register = lazy(() => import("@/views/register"));
-const Verifyemail = lazy(() => import("@/views/verifyemail"));
-const ResetPasswordPage = lazy(() => import("@/views/resetPasswordPage"));
-const ForgotPassword = lazy(() => import("@/views/forgotPassword"));
-const Einstein = lazy(() => import("@/views/einstein"));
-const DocumentDetails = lazy(() => import("@/views/documentDetails"));
+const renderRoutes = (routes) => {
+  if (!Array.isArray(routes)) {
+    return null;
+  }
 
-// Routes that require a header (and possibly a footer)
-export const headerRoutes = [
-  { path: "/", component: Home, withHeader: true },
-  { path: "/arxtect", component: Arxtect, withHeader: true },
-  { path: "/einstein", component: Einstein, withHeader: true },
-  { path: "/documentdetails", component: DocumentDetails, withHeader: true },
-  // { path: "/git-test", component: GitText, withHeader: true },
-  // Add more routes as needed
-];
-
-// Routes that do not require a header or footer
-export const noHeaderRoutes = [
-  { path: "/login", component: Login },
-  { path: "/register", component: Register },
-  { path: "/verifyemail", component: Verifyemail },
-  { path: "/resetpassword", component: ResetPasswordPage },
-  { path: "/forgotpassword", component: ForgotPassword },
-  // Add more routes as needed
-];
-const RouterComponent = () => {
   return (
     <Routes>
-      {headerRoutes.map(({ path, component: Component, withHeader }) => (
-        <Route
-          key={path}
-          path={path}
-          element={
-            <Layout withHeader={withHeader}>
-              <Component />
-            </Layout>
-          }
-        />
-      ))}
-      {noHeaderRoutes.map(({ path, component: Component }) => (
-        <Route
-          key={path}
-          path={path}
-          element={
-            <Layout>
-              <Component />
-            </Layout>
-          }
-        />
-      ))}
+      {routes.map((route, index) => {
+        const Component = route.component;
+        console.log(route, "route");
+        if (route.redirect) {
+          console.log(route.redirect, "route.redirect");
+          return (
+            <Route
+              key={route.path || index}
+              path={route.path}
+              element={<Navigate replace to={route.redirect} />}
+            />
+          );
+        }
+        return (
+          <Route
+            key={route.path || index}
+            path={route.path}
+            element={
+              <Suspense fallback={<Nprogress />}>
+                {Component && <Component route={route} />}
+              </Suspense>
+            }
+          >
+            {route.childRoutes &&
+              route.childRoutes.map((item) => {
+                if (item.redirect) {
+                  return (
+                    <Route
+                      key={item.path || index}
+                      path={item.path}
+                      element={<Navigate replace to={item.redirect} />}
+                    />
+                  );
+                }
+                return (
+                  <Route
+                    key={item.path}
+                    path={item.path}
+                    exact={item.exact}
+                    element={item.component && <item.component />}
+                  ></Route>
+                );
+              })}
+          </Route>
+        );
+      })}
     </Routes>
   );
 };
 
-export default RouterComponent;
+const AppRouter = () => {
+  return <Router>{renderRoutes(config)}</Router>;
+};
+
+export default AppRouter;

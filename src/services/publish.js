@@ -6,12 +6,14 @@
 import { toast } from "react-toastify"; // 假设你已经安装了react-toastify
 import { refreshAuth } from "./auth";
 import { setCookie, deleteCookie } from "@/util";
+import { updateAccessToken } from "store";
 // 辅助函数：生成带有统一前缀的URL
 function getApiUrl(endpoint) {
   return `/api/v1/documents${endpoint}`;
 }
 
 export async function getAllTags() {
+  await refreshAuth();
   const response = await fetch(getApiUrl("/tags/list"), {
     method: "GET",
     headers: {
@@ -23,6 +25,7 @@ export async function getAllTags() {
 }
 
 export async function documentSearch(search) {
+  await refreshAuth();
   // Initialize the query parameters as an array of strings
   let queryParams = [];
 
@@ -59,6 +62,7 @@ export async function documentSearch(search) {
 }
 
 export async function getDocumentById(documentId) {
+  await refreshAuth();
   if (!documentId) {
     throw new Error("A document ID is required to fetch a document");
   }
@@ -79,7 +83,8 @@ export async function getDocumentById(documentId) {
     if (response.ok) {
       return response.json();
     } else if (response.status === 401) {
-      deleteCookie("mojolicious");
+      // deleteCookie("mojolicious");
+      updateAccessToken("");
       toast.error("Login has expired. Please log in again", {
         position: "top-right",
       });
@@ -93,6 +98,7 @@ export async function getDocumentById(documentId) {
 }
 
 export async function getPreviewPdfUrl(storageKey) {
+  await refreshAuth();
   const response = await fetch(getApiUrl("/pre/download"), {
     method: "POST",
     headers: {
@@ -150,7 +156,8 @@ export async function uploadDocument({
   if (uploadResponse.ok) {
     return uploadResponse.json();
   } else if (response.status === 401) {
-    deleteCookie("mojolicious");
+    // deleteCookie("mojolicious");
+    updateAccessToken("");
     toast.error("Login has expired. Please log in again", {
       position: "top-right",
     });

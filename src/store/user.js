@@ -15,6 +15,7 @@ export const useUserStore = create()(
       user: {},
       isFirstLogin: false,
       tip: "",
+      accessToken: "",
       updateUser(user) {
         set((state) => ({ user }));
       },
@@ -24,6 +25,9 @@ export const useUserStore = create()(
       updateTip(tip) {
         set((state) => ({ tip }));
       },
+      updateAccessToken(cookie) {
+        set((state) => ({ accessToken: cookie }));
+      },
     }),
     {
       name: USER_KEY,
@@ -31,3 +35,5 @@ export const useUserStore = create()(
     }
   )
 );
+
+export const { updateAccessToken } = useUserStore.getState();

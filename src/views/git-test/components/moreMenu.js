@@ -26,7 +26,7 @@ import CreateIcon from "@mui/icons-material/Create";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ExportIcon from "@mui/icons-material/MoveToInbox"; // 假设您想要用这个图标作为导出的图标
 
-import { usePdfPreviewStore } from "store";
+import { usePdfPreviewStore, useUserStore } from "store";
 const MoreMenu = ({
   reload,
   filepath,
@@ -45,6 +45,7 @@ const MoreMenu = ({
   const { pdfUrl } = usePdfPreviewStore((state) => ({
     pdfUrl: state.pdfUrl,
   }));
+  const { accessToken, updateAccessToken } = useUserStore();
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -95,9 +96,8 @@ const MoreMenu = ({
   const [openPublishDialog, setOpenPublishDialog] = useState(false);
 
   const handleOpenPublish = () => {
-    const cookie = getCookie("mojolicious");
-    console.log(cookie, "cookie");
-    if (!cookie || cookie == "") {
+    console.log(accessToken, "cookie");
+    if (!accessToken || accessToken == "") {
       updateDialogLoginOpen(true);
       toast.warning("Please login");
       return;

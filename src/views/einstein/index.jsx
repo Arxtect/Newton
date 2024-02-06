@@ -22,6 +22,7 @@ import { getCookie } from "@/util";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { updateDialogLoginOpen } from "@/store";
+import { useUserStore } from "store";
 
 const Einstein = () => {
   const [page, setPage] = React.useState(1);
@@ -29,6 +30,7 @@ const Einstein = () => {
   const [keyword, setKeyword] = React.useState("");
   const [customTags, setCustomTags] = useState([]);
   const [totalDocuments, setTotalDocuments] = useState(0);
+  const { accessToken, updateAccessToken } = useUserStore();
 
   const navigate = useNavigate();
 
@@ -120,9 +122,8 @@ const Einstein = () => {
   }, []);
 
   const handleToEditor = (StorageKey) => {
-    const cookie = getCookie("mojolicious");
-    console.log(cookie, "cookie");
-    if (!cookie || cookie == "") {
+    console.log(accessToken, "cookie");
+    if (!accessToken || accessToken == "") {
       toast.warning("Please login");
       updateDialogLoginOpen(true);
       return;
