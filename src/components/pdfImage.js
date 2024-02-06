@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { pdfjs } from "react-pdf";
-import { getPreviewPdfUrl } from "services";
 import Skeleton from "@mui/material/Skeleton";
 import { getPreViewUrl } from "@/util";
 

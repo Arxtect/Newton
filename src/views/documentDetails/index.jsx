@@ -59,18 +59,9 @@ const DocumentDetails = () => {
     // getPdfUrl();
   }, []);
 
-  const getPdfUrl = async (storageKey) => {
-    try {
-      const response = await getPreviewPdfUrl(storageKey);
-      setPdfUrl(response.data.preview);
-    } catch (error) {
-      console.error("Fetching PDF failed:", error);
-    }
-  };
   const getZipUrl = async (storageKey) => {
     try {
-      const response = await getPreviewPdfUrl(storageKey);
-      setZipUrl(response.data.preview);
+      setZipUrl(getPreViewUrl(storageKey));
     } catch (error) {
       console.error("Fetching PDF failed:", error);
     }

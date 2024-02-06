@@ -27,7 +27,7 @@ export const ButtonBar = ({
         <CustomSplitButton
           multi
           buttonList={[
-            { key: "1", label: "COPOILE", onClick: compile },
+            { key: "1", label: "COMPILE", onClick: compile },
             { key: "2", label: "SHOWLOG", onClick: showLog },
           ]}
         ></CustomSplitButton>

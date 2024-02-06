@@ -14,6 +14,7 @@ import {
   Box,
 } from "@mui/material";
 import { getCookie } from "@/util";
+import { updateDialogLoginOpen } from "store";
 
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { toast } from "react-toastify";
@@ -97,6 +98,7 @@ const MoreMenu = ({
     const cookie = getCookie("mojolicious");
     console.log(cookie, "cookie");
     if (!cookie || cookie == "") {
+      updateDialogLoginOpen(true);
       toast.warning("Please login");
       return;
     }
