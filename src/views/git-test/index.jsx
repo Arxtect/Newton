@@ -20,6 +20,8 @@ import MoreMenu from "./components/moreMenu.js";
 import { FileUploader, FolderUploader } from "./upload.jsx";
 import DropdownFormWithIcon from "./components/DropdownFormWithIcon.jsx";
 
+import { gitClone, linkRepo } from "./gitclone.js";
+
 const GitTest = () => {
   const {
     filepath,
@@ -83,6 +85,7 @@ const GitTest = () => {
   useEffect(() => {
     getAllProject();
   }, [currentProjectRoot]);
+
   return (
     <main className="max-w-[100%]">
       <div className="flex justify-between items-center bg-[#e7f8fd] h-[52px] pr-3 border-gradient-top">
@@ -122,6 +125,7 @@ const GitTest = () => {
           ></FileUploader>
         </div>
       </div>
+      <button onClick={() => linkRepo()}>git clone </button>
       <RootDirectory
         key={currentProjectRoot}
         root={currentProjectRoot}

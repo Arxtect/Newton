@@ -1,3 +1,8 @@
+/*
+ * @Description:
+ * @Author: Devin
+ * @Date: 2024-02-26 20:29:27
+ */
 import fs from "fs";
 import path from "path";
 import pify from "pify";
@@ -10,6 +15,7 @@ export async function findAllProject(currentDir = ".") {
     const dirPromises = entries.map(async (entry) => {
       const entryPath = path.join(currentDir, entry);
       const stat = await pify(fs.stat)(entryPath);
+      console.log(stat);
       // 如果条目是一个目录，返回其名称，否则返回null
       return stat.isDirectory() ? entry : null;
     });

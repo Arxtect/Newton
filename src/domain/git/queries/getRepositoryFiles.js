@@ -1,6 +1,6 @@
 import * as git from "isomorphic-git";
 import uniq from "lodash/uniq";
-import { getFilesRecursively } from "@/filesystem/queries/getFileRecursively";
+import { getFilesRecursively } from "domain/filesystem/queries/getFileRecursively";
 
 export async function getRepositoryFiles(projectRoot, ignoreGit = true) {
   const files = await getFilesRecursively(projectRoot);

@@ -4,8 +4,9 @@
  * @Date: 2024-01-25 12:25:23
  */
 import { openDB } from "idb";
+import ini from "ini";
 
-function routerQuery() {
+export function routerQuery() {
   let queryStr = window.location.search.substring(1);
   let vars = queryStr.split("&");
   const query = {};
@@ -16,7 +17,7 @@ function routerQuery() {
   return query;
 }
 
-function getRandomColor() {
+export function getRandomColor() {
   function randomColor() {
     let random = Math.random();
     if (random === 0) {
@@ -27,7 +28,7 @@ function getRandomColor() {
   return randomColor();
 }
 
-const initDB = async () => {
+export const initDB = async () => {
   const db = await openDB("fileDB", 1, {
     upgrade(db) {
       if (!db.objectStoreNames.contains("files")) {
@@ -38,28 +39,28 @@ const initDB = async () => {
   return db;
 };
 
-const loadFileNames = async () => {
+export const loadFileNames = async () => {
   const db = await initDB();
   const tx = db.transaction("files", "readonly");
   const files = await tx.store.getAllKeys();
   return files;
 };
 
-const getFileContent = async (fileName) => {
+export const getFileContent = async (fileName) => {
   const db = await initDB();
   const tx = db.transaction("files", "readonly");
   const file = await tx.store.get(fileName);
   return file?.content; // 假设文件内容存储在 'content' 字段中
 };
 
-function setCookie(name, value, days) {
+export function setCookie(name, value, days) {
   const expires = new Date();
   expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
   document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/`;
 }
 
 // 获取 cookie
-function getCookie(name) {
+export function getCookie(name) {
   const matches = document.cookie.match(
     new RegExp(
       `(?:^|; )${name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, "\\$1")}=([^;]*)`
@@ -69,23 +70,22 @@ function getCookie(name) {
 }
 
 // 删除 cookie
-function deleteCookie(name) {
+export function deleteCookie(name) {
   setCookie(name, "", -1);
 }
 
-function getPreViewUrl(urlId) {
+export function getPreViewUrl(urlId) {
   console.log(window.location.origin, "window.location.origin");
   return window.location.origin + `/api/v1/documents/pre/preview/${urlId}`;
 }
 
-export {
-  getPreViewUrl,
-  routerQuery,
-  getRandomColor,
-  loadFileNames,
-  initDB,
-  getFileContent,
-  setCookie,
-  getCookie,
-  deleteCookie,
-};
+export function parseGitConfig(text) {
+  const parsed = ini.parse(text);
+  const remotes = Object.keys(parsed)
+    .filter((t) => t.startsWith("remote "))
+    .map((t) => {
+      const m = t.match(/remote \"(.*)\"/);
+      return m && m[1];
+    });
+  return { remotes, core: parsed.core };
+}
