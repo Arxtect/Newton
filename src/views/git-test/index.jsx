@@ -75,6 +75,7 @@ const GitTest = () => {
   const getAllProject = async () => {
     let projectLists = await findAllProject(".");
     if (projectLists.length > 0) {
+      console.log(projectLists, "projectLists");
       updateAllProject(projectLists);
     }
   };
