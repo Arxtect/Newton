@@ -22,6 +22,8 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import AppRouter from "@/router";
 import DialogLogin from "@/views/login/dialog-login.js";
+import "@blueprintjs/core/lib/css/blueprint.css";
+import "@blueprintjs/icons/lib/css/blueprint-icons.css";
 
 async function loadBrowserFS() {
   return new Promise((resolve) => {
@@ -54,3 +56,4 @@ root.render(
 );
 
 reportWebVitals();
+

@@ -20,7 +20,8 @@ import MoreMenu from "./components/moreMenu.js";
 import { FileUploader, FolderUploader } from "./upload.jsx";
 import DropdownFormWithIcon from "./components/DropdownFormWithIcon.jsx";
 
-import { gitClone, linkRepo } from "./gitclone.js";
+import { gitClone, linkRepo, commitFile, gitPush } from "./gitclone.js";
+import BottomDrawer from "@/features/bottomDrawer/bottomDrawer";
 
 const GitTest = () => {
   const {
@@ -86,6 +87,12 @@ const GitTest = () => {
     getAllProject();
   }, [currentProjectRoot]);
 
+  const [isOpen, setIsOpen] = useState(false);
+
+  const toggleDrawer = (open) => {
+    setIsOpen(open);
+  };
+
   return (
     <main className="max-w-[100%]">
       <div className="flex justify-between items-center bg-[#e7f8fd] h-[52px] pr-3 border-gradient-top">
@@ -125,7 +132,23 @@ const GitTest = () => {
           ></FileUploader>
         </div>
       </div>
-      <button onClick={() => linkRepo()}>git clone </button>
+      <button onClick={() => gitClone()}>git clone </button> <div></div>
+      <button onClick={() => linkRepo()}>git link </button> <div></div>
+      <button onClick={() => commitFile(currentProjectRoot, "test commit")}>
+        commit
+      </button>
+      <div></div>
+      <button onClick={() => gitPush(currentProjectRoot, "test commit")}>
+        push
+      </button>
+      <div></div>
+      <button
+        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition duration-300"
+        onClick={() => toggleDrawer(true)}
+      >
+        打开抽屉
+      </button>
+      <BottomDrawer isOpen={isOpen} toggleDrawer={toggleDrawer} />
       <RootDirectory
         key={currentProjectRoot}
         root={currentProjectRoot}

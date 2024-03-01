@@ -1,6 +1,6 @@
 import * as git from "isomorphic-git";
 
-export async function pushBranch(projectRoot, remote, ref, token, corsProxy) {
+export async function pushBranch({projectRoot, remote, ref, token, corsProxy}) {
   const ret = await git.push({
     dir: projectRoot,
     remote,

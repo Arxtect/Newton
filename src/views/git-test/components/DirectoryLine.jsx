@@ -2,8 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 import fs from "fs";
 import path from "path";
 import pify from "pify";
-import { Icon, Tooltip } from "@blueprintjs/core";
-import { ContextMenuProvider } from "react-contexify";
 import range from "lodash/range";
 
 import AddDir from "./AddDir";

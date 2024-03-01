@@ -87,5 +87,22 @@ export function parseGitConfig(text) {
       const m = t.match(/remote \"(.*)\"/);
       return m && m[1];
     });
-  return { remotes, core: parsed.core };
+  const remoteUrl = parsed['remote "origin"']?.url; // 使用可选链避免undefined错误
+  return { remotes, core: parsed.core, remoteUrl };
 }
+
+export const gitCommandSuccess = (status, options = {}) => {
+  return {
+    code: 200,
+    status: status,
+    ...options,
+  };
+};
+
+export const gitCommandError = (message, options = {}) => {
+  return {
+    code: 500,
+    message: message,
+    ...options,
+  };
+};
