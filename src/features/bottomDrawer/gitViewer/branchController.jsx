@@ -1,12 +1,19 @@
 import React, { useState } from "react";
-import { Button } from "@blueprintjs/core";
+import {
+  Button,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+} from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import CommandWithInput from "@/components/commandWithInput";
 import CommandWithSelect from "@/components/commandWithSelect";
 import FetchManager from "./fetchManager";
 import MergeManager from "./mergeManager";
+import { useGitRepo, useFileStore } from "store";
+import Typography from "@mui/material/Typography";
 
 const BranchController = ({
-  config,
   projectRoot,
   currentBranch,
   branches,
@@ -20,19 +27,42 @@ const BranchController = ({
 }) => {
   const [opened, setOpened] = useState(true);
 
+  const { githubApiToken, corsProxy } = useGitRepo();
+  // const { projectRoot } = useFileStore((state) => ({
+  //   projectRoot: state.currentProjectRoot,
+  // }));
   return (
-    <fieldset>
-      <legend style={{ userSelect: "none", cursor: "pointer" }}>
-        <Button
-          minimal
-          icon={opened ? "minus" : "plus"}
-          onClick={() => setOpened(!opened)}
-        />
-        Branch
-      </legend>
-      {opened && (
-        <>
-          <div>
+    <div className="border border-gray-300 radius mt-3 ">
+      <Accordion
+        expanded={opened}
+        onChange={() => setOpened(!opened)}
+        sx={{
+          minHeight: 32,
+          "& .Mui-expanded": {
+            minHeight: "32px !important",
+          },
+          "& .MuiAccordionDetails-root": { padding: "0px 16px 16px" },
+        }}
+      >
+        <AccordionSummary
+          expandIcon={<ExpandMoreIcon />}
+          aria-controls="panel1a-content"
+          id="panel1a-header"
+          sx={{
+            minHeight: 32,
+            "& .MuiAccordionSummary-content": { margin: "0px !important" },
+            "& .MuiAccordionSummary-expandIconWrapper": { padding: "0px" },
+          }}
+        >
+          <Typography
+            variant="caption"
+            sx={{ fontSize: "0.75rem", lineHeight: "32px" }}
+          >
+            Branch[{currentBranch}]
+          </Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <div className="w-full">
             <CommandWithSelect
               key={currentBranch}
               description="Checkout"
@@ -43,16 +73,17 @@ const BranchController = ({
               onExec={onChangeBranch}
             />
           </div>
-          <div>
+          <div className="w-full">
             <CommandWithInput
               description="Checkout new branch"
               validate={(value) =>
                 value.length > 0 && !branches.includes(value)
               }
               onExec={onClickCreateBranch}
+              placeholder={"commit message"}
             />
           </div>
-          <div>
+          <div className="w-full">
             <MergeManager
               currentBranch={currentBranch}
               remoteBranches={remoteBranches}
@@ -65,20 +96,15 @@ const BranchController = ({
           {remotes.length > 0 && (
             <>
               <hr />
-              {!config.githubApiToken && (
-                <button onClick={onClickOpenConfig}>
-                  Set github API Token
-                </button>
-              )}
-              <div>
+              <div className="w-full">
                 <FetchManager
                   projectRoot={projectRoot}
                   remotes={remotes}
-                  corsProxy={config.corsProxy}
-                  token={config.githubApiToken}
+                  corsProxy={corsProxy}
+                  token={githubApiToken}
                 />
               </div>
-              <div>
+              <div className="w-full">
                 <CommandWithSelect
                   key={currentBranch}
                   description="Push to origin"
@@ -90,9 +116,9 @@ const BranchController = ({
               </div>
             </>
           )}
-        </>
-      )}
-    </fieldset>
+        </AccordionDetails>
+      </Accordion>
+    </div>
   );
 };
 

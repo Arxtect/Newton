@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Tooltip } from "@blueprintjs/core";
+import { Button, MenuItem, Select, Tooltip } from "@mui/material";
 
 const CommandWithSelect = ({
   description,
@@ -12,23 +12,29 @@ const CommandWithSelect = ({
   const [value, setValue] = useState(initialValue);
 
   return (
-    <div>
+    <div className="my-2">
       <span>{description}</span>
       &nbsp;
-      <select value={value} onChange={(e) => setValue(e.target.value)}>
+      <Select
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        className="text-xs p-0 overflow-hidden mx-[8px]"
+        size="small"
+      >
         {options.map((o) => (
-          <option key={o} value={o}>
+          <MenuItem key={o} value={o}>
             {o}
-          </option>
+          </MenuItem>
         ))}
-      </select>
-      &nbsp;
-      <Tooltip content={tooltip ? tooltip(value) : undefined}>
+      </Select>
+      <Tooltip title={tooltip ? tooltip(value) : undefined}>
         <Button
-          text="exec"
+          variant="outlined"
           disabled={validate ? !validate(value) : false}
           onClick={() => onExec(value)}
-        />
+        >
+          exec
+        </Button>
       </Tooltip>
     </div>
   );

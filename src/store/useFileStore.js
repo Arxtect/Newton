@@ -2,6 +2,10 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import * as FS from "domain/filesystem";
 import path from "path";
+import {
+  initializeGitStatus,
+  updateStatusMatrixOnSaveFile,
+} from "./useGitRepo";
 
 // Define a store using Zustand
 
@@ -56,24 +60,12 @@ export const useFileStore = create()(
       saveFile: async (filepath, value, withReload = false) => {
         await FS.writeFile(filepath, value);
         get().saveFileState(value);
-
+        await updateStatusMatrixOnSaveFile({
+          projectRoot: get().currentProjectRoot,
+        });
         if (withReload) {
           get().reload();
         }
-
-        // Update git status
-        // TODO: Skip git on background
-        // const state = get();
-        // const projectRoot = state.repository.currentProjectRoot;
-        // const relpath = path.relative(projectRoot, filepath);
-        // if (!relpath.startsWith("..") && state.git.statusMatrix) {
-        //     const newMat = await Git.updateStatusMatrix(
-        //         projectRoot,
-        //         state.git.statusMatrix,
-        //         []
-        //     );
-        // GitActions.updateStatusMatrix(newMat); // Assuming GitActions.updateStatusMatrix is adapted for Zustand
-        // }
       },
       reload: () => {
         const state = get();
@@ -101,26 +93,11 @@ export const useFileStore = create()(
       },
       updateFileContent: async (filepath, value, withReload = false) => {
         const state = get();
-
         if (state.autosave) {
-          get().saveFileState(value);
-          await FS.writeFile(filepath, value);
+          await state.saveFile(filepath, value, withReload);
         } else {
           get().changeValue(value);
         }
-
-        // 更新 git 状态
-        // // TODO: 在后台跳过 git
-        // const projectRoot = state.repository.currentProjectRoot;
-        // const relpath = path.relative(projectRoot, filepath);
-        // if (!relpath.startsWith("..") && state.git.statusMatrix) {
-        //     const newMat = await Git.updateStatusMatrix(
-        //         projectRoot,
-        //         state.git.statusMatrix,
-        //         []
-        //     );
-        //     GitActions.updateStatusMatrix(newMat); // 假设 GitActions.updateStatusMatrix 已适配 Zustand
-        // }
       },
 
       // repo
@@ -150,22 +127,8 @@ export const useFileStore = create()(
           )
             .map((p) => path.relative(projectRoot, p))
             .filter((r) => !r.startsWith(".."));
-
-          // if (relpaths.length > 0 && state.git.statusMatrix) {
-          //     const newMat = await Git.updateStatusMatrix(
-          //         projectRoot,
-          //         state.git.statusMatrix,
-          //         []
-          //     );
-          //     set((state) => ({
-          //         ...state,
-          //         git: {
-          //             ...state.git,
-          //             statusMatrix: newMat
-          //         }
-          //     }));
-          // }
         }
+        updateStatusMatrixOnSaveFile({ projectRoot: get().currentProjectRoot });
       },
 
       removeFileFromGit: async ({ projectRoot, relpath }) => {
@@ -240,6 +203,7 @@ export const useFileStore = create()(
       },
       changeCurrentProjectRoot: ({ projectRoot }) => {
         set({ currentProjectRoot: projectRoot, currentSelectDir: projectRoot });
+        initializeGitStatus({ projectRoot });
       },
       createProject: async (newProjectRoot) => {
         let isExists = await FS.existsPath(newProjectRoot);
@@ -272,4 +236,4 @@ export function getInitialState() {
   };
 }
 
-export const { changeCurrentProjectRoot } = useFileStore.getState();
+export const { changeCurrentProjectRoot, startUpdate } = useFileStore.getState();

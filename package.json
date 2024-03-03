@@ -23,6 +23,7 @@
     "@mui/icons-material": "^5.11.16",
     "@mui/lab": "^5.0.0-alpha.79",
     "@mui/material": "^5.13.6",
+    "@mui/styles": "^5.15.11",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.10",
     "@react-pdf/renderer": "^3.3.4",
     "@svgr/webpack": "^5.5.0",

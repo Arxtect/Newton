@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { isFastForward } from "domain/git";
+import { Select, MenuItem, Button, Typography } from "@mui/material";
 
 const MergeManager = ({
   projectRoot,
@@ -11,11 +12,17 @@ const MergeManager = ({
 }) => {
   const [theirs, setTheirs] = useState(currentBranch);
   const [mergeable, setMergeable] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const checkFastForward = async () => {
-      const ret = await isFastForward(projectRoot, currentBranch, theirs);
-      setMergeable(ret.fastForward && !ret.self);
+      try {
+        const ret = await isFastForward(projectRoot, currentBranch, theirs);
+        setMergeable(ret.fastForward && !ret.self);
+        setError(null); // Reset error state on successful check
+      } catch (error) {
+        setError("Error checking mergeability"); // Set error state if there's an error
+      }
     };
 
     checkFastForward();
@@ -24,30 +31,44 @@ const MergeManager = ({
   const mergeBranches = [...branches, ...remoteBranches];
 
   return (
-    <div>
+    <div className="my-2">
       <div>
         Merge ours: [{currentBranch}] : theirs:
-        <select
+        <Select
           value={theirs}
-          onChange={async (e) => {
+          onChange={(e) => {
             const newTheirs = e.target.value;
             setTheirs(newTheirs);
           }}
+          style={{ marginLeft: "8px", marginRight: "8px" }}
+          labelId="simple-select-outlined-label"
+          className="text-xs p-0 overflow-hidden"
+          size="small"
         >
           {mergeBranches.map((b) => (
-            <option key={b} value={b}>
+            <MenuItem key={b} value={b}>
               {b}
-            </option>
+            </MenuItem>
           ))}
-        </select>
-        &nbsp;
-        <button
-          disabled={!mergeable}
+        </Select>
+        <Button
+          variant="outlined"
+          color="primary"
           onClick={() => onMerge(currentBranch, theirs)}
+          disabled={!mergeable}
         >
           exec
-        </button>
-        {!mergeable && <span>(fast forward only)</span>}
+        </Button>
+        {!mergeable && (
+          <Typography color="warning" className="inline-block ml-[8px]">
+            (fast forward only)
+          </Typography>
+        )}
+        {error && (
+          <Typography color="error" className="inline-block ml-[8px]">
+            {error}
+          </Typography>
+        )}
       </div>
     </div>
   );

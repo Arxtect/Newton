@@ -1,3 +1,8 @@
+/*
+ * @Description:
+ * @Author: Devin
+ * @Date: 2024-03-01 18:22:58
+ */
 export * from "./commands/addFile";
 export * from "./commands/checkoutBranch";
 export * from "./commands/cloneRepository";
@@ -22,3 +27,5 @@ export * from "./queries/listGitFiles";
 export * from "./queries/updateStatusMatrix";
 
 export * from "./commands/setupAndPushToRepo";
+export * from "./queries/getFileHistory";
+export * from "./queries/isCanPush";

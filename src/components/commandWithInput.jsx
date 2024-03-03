@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Tooltip } from "@blueprintjs/core";
+import { Button, TextField } from "@mui/material";
 
 const CommandWithInput = ({
   description,
@@ -10,11 +10,17 @@ const CommandWithInput = ({
 }) => {
   const [value, setValue] = useState(initialValue);
 
+  const handleExec = () => {
+    onExec(value);
+    setValue("");
+  };
+
   return (
-    <div>
+    <div className="my-2">
       <span>{description}</span>
       &nbsp;
-      <input
+      <TextField
+        size="small"
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder={placeholder}
@@ -22,13 +28,13 @@ const CommandWithInput = ({
       />
       &nbsp;
       <Button
-        text="exec"
+        variant="contained"
+        size="small"
         disabled={validate ? !validate(value) : false}
-        onClick={() => {
-          onExec(value);
-          setValue("");
-        }}
-      />
+        onClick={handleExec}
+      >
+        exec
+      </Button>
     </div>
   );
 };

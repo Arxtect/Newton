@@ -1,6 +1,6 @@
 import React from "react";
 
-export function Help() {
+function Help() {
   return (
     <table className="bp3-html-table bp3-small .modifier">
       <thead>
@@ -34,3 +34,5 @@ export function Help() {
     </table>
   );
 }
+
+export default Help;

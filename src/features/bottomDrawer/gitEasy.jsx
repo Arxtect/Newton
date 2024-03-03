@@ -1,115 +1,159 @@
-import React from "react";
-import { Button } from "@blueprintjs/core";
-import { useGitRepo } from "store";
+import React, { useMemo, useState } from "react";
+import Button from "@mui/material/Button";
+import CircularProgress from "@mui/material/CircularProgress";
+import TextField from "@mui/material/TextField";
+import Accordion from "@mui/material/Accordion";
+import AccordionSummary from "@mui/material/AccordionSummary";
+import AccordionDetails from "@mui/material/AccordionDetails";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import Typography from "@mui/material/Typography";
+import { useGitRepo, useFileStore } from "store";
 import GitBriefHistory from "./gitBriefHistory";
-import { toast } from "react-toastify";
 import {
   getRemovableFilenames,
   getModifiedFilenames,
 } from "domain/git/queries/parseStatusMatrix";
-import fs from "fs";
-import path from "path";
-import pify from "pify";
 
 const GitEasy = () => {
+  const [commitMessage, setCommitMessage] = useState("");
+
   const {
-    projectRoot,
     githubApiToken,
     currentBranch,
     statusMatrix,
     corsProxy,
     remotes,
-    setRemotes,
-    // Assume additional actions for commitAll, initializeGitStatus are available
+    updateRemotes,
+    commitAll,
+    pushCurrentBranchToOrigin,
+    initializeGitStatus,
+    isCanPush,
   } = useGitRepo((state) => ({
-    projectRoot: state.projectRoot,
     githubApiToken: state.githubApiToken,
     currentBranch: state.currentBranch,
     statusMatrix: state.statusMatrix,
     corsProxy: state.corsProxy,
     remotes: state.remotes,
-    setRemotes: state.setRemotes,
-    // Additional actions
+    updateRemotes: state.updateRemotes,
+    commitAll: state.commitAll,
+    pushCurrentBranchToOrigin: state.pushCurrentBranchToOrigin,
+    initializeGitStatus: state.initializeGitStatus,
+    isCanPush: state.isCanPush,
   }));
 
-  const createGitHubRepository = async () => {
-    const sp = projectRoot.split("/");
-    const repoName = sp[sp.length - 1];
-    const octokit = new Octokit({ auth: githubApiToken });
-
-    try {
-      const result = await octokit.repos.createForAuthenticatedUser({
-        name: repoName,
-      });
-
-      const url = result.data.html_url;
-      toast.success(`Repository created: ${url}`);
-
-      const configPath = path.join(projectRoot, ".git/config");
-      let config = await pify(fs.readFile)(configPath, "utf8");
-      config += `\n[remote "origin"]\n`;
-      config += `\turl = ${url}\n`;
-      config += `\tfetch = +refs/heads/*:refs/remotes/origin/*\n`;
-
-      await pify(fs.writeFile)(configPath, config);
-      toast.success("Remote origin added to .git/config");
-
-      // Assuming setRemotes is a function to update the Zustand store
-      setRemotes([...remotes, { name: "origin", url }]);
-    } catch (error) {
-      toast.error(`Repository creation failed: ${error.message}`);
-    }
-  };
-
-  const commitAndPushChanges = async () => {
-    // Placeholder function, implement logic to commit and push changes
-    // Use git and fs as needed, similar to the createGitHubRepository function
-  };
+  const { hasChanges, modified, removable } = useMemo(() => {
+    const removableFiles = getRemovableFilenames(statusMatrix);
+    const modifiedFiles = getModifiedFilenames(statusMatrix).filter(
+      (a) => !removableFiles.includes(a)
+    );
+    const changes = modifiedFiles.length > 0 || removableFiles.length > 0;
+    return {
+      hasChanges: changes,
+      modified: modifiedFiles,
+      removable: removableFiles,
+    };
+  }, [statusMatrix]);
 
   if (!statusMatrix) {
-    return <span>Loading...</span>;
+    return <CircularProgress />;
   }
 
-  const removable = getRemovableFilenames(statusMatrix);
-  const modified = getModifiedFilenames(statusMatrix).filter(
-    (a) => !removable.includes(a)
-  );
-  const hasChanges = modified.length > 0 || removable.length > 0;
-  const showCreateRepo = githubApiToken && remotes.length === 0;
-
   return (
-    <div>
-      {showCreateRepo && (
-        <Button
-          text="Create GitHub Repository"
-          onClick={createGitHubRepository}
-        />
-      )}
-      <hr />
-      <h1>Changes</h1>
-      <Button
-        text="Commit All"
-        disabled={!hasChanges}
-        onClick={commitAndPushChanges}
-        data-testid="commit-all-button"
-      />
-      {!hasChanges && <p>No Changes</p>}
-      {hasChanges && (
-        <>
-          <div>
-            {modified.map((filepath) => (
-              <div key={filepath}>{filepath} (modified)</div>
-            ))}
-          </div>
-          <div>
-            {removable.map((filepath) => (
-              <div key={filepath}>{filepath} (deleted)</div>
-            ))}
-          </div>
-        </>
-      )}
+    <React.Fragment>
+      <div className="border border-gray-300 radius mt-3">
+        <Accordion
+          defaultExpanded
+          sx={{
+            minHeight: 32,
+            "& .Mui-expanded": {
+              minHeight: "32px !important",
+            },
+          }}
+        >
+          <AccordionSummary
+            sx={{
+              minHeight: 32,
+              "& .MuiAccordionSummary-content": { margin: "0px !important" },
+              "& .MuiAccordionSummary-expandIconWrapper": { padding: "0px" },
+            }}
+            className="mh-0"
+            expandIcon={<ExpandMoreIcon />}
+            aria-controls="panel1a-content"
+            id="panel1a-header"
+          >
+            <Typography
+              variant="caption"
+              sx={{ fontSize: "0.75rem", lineHeight: "32px" }}
+            >
+              Changes
+            </Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                marginBottom: "8px",
+              }}
+            >
+              <TextField
+                size="small"
+                variant="outlined"
+                value={commitMessage}
+                onChange={(e) => setCommitMessage(e.target.value)}
+                placeholder="Commit message"
+              />
+              <Button
+                variant="contained"
+                size="small"
+                disabled={!hasChanges}
+                onClick={() => commitAll({ message: commitMessage })}
+                data-testid="commit-all-button"
+              >
+                Commit All
+              </Button>
+              <Button
+                variant="contained"
+                size="small"
+                color="success"
+                onClick={() => pushCurrentBranchToOrigin()}
+                data-testid="push-all-button"
+              >
+                Push
+              </Button>
+            </div>
+            {!hasChanges && (
+              <Typography
+                variant="caption"
+                sx={{ fontSize: "0.75rem", lineHeight: "32px" }}
+              >
+                No Changes
+              </Typography>
+            )}
+            {hasChanges && (
+              <>
+                <div>
+                  {modified.map((filepath) => (
+                    <div key={filepath} className="my-1">
+                      {filepath} (modified)
+                    </div>
+                  ))}
+                </div>
+                <div>
+                  {removable.map((filepath) => (
+                    <div key={filepath} className="my-1">
+                      {filepath} (deleted)
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+          </AccordionDetails>
+        </Accordion>
+      </div>
       <GitBriefHistory />
-    </div>
+    </React.Fragment>
   );
 };
 

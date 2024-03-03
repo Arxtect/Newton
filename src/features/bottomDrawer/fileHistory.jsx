@@ -1,31 +1,29 @@
 /*
- * @Description: 
+ * @Description:
  * @Author: Devin
  * @Date: 2024-03-01 17:05:34
  */
-import React, { useEffect } from "react";
-import { Button, Card } from "@blueprintjs/core";
+import React, { useState, useEffect } from "react";
+import Button from "@mui/material/Button";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import Typography from "@mui/material/Typography";
 import format from "date-fns/format";
 import path from "path";
-import { useGitRepo } from "./yourStorePath"; // Adjust the path as necessary
+import { useGitRepo, useFileStore } from "store"; // Adjust the path as necessary
 import { getFileHistoryWithDiff } from "domain/git";
 
 const FileHistory = () => {
-  const {
-    filepath,
-    currentBranch,
-    projectRoot,
-    history,
-    setHistory,
-    saveFile,
-  } = useGitRepo((state) => ({
+  const { projectRoot, filepath, saveFile } = useFileStore((state) => ({
+    projectRoot: state.currentProjectRoot,
     filepath: state.filepath,
-    currentBranch: state.currentBranch,
-    projectRoot: state.projectRoot,
-    history: state.history,
-    setHistory: state.setHistory,
     saveFile: state.saveFile,
   }));
+  const { currentBranch } = useGitRepo((state) => ({
+    currentBranch: state.currentBranch,
+  }));
+
+  const [currentHistory, setCurrentHistory] = useState([]);
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -42,7 +40,6 @@ const FileHistory = () => {
         .map((c) => ({
           message: c.commit.message,
           commitId: c.commit.oid,
-          blobId: c.blob.oid,
           timestamp: c.commit.committer.timestamp,
           content: c.blob.object.toString(),
           diffText: c.diff
@@ -58,35 +55,43 @@ const FileHistory = () => {
         }))
         .reverse();
 
-      setHistory(formattedHistory);
+      setCurrentHistory(formattedHistory);
     };
 
     fetchHistory();
-  }, [filepath, projectRoot, currentBranch, setHistory]);
+  }, [filepath, projectRoot, currentBranch]);
 
   if (!filepath) {
     return <div>File not selected</div>;
   }
 
   return (
-    <div style={{ padding: 10 }}>
-      {projectRoot}: {path.relative(projectRoot, filepath)} on {currentBranch}
-      <hr />
-      {history.map((h) => (
-        <Card key={h.commitId}>
-          <div>
-            {format(h.timestamp * 1000, "MM/DD-HH:mm")}
-            |&nbsp;
-            {h.message}
-            &nbsp;
-            <Button
-              onClick={() => saveFile(filepath, h.content, true)}
-              text="Checkout"
-            />
-          </div>
-          <pre className="bp3-code-block">
-            <code>{h.diffText}</code>
-          </pre>
+    <div>
+      <Typography variant="body1" className="mb-2">
+        {projectRoot}: {path.relative(projectRoot, filepath)} on {currentBranch}
+      </Typography>
+      <hr className="my-2" />
+      {currentHistory?.map((h) => (
+        <Card key={h.commitId} className="mb-4">
+          <CardContent>
+            <div className="flex items-center">
+              <Typography variant="body2" className="mb-2 mr-2">
+                {h.timestamp ? format(h.timestamp * 1000, "MM/dd-HH:mm") : ""}
+                &nbsp;|&nbsp;{h.message}
+              </Typography>
+              <Button
+                variant="contained"
+                size="small"
+                onClick={() => saveFile(filepath, h.content, true)}
+                className="mb-2"
+              >
+                Checkout
+              </Button>
+            </div>
+            <pre className="bp3-code-block">
+              <code>{h.diffText}</code>
+            </pre>
+          </CardContent>
         </Card>
       ))}
     </div>

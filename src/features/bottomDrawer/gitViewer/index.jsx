@@ -1,14 +1,18 @@
 import React, { useEffect } from "react";
-import { useGitRepo } from "store";
+import { useGitRepo, useFileStore } from "store";
 import GitBriefHistory from "../gitBriefHistory";
 import BranchController from "./branchController";
 import { Staging } from "./staging";
+import Typography from "@mui/material/Typography";
 
-export const GitViewer = () => {
+const GitViewer = () => {
   const {
-    git,
-    config,
-    projectRoot,
+    type,
+    currentBranch,
+    branches,
+    remotes,
+    remoteBranches,
+    statusMatrix,
     // Actions
     initializeGitStatus,
     mergeBranches,
@@ -22,27 +26,27 @@ export const GitViewer = () => {
     commitStagedChanges,
   } = useGitRepo();
 
+  const { projectRoot } = useFileStore((state) => ({
+    projectRoot: state.currentProjectRoot,
+  }));
+
   useEffect(() => {
-    if (git.type === "loading") {
+    if (type === "loading") {
       initializeGitStatus(projectRoot);
     }
-  }, [git.type, initializeGitStatus, projectRoot]);
+  }, [type, initializeGitStatus, projectRoot]);
 
-  if (git.type === "loading") {
+  if (type === "loading") {
     return <span>[Git] initialize...</span>;
   }
-
-  const { currentBranch, branches, remotes, remoteBranches, statusMatrix } =
-    git;
 
   return (
     <div key={projectRoot} style={{ width: "100%", boxSizing: "border-box" }}>
       <div style={{ display: "flex", flexDirection: "column" }}>
-        <div>
+        <Typography variant="body1" className="my-2">
           {projectRoot} [{currentBranch}]
-        </div>
+        </Typography>
         <BranchController
-          config={config}
           remoteBranches={remoteBranches}
           projectRoot={projectRoot}
           currentBranch={currentBranch}
@@ -68,7 +72,6 @@ export const GitViewer = () => {
           {statusMatrix && (
             <Staging
               statusMatrix={statusMatrix}
-              config={config}
               onClickReload={() => {
                 initializeGitStatus(projectRoot);
               }}
@@ -98,3 +101,5 @@ export const GitViewer = () => {
     </div>
   );
 };
+
+export default GitViewer;
