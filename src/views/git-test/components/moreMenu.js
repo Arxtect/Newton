@@ -24,7 +24,8 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import PublishIcon from "@mui/icons-material/Publish";
 import CreateIcon from "@mui/icons-material/Create";
 import DeleteIcon from "@mui/icons-material/Delete";
-import ExportIcon from "@mui/icons-material/MoveToInbox"; // 假设您想要用这个图标作为导出的图标
+import ExportIcon from "@mui/icons-material/MoveToInbox";
+import ArDialog from "@/components/arDialog";
 
 import { usePdfPreviewStore, useUserStore } from "store";
 const MoreMenu = ({
@@ -152,65 +153,54 @@ const MoreMenu = ({
           Export Project
         </MenuItem>
       </Menu>
-
-      {/* Create Project Dialog */}
-      <Dialog open={dialogOpen} onClose={handleCancelProject}>
-        <DialogTitle>Create Project</DialogTitle>
-        <DialogContent className="pt-[20px]">
-          <Box
-            component="form"
-            sx={{
-              "& .MuiTextField-root": { m: 1, width: "25ch" },
+      <ArDialog
+        title="Create Project"
+        dialogOpen={dialogOpen}
+        handleCancel={handleCancelProject}
+        buttonList={[
+          { title: "Cancel", click: handleCancelProject },
+          { title: "Save", click: handleSaveProject },
+        ]}
+      >
+        <Box
+          component="form"
+          sx={{
+            "& .MuiTextField-root": { m: 1, width: "25ch" },
+          }}
+          noValidate
+          autoComplete="off"
+        >
+          <TextField
+            label="Project Name"
+            value={projectName}
+            onChange={(e) => setProjectName(e.target.value)}
+            size="small"
+            htmlFor="component-outlined"
+            id="outlined-size-small"
+            inputProps={{
+              style: { height: "40px" },
             }}
-            noValidate
-            autoComplete="off"
-          >
-            <TextField
-              label="Project Name"
-              value={projectName}
-              onChange={(e) => setProjectName(e.target.value)}
-              size="small"
-              htmlFor="component-outlined"
-              id="outlined-size-small"
-              inputProps={{
-                style: { height: "40px" },
-              }}
-            />
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCancelProject} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleSaveProject} color="primary">
-            Save
-          </Button>
-        </DialogActions>
-      </Dialog>
-
+          />
+        </Box>
+      </ArDialog>
       <PublishDocument
         open={openPublishDialog}
         pdfUrl={pdfUrl}
         handleClosePublish={handleClosePublish}
       />
-
       {/* Delete Project Confirmation Dialog */}
-      <Dialog open={deleteDialogOpen} onClose={handleCancelDelete}>
-        <DialogTitle>Delete Project</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Are you sure you want to delete the project: {currentProject}?
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCancelDelete} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleConfirmDelete} color="primary">
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <ArDialog
+        title="Delete Project"
+        dialogOpen={deleteDialogOpen}
+        handleCancel={handleCancelDelete}
+        buttonList={[
+          { title: "Cancel", click: handleCancelDelete },
+          { title: "Delete", click: handleConfirmDelete },
+        ]}
+      >
+        Are you sure you want to delete the project：
+        <span className="text-red-500 mr-1">{currentProject}</span>
+      </ArDialog>
     </>
   );
 };

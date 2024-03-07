@@ -14,6 +14,12 @@ const routerConfig = [
     component: "arxtect",
     exact: true,
   },
+  {
+    path: "/project",
+    name: "/project",
+    component: "project",
+    exact: true,
+  },
   { path: "/einstein", name: "einstein", component: "einstein" },
   {
     path: "/documentdetails",

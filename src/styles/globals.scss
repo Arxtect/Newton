@@ -128,8 +128,8 @@ input[type="checkbox"] {
   appearance: none;
   border: var(--border-in-light);
   border-radius: 5px;
-  height: 16px;
-  width: 16px;
+  // height: 16px;
+  // width: 16px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -257,9 +257,9 @@ textarea:-webkit-autofill:focus {
   // box-shadow: 0 0 0px 1000px white inset;
 }
 
-.MuiPaper-root {
-  background-color: var(--second) !important;
-}
+// .MuiPaper-root {
+//   background-color: var(--second) !important;
+// }
 
 body{
   overflow-x: hidden;

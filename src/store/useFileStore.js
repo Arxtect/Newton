@@ -210,6 +210,8 @@ export const useFileStore = create()(
 
         if (!isExists) {
           await FS.mkdir(newProjectRoot);
+        } else {
+          throw new Error("Project name is already exists");
         }
         get().changeCurrentProjectRoot({ projectRoot: newProjectRoot });
       },
@@ -236,4 +238,5 @@ export function getInitialState() {
   };
 }
 
-export const { changeCurrentProjectRoot, startUpdate } = useFileStore.getState();
+export const { changeCurrentProjectRoot, startUpdate } =
+  useFileStore.getState();

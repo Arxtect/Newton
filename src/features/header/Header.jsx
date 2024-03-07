@@ -42,7 +42,12 @@ export const Header = () => {
   return (
     <header className="flex justify-between items-center">
       <Box sx={{ flexGrow: 1 }}>
-        <AppBar position="static">
+        <AppBar
+          position="static"
+          sx={{
+            backgroundColor: "var(--second) ",
+          }}
+        >
           <Toolbar>
             {/* <IconButton
               size="large"
