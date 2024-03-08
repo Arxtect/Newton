@@ -1,3 +1,8 @@
+/*
+ * @Description:
+ * @Author: Devin
+ * @Date: 2024-03-08 14:55:15
+ */
 import { Link, NavLink } from "react-router-dom";
 import { Button } from "@/components/Button";
 
@@ -50,7 +55,7 @@ const Editor = () => {
               </tbody>
             </table>
           </div>
-          <Link to="/arxtect">
+          <Link to="/project">
             <Button> GO TO Editor(Newton) DEMO</Button>
           </Link>
         </div>
