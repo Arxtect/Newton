@@ -132,7 +132,7 @@ const GitTest = () => {
           ></FileUploader>
         </div>
       </div>
-      <button onClick={() => gitClone()}>git clone </button> <div></div>
+      {/* <button onClick={() => gitClone()}>git clone </button> <div></div>
       <button onClick={() => linkRepo()}>git link </button> <div></div>
       <button onClick={() => commitFile(currentProjectRoot, "test commit")}>
         commit
@@ -147,7 +147,7 @@ const GitTest = () => {
         onClick={() => toggleDrawer(true)}
       >
         打开抽屉
-      </button>
+      </button> */}
       <BottomDrawer isOpen={isOpen} toggleDrawer={toggleDrawer} />
       <RootDirectory
         key={currentProjectRoot}

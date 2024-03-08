@@ -1,7 +1,7 @@
 import create from "zustand";
 
 import { persist } from "zustand/middleware";
-import * as FS from "domain/filesystem";
+import { existsPath } from "domain/filesystem";
 import path from "path";
 import * as git from "isomorphic-git";
 import * as Git from "domain/git";
@@ -9,6 +9,28 @@ import { useFileStore, startUpdate } from "./useFileStore";
 import { toast } from "react-toastify";
 
 export const GIT_STORE = "git_store";
+
+export function getInitialRepoState() {
+  return {
+    type: "loading",
+    loaded: false,
+    currentBranch: null,
+    branches: [],
+    remotes: [],
+    remoteBranches: [],
+    history: [],
+    statusMatrix: null,
+    stagingLoading: true,
+
+    //git config
+    committerName: "test",
+    committerEmail: "test@gmail.com",
+    githubApiToken: "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",
+    corsProxy: "https://cors.isomorphic-git.org",
+    gitEasyMode: true,
+    isCanPush: false,
+  };
+}
 
 export const useGitRepo = create()(
   persist(
@@ -85,6 +107,11 @@ export const useGitRepo = create()(
         set({ remotes });
       },
       initializeGitStatus: async ({ projectRoot }) => {
+        let isExists = await existsPath(path.join(projectRoot, ".git"));
+        if (!isExists) {
+          get().endInitialize({ ...getInitialRepoState() });
+          return;
+        }
         const { currentBranch, branches, remotes, remoteBranches } =
           await Git.getBranchStatus(projectRoot);
 
@@ -194,6 +221,10 @@ export const useGitRepo = create()(
         }
       },
       updateStatusMatrixOnSaveFile: async ({ projectRoot }) => {
+        let isExists = await existsPath(path.join(projectRoot, ".git"));
+        if (!isExists) {
+          return;
+        }
         const { statusMatrix } = get();
         const newMat = await Git.updateStatusMatrix(
           projectRoot,

@@ -10,6 +10,7 @@ const fsPify = {
   readFile: pify(fs.readFile),
 };
 
+
 export async function readDirectoryTree(rootpath) {
   async function readDirRecursive(currentPath) {
     const entries = await fsPify.readdir(currentPath);

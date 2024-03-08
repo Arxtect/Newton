@@ -162,15 +162,9 @@ const MoreMenu = ({
           { title: "Save", click: handleSaveProject },
         ]}
       >
-        <Box
-          component="form"
-          sx={{
-            "& .MuiTextField-root": { m: 1, width: "25ch" },
-          }}
-          noValidate
-          autoComplete="off"
-        >
+        <Box component="form" noValidate autoComplete="off" className="my-4">
           <TextField
+            w-full
             label="Project Name"
             value={projectName}
             onChange={(e) => setProjectName(e.target.value)}
@@ -180,6 +174,7 @@ const MoreMenu = ({
             inputProps={{
               style: { height: "40px" },
             }}
+            className="w-full"
           />
         </Box>
       </ArDialog>

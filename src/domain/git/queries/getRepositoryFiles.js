@@ -10,7 +10,7 @@ export async function getRepositoryFiles(projectRoot, ignoreGit = true) {
       dir: projectRoot,
       ref: "HEAD",
     })
-  ).filter((a) => !a.startsWith(".."));
+  ).filter((a) => !a?.startsWith(".."));
 
   const withGitIndex = uniq(relpaths.concat(indexes));
   withGitIndex.sort();

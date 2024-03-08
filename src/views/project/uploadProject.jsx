@@ -135,9 +135,9 @@ const UploadProject = ({ dialogOpen, setDialogOpen }) => {
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         onDragEnd={handleDragEnd}
-        className={`flex flex-col items-center justify-center p-4 border-2 ${
+        className={`flex flex-col items-center justify-center p-4 border-2 py-10 ${
           isDragOver ? "border-blue-500 bg-blue-100" : "border-dashed"
-        }`} // 根据isDragOver状态改变样式
+        }`}
       >
         <Button
           component="label"

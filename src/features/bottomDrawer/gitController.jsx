@@ -1,3 +1,8 @@
+/*
+ * @Description: 
+ * @Author: Devin
+ * @Date: 2024-03-08 10:01:17
+ */
 import React from "react";
 import Switch from "@mui/material/Switch";
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -18,14 +23,15 @@ const GitController = () => {
 
   return (
     <div>
-      <FormControlLabel
+      <GitEasy />
+      {/* <FormControlLabel
         control={
           <Switch checked={easyMode} onChange={handleToggle} size="small" />
         }
         label="Easy Mode"
         sx={{ "& .MuiFormControlLabel-label": { fontSize: "0.875rem" } }} // 调整标签字体大小
       />
-      {easyMode ? <GitEasy /> : <GitViewer />}
+      {easyMode ? <GitEasy /> : <GitViewer />} */}
     </div>
   );
 };

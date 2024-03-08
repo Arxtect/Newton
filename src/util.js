@@ -5,6 +5,7 @@
  */
 import { openDB } from "idb";
 import ini from "ini";
+import { format } from "date-fns";
 
 export function routerQuery() {
   let queryStr = window.location.search.substring(1);
@@ -37,6 +38,37 @@ export const initDB = async () => {
     },
   });
   return db;
+};
+
+export const savePdfToIndexedDB = async (projectRoot, pdfBlobUrl) => {
+  // 首先执行异步操作获取 PDF 的 ArrayBuffer
+  const response = await fetch(pdfBlobUrl);
+  const pdfBlob = await response.blob();
+  const pdfArrayBuffer = await pdfBlob.arrayBuffer();
+
+  // 异步操作完成后，初始化数据库并创建事务
+  const db = await initDB();
+  const tx = db.transaction("files", "readwrite");
+  const store = tx.objectStore("files");
+
+  // 将获取到的数据存入 IndexedDB
+  store.put({ name: projectRoot, content: pdfArrayBuffer });
+
+  // 等待事务完成
+  await tx.done;
+};
+
+export const getPdfFromIndexedDB = async (projectRoot) => {
+  const db = await initDB();
+  const tx = db.transaction("files", "readonly");
+  const file = await tx.store.get(projectRoot);
+
+  // 如果文件存在，则将ArrayBuffer转换为Blob
+  if (file && file.content) {
+    return new Blob([file.content], { type: "application/pdf" });
+  }
+
+  return null; // 如果文件不存在，返回null
 };
 
 export const loadFileNames = async () => {
@@ -82,7 +114,7 @@ export function getPreViewUrl(urlId) {
 export function parseGitConfig(text) {
   const parsed = ini.parse(text);
   const remotes = Object.keys(parsed)
-    .filter((t) => t.startsWith("remote "))
+    .filter((t) => t?.startsWith("remote "))
     .map((t) => {
       const m = t.match(/remote \"(.*)\"/);
       return m && m[1];
@@ -105,4 +137,8 @@ export const gitCommandError = (message, options = {}) => {
     message: message,
     ...options,
   };
+};
+
+export const formatDate = (date) => {
+  return format(new Date(date), "yyyy-MM-dd HH:mm:ss");
 };

@@ -1,3 +1,8 @@
+/*
+ * @Description: 
+ * @Author: Devin
+ * @Date: 2024-03-08 10:15:06
+ */
 import React, { useState } from "react";
 import { Tab, Tabs, Box, Card } from "@mui/material";
 
@@ -42,7 +47,7 @@ const GitTab = () => {
         >
           <Tab label="Git" value="git" />
           <Tab label="History" value="history" />
-          <Tab label="Help" value="help" />
+          {/* <Tab label="Help" value="help" /> */}
           <Tab label="Config" value="config" />
         </Tabs>
       </Box>

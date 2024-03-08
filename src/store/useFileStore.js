@@ -6,8 +6,7 @@ import {
   initializeGitStatus,
   updateStatusMatrixOnSaveFile,
 } from "./useGitRepo";
-
-// Define a store using Zustand
+import { savePdfToIndexedDB, getPdfFromIndexedDB } from "@/util";
 
 export const FILE_STORE = "file_store";
 
@@ -31,6 +30,21 @@ export const useFileStore = create()(
       currentSelectDir: "",
       preRenamingDirpath: "",
       allProject: [],
+
+      updateProject: async (pdfBlob) => {
+        const projectRoot = get().currentProjectRoot;
+        // 保存PDF到IndexedDB
+        await savePdfToIndexedDB(projectRoot, pdfBlob);
+      },
+
+      getCurrentProjectPdf: async (projectRoot) => {
+        // 从IndexedDB获取PDF Blob
+        const pdfBlob = await getPdfFromIndexedDB(projectRoot);
+        if (pdfBlob) {
+          return URL.createObjectURL(pdfBlob);
+        }
+        return null;
+      },
 
       // Actions
       setAutosave: (autosave) => set({ autosave }),
@@ -126,7 +140,7 @@ export const useFileStore = create()(
             Array.isArray(changedPath) ? changedPath : [changedPath]
           )
             .map((p) => path.relative(projectRoot, p))
-            .filter((r) => !r.startsWith(".."));
+            .filter((r) => !r?.startsWith(".."));
         }
         updateStatusMatrixOnSaveFile({ projectRoot: get().currentProjectRoot });
       },
@@ -214,6 +228,16 @@ export const useFileStore = create()(
           throw new Error("Project name is already exists");
         }
         get().changeCurrentProjectRoot({ projectRoot: newProjectRoot });
+      },
+      copyProject: async (projectRoot, copyProjectRoot) => {
+        let isExists = await FS.existsPath(copyProjectRoot);
+
+        if (!isExists) {
+          await FS.copyProject(projectRoot, copyProjectRoot);
+        } else {
+          throw new Error("Project name is already exists");
+        }
+        // get().changeCurrentProjectRoot({ projectRoot: copyProjectRoot });
       },
       updateAllProject: (allProject) => {
         set({ allProject });

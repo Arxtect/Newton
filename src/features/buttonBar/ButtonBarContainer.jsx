@@ -7,12 +7,9 @@
 import { useEffect } from "react";
 // Components
 import { ButtonBar } from "./ButtonBar";
-import {
-  revokeCompiledPdfUrl,
-  compileLatex,
-} from "../latexCompilation/latexCompilation";
+import { compileLatex } from "../latexCompilation/latexCompilation";
 import { useFileStore } from "store";
-import { usePdfPreviewStore } from "store";
+import { usePdfPreviewStore, revokeCompiledPdfUrl } from "store";
 
 export const ButtonBarContainer = () => {
   const { pdfUrl, toggleCompilerLog } = usePdfPreviewStore((state) => ({
@@ -28,12 +25,12 @@ export const ButtonBarContainer = () => {
   );
 
   // Revoke the PDF URL every 30000 milliseconds
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      revokeCompiledPdfUrl(pdfUrl);
-    }, 300000);
-    return () => clearTimeout(timer);
-  }, [pdfUrl]);
+  // useEffect(() => {
+  //   const timer = setTimeout(() => {
+  //     revokeCompiledPdfUrl(pdfUrl);
+  //   }, 300000);
+  //   return () => clearTimeout(timer);
+  // }, [pdfUrl]);
 
   // const toggleVisibility = () => dispatch(toggleSourceCode());
   const compile = () => compileLatex(sourceCode, currentProjectRoot);

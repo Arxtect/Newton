@@ -13,6 +13,7 @@ import {
   getRemovableFilenames,
   getModifiedFilenames,
 } from "domain/git/queries/parseStatusMatrix";
+import { toast } from "react-toastify";
 
 const GitEasy = () => {
   const [commitMessage, setCommitMessage] = useState("");
@@ -43,10 +44,10 @@ const GitEasy = () => {
 
   const { hasChanges, modified, removable } = useMemo(() => {
     const removableFiles = getRemovableFilenames(statusMatrix);
-    const modifiedFiles = getModifiedFilenames(statusMatrix).filter(
+    const modifiedFiles = getModifiedFilenames(statusMatrix)?.filter(
       (a) => !removableFiles.includes(a)
     );
-    const changes = modifiedFiles.length > 0 || removableFiles.length > 0;
+    const changes = modifiedFiles?.length > 0 || removableFiles?.length > 0;
     return {
       hasChanges: changes,
       modified: modifiedFiles,
@@ -57,6 +58,16 @@ const GitEasy = () => {
   if (!statusMatrix) {
     return <CircularProgress />;
   }
+
+  const commitAndPush = async (commitMessage) => {
+    commitAll({ message: commitMessage })
+      .then(() => {
+        pushCurrentBranchToOrigin();
+      })
+      .catch((e) => {
+        toast.error(e.message);
+      });
+  };
 
   return (
     <React.Fragment>
@@ -108,12 +119,12 @@ const GitEasy = () => {
                 variant="contained"
                 size="small"
                 disabled={!hasChanges}
-                onClick={() => commitAll({ message: commitMessage })}
+                onClick={() => commitAndPush(commitMessage)}
                 data-testid="commit-all-button"
               >
                 Commit All
               </Button>
-              <Button
+              {/* <Button
                 variant="contained"
                 size="small"
                 color="success"
@@ -121,7 +132,7 @@ const GitEasy = () => {
                 data-testid="push-all-button"
               >
                 Push
-              </Button>
+              </Button> */}
             </div>
             {!hasChanges && (
               <Typography

@@ -25,26 +25,31 @@ import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-import { useFileStore } from "../../store/useFileStore";
+import { useFileStore } from "store";
 import ArMenu from "@/components/arMenu";
-import { findAllProjectInfo } from "domain/filesystem";
+import { findAllProjectInfo, downloadDirectoryAsZip } from "domain/filesystem";
 
 import NewProject from "./newProject";
 import UploadProject from "./uploadProject";
+import CopyProject from "./copyProject";
+import Github from "./github";
 import { toast } from "react-toastify";
+import { formatDate } from "@/util";
 
 function Project() {
   const navigate = useNavigate();
   const {
     projectLists,
-    currentProject,
+    currentProjectRoot,
     deleteProject,
     changeCurrentProjectRoot,
+    getCurrentProjectPdf,
   } = useFileStore((state) => ({
     allProject: state.allProject,
-    currentProject: state.currentProject,
+    currentProjectRoot: state.currentProjectRoot,
     deleteProject: state.deleteProject,
     changeCurrentProjectRoot: state.changeCurrentProjectRoot,
+    getCurrentProjectPdf: state.getCurrentProjectPdf,
   }));
   const [tableWidth, setTableWidth] = useState(0);
   const tableContainerRef = useRef(null);
@@ -103,6 +108,32 @@ function Project() {
     setDeleteDialogOpen(false);
   };
 
+  //copy project
+
+  const [sourceProject, setSourceProject] = useState("");
+  const [copyDialogOpen, setCopyDialogOpen] = useState(false);
+
+  //github
+  const [githubDialogOpen, setGithubDialogOpen] = useState(false);
+
+  // download pdf
+  const downloadPdf = async (projectName) => {
+    const blobUrl = await getCurrentProjectPdf(projectName);
+    console.log(blobUrl, "blobUrl");
+
+    if (!blobUrl) {
+      toast.warning("project is not compiled please compile it first");
+      return;
+    }
+    const link = document.createElement("a");
+    link.href = blobUrl;
+    link.download = projectName + ".pdf";
+    link.click();
+    setTimeout(() => {
+      URL.revokeObjectURL(blobUrl);
+    }, 30000);
+  };
+
   // table
   const columns = [
     {
@@ -157,6 +188,7 @@ function Project() {
       headerAlign: "center",
       align: "center",
       sortable: false,
+      renderCell: (params) => <div>{formatDate(params.value)}</div>,
     },
     {
       field: "actions",
@@ -172,7 +204,8 @@ function Project() {
               size="small"
               onClick={(e) => {
                 e.stopPropagation();
-                // Add your copy logic here
+                setSourceProject(params.row.title);
+                setCopyDialogOpen(true);
               }}
             >
               <FileCopyIcon />
@@ -183,7 +216,7 @@ function Project() {
               size="small"
               onClick={(e) => {
                 e.stopPropagation();
-                // Add your download logic here
+                downloadDirectoryAsZip(params.row.title);
               }}
             >
               <CloudDownloadIcon />
@@ -194,7 +227,7 @@ function Project() {
               size="small"
               onClick={(e) => {
                 e.stopPropagation();
-                // Add your download PDF logic here
+                downloadPdf(params.row.title);
               }}
             >
               <PictureAsPdfIcon />
@@ -266,7 +299,7 @@ function Project() {
                 },
                 {
                   label: "Import from GitHub",
-                  onClick: () => console.log("Logout clicked"),
+                  onClick: () => setGithubDialogOpen(true),
                 },
               ]}
               // templateItems={{
@@ -395,6 +428,17 @@ function Project() {
         dialogOpen={uploadDialogOpen}
         setDialogOpen={setUploadDialogOpen}
       />
+      <CopyProject
+        dialogOpen={copyDialogOpen}
+        setDialogOpen={setCopyDialogOpen}
+        sourceProject={sourceProject}
+        getProjectList={getProjectList}
+      />
+      <Github
+        dialogOpen={githubDialogOpen}
+        setDialogOpen={setGithubDialogOpen}
+        getProjectList={getProjectList}
+      ></Github>
       <ArDialog
         title="Delete Project"
         dialogOpen={deleteDialogOpen}

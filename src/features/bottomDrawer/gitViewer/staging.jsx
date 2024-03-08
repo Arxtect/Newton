@@ -54,7 +54,7 @@ export function Staging(props) {
   const removable = getRemovableFilenames(statusMatrix);
   const removed = getRemovedFilenames(statusMatrix);
   const staged = getStagedFilenames(statusMatrix);
-  const modified = getModifiedFilenames(statusMatrix).filter(
+  const modified = getModifiedFilenames(statusMatrix)?.filter(
     (f) => !removable.includes(f) && !staged.includes(f) && !removed.includes(f)
   );
 

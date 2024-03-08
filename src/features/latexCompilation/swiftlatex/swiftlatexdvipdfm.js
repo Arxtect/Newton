@@ -174,7 +174,7 @@ let texlive404_cache = {};
 let texlive200_cache = {};
 function kpse_find_file_impl(nameptr, format, _mustexist) {
   let reqname = UTF8ToString(nameptr);
-  if (reqname.startsWith("/tex/")) {
+  if (reqname?.startsWith("/tex/")) {
     reqname = reqname.substr(5);
   }
   if (reqname.includes("/")) {

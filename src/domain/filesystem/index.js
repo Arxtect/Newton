@@ -20,3 +20,5 @@ export * from "./queries/extToFileType";
 export * from "./commands/upLoadFile";
 export * from "./commands/upLoadFolder";
 export * from "./commands/uploadZip";
+export * from "./commands/copyProject";
+export * from "./commands/copyFile";

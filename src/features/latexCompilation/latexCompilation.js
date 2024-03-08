@@ -177,7 +177,7 @@ export const compileLatex = async (latexCode, currentProject) => {
     });
 
     // Create a temporary URL to this PDF blob
-    setCompiledPdfUrl(URL.createObjectURL(pdfBlob));
+    await setCompiledPdfUrl(URL.createObjectURL(pdfBlob));
     setShowCompilerLog(false);
     // After compilation, the engine is ready again
     setReadyEngineStatus();
@@ -185,10 +185,4 @@ export const compileLatex = async (latexCode, currentProject) => {
     // If the compilation failed, reflect it with an error
     setErrorEngineStatus();
   }
-};
-
-export const revokeCompiledPdfUrl = (pdfUrl) => {
-  // Revoke the temporary URL to the PDF blob created in `compileLatex()`
-  URL.revokeObjectURL(pdfUrl);
-  console.log("Revoked URL");
 };

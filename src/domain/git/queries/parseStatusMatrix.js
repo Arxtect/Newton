@@ -1,3 +1,8 @@
+/*
+ * @Description:
+ * @Author: Devin
+ * @Date: 2024-03-07 21:37:28
+ */
 // See detail https://isomorphic-git.org/docs/en/statusMatrix
 
 const FILE = 0;
@@ -22,7 +27,7 @@ const STAGE_DIFFERENT_TO_WORKDIR = 3;
 
 export function getModifiedFilenames(matrix) {
   return matrix
-    .filter((row) => row[HEAD] !== row[WORKDIR])
+    ?.filter((row) => row[HEAD] !== row[WORKDIR])
     .map((row) => row[FILE]);
 }
 
@@ -40,7 +45,7 @@ export function getStagedFilenames(matrix) {
 
 export function getRemovableFilenames(matrix) {
   return matrix
-    .filter(
+    ?.filter(
       (row) => row[WORKDIR] === HEAD_ABSENT && row[STAGE] !== STAGE_ABSENT
     )
     .map((row) => row[FILE]);

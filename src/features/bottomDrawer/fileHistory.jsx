@@ -58,7 +58,9 @@ const FileHistory = () => {
       setCurrentHistory(formattedHistory);
     };
 
-    fetchHistory();
+    fetchHistory()
+      .then(() => {})
+      .catch((e) => console.error(e));
   }, [filepath, projectRoot, currentBranch]);
 
   if (!filepath) {
