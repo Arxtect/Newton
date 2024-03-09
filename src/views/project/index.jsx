@@ -33,6 +33,9 @@ import NewProject from "./newProject";
 import UploadProject from "./uploadProject";
 import CopyProject from "./copyProject";
 import Github from "./github";
+import Slider from "./slider"
+import ActionBar from './actionBar'
+
 import { toast } from "react-toastify";
 import { formatDate } from "@/util";
 
@@ -271,6 +274,9 @@ function Project() {
     }));
   }, [tableWidth]);
 
+  // search 
+  const [searchInput, setSearchInput] = useState('')
+
   return (
     <React.Fragment>
       <Box
@@ -278,84 +284,11 @@ function Project() {
         className="h-[calc(100vh-64px)]"
         bgcolor="background.paper"
       >
-        <Box
-          display="flex"
-          flexDirection="column"
-          width={256}
-          bgcolor="background.default"
-          boxShadow={3}
-        >
-          <Box p={2} className="bg-[#c6c6c680]">
-            <ArMenu
-              buttonLabel="New Project"
-              menuList={[
-                {
-                  label: "New Project",
-                  onClick: () => setNewDialogOpen(true),
-                },
-                {
-                  label: "Upload Project",
-                  onClick: () => setUploadDialogOpen(true),
-                },
-                {
-                  label: "Import from GitHub",
-                  onClick: () => setGithubDialogOpen(true),
-                },
-              ]}
-              // templateItems={{
-              //   title: "Templates",
-              //   items: [
-              //     {
-              //       label: "Academic Journal",
-              //       onClick: () => console.log("Academic Journal clicked"),
-              //     },
-              //     { label: "Book", onClick: () => console.log("Book clicked") },
-              //   ],
-              // }}
-            />
-          </Box>
-          <nav>
-            <List className="py-0">
-              <ListItem button component="a" href="#">
-                <ListItemText primary="All Projects" />
-              </ListItem>
-              <ListItem button component="a" href="#">
-                <ListItemText primary="Your Projects" />
-              </ListItem>
-              <ListItem button component="a" href="#">
-                <ListItemText primary="Shared with you" />
-              </ListItem>
-              <ListItem button component="a" href="#">
-                <ListItemText primary="Archived Projects" />
-              </ListItem>
-              <ListItem button component="a" href="#">
-                <ListItemText primary="Trashed Projects" />
-              </ListItem>
-              <Divider />
-              <Typography variant="subtitle2" sx={{ my: 2, mx: 2 }}>
-                ORGANIZE PROJECTS
-              </Typography>
-              <ListItem button component="a" href="#">
-                <ListItemText primary="New Tag" />
-              </ListItem>
-              <ListItem button component="a" href="#">
-                <ListItemText primary="123" />
-              </ListItem>
-              <ListItem button component="a" href="#">
-                <ListItemText primary="Uncategorized (6)" />
-              </ListItem>
-              <Divider />
-              <Typography variant="subtitle2" sx={{ my: 2, mx: 2 }}>
-                Are you affiliated with an institution?
-              </Typography>
-              <Box sx={{ display: "flex", justifyContent: "center", my: 2 }}>
-                <Button variant="outlined" size="small">
-                  Add Affiliation
-                </Button>
-              </Box>
-            </List>
-          </nav>
-        </Box>
+        <Slider
+          setNewDialogOpen={setNewDialogOpen}
+          setUploadDialogOpen={setUploadDialogOpen}
+          setGithubDialogOpen={setGithubDialogOpen}
+        ></Slider>
         <Box flex={1} display="flex" flexDirection="column" overflow="hidden">
           <Box
             bgcolor="background.default"
@@ -371,14 +304,16 @@ function Project() {
             >
               <Typography variant="h6">All Projects</Typography>
               <Box display="flex" alignItems="center">
-                <Typography variant="body2" sx={{ mx: 2 }}>
+                {/* <Typography variant="body2" sx={{ mx: 2 }}>
                   You're on the free plan
                 </Typography>
                 <Button variant="contained" color="primary" size="small">
                   Upgrade
-                </Button>
+                </Button> */}
+                <ActionBar selectedRows={selectedRows} getProjectList={getProjectList}></ActionBar>
               </Box>
             </Box>
+
             <Box display="flex" my={2}>
               <TextField
                 size="small"
@@ -390,6 +325,7 @@ function Project() {
                 }}
                 id="outlined-start-adornment"
                 placeholder="Search in all projects..."
+                onChange={(e) => setSearchInput(e.target.value)}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -402,7 +338,7 @@ function Project() {
             <Box>
               <Paper ref={tableContainerRef}>
                 <DataGrid
-                  rows={projectData}
+                  rows={projectData.filter(data => data.title.includes(searchInput))}
                   columns={calculatedColumns}
                   disableColumnMenu
                   rowHeight={40}
