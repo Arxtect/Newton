@@ -14,8 +14,9 @@ import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import ArDialog from "@/components/arDialog";
 import { toast } from "react-toastify";
 import { useFileStore } from "store"
+import { downloadMultiDirectoryAsZip } from "domain/filesystem"
 
-function ActionBar({ selectedRows, getProjectList }) {
+function ActionBar({ handleCopy, handleRename, selectedRows, getProjectList }) {
     const {
         deleteProject,
     } = useFileStore((state) => ({
@@ -24,7 +25,12 @@ function ActionBar({ selectedRows, getProjectList }) {
 
 
     const downloadClick = () => {
-        console.log(downloadClick, 'downloadClick')
+        if (!selectedRows?.length > 0) {
+            toast.warning("Please select project to delete");
+            return;
+        }
+        let rootPathList = selectedRows.map((item) => item.title)
+        downloadMultiDirectoryAsZip(rootPathList)
     }
 
 
@@ -114,7 +120,7 @@ function ActionBar({ selectedRows, getProjectList }) {
             </div>
 
             {/* Spacer */}
-            <div className="inline-block w-px h-6 bg-gray-300 mr-3"></div>
+            {selectedRows.length == 1 && <div className="inline-block w-px h-6 bg-gray-300 mr-3"></div>}
 
             {/* <ArMenu
                 buttonCom={
@@ -160,7 +166,7 @@ function ActionBar({ selectedRows, getProjectList }) {
             </ArMenu> */}
 
             {/* More button */}
-            <ArMenu
+            {selectedRows.length == 1 && <ArMenu
                 buttonCom={
                     <Button
                         endIcon={<ExpandMoreIcon />}
@@ -181,12 +187,12 @@ function ActionBar({ selectedRows, getProjectList }) {
                 }
                 menuList={[
                     {
-                        label: "New Project",
-                        onClick: () => { },
+                        label: "Rename",
+                        onClick: () => { handleRename(selectedRows?.[0]?.title) },
                     },
                     {
-                        label: "New aProject",
-                        onClick: () => { },
+                        label: "Make a copy",
+                        onClick: () => { handleCopy(selectedRows?.[0]?.title) },
                     },
                 ]}
                 menuProps={{
@@ -201,7 +207,7 @@ function ActionBar({ selectedRows, getProjectList }) {
                 }}
                 widthExtend={false}
             >
-            </ArMenu>
+            </ArMenu>}
             <ArDialog
                 title="Delete Project"
                 dialogOpen={deleteDialogOpen}

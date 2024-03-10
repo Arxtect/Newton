@@ -32,6 +32,7 @@ import { findAllProjectInfo, downloadDirectoryAsZip } from "domain/filesystem";
 import NewProject from "./newProject";
 import UploadProject from "./uploadProject";
 import CopyProject from "./copyProject";
+import RenameProject from './renameProject'
 import Github from "./github";
 import Slider from "./slider"
 import ActionBar from './actionBar'
@@ -115,9 +116,24 @@ function Project() {
 
   const [sourceProject, setSourceProject] = useState("");
   const [copyDialogOpen, setCopyDialogOpen] = useState(false);
+  const handleCopy = (title) => {
+    setSourceProject(title)
+    setCopyDialogOpen(true)
+  }
+
+  //rename project
+
+  const [renameSourceProject, setRenameSourceProject] = useState("");
+  const [renameDialogOpen, setRenameDialogOpen] = useState(false);
+  const handleRename = (title) => {
+    setRenameSourceProject(title)
+    setRenameDialogOpen(true)
+  }
+
 
   //github
   const [githubDialogOpen, setGithubDialogOpen] = useState(false);
+
 
   // download pdf
   const downloadPdf = async (projectName) => {
@@ -206,9 +222,10 @@ function Project() {
             <IconButton
               size="small"
               onClick={(e) => {
+
                 e.stopPropagation();
-                setSourceProject(params.row.title);
-                setCopyDialogOpen(true);
+                handleCopy(params.row.title)
+
               }}
             >
               <FileCopyIcon />
@@ -301,16 +318,19 @@ function Project() {
               display="flex"
               justifyContent="space-between"
               alignItems="center"
+              className="h-[56px]"
             >
               <Typography variant="h6">All Projects</Typography>
               <Box display="flex" alignItems="center">
-                {/* <Typography variant="body2" sx={{ mx: 2 }}>
-                  You're on the free plan
-                </Typography>
-                <Button variant="contained" color="primary" size="small">
-                  Upgrade
-                </Button> */}
-                <ActionBar selectedRows={selectedRows} getProjectList={getProjectList}></ActionBar>
+                {selectedRows.length > 0 ? <ActionBar handleCopy={handleCopy} handleRename={handleRename} selectedRows={selectedRows} getProjectList={getProjectList} /> : <React.Fragment>
+                  <Typography variant="body2" sx={{ mx: 2 }}>
+                    You're on the free plan
+                  </Typography>
+                  <Button variant="contained" color="primary" size="small">
+                    Upgrade
+                  </Button>
+                </React.Fragment>
+                }
               </Box>
             </Box>
 
@@ -342,13 +362,13 @@ function Project() {
                   columns={calculatedColumns}
                   disableColumnMenu
                   rowHeight={40}
-                  // initialState={{
-                  //   pagination: {
-                  //     paginationModel: { page: 0, pageSize: 5 },
-                  //   },
-                  // }}
-                  // pageSizeOptions={[5, 10]}\
-                  pageSize={5}
+                  initialState={{
+                    pagination: {
+                      paginationModel: { page: 0, pageSize: 5 },
+                    },
+                  }}
+                  pageSizeOptions={[5, 10]}
+                  pageSize={10}
                   checkboxSelection={true}
                   onRowSelectionModelChange={handleSelection}
                   disableRowSelectionOnClick
@@ -368,6 +388,14 @@ function Project() {
         dialogOpen={copyDialogOpen}
         setDialogOpen={setCopyDialogOpen}
         sourceProject={sourceProject}
+        setSourceProject={setSourceProject}
+        getProjectList={getProjectList}
+      />
+      <RenameProject
+        dialogOpen={renameDialogOpen}
+        setDialogOpen={setRenameDialogOpen}
+        sourceProject={renameSourceProject}
+        setSourceProject={setRenameSourceProject}
         getProjectList={getProjectList}
       />
       <Github

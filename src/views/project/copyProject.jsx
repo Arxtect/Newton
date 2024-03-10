@@ -14,6 +14,7 @@ import { toast } from "react-toastify";
 const CopyProject = ({
   dialogOpen,
   setDialogOpen,
+  setSourceProject,
   getProjectList,
   sourceProject = "",
 }) => {
@@ -39,6 +40,7 @@ const CopyProject = ({
       .then(() => {
         getProjectList();
         setDialogOpen(false);
+        setSourceProject("")
       })
       .catch((error) => {
         toast.warning(error.message);

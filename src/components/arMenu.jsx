@@ -5,7 +5,7 @@ import MenuItem from "@mui/material/MenuItem";
 import ListSubheader from "@mui/material/ListSubheader";
 import Divider from "@mui/material/Divider";
 
-const ArMenu = ({ buttonLabel, menuList, templateItems, className, buttonCom, menuProps, widthExtend = true }) => {
+const ArMenu = ({ buttonLabel, menuList, templateItems, className, buttonCom, menuProps, widthExtend = true, buttonProps }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
 
@@ -26,6 +26,7 @@ const ArMenu = ({ buttonLabel, menuList, templateItems, className, buttonCom, me
         size="small"
         className={`w-full ${className}`}
         onClick={handleClick}
+        {...buttonProps}
       >
         {buttonLabel}
       </Button>

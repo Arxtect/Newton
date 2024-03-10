@@ -31,17 +31,6 @@ const Slider = ({ setNewDialogOpen, setUploadDialogOpen, setGithubDialogOpen }) 
             title: "Shared with you",
             onClick: () => { },
         },
-        {
-            id: "Archived Projects",
-            title: "Archived Projects",
-            onClick: () => { },
-        },
-        {
-            id: "Trashed Projects",
-            title: "Trashed Projects",
-            onClick: () => { },
-        },
-
     ]
 
     const organizeMenuList = [
@@ -73,9 +62,13 @@ const Slider = ({ setNewDialogOpen, setUploadDialogOpen, setGithubDialogOpen }) 
             boxShadow={3}
             className="h-full"
         >
-            <Box p={2} className="bg-[#c6c6c680]">
+            <Box px={2} pb={1} pt={2}>
                 <ArMenu
                     buttonLabel="New Project"
+                    buttonProps={{
+                        size: "middle",
+                        className: `w-full rounded-full`
+                    }}
                     menuList={[
                         {
                             label: "New Project",
@@ -103,11 +96,17 @@ const Slider = ({ setNewDialogOpen, setUploadDialogOpen, setGithubDialogOpen }) 
                 />
             </Box>
             <nav className="overflow-auto">
-                <List className="py-0">
-
-                    {mainMenuList.map(item => {
-                        return <ListItem button component="a">
-                            <ListItemText primary={item.title} onClick={item.onClick} />
+                <List className="py-1">
+                    {mainMenuList.map((item) => {
+                        return <ListItem button component="a" key={item.id} className="py-[4px]">
+                            <ListItemText primary={item.title} onClick={item.onClick}
+                                sx={{
+                                    padding: "0 10px",
+                                    "& .MuiTypography-root": {
+                                        fontSize: "18px",
+                                    }
+                                }}
+                            />
                         </ListItem>
                     })}
                     {/* <Divider />
@@ -115,7 +114,7 @@ const Slider = ({ setNewDialogOpen, setUploadDialogOpen, setGithubDialogOpen }) 
                         ORGANIZE PROJECTS
                     </Typography>
                     {organizeMenuList.map(item => {
-                        return <ListItem button component="a">
+                        return <ListItem button component="a"  key={item.id}>
                             <ListItemText primary={item.title} onClick={item.onClick} />
                         </ListItem>
                     })}
