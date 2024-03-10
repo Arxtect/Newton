@@ -30,8 +30,8 @@ export async function documentSearch(search) {
   let queryParams = [];
 
   // Add pageIndex and pageSize with default values if they are not provided
-  queryParams.push(`pageIndex=${search.pageIndex ?? 1}`);
-  queryParams.push(`pageSize=${search.pageSize ?? 10}`);
+  queryParams.push(`page_index=${search.pageIndex ?? 1}`);
+  queryParams.push(`page_size=${search.pageSize ?? 10}`);
 
   // Add keyword if it exists and is not an empty string
   if (search?.keyword && search.keyword !== "") {

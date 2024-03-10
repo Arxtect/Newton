@@ -163,13 +163,13 @@ export async function forgotPassword(email) {
 }
 
 // 重置密码
-export async function resetPassword({ resetToken, password, passwordConfirm }) {
+export async function resetPassword({ resetToken, password, password_confirm }) {
   const response = await fetch(getApiUrl(`/auth/resetpassword/${resetToken}`), {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ password, passwordConfirm }),
+    body: JSON.stringify({ password, password_confirm }),
     credentials: "include",
   });
 

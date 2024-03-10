@@ -294,6 +294,21 @@ function Project() {
   // search 
   const [searchInput, setSearchInput] = useState('')
 
+  // slider menu
+  const [currentSelectMenu, setCurrentSelectMenu] = useState(1)
+  const [currentSelectMenuTitle, setCurrentSelectMenuTitle] = useState("")
+
+  const sliderRef = useRef(null)
+
+  const handleCurrentSelectMenu = (id) => {
+    setCurrentSelectMenu(id)
+    setCurrentSelectMenuTitle(sliderRef.current.getMainMenuTitleViaId(id))
+  }
+  useEffect(() => {
+    setCurrentSelectMenuTitle(sliderRef.current.getMainMenuTitleViaId(currentSelectMenu))
+  }, [])
+
+
   return (
     <React.Fragment>
       <Box
@@ -305,6 +320,9 @@ function Project() {
           setNewDialogOpen={setNewDialogOpen}
           setUploadDialogOpen={setUploadDialogOpen}
           setGithubDialogOpen={setGithubDialogOpen}
+          handleCurrentSelectMenu={handleCurrentSelectMenu}
+          currentSelectMenu={currentSelectMenu}
+          ref={sliderRef}
         ></Slider>
         <Box flex={1} display="flex" flexDirection="column" overflow="hidden">
           <Box
@@ -320,7 +338,7 @@ function Project() {
               alignItems="center"
               className="h-[56px]"
             >
-              <Typography variant="h6">All Projects</Typography>
+              <Typography variant="h6">{currentSelectMenuTitle}</Typography>
               <Box display="flex" alignItems="center">
                 {selectedRows.length > 0 ? <ActionBar handleCopy={handleCopy} handleRename={handleRename} selectedRows={selectedRows} getProjectList={getProjectList} /> : <React.Fragment>
                   <Typography variant="body2" sx={{ mx: 2 }}>

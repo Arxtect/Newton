@@ -1,5 +1,5 @@
 
-
+import React, { forwardRef, useImperativeHandle } from 'react';
 import ArMenu from "@/components/arMenu";
 
 import {
@@ -13,23 +13,27 @@ import {
 } from "@mui/material";
 
 
-const Slider = ({ setNewDialogOpen, setUploadDialogOpen, setGithubDialogOpen }) => {
+const Slider = forwardRef(({ currentSelectMenu, handleCurrentSelectMenu, setNewDialogOpen, setUploadDialogOpen, setGithubDialogOpen }, ref) => {
+    const getMainMenuTitleViaId = (id) => {
+        return mainMenuList.find(item => item.id === id)?.title
+    }
+
+    useImperativeHandle(ref, () => ({
+        getMainMenuTitleViaId
+    }));
 
     const mainMenuList = [
         {
-            id: "All Projects",
+            id: 1,
             title: "All Projects",
-            onClick: () => { },
         },
         {
-            id: "Your Projects",
+            id: 2,
             title: "Your Projects",
-            onClick: () => { },
         },
         {
-            id: "Shared with you",
+            id: 3,
             title: "Shared with you",
-            onClick: () => { },
         },
     ]
 
@@ -98,8 +102,15 @@ const Slider = ({ setNewDialogOpen, setUploadDialogOpen, setGithubDialogOpen }) 
             <nav className="overflow-auto">
                 <List className="py-1">
                     {mainMenuList.map((item) => {
-                        return <ListItem button component="a" key={item.id} className="py-[4px]">
-                            <ListItemText primary={item.title} onClick={item.onClick}
+                        return <ListItem
+                            button
+                            component="a"
+                            key={item.id}
+                            className={`py-[4px] ${currentSelectMenu === item.id && 'bg-[#8776762e]'}`}
+                            onClick={() => handleCurrentSelectMenu(item.id)}
+                        >
+                            <ListItemText
+                                primary={item.title}
                                 sx={{
                                     padding: "0 10px",
                                     "& .MuiTypography-root": {
@@ -132,6 +143,6 @@ const Slider = ({ setNewDialogOpen, setUploadDialogOpen, setGithubDialogOpen }) 
             </nav>
         </Box>
     )
-}
+})
 
 export default Slider
