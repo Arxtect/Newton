@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   IconButton,
   Tooltip,
@@ -26,6 +26,7 @@ import CreateIcon from "@mui/icons-material/Create";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ExportIcon from "@mui/icons-material/MoveToInbox";
 import ArDialog from "@/components/arDialog";
+import { FileUploader, FolderUploader } from "../upload.jsx";
 
 import { usePdfPreviewStore, useUserStore } from "store";
 const MoreMenu = ({
@@ -114,6 +115,8 @@ const MoreMenu = ({
   const handleClosePublish = () => {
     setOpenPublishDialog(false);
   };
+  const fileUploaderRef = useRef(null);
+  const folderUploaderRef = useRef(null);
 
   return (
     <>
@@ -128,6 +131,30 @@ const MoreMenu = ({
         onClose={handleClose}
         style={{ left: "0px", top: "0px" }}
       >
+        <MenuItem onClick={() => fileUploaderRef.current.click()}>
+          <ListItemIcon>
+            <FileUploader
+              reload={reload}
+              filepath={filepath}
+              currentSelectDir={currentSelectDir}
+              fontSize="small"
+              ref={fileUploaderRef}
+            ></FileUploader>
+          </ListItemIcon>
+          Upload Folder
+        </MenuItem>
+        <MenuItem onClick={() => folderUploaderRef.current.click()}>
+          <ListItemIcon>
+            <FolderUploader
+              reload={reload}
+              filepath={filepath}
+              currentSelectDir={currentSelectDir}
+              fontSize="small"
+              ref={folderUploaderRef}
+            ></FolderUploader>
+          </ListItemIcon>
+          Upload Folder
+        </MenuItem>
         <MenuItem onClick={handleOpenPublish}>
           <ListItemIcon>
             <PublishIcon fontSize="small" />

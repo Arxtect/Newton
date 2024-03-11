@@ -4,7 +4,7 @@
  * @Date: 2024-01-25 12:25:23
  */
 // Hooks
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { usePdfPreviewStore } from "store";
 
 export const PdfPreview = () => {
@@ -16,8 +16,32 @@ export const PdfPreview = () => {
       setCompiledPdfUrl: state.setCompiledPdfUrl,
     }));
 
+  const [resizing, setResizing] = useState(false);
+
+  const resizeFrameStart = () => {
+    setResizing(true);
+  };
+
+  const resizeDone = () => {
+    setResizing(false);
+  };
+
+  useEffect(() => {
+    if (resizing) {
+      window.addEventListener("mousemove", resizeFrameStart);
+      window.removeEventListener("mouseup", resizeDone);
+    } else {
+      window.addEventListener("mousemove", resizeFrameStart);
+      window.removeEventListener("mouseup", resizeDone);
+    }
+
+    return () => {
+      window.removeEventListener("mouseup", resizeDone);
+    };
+  }, [resizing]);
+
   const formattedCompilerLog = (
-    <p className="h-minus-125 border border-black p-2 font-mono overflow-y-scroll">
+    <p className="h-full  p-2 font-mono overflow-y-scroll">
       <b>Compiler Log:</b>
       <br />
       <br />
@@ -25,19 +49,26 @@ export const PdfPreview = () => {
     </p>
   );
   const pdfEmbed = (
-    <embed
-      src={pdfUrl}
-      width="100%"
-      type="application/pdf"
-      className="h-minus-125 border border-black"
-    ></embed>
+    <div
+      onMouseDown={resizeFrameStart}
+      className={`h-full relative ${resizing ? "z-10" : ""}`}
+    >
+      <embed
+        src={pdfUrl}
+        width="100%"
+        type="application/pdf"
+        className="h-full"
+      ></embed>
+      {resizing && (
+        <div className="absolute top-0 left-0 w-full h-full z-20"></div>
+      )}
+    </div>
   );
 
-
   return (
-    <article>
+    <div className="h-full">
       {pdfUrl !== "" && !showCompilerLog && pdfEmbed}
       {(pdfUrl === "" || showCompilerLog) && formattedCompilerLog}
-    </article>
+    </div>
   );
 };

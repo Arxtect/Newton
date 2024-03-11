@@ -11,6 +11,12 @@ module.exports = {
       colors: {
         link: "#13678a",
         primary: "#e7f8ff",
+        colors: {
+          "g-color-87": "var(--g-color-87)",
+        },
+        borderWidth: {
+          1: "1px", // 如果 Tailwind 默认没有提供 1px 宽度，可以在这里添加
+        },
       },
       height: {
         "minus-125": "calc(100vh - 125px)",

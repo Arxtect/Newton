@@ -95,32 +95,25 @@ const GitTest = () => {
 
   return (
     <main className="max-w-[100%]">
-      <div className="flex justify-between items-center bg-[#e7f8fd] h-[52px] pr-3 border-gradient-top">
-        <div className="flex gap-2 w-3/5">
+      <div className="flex justify-between items-center h-[52px] border-gradient-top border-b border-g-color-87 border-1">
+        <div className="flex gap-2 w-4/5 ">
           <DropdownFormWithIcon
             currentProjectRoot={currentProjectRoot}
             projectList={allProject}
             changeCurrentProjectRoot={changeCurrentProjectRoot}
           />
         </div>
-        <div className="flex w-2/5 flex-row-reverse">
+        <div className="flex w-1/5 items-center">
           <MoreMenu
             createProject={createProject}
             currentProject={currentProjectRoot}
             deleteProject={deleteProject}
             projectLists={allProject}
+            reload={repoChanged}
+            filepath={filepath}
+            currentSelectDir={currentSelectDir}
           ></MoreMenu>
-          {/* <Tooltip title="export project">
-            <IconButton
-              className="text-gray-700"
-              onClick={() => {
-                downloadDirectoryAsZip(currentProjectRoot);
-              }}
-            >
-              <IosShareIcon fontSize="inherit" />
-            </IconButton>
-          </Tooltip> */}
-          <FolderUploader
+          {/* <FolderUploader
             reload={repoChanged}
             filepath={filepath}
             currentSelectDir={currentSelectDir}
@@ -129,7 +122,7 @@ const GitTest = () => {
             reload={repoChanged}
             filepath={filepath}
             currentSelectDir={currentSelectDir}
-          ></FileUploader>
+          ></FileUploader> */}
         </div>
       </div>
       {/* <button onClick={() => gitClone()}>git clone </button> <div></div>

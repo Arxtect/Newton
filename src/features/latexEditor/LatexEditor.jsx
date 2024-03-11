@@ -102,10 +102,10 @@ const LatexEditor = ({ handleChange, sourceCode }) => {
   // }, []);
 
   return (
-    <div>
+    <div className="h-full">
       <AceEditor
         mode="latex"
-        theme="monokai" //monokai
+        // theme="theme-github" //monokai
         name="aceEditor"
         height="100%"
         width="100%"
@@ -114,7 +114,7 @@ const LatexEditor = ({ handleChange, sourceCode }) => {
         editorProps={{ $blockScrolling: true }}
         onChange={handleChange}
         value={sourceCode}
-        className="border border-black"
+        // className="border border-black"
         ref={latexRef}
       ></AceEditor>
       {/* <div className="input overlay">{fragments}</div> */}

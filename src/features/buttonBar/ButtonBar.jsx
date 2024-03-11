@@ -19,20 +19,18 @@ export const ButtonBar = ({
     : "Show full source code";
 
   return (
-    <SplitPane>
-      <aside className="flex flex-row justify-end gap-2 my-2">
-        {/* <Button onClick={toggleVisibility} sticky={showFullSourceCode}>{toggleText}</Button> */}
-        {/* <FileUpload></FileUpload> */}
-        {/* <Button onClick={compile}>Compile</Button> */}
-        <CustomSplitButton
-          multi
-          buttonList={[
-            { key: "1", label: "COMPILE", onClick: compile },
-            { key: "2", label: "SHOWLOG", onClick: showLog },
-          ]}
-        ></CustomSplitButton>
-        <EngineStatus />
-      </aside>
-    </SplitPane>
+    <aside className="flex flex-row justify-end gap-2 my-2">
+      {/* <Button onClick={toggleVisibility} sticky={showFullSourceCode}>{toggleText}</Button> */}
+      {/* <FileUpload></FileUpload> */}
+      {/* <Button onClick={compile}>Compile</Button> */}
+      <CustomSplitButton
+        multi
+        buttonList={[
+          { key: "1", label: "COMPILE", onClick: compile },
+          { key: "2", label: "SHOWLOG", onClick: showLog },
+        ]}
+      ></CustomSplitButton>
+      <EngineStatus />
+    </aside>
   );
 };
