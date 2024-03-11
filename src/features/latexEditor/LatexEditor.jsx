@@ -114,6 +114,7 @@ const LatexEditor = ({ handleChange, sourceCode }) => {
         editorProps={{ $blockScrolling: true }}
         onChange={handleChange}
         value={sourceCode}
+        showPrintMargin={false}
         // className="border border-black"
         ref={latexRef}
       ></AceEditor>

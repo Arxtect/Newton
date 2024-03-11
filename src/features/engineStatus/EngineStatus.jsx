@@ -4,7 +4,7 @@ import ReactTooltip from "react-tooltip";
 import { useEffect } from "react";
 import { usePdfPreviewStore, useEngineStatusStore } from "store";
 
-export const EngineStatus = () => {
+export const EngineStatus = ({ className }) => {
   const { engineStatus, selectFormattedEngineStatus } = useEngineStatusStore();
 
   const [showTooltip, setShowTooltip] = useState(true);
@@ -29,10 +29,10 @@ export const EngineStatus = () => {
   };
 
   return (
-    <div>
+    <div className={`flex justify-center items-center ${className}`}>
       <FontAwesomeIcon
         icon={icon}
-        className={`inline-block text-center mt-2 ${color} hover:cursor-pointer`}
+        className={` text-center  ${color} hover:cursor-pointer`}
         size="xl"
         data-tip={tooltip}
         data-for="engineStatus"

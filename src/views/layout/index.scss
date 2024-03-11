@@ -102,8 +102,13 @@
 
 .right-before {
     flex: none;
-    background-color: var(--g-color-87);
-    height: 52px;
+    // background-color: var(--g-color-87);
+    background-color: #d1d5db;
+    height: 30px;
+}
+.right-before-right{
+    padding: 0 10px;
+    border-left: 1px solid var(--g-color-86);
 }
 
 .content {

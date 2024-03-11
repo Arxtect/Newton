@@ -1,3 +1,8 @@
+/*
+ * @Description:
+ * @Author: Devin
+ * @Date: 2024-03-11 11:53:35
+ */
 import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
 import Layout from "./layout";
 import GitTest from "../git-test";
@@ -6,6 +11,7 @@ import { initializeLatexEngines } from "@/features/latexCompilation/latexCompila
 
 import { PdfPreview } from "@/features/pdfPreview/PdfPreview";
 import { ButtonBarContainer } from "@/features/buttonBar/ButtonBarContainer";
+import RightBefore from "./rightBefore";
 
 const Index = () => {
   useLayoutEffect(() => {
@@ -14,7 +20,8 @@ const Index = () => {
   return (
     <Layout
       left={<GitTest></GitTest>}
-      rightBefore={<ButtonBarContainer />}
+      rightBefore={<RightBefore />}
+      // rightBeforeRight={<ButtonBarContainer />}
       content={<LatexEditorContainer />}
       preview={<PdfPreview />}
     ></Layout>

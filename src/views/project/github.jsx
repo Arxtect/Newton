@@ -83,7 +83,7 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList }) => {
         { title: "Cancel", click: handleCancelProject },
         { title: "Save", click: handleSaveProject },
       ]}
-      width={"40vw"}
+      width={"50vw"}
     >
       <Box component="form" noValidate autoComplete="off">
         <div className="w-[100%]">
@@ -97,6 +97,7 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList }) => {
             margin="normal"
             fullWidth
             className="my-3"
+            inputSize="middle"
           />
         </div>
         {!committerName && (
@@ -110,6 +111,7 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList }) => {
               }}
               sx={{ width: "100%" }}
               className="my-3"
+              inputSize="middle"
             />
           </div>
         )}
@@ -125,6 +127,7 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList }) => {
               }
               sx={{ width: "100%" }}
               className="my-3"
+              inputSize="middle"
             />
           </div>
         )}
@@ -140,6 +143,7 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList }) => {
               }
               className="my-3"
               sx={{ width: "100%" }}
+              inputSize="middle"
             />
           </div>
         )}

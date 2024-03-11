@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
 import "./index.scss";
 import { useStore } from "store";
 import { useReactive } from "ahooks";
@@ -293,6 +293,17 @@ const Layout = ({
     };
   }, [showEditor, showView]);
 
+  // rightBefore
+  const [rightBeforeWidth, setRightBeforeWidth] = useState("100%");
+
+  useLayoutEffect(() => {
+    if (showEditor && showView && editorRef.current) {
+      setRightBeforeWidth(`${editorRef.current.offsetWidth}px`);
+    } else {
+      setRightBeforeWidth("100%");
+    }
+  }, [showEditor, showView, editorRef.current?.offsetWidth]);
+
   // Convert Vue's template syntax to JSX
   return (
     <div className={`layout ${presentation ? "presentation" : ""}`}>
@@ -309,12 +320,18 @@ const Layout = ({
           </div>
         )}
         <div className="right">
-          <div
-            className="right-before"
-            style={{ width: editorRef?.current?.offsetWidth }}
-          >
+          <div className="right-before flex">
+            {/* <div
+              style={
+                {
+                  // width: rightBeforeWidth,
+                }
+              }
+            >
+              {rightBefore}
+            </div>
+            <div className="right-before-right">{rightBeforeRight}</div> */}
             {rightBefore}
-            {rightBeforeRight}
           </div>
           <div className="content" ref={contentRef}>
             {showEditor && (

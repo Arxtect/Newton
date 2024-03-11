@@ -27,16 +27,12 @@ export const PdfPreview = () => {
   };
 
   useEffect(() => {
-    if (resizing) {
-      window.addEventListener("mousemove", resizeFrameStart);
-      window.removeEventListener("mouseup", resizeDone);
-    } else {
-      window.addEventListener("mousemove", resizeFrameStart);
-      window.removeEventListener("mouseup", resizeDone);
-    }
+    window.document.addEventListener("mousemove", resizeFrameStart);
+    window.document.addEventListener("mouseup", resizeDone);
 
     return () => {
-      window.removeEventListener("mouseup", resizeDone);
+      window.document.removeEventListener("mousemove", resizeFrameStart);
+      window.document.removeEventListener("mouseup", resizeDone);
     };
   }, [resizing]);
 
