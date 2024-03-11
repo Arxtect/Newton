@@ -47,9 +47,14 @@ export async function readDirectoryTree(rootpath) {
 
   return readDirRecursive(rootpath);
 }
-function addFilesToZip(dir, zipFolder, parentDir = "", rootpath = "") {
+function addFilesToZip(dir, zipFolder, parentDir = "", rootpath = "", isMulti = false) {
   dir.files.forEach((file) => {
-    zipFolder.file(path.basename(file.path), file.content);
+    if (isMulti) {
+      const relativeFilePath = path.basename(file.path)
+      zipFolder.file(relativeFilePath, file.content);
+    } else {
+      zipFolder.file(path.basename(file.path), file.content);
+    }
   });
 
   dir.directories.forEach((subDir) => {
@@ -60,7 +65,7 @@ function addFilesToZip(dir, zipFolder, parentDir = "", rootpath = "") {
       ? path.relative(parentDir, relativeDirPath)
       : relativeDirPath;
     const subFolder = zipFolder.folder(zipDirPath);
-    addFilesToZip(subDir, subFolder, relativeDirPath, rootpath); // 递归调用时更新 parentDir
+    addFilesToZip(subDir, subFolder, relativeDirPath, rootpath, isMulti); // 递归调用时更新 
   });
 }
 export async function downloadDirectoryAsZip(rootpath) {
@@ -72,6 +77,29 @@ export async function downloadDirectoryAsZip(rootpath) {
 
   zip.generateAsync({ type: "blob" }).then(function (blob) {
     saveAs(blob, `${rootpath}.zip`);
+  });
+}
+
+export const getRandomString = () => {
+  const randomPart = Math.random().toString(36).substring(2, 15);
+  const timestamp = new Date().getTime();
+  const randomName = `${timestamp}-${randomPart}`;
+  return randomName
+}
+
+export async function downloadMultiDirectoryAsZip(rootpathList) {
+  const zip = new JSZip();
+
+  for (let rootpath of rootpathList) {
+    const directoryTree = await readDirectoryTree(rootpath);
+    const zipFolder = zip.folder(rootpath)
+    console.log(directoryTree, rootpathList, 'directoryTree')
+    addFilesToZip(directoryTree, zipFolder, "", rootpath, true);
+  }
+
+
+  zip.generateAsync({ type: "blob" }).then(function (blob) {
+    saveAs(blob, `${getRandomString()}.zip`);
   });
 }
 

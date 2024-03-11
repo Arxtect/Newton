@@ -27,10 +27,10 @@ const resetPasswordSchema = object({
   password: string()
     .nonempty("Need to fill in the password")
     .min(8, "Password must be more than 8 characters"),
-  passwordConfirm: string().nonempty("Please confirm your password"),
-}).refine((data) => data.password === data.passwordConfirm, {
+  password_confirm: string().nonempty("Please confirm your password"),
+}).refine((data) => data.password === data.password_confirm, {
   message: "Password mismatch",
-  path: ["passwordConfirm"],
+  path: ["password_confirm"],
 });
 
 const ResetPasswordPage = () => {
@@ -106,7 +106,7 @@ const ResetPasswordPage = () => {
           >
             <FormInput name="password" label="password" type="password" />
             <FormInput
-              name="passwordConfirm"
+              name="password_confirm"
               label="confirm password"
               type="password"
             />

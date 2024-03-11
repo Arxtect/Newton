@@ -5,7 +5,7 @@ import MenuItem from "@mui/material/MenuItem";
 import ListSubheader from "@mui/material/ListSubheader";
 import Divider from "@mui/material/Divider";
 
-const ArMenu = ({ buttonLabel, menuList, templateItems, className }) => {
+const ArMenu = ({ buttonLabel, menuList, templateItems, className, buttonCom, menuProps, widthExtend = true, buttonProps }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
 
@@ -17,17 +17,23 @@ const ArMenu = ({ buttonLabel, menuList, templateItems, className }) => {
     setAnchorEl(null);
   };
 
-  return (
-    <React.Fragment>
+  const renderButton = buttonCom
+    ? React.cloneElement(buttonCom, { onClick: handleClick })
+    : (
       <Button
         variant="contained"
         color="success"
         size="small"
         className={`w-full ${className}`}
         onClick={handleClick}
+        {...buttonProps}
       >
         {buttonLabel}
       </Button>
+    );
+  return (
+    <React.Fragment>
+      {renderButton}
       <Menu
         anchorEl={anchorEl}
         open={open}
@@ -37,9 +43,10 @@ const ArMenu = ({ buttonLabel, menuList, templateItems, className }) => {
         }}
         PaperProps={{
           style: {
-            width: anchorEl ? anchorEl.clientWidth : undefined, // Set the menu width to match the button
+            width: anchorEl && widthExtend ? anchorEl.clientWidth : undefined,
           },
         }}
+        {...menuProps}
       >
         {menuList.map((item, index) => (
           <MenuItem

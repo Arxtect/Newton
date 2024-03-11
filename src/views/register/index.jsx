@@ -40,9 +40,9 @@ const registerSchema = object({
     .min(1, "Need to fill in the password")
     .min(8, "Passwords are longer than eight characters")
     .max(32, "Passwords should be shorter than 32 characters"),
-  passwordConfirm: string().min(1, "Please confirm your password"),
-}).refine((data) => data.password === data.passwordConfirm, {
-  path: ["passwordConfirm"],
+  password_confirm: string().min(1, "Please confirm your password"),
+}).refine((data) => data.password === data.password_confirm, {
+  path: ["password_confirm"],
   message: "Password mismatch",
 });
 
@@ -115,7 +115,7 @@ const RegisterPage = () => {
             <FormInput name="email" label="email" type="email" />
             <FormInput name="password" label="password" type="password" />
             <FormInput
-              name="passwordConfirm"
+              name="password_confirm"
               label={"confirm password"}
               type="password"
             />
