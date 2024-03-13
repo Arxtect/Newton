@@ -61,8 +61,9 @@ const GitEasy = () => {
 
   const commitAndPush = async (commitMessage) => {
     commitAll({ message: commitMessage })
-      .then(() => {
-        pushCurrentBranchToOrigin();
+      .then(async () => {
+        await pushCurrentBranchToOrigin();
+        setCommitMessage("");
       })
       .catch((e) => {
         toast.error(e.message);

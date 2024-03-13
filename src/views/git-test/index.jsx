@@ -22,6 +22,7 @@ import DropdownFormWithIcon from "./components/DropdownFormWithIcon.jsx";
 
 import { gitClone, linkRepo, commitFile, gitPush } from "./gitclone.js";
 import BottomDrawer from "@/features/bottomDrawer/bottomDrawer";
+import RightBeforeLeft from "@/views/layout/rightBeforeLeft";
 
 const GitTest = () => {
   const {
@@ -95,7 +96,18 @@ const GitTest = () => {
 
   return (
     <main className="max-w-[100%]">
-      <div className="flex justify-between items-center h-[52px] border-gradient-top border-b border-g-color-87 border-1">
+      <div className="right-before flex pl-2 overflow-hidden">
+        <RightBeforeLeft
+          createProject={createProject}
+          currentProject={currentProjectRoot}
+          deleteProject={deleteProject}
+          projectLists={allProject}
+          reload={repoChanged}
+          filepath={filepath}
+          currentSelectDir={currentSelectDir}
+        ></RightBeforeLeft>
+      </div>
+      {/* <div className="flex justify-between items-center h-[52px] border-gradient-top border-b border-g-color-87 border-1">
         <div className="flex gap-2 w-4/5 ">
           <DropdownFormWithIcon
             currentProjectRoot={currentProjectRoot}
@@ -113,7 +125,7 @@ const GitTest = () => {
             filepath={filepath}
             currentSelectDir={currentSelectDir}
           ></MoreMenu>
-          {/* <FolderUploader
+        <FolderUploader
             reload={repoChanged}
             filepath={filepath}
             currentSelectDir={currentSelectDir}
@@ -122,9 +134,9 @@ const GitTest = () => {
             reload={repoChanged}
             filepath={filepath}
             currentSelectDir={currentSelectDir}
-          ></FileUploader> */}
+          ></FileUploader>
         </div>
-      </div>
+      </div> */}
       {/* <button onClick={() => gitClone()}>git clone </button> <div></div>
       <button onClick={() => linkRepo()}>git link </button> <div></div>
       <button onClick={() => commitFile(currentProjectRoot, "test commit")}>
@@ -141,7 +153,7 @@ const GitTest = () => {
       >
         打开抽屉
       </button> */}
-      <BottomDrawer isOpen={isOpen} toggleDrawer={toggleDrawer} />
+      {/* <BottomDrawer isOpen={isOpen} toggleDrawer={toggleDrawer} /> */}
       <RootDirectory
         key={currentProjectRoot}
         root={currentProjectRoot}

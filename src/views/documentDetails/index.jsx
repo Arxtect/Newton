@@ -7,7 +7,7 @@ import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { Button } from "@mui/material";
 import { Tooltip } from "@mui/material";
-import PdfImage from "@/components/pdfImage";
+import PreviewImage from "@/components/previewImage";
 import { Container } from "@mui/material";
 import PreviewPdf from "@/components/previewPdf";
 import { toast } from "react-toastify";
@@ -38,8 +38,8 @@ const DocumentDetails = () => {
     console.log(query.get("id"), "id");
     getDocumentById(query.get("id")).then((res) => {
       if (res?.data) {
-        setPdfUrl(getPreViewUrl(res.data.StorageKey));
-        getZipUrl(res.data.StorageZip);
+        setPdfUrl(getPreViewUrl(res.data.storage_key));
+        getZipUrl(res.data.storage_zip);
         setDocumentInfo(res.data);
       }
     });
@@ -102,7 +102,7 @@ const DocumentDetails = () => {
       return;
     }
     try {
-      downloadZipAndUpload(zipUrl, ".", repoChanged, documentInfo?.StorageZip);
+      downloadZipAndUpload(zipUrl, ".", repoChanged, documentInfo?.storage_zip);
     } catch (error) {
       toast.error(`get project source failed:${error}`);
     }
@@ -147,34 +147,39 @@ const DocumentDetails = () => {
 
           <div className="flex my-8">
             <div className="w-1/4 font-bold">Author</div>
-            <div className="w-3/4">{documentInfo?.User?.Name}</div>
+            <div className="w-3/4">{documentInfo?.user?.name}</div>
           </div>
 
           <div className="flex my-8">
             <div className="w-1/4 font-bold">Title</div>
-            <div className="w-3/4">{documentInfo?.Title}</div>
+            <div className="w-3/4">{documentInfo?.title}</div>
           </div>
           <div className="flex my-8">
             <div className="w-1/4 font-bold">Content</div>
             <div className="w-3/4">
-              <p>{documentInfo?.Content}</p>
+              <p>{documentInfo?.content}</p>
             </div>
           </div>
           <div className="flex my-8">
             <div className="w-1/4 font-bold">Last Updated</div>
             <div className="w-3/4">
               <Tooltip title="23rd Sep 2021, 9:00 am" placement="bottom">
-                <span>{formatDate(documentInfo?.UpdatedAt)}</span>
+                <span>{formatDate(documentInfo?.updated_at)}</span>
               </Tooltip>
             </div>
           </div>
         </div>
         <div className="w-full m-auto md:w-1/2 flex justify-center">
-          <PdfImage
-            storageKey={documentInfo?.StorageKey}
+          {/* <PdfImage
+            storageKey={documentInfo?.storage_key}
             height={500}
             className="w-[80%]"
-          ></PdfImage>
+          ></PdfImage> */}
+          <PreviewImage
+            pageImage={documentInfo?.cover}
+            height={500}
+            className="w-[80%]"
+          />
         </div>
       </div>
       <PreviewPdf

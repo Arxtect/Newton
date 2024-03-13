@@ -6,6 +6,9 @@
 import { openDB } from "idb";
 import ini from "ini";
 import { format } from "date-fns";
+import { pdfjs } from "react-pdf";
+
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
 export function routerQuery() {
   let queryStr = window.location.search.substring(1);
@@ -142,3 +145,53 @@ export const gitCommandError = (message, options = {}) => {
 export const formatDate = (date) => {
   return format(new Date(date), "yyyy-MM-dd HH:mm:ss");
 };
+
+/**
+ * 获取PDF第一页的图像URL
+ * @param {String} pdfUrl PDF文件的URL
+ * @return {Promise<String>} 返回一个promise，解析为图像的DataURL
+ */
+export async function getPdfFirstPageImageUrl(pdfUrl) {
+  try {
+    const loadingTask = pdfjs.getDocument(pdfUrl);
+    const pdf = await loadingTask.promise;
+    const page = await pdf.getPage(1);
+
+    const viewport = page.getViewport({ scale: 1.5 });
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d");
+    canvas.height = viewport.height;
+    canvas.width = viewport.width;
+
+    const renderContext = {
+      canvasContext: context,
+      viewport: viewport,
+    };
+    await page.render(renderContext).promise;
+
+    return canvas.toDataURL();
+  } catch (error) {
+    console.error("Error loading PDF:", error);
+    return "";
+  }
+}
+
+export async function dataURLtoBlob(dataurl) {
+  const arr = dataurl.split(",");
+  const mime = arr[0].match(/:(.*?);/)[1];
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+
+  return new Blob([u8arr], { type: mime });
+}
+
+export async function pdfToImageFirst(pdfUrl) {
+  const pdf = await getPdfFirstPageImageUrl(pdfUrl);
+  const blob = await dataURLtoBlob(pdf);
+  return blob;
+}

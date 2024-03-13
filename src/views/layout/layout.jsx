@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
 import "./index.scss";
-import { useStore } from "store";
+import { useLayout } from "store";
 import { useReactive } from "ahooks";
 
 const Layout = ({
@@ -27,7 +27,7 @@ const Layout = ({
     toggleView,
     emitResize,
     showFooter,
-  } = useStore();
+  } = useLayout();
 
   // Refs for DOM elements
   const asideRef = useRef(null);
@@ -335,7 +335,7 @@ const Layout = ({
           </div>
           <div className="content" ref={contentRef}>
             {showEditor && (
-              <div className="editor" ref={editorRef}>
+              <div className="editor pt-[3px]" ref={editorRef}>
                 {content}
               </div>
             )}

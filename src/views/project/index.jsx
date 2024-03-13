@@ -1,4 +1,10 @@
-import React, { useMemo, useRef, useState, useEffect } from "react";
+import React, {
+  useMemo,
+  useRef,
+  useState,
+  useEffect,
+  useLayoutEffect,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
@@ -32,10 +38,10 @@ import { findAllProjectInfo, downloadDirectoryAsZip } from "domain/filesystem";
 import NewProject from "./newProject";
 import UploadProject from "./uploadProject";
 import CopyProject from "./copyProject";
-import RenameProject from './renameProject'
+import RenameProject from "./renameProject";
 import Github from "./github";
-import Slider from "./slider"
-import ActionBar from './actionBar'
+import Slider from "./slider";
+import ActionBar from "./actionBar";
 
 import { toast } from "react-toastify";
 import { formatDate } from "@/util";
@@ -117,23 +123,21 @@ function Project() {
   const [sourceProject, setSourceProject] = useState("");
   const [copyDialogOpen, setCopyDialogOpen] = useState(false);
   const handleCopy = (title) => {
-    setSourceProject(title)
-    setCopyDialogOpen(true)
-  }
+    setSourceProject(title);
+    setCopyDialogOpen(true);
+  };
 
   //rename project
 
   const [renameSourceProject, setRenameSourceProject] = useState("");
   const [renameDialogOpen, setRenameDialogOpen] = useState(false);
   const handleRename = (title) => {
-    setRenameSourceProject(title)
-    setRenameDialogOpen(true)
-  }
-
+    setRenameSourceProject(title);
+    setRenameDialogOpen(true);
+  };
 
   //github
   const [githubDialogOpen, setGithubDialogOpen] = useState(false);
-
 
   // download pdf
   const downloadPdf = async (projectName) => {
@@ -222,10 +226,8 @@ function Project() {
             <IconButton
               size="small"
               onClick={(e) => {
-
                 e.stopPropagation();
-                handleCopy(params.row.title)
-
+                handleCopy(params.row.title);
               }}
             >
               <FileCopyIcon />
@@ -269,7 +271,7 @@ function Project() {
     },
   ];
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const updateTableWidth = () => {
       if (tableContainerRef.current) {
         setTableWidth(tableContainerRef.current.offsetWidth);
@@ -277,37 +279,42 @@ function Project() {
     };
 
     window.addEventListener("resize", updateTableWidth);
-    updateTableWidth(); // 初始调用以设置宽度
+    updateTableWidth();
 
     return () => {
       window.removeEventListener("resize", updateTableWidth);
     };
   }, []);
 
-  const calculatedColumns = useMemo(() => {
-    return columns.map((column) => ({
-      ...column,
-      width: tableWidth * column.width,
-    }));
+  const [calculatedColumns, setCalculatedColumns] = useState([]);
+
+  useLayoutEffect(() => {
+    setCalculatedColumns(
+      columns.map((column) => ({
+        ...column,
+        width: tableWidth * column.width,
+      }))
+    );
   }, [tableWidth]);
 
-  // search 
-  const [searchInput, setSearchInput] = useState('')
+  // search
+  const [searchInput, setSearchInput] = useState("");
 
   // slider menu
-  const [currentSelectMenu, setCurrentSelectMenu] = useState(1)
-  const [currentSelectMenuTitle, setCurrentSelectMenuTitle] = useState("")
+  const [currentSelectMenu, setCurrentSelectMenu] = useState(1);
+  const [currentSelectMenuTitle, setCurrentSelectMenuTitle] = useState("");
 
-  const sliderRef = useRef(null)
+  const sliderRef = useRef(null);
 
   const handleCurrentSelectMenu = (id) => {
-    setCurrentSelectMenu(id)
-    setCurrentSelectMenuTitle(sliderRef.current.getMainMenuTitleViaId(id))
-  }
+    setCurrentSelectMenu(id);
+    setCurrentSelectMenuTitle(sliderRef.current.getMainMenuTitleViaId(id));
+  };
   useEffect(() => {
-    setCurrentSelectMenuTitle(sliderRef.current.getMainMenuTitleViaId(currentSelectMenu))
-  }, [])
-
+    setCurrentSelectMenuTitle(
+      sliderRef.current.getMainMenuTitleViaId(currentSelectMenu)
+    );
+  }, []);
 
   return (
     <React.Fragment>
@@ -324,12 +331,20 @@ function Project() {
           currentSelectMenu={currentSelectMenu}
           ref={sliderRef}
         ></Slider>
-        <Box flex={1} display="flex" flexDirection="column" overflow="hidden">
+        <Box
+          flex={1}
+          display="flex"
+          flexDirection="column"
+          overflow="hidden"
+          style={{
+            width: "calc(100vw - 256px)",
+          }}
+        >
           <Box
             bgcolor="background.default"
             borderBottom={1}
             borderColor="divider"
-            className="h-full bg-[#f4f5f6]"
+            className="h-full  bg-[#f4f5f6]"
             p={3}
           >
             <Box
@@ -340,15 +355,23 @@ function Project() {
             >
               <Typography variant="h6">{currentSelectMenuTitle}</Typography>
               <Box display="flex" alignItems="center">
-                {selectedRows.length > 0 ? <ActionBar handleCopy={handleCopy} handleRename={handleRename} selectedRows={selectedRows} getProjectList={getProjectList} /> : <React.Fragment>
-                  <Typography variant="body2" sx={{ mx: 2 }}>
-                    You're on the free plan
-                  </Typography>
-                  <Button variant="contained" color="primary" size="small">
-                    Upgrade
-                  </Button>
-                </React.Fragment>
-                }
+                {selectedRows.length > 0 ? (
+                  <ActionBar
+                    handleCopy={handleCopy}
+                    handleRename={handleRename}
+                    selectedRows={selectedRows}
+                    getProjectList={getProjectList}
+                  />
+                ) : (
+                  <React.Fragment>
+                    <Typography variant="body2" sx={{ mx: 2 }}>
+                      You're on the free plan
+                    </Typography>
+                    <Button variant="contained" color="primary" size="small">
+                      Upgrade
+                    </Button>
+                  </React.Fragment>
+                )}
               </Box>
             </Box>
 
@@ -376,7 +399,9 @@ function Project() {
             <Box>
               <Paper ref={tableContainerRef}>
                 <DataGrid
-                  rows={projectData.filter(data => data.title.includes(searchInput))}
+                  rows={projectData.filter((data) =>
+                    data.title.includes(searchInput)
+                  )}
                   columns={calculatedColumns}
                   disableColumnMenu
                   rowHeight={40}

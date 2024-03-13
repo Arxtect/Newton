@@ -15,7 +15,7 @@ import {
   Pagination,
 } from "@mui/material";
 import Masonry from "@mui/lab/Masonry";
-import PdfImage from "@/components/pdfImage";
+import PreviewImage from "@/components/previewImage";
 import { getAllTags, documentSearch } from "services";
 import { Link, NavLink } from "react-router-dom";
 import { getCookie } from "@/util";
@@ -23,6 +23,7 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { updateDialogLoginOpen } from "@/store";
 import { useUserStore } from "store";
+import { getPreViewUrl } from "@/util";
 
 const Einstein = () => {
   const [page, setPage] = React.useState(1);
@@ -167,15 +168,15 @@ const Einstein = () => {
           >
             {customTags.map((option) => (
               <MenuItem
-                key={option.Name}
-                value={option.Name}
+                key={option.name}
+                value={option.name}
                 sx={{ padding: "0" }}
               >
                 <Checkbox
-                  checked={selectedTags.includes(option.Name)}
+                  checked={selectedTags.includes(option.name)}
                   size="small"
                 />
-                {option.Name}
+                {option.name}
               </MenuItem>
             ))}
           </Select>
@@ -213,9 +214,10 @@ const Einstein = () => {
 
       <Masonry columns={3} spacing={6}>
         {documentsList.map((doc, index) => (
-          <Paper key={doc.ID} elevation={3}>
+          <Paper key={doc.id} elevation={3}>
             <Box textAlign="center">
-              <PdfImage storageKey={doc.StorageKey}></PdfImage>
+              {/* <PdfImage storageKey={doc.storage_key}></PdfImage> */}
+              <PreviewImage pageImage={doc?.cover} />
               {/* StorageKey */}
               <div className="px-4">
                 <Typography
@@ -231,9 +233,9 @@ const Einstein = () => {
                     fontSize: "16px",
                     lineHeight: 1.5625,
                   }}
-                  onClick={() => handleToEditor(doc.StorageKey)}
+                  onClick={() => handleToEditor(doc.storage_key)}
                 >
-                  {doc.Title}
+                  {doc.title}
                 </Typography>
 
                 <Typography
@@ -249,9 +251,9 @@ const Einstein = () => {
                     fontSize: "16px",
                   }}
                   className="my-2"
-                  title={doc.Content}
+                  title={doc.content}
                 >
-                  {doc.Content}
+                  {doc.content}
                 </Typography>
                 <Typography
                   variant="caption"
@@ -262,7 +264,7 @@ const Einstein = () => {
                   }}
                   className="my-2"
                 >
-                  {doc?.User?.Name}
+                  {doc?.user?.name}
                 </Typography>
               </div>
             </Box>

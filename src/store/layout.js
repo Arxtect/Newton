@@ -6,7 +6,7 @@
 // store.js
 import create from "zustand";
 
-export const useStore = create((set) => ({
+export const useLayout = create((set) => ({
   showHeader: false,
   showSide: true,
   showEditor: true,
@@ -18,8 +18,26 @@ export const useStore = create((set) => ({
 
   toggleSide: () => set((state) => ({ showSide: !state.showSide })),
   toggleXterm: () => set((state) => ({ showXterm: !state.showXterm })),
-  toggleEditor: () => set((state) => ({ showEditor: !state.showEditor })),
-  toggleView: () => set((state) => ({ showView: !state.showView })),
+  toggleEditor: () =>
+    set((state) => {
+      if (!state.showView && state.showEditor) {
+        return {
+          showView: !state.showView,
+          showEditor: !state.showEditor,
+        };
+      }
+      return { showEditor: !state.showEditor };
+    }),
+  toggleView: () =>
+    set((state) => {
+      if (!state.showEditor && state.showView) {
+        return {
+          showView: !state.showView,
+          showEditor: !state.showEditor,
+        };
+      }
+      return { showView: !state.showView };
+    }),
   showFooter: () => set((state) => ({ showFooter: !state.showFooter })),
   setSideWidth: (width) => set(() => ({ sideWidth: width })),
   setXtermHeight: (height) => set(() => ({ xtermHeight: height })),

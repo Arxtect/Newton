@@ -5,7 +5,7 @@
  */
 import { toast } from "react-toastify"; // 假设你已经安装了react-toastify
 import { refreshAuth } from "./auth";
-import { setCookie, deleteCookie } from "@/util";
+import { setCookie, deleteCookie, pdfToImageFirst } from "@/util";
 import { updateAccessToken } from "store";
 // 辅助函数：生成带有统一前缀的URL
 function getApiUrl(endpoint) {
@@ -130,12 +130,17 @@ export async function uploadDocument({
   const response = await fetch(blobUrl);
   const blob = await response.blob();
 
+  const coverBlob = await pdfToImageFirst(blobUrl);
+
   // Create a new FormData object
   const formData = new FormData();
   const file = new File([blob], `${currentProjectRoot}.pdf`, {
     type: blob.type,
   });
-  console.log(blob.type, "blob.type");
+  const cover = new File([coverBlob], `${currentProjectRoot}.jpg`, {
+    type: coverBlob.type,
+  });
+
   // Append the file (as a Blob) and other parameters to the FormData object
   formData.append("upload_type", uploadType);
   formData.append("file", file);
@@ -143,6 +148,7 @@ export async function uploadDocument({
   formData.append("title", title);
   formData.append("tags", JSON.stringify(tags));
   formData.append("zip", zipFile); // 添加 ZIP 文件
+  formData.append("cover", cover);
 
   console.log(zipFile, "zipFile");
 

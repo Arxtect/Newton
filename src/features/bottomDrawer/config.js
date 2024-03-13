@@ -1,5 +1,5 @@
 import React from "react";
-import TextField from "@mui/material/TextField";
+import ArTextField from "@/components/arTextField";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
@@ -25,7 +25,7 @@ export default function Config() {
   return (
     <div className="mt-[-10px]">
       <div className=" w-[25%]">
-        <TextField
+        <ArTextField
           label="Git: Committer Name"
           variant="outlined"
           placeholder="Your committer name"
@@ -38,7 +38,7 @@ export default function Config() {
         />
       </div>
       <div className="w-[25%]">
-        <TextField
+        <ArTextField
           label="Git: Committer Email"
           variant="outlined"
           placeholder="Your email"
@@ -52,7 +52,7 @@ export default function Config() {
       </div>
 
       <div className="w-[50%]">
-        <TextField
+        <ArTextField
           label="GitHub: Private Access Token"
           variant="outlined"
           defaultValue={githubApiToken}
@@ -64,7 +64,7 @@ export default function Config() {
         />
       </div>
       <div className="mb-[10px] w-[50%]">
-        <TextField
+        <ArTextField
           label="GitHub: CORS Proxy"
           variant="outlined"
           defaultValue={corsProxy}

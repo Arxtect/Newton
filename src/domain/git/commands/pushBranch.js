@@ -4,6 +4,7 @@
  * @Date: 2024-03-02 14:23:15
  */
 import * as git from "isomorphic-git";
+import { EventEmitter } from "events";
 import fs from "fs";
 import { isCanPush } from "domain/git";
 
@@ -13,25 +14,37 @@ export async function pushBranch({
   ref,
   token,
   corsProxy,
+  ...options
 }) {
-  const hasCommits = await isCanPush({
-    projectRoot,
-    ref,
-    remote,
-    corsProxy,
-    token,
-  });
+  const emitter = new EventEmitter();
 
-  if (!hasCommits) {
-    console.log("No local commits to push.");
-    return false;
+  if (options.onProgress) {
+    emitter.on("progress", options.onProgress);
   }
+  if (options.onMessage) {
+    emitter.on("message", options.onMessage);
+  }
+
+  // const hasCommits = await isCanPush({
+  //   projectRoot,
+  //   ref,
+  //   remote,
+  //   corsProxy,
+  //   token,
+  // });
+
+  // if (!hasCommits) {
+  //   console.log("No local commits to push.");
+  //   return false;
+  // }
   const ret = await git.push({
     dir: projectRoot,
     remote,
     ref,
     corsProxy,
     token,
+    emitter,
+    ...options,
   });
 
   if (ret.errors && ret.errors.length > 0) {

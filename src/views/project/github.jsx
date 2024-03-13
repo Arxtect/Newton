@@ -7,16 +7,53 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import ArDialog from "@/components/arDialog";
-import { Card, CardContent, Typography, TextField, Box } from "@mui/material";
+import {
+  Card,
+  CardContent,
+  Typography,
+  TextField,
+  Box,
+  CircularProgress,
+  LinearProgress,
+} from "@mui/material";
 import { useFileStore, useGitRepo } from "store";
 import { toast } from "react-toastify";
 import ArTextField from "@/components/arTextField";
 import path from "path";
 import { cloneRepository } from "domain/git";
 
+const GithubProgressBar = ({ progress, messages }) => {
+  return (
+    <Box
+      display="flex"
+      flexDirection="column"
+      width="100%"
+      mt={1}
+      border="1px solid lightgray"
+      borderRadius="4px"
+      position="relative"
+    >
+      <Box width="100%" position="absolute" top={0} left={0}>
+        <LinearProgress
+          variant="determinate"
+          value={progress * 100}
+          className="color-[#176cd0] h-[2px]"
+        />
+      </Box>
+      <Box display="flex" p={1.5}>
+        <CircularProgress size={20} thickness={5} className="color-[#176cd0]" />
+        <Typography variant="body2" ml={1}>
+          {messages}
+        </Typography>
+      </Box>
+    </Box>
+  );
+};
+
 const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList }) => {
   const [projectName, setProjectName] = useState("");
-
+  const [messages, setMessages] = useState("");
+  const [progress, setProgress] = useState(0);
   const { copyProject } = useFileStore((state) => ({
     copyProject: state.copyProject,
   }));
@@ -55,6 +92,18 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList }) => {
       });
   };
 
+  const onProgress = (progress) => {
+    // lengthComputable: true;
+    // loaded: 7;
+    // total: 23;
+    const rate = progress.loaded / progress.total;
+    setProgress(rate > 1 ? 1 : rate);
+    console.log(progress);
+  };
+  const onMessage = (message) => {
+    setMessages(message);
+    console.log(message, "message");
+  };
   const gitClone = async (clonePath) => {
     const match = clonePath.match(/github\.com\/(.+?)\/(.+?)\.git$/);
     if (!match) {
@@ -71,6 +120,8 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList }) => {
       singleBranch: false,
       corsProxy: corsProxy,
       token: githubApiToken,
+      onProgress,
+      onMessage,
     });
   };
 
@@ -99,6 +150,9 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList }) => {
             className="my-3"
             inputSize="middle"
           />
+          {progress > 0 && (
+            <GithubProgressBar progress={progress} messages={messages} />
+          )}
         </div>
         {!committerName && (
           <div className="w-[100%]">

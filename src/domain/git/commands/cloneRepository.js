@@ -9,6 +9,7 @@ import * as git from "isomorphic-git";
 //    depth,
 //    singleBranch,
 //  };
+
 export async function cloneRepository(projectRoot, cloneDest, options) {
   const emitter = new EventEmitter();
 

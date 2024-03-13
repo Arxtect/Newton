@@ -26,7 +26,36 @@ import BorderColorTwoToneIcon from "@mui/icons-material/BorderColorTwoTone";
 import WebAssetIcon from "@mui/icons-material/WebAsset";
 import { Box } from "@mui/material";
 
+import { useLayout } from "store";
+
+const WebAssetIconRotate = (props) => {
+  return (
+    <WebAssetIcon
+      sx={{
+        transform: "rotate(-90deg)", // This rotates the whole icon
+      }}
+      {...props}
+    />
+  );
+};
+
 const CustomDropdownMenu = forwardRef((props, ref) => {
+  const {
+    showView,
+    showXterm,
+    showSide,
+    showEditor,
+    presentation,
+    showHeader,
+
+    toggleSide,
+    toggleXterm,
+    toggleEditor,
+    toggleView,
+    emitResize,
+    showFooter,
+  } = useLayout();
+
   const [anchorEl, setAnchorEl] = useState(null);
 
   const handleClick = (event) => {
@@ -43,38 +72,21 @@ const CustomDropdownMenu = forwardRef((props, ref) => {
   const open = Boolean(anchorEl);
   const id = open ? "simple-popover" : undefined;
 
-  const WebAssetIconRotate = (props) => {
-    return (
-      <WebAssetIcon
-        sx={{
-          transform: "rotate(-90deg)", // This rotates the whole icon
-        }}
-        {...props}
-      />
-    );
-  };
-
-  const [icons, setIcons] = useState([
-    { icon: <WebAssetIconRotate />, isSelected: false },
-    { icon: <BorderColorTwoToneIcon />, isSelected: false },
-    { icon: <VisibilityIcon />, isSelected: false },
+  const actionList = [
+    { icon: <WebAssetIconRotate />, isSelected: showSide, onClick: toggleSide },
+    {
+      icon: <BorderColorTwoToneIcon />,
+      isSelected: showEditor,
+      onClick: toggleEditor,
+    },
+    { icon: <VisibilityIcon />, isSelected: showView, onClick: toggleView },
     { icon: <ViewColumnIcon />, isSelected: false },
     { icon: <HelpOutlineIcon />, isSelected: false },
     { icon: <TextFieldsIcon />, isSelected: false },
     { icon: <GridViewIcon />, isSelected: false },
     { icon: <SearchIcon />, isSelected: false },
-  ]);
+  ];
 
-  const handleSelection = (index) => {
-    setIcons(
-      icons.map((item, idx) => {
-        if (idx === index) {
-          return { ...item, isSelected: !item.isSelected };
-        }
-        return item;
-      })
-    );
-  };
   return (
     <React.Fragment>
       <IconButton
@@ -107,11 +119,13 @@ const CustomDropdownMenu = forwardRef((props, ref) => {
         }}
       >
         <Grid container className="p-1 py-2" spacing={1}>
-          {icons.map((item, index) => (
+          {actionList.map((item, index) => (
             <Grid item xs={3} key={index}>
               <IconButton
                 className={`p-2`}
-                onClick={() => handleSelection(index)}
+                onClick={() => {
+                  item.onClick && item.onClick();
+                }}
                 sx={{
                   borderRadius: "20%",
                   ...(item.isSelected && {

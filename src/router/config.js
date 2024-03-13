@@ -8,12 +8,12 @@ import Layout from "./Layout";
 
 const routerConfig = [
   { path: "/home", name: "home", component: "home" },
-  {
-    path: "/arxtect",
-    name: "/arxtect",
-    component: "arxtect",
-    exact: true,
-  },
+  // {
+  //   path: "/arxtect",
+  //   name: "/arxtect",
+  //   component: "arxtect",
+  //   exact: true,
+  // },
   {
     path: "/project",
     name: "/project",
@@ -33,7 +33,7 @@ const routerConfig = [
 
 const noHeaderRoutes = [
   { path: "/login", name: "login", component: "login" },
-  { path: "/layout", name: "layout", component: "layout" },
+  { path: "/arxtect", name: "arxtect", component: "layout" },
   {
     path: "/register",
     name: "register",

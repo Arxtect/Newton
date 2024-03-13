@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { IconButton, Button, Menu, MenuItem } from "@mui/material";
 import SettingsIcon from "@mui/icons-material/Settings";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
@@ -6,8 +6,28 @@ import { EngineStatus } from "@/features/engineStatus/EngineStatus";
 import { usePdfPreviewStore, useFileStore } from "@/store";
 import { compileLatex } from "@/features/latexCompilation/latexCompilation";
 import Controls from "./controls";
+import BottomDrawer from "@/features/bottomDrawer/bottomDrawer";
+import RightBeforeLeft from "./rightBeforeLeft";
+import { existsPath } from "domain/filesystem";
+import path from "path";
 
 function RightBefore() {
+  const {
+    filepath,
+    createProject,
+    currentSelectDir,
+    repoChanged,
+    deleteProject,
+    allProject,
+  } = useFileStore((state) => ({
+    filepath: state.filepath,
+    createProject: state.createProject,
+    currentSelectDir: state.currentSelectDir,
+    repoChanged: state.repoChanged,
+    deleteProject: state.deleteProject,
+    allProject: state.allProject,
+  }));
+
   const { pdfUrl, toggleCompilerLog } = usePdfPreviewStore((state) => ({
     pdfUrl: state.pdfUrl,
     toggleCompilerLog: state.toggleCompilerLog,
@@ -26,22 +46,35 @@ function RightBefore() {
     toggleCompilerLog();
   };
 
-  //menu
-  const [anchorEl, setAnchorEl] = useState(null);
-  const open = Boolean(anchorEl);
-
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
+  const getIsExistGit = async () => {
+    const isExistsGit = await existsPath(path.join(currentProjectRoot, ".git"));
+    setIsExistsGit(isExistsGit);
   };
+  const [isExistsGit, setIsExistsGit] = useState(false);
+  useEffect(() => {
+    getIsExistGit();
+  }, [currentProjectRoot]);
 
-  const handleClose = () => {
-    setAnchorEl(null);
+  //git control
+
+  const [isOpen, setIsOpen] = useState(false);
+
+  const toggleDrawer = (open) => {
+    setIsOpen(open);
   };
 
   return (
     <div className="flex h-full w-full justify-between px-2">
       <div className="w-1/2  flex items-center">
-        <div></div>
+        {/* <RightBeforeLeft
+          createProject={createProject}
+          currentProject={currentProjectRoot}
+          deleteProject={deleteProject}
+          projectLists={allProject}
+          reload={repoChanged}
+          filepath={filepath}
+          currentSelectDir={currentSelectDir}
+        ></RightBeforeLeft> */}
       </div>
       <div className="w-1/2 flex justify-between items-center pr-2">
         <div className="flex justify-center items-center">
@@ -59,17 +92,25 @@ function RightBefore() {
           <EngineStatus className="text-[12px]" />
         </div>
         <div>
-          <Button color="inherit" aria-label="log" size="small">
-            <span className="flex items-center justify-center w-[20px] h-[20px] text-[14px]">
-              sync
-            </span>
-          </Button>
-          <IconButton color="inherit" aria-label="settings" size="small">
+          {!!isExistsGit && (
+            <Button
+              color="inherit"
+              aria-label="log"
+              size="small"
+              onClick={() => toggleDrawer(true)}
+            >
+              <span className="flex items-center justify-center w-[20px] h-[20px] text-[14px]">
+                sync
+              </span>
+            </Button>
+          )}
+          {/* <IconButton color="inherit" aria-label="settings" size="small">
             <SettingsIcon fontSize="small" />
-          </IconButton>
+          </IconButton> */}
           <Controls></Controls>
         </div>
       </div>
+      <BottomDrawer isOpen={isOpen} toggleDrawer={toggleDrawer} />
     </div>
   );
 }

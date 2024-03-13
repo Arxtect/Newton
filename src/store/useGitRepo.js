@@ -239,7 +239,14 @@ export const useGitRepo = create()(
         const corsProxy = state.corsProxy;
         const { currentProjectRoot: projectRoot } = useFileStore.getState();
         const { currentBranch } = await Git.getBranchStatus(projectRoot);
-        console.log(currentBranch, "currentBranch", projectRoot);
+
+        const onProgress = (progress) => {
+          console.log("progress", progress);
+        };
+        const onMessage = (message) => {
+          console.log("message", message);
+        };
+
         if (githubToken.length > 0) {
           try {
             const pushResult = await Git.pushBranch({
@@ -248,6 +255,8 @@ export const useGitRepo = create()(
               ref: currentBranch,
               token: githubToken,
               corsProxy,
+              onProgress,
+              onMessage,
             });
             if (pushResult) {
               toast.success("Push successful");
