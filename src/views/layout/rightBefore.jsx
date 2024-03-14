@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { IconButton, Button, Menu, MenuItem } from "@mui/material";
+import { IconButton, Button, Menu, MenuItem, Tooltip } from "@mui/material";
 import SettingsIcon from "@mui/icons-material/Settings";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import { EngineStatus } from "@/features/engineStatus/EngineStatus";
@@ -10,6 +10,7 @@ import BottomDrawer from "@/features/bottomDrawer/bottomDrawer";
 import RightBeforeLeft from "./rightBeforeLeft";
 import { existsPath } from "domain/filesystem";
 import path from "path";
+import LinkGithub from "./linkGithub";
 
 function RightBefore() {
   const {
@@ -46,11 +47,12 @@ function RightBefore() {
     toggleCompilerLog();
   };
 
+  // sync
+  const [isExistsGit, setIsExistsGit] = useState(false);
   const getIsExistGit = async () => {
     const isExistsGit = await existsPath(path.join(currentProjectRoot, ".git"));
     setIsExistsGit(isExistsGit);
   };
-  const [isExistsGit, setIsExistsGit] = useState(false);
   useEffect(() => {
     getIsExistGit();
   }, [currentProjectRoot]);
@@ -62,6 +64,9 @@ function RightBefore() {
   const toggleDrawer = (open) => {
     setIsOpen(open);
   };
+
+  // link
+  const [githubDialogOpen, setGithubDialogOpen] = useState(false);
 
   return (
     <div className="flex h-full w-full justify-between px-2">
@@ -92,17 +97,32 @@ function RightBefore() {
           <EngineStatus className="text-[12px]" />
         </div>
         <div>
-          {!!isExistsGit && (
-            <Button
-              color="inherit"
-              aria-label="log"
-              size="small"
-              onClick={() => toggleDrawer(true)}
-            >
-              <span className="flex items-center justify-center w-[20px] h-[20px] text-[14px]">
-                sync
-              </span>
-            </Button>
+          {!!isExistsGit ? (
+            <Tooltip title="Sync">
+              <Button
+                color="inherit"
+                aria-label="log"
+                size="small"
+                onClick={() => toggleDrawer(true)}
+              >
+                <span className="flex items-center justify-center w-[20px] h-[20px] text-[14px]">
+                  sync
+                </span>
+              </Button>
+            </Tooltip>
+          ) : (
+            <Tooltip title="Link a git repository">
+              <Button
+                color="inherit"
+                aria-label="log"
+                size="small"
+                onClick={() => setGithubDialogOpen(true)}
+              >
+                <span className="flex items-center justify-center w-[20px] h-[20px] text-[14px]">
+                  Link
+                </span>
+              </Button>
+            </Tooltip>
           )}
           {/* <IconButton color="inherit" aria-label="settings" size="small">
             <SettingsIcon fontSize="small" />
@@ -110,6 +130,11 @@ function RightBefore() {
           <Controls></Controls>
         </div>
       </div>
+      <LinkGithub
+        dialogOpen={githubDialogOpen}
+        setDialogOpen={setGithubDialogOpen}
+        setIsExistsGit={setIsExistsGit}
+      ></LinkGithub>
       <BottomDrawer isOpen={isOpen} toggleDrawer={toggleDrawer} />
     </div>
   );

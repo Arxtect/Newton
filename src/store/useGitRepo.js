@@ -46,9 +46,12 @@ export const useGitRepo = create()(
       stagingLoading: true,
 
       //git config
-      committerName: "test",
-      committerEmail: "test@gmail.com",
-      githubApiToken: "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",
+      // committerName: "test",
+      // committerEmail: "test@gmail.com",
+      // githubApiToken: "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",
+      committerName: "",
+      committerEmail: "",
+      githubApiToken: "",
       corsProxy: "https://cors.isomorphic-git.org",
       gitEasyMode: true,
       isCanPush: false,

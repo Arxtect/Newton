@@ -20,7 +20,7 @@ import { useFileStore, useGitRepo } from "store";
 import { toast } from "react-toastify";
 import ArTextField from "@/components/arTextField";
 import path from "path";
-import { cloneRepository } from "domain/git";
+import { setupAndPushToRepo } from "domain/git";
 
 const GithubProgressBar = ({ progress, messages }) => {
   return (
@@ -50,13 +50,14 @@ const GithubProgressBar = ({ progress, messages }) => {
   );
 };
 
-const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList }) => {
+const LinkGithub = ({ dialogOpen, setDialogOpen, setIsExistsGit }) => {
   const [projectName, setProjectName] = useState("");
   const [messages, setMessages] = useState("");
   const [progress, setProgress] = useState(0);
-  const { copyProject } = useFileStore((state) => ({
-    copyProject: state.copyProject,
+  const { currentProjectRoot } = useFileStore((state) => ({
+    currentProjectRoot: state.currentProjectRoot,
   }));
+  const { initializeGitStatus } = useGitRepo();
 
   const {
     committerName,
@@ -83,7 +84,7 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList }) => {
   };
   const handleSaveProject = () => {
     if (!projectName) {
-      toast.warning("Please enter project name");
+      toast.warning("Please enter remote repository url");
       return;
     }
     if (
@@ -100,12 +101,12 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList }) => {
       toast.warning("Please enter git config");
       return;
     }
-    gitClone(projectName)
+    linkRemoteRepo(projectName)
       .then((res) => {
-        console.log(res);
-        getProjectList();
         setDialogOpen(false);
-        toast.success("Import success from github");
+        toast.success("Link repository success from github");
+        setIsExistsGit(true);
+        initializeGitStatus({ projectRoot: currentProjectRoot });
       })
       .catch((error) => {
         toast.warning(error.message);
@@ -113,9 +114,6 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList }) => {
   };
 
   const onProgress = (progress) => {
-    // lengthComputable: true;
-    // loaded: 7;
-    // total: 23;
     const rate = progress.loaded / progress.total;
     setProgress(rate > 1 ? 1 : rate);
     console.log(progress);
@@ -124,22 +122,13 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList }) => {
     setMessages(message);
     console.log(message, "message");
   };
-  const gitClone = async (clonePath) => {
-    const match = clonePath.match(/github\.com\/(.+?)\/(.+?)\.git$/);
-    if (!match) {
-      toast.warning("Invalid repository URL");
-      return;
-    }
-
-    const user = match[1];
-    const repo = match[2];
-    const destPath = path.join("/", repo);
-    console.log(destPath, "destPath");
-
-    return await cloneRepository(destPath, clonePath, {
+  const linkRemoteRepo = async (remoteUrl) => {
+    return await setupAndPushToRepo(currentProjectRoot, remoteUrl, {
       singleBranch: false,
       corsProxy: corsProxy,
       token: gitConfig.githubApiToken,
+      committerName: gitConfig.committerName,
+      committerEmail: gitConfig.committerEmail,
       onProgress,
       onMessage,
     });
@@ -147,7 +136,7 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList }) => {
 
   return (
     <ArDialog
-      title="Import From Github"
+      title="Link Remote Github Repository"
       dialogOpen={dialogOpen}
       handleCancel={handleCancelProject}
       buttonList={[
@@ -159,8 +148,8 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList }) => {
       <Box component="form" noValidate autoComplete="off">
         <div className="w-[100%]">
           <ArTextField
-            label="Github Repository Url"
-            placeholder="please input github repository url"
+            label="Remote Repository Url"
+            placeholder="please input remote repository url"
             defaultValue={""}
             onChange={(event) => {
               setProjectName(event.target.value);
@@ -235,4 +224,4 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList }) => {
   );
 };
 
-export default ImportGithub;
+export default LinkGithub;

@@ -1,10 +1,45 @@
 import * as git from "isomorphic-git";
 import fs from "fs";
 import pify from "pify";
+import path from "path";
 import { createBranch } from "./createBranch";
+import { checkoutBranch } from "./checkoutBranch";
+
+const fsPify = {
+  mkdir: pify(fs.mkdir),
+  readdir: pify(fs.readdir),
+  stat: pify(fs.stat),
+};
 
 // 将 fs 的方法转换为返回 Promise 的方法
 const writeFile = pify(fs.writeFile);
+
+export async function addAllFilesToGit(dir) {
+  async function addFilesFromDirectory(currentPath) {
+    const entries = await fsPify.readdir(currentPath);
+
+    for (const entry of entries) {
+      // Skip the .git directory
+      if (entry === ".git") {
+        continue;
+      }
+
+      const entryPath = path.join(currentPath, entry);
+      const stat = await fsPify.stat(entryPath);
+
+      if (stat.isFile()) {
+        // Assuming `dir` is the root of your project and also the root where the git repo is initialized
+        const gitPath = path.relative(dir, entryPath);
+        await git.add({ fs, dir, filepath: gitPath });
+        console.log(`Added ${gitPath}`);
+      } else if (stat.isDirectory()) {
+        await addFilesFromDirectory(entryPath); // Recurse into subdirectories
+      }
+    }
+  }
+
+  await addFilesFromDirectory(dir);
+}
 
 export async function setupAndPushToRepo(projectRoot, remoteUrl, options) {
   await git.init({ fs, dir: projectRoot });
@@ -16,22 +51,24 @@ export async function setupAndPushToRepo(projectRoot, remoteUrl, options) {
   });
 
   // 为了简单起见，直接使用文件系统操作来创建一个文件
-  await writeFile(`${projectRoot}/README.md`, "# Project Title\n");
+  // await writeFile(`${projectRoot}/main.tex`, "\\documentclass{article}\n");
 
   // 将文件添加到Git跟踪
-  await git.add({ fs, dir: projectRoot, filepath: "README.md" });
+  await addAllFilesToGit(projectRoot);
 
   // 进行首次提交
   await git.commit({
     fs,
     dir: projectRoot,
     author: {
-      name: "username",
-      email: "username@example.com",
+      name: options.committerName,
+      email: options.committerEmail,
     },
-    message: "Initial commit",
+    message: "arxtect initial commit",
   });
+
   await createBranch(projectRoot, "main");
+  await checkoutBranch(projectRoot, "main");
 
   try {
     await git.push({

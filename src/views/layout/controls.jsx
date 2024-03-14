@@ -24,8 +24,7 @@ import GridViewIcon from "@mui/icons-material/GridView";
 import SearchIcon from "@mui/icons-material/Search";
 import BorderColorTwoToneIcon from "@mui/icons-material/BorderColorTwoTone";
 import WebAssetIcon from "@mui/icons-material/WebAsset";
-import { Box } from "@mui/material";
-
+import { Box, Tooltip } from "@mui/material";
 import { useLayout } from "store";
 
 const WebAssetIconRotate = (props) => {
@@ -73,13 +72,24 @@ const CustomDropdownMenu = forwardRef((props, ref) => {
   const id = open ? "simple-popover" : undefined;
 
   const actionList = [
-    { icon: <WebAssetIconRotate />, isSelected: showSide, onClick: toggleSide },
+    {
+      icon: <WebAssetIconRotate />,
+      isSelected: showSide,
+      onClick: toggleSide,
+      title: "sidebar",
+    },
     {
       icon: <BorderColorTwoToneIcon />,
       isSelected: showEditor,
       onClick: toggleEditor,
+      title: "editor",
     },
-    { icon: <VisibilityIcon />, isSelected: showView, onClick: toggleView },
+    {
+      icon: <VisibilityIcon />,
+      isSelected: showView,
+      onClick: toggleView,
+      title: "preview",
+    },
     { icon: <ViewColumnIcon />, isSelected: false },
     { icon: <HelpOutlineIcon />, isSelected: false },
     { icon: <TextFieldsIcon />, isSelected: false },
@@ -121,23 +131,25 @@ const CustomDropdownMenu = forwardRef((props, ref) => {
         <Grid container className="p-1 py-2" spacing={1}>
           {actionList.map((item, index) => (
             <Grid item xs={3} key={index}>
-              <IconButton
-                className={`p-2`}
-                onClick={() => {
-                  item.onClick && item.onClick();
-                }}
-                sx={{
-                  borderRadius: "20%",
-                  ...(item.isSelected && {
-                    bgcolor: "#cfcfd2",
-                    "&:hover": {
-                      bgcolor: "#cfcfd2", // 选中状态下悬停颜色不变
-                    },
-                  }),
-                }}
-              >
-                {React.cloneElement(item.icon, { className: "text-[#000]" })}
-              </IconButton>
+              <Tooltip title={item.title} key={index}>
+                <IconButton
+                  className={`p-2`}
+                  onClick={() => {
+                    item.onClick && item.onClick();
+                  }}
+                  sx={{
+                    borderRadius: "20%",
+                    ...(item.isSelected && {
+                      bgcolor: "#cfcfd2",
+                      "&:hover": {
+                        bgcolor: "#cfcfd2", // 选中状态下悬停颜色不变
+                      },
+                    }),
+                  }}
+                >
+                  {React.cloneElement(item.icon, { className: "text-[#000]" })}
+                </IconButton>
+              </Tooltip>
             </Grid>
           ))}
         </Grid>
