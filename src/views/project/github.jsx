@@ -82,7 +82,9 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList }) => {
     setDialogOpen(false);
   };
   const handleSaveProject = () => {
+    setLoading(true)
     if (!projectName) {
+      setLoading(false)
       toast.warning("Please enter project name");
       return;
     }
@@ -97,6 +99,7 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList }) => {
         githubApiToken: gitConfig.githubApiToken,
       });
     } else {
+      setLoading(false)
       toast.warning("Please enter git config");
       return;
     }
@@ -104,10 +107,12 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList }) => {
       .then((res) => {
         console.log(res);
         getProjectList();
+        setLoading(false)
         setDialogOpen(false);
         toast.success("Import success from github");
       })
       .catch((error) => {
+        setLoading(false)
         toast.warning(error.message);
       });
   };
@@ -144,6 +149,7 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList }) => {
       onMessage,
     });
   };
+  const [loading, setLoading] = useState(false)
 
   return (
     <ArDialog
@@ -152,7 +158,7 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList }) => {
       handleCancel={handleCancelProject}
       buttonList={[
         { title: "Cancel", click: handleCancelProject },
-        { title: "Save", click: handleSaveProject },
+        { title: "Save", click: handleSaveProject, loading: loading },
       ]}
       width={"50vw"}
     >

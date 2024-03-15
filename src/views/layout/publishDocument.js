@@ -20,6 +20,7 @@ import { useFileStore } from "store";
 import { toast } from "react-toastify";
 import PreviewPdf from "@/components/previewPdf";
 import { saveZipToBlob } from "domain/filesystem";
+import ArDialog from "@/components/arDialog"
 
 const ProductDialog = ({ open, pdfUrl, handleClosePublish }) => {
   const { currentProjectRoot } = useFileStore((state) => ({
@@ -58,13 +59,17 @@ const ProductDialog = ({ open, pdfUrl, handleClosePublish }) => {
   };
 
   const handlePublish = () => {
+    setLoading(true)
+
     if (!pdfUrl) {
       toast.warning("Please compile first");
+      setLoading(false)
       return;
     }
     if (!content || !title || !selectedTags || selectedTags.length === 0) {
       // 如果任何一个不存在或为空，则显示警告信息
       toast.warning("Content, title, and tags must not be empty.");
+      setLoading(false)
       return; // 阻止执行后续代码
     }
     // downloadDirectoryAsZip(currentProjectRoot)
@@ -87,6 +92,7 @@ const ProductDialog = ({ open, pdfUrl, handleClosePublish }) => {
           setTitle("");
           setContent("");
           setSelectedTags([]);
+          setLoading(false)
         });
       }
     });
@@ -119,125 +125,123 @@ const ProductDialog = ({ open, pdfUrl, handleClosePublish }) => {
     }
     setPreviewOpen(true);
   };
+  const [loading, setLoading] = useState(false)
 
   return (
-    <Dialog
-      open={open}
-      onClose={handleClosePublish}
-      maxWidth="sm"
-      fullWidth
+    <ArDialog
+      title="Publish Product"
+      dialogOpen={open}
+      handleCancel={handleClosePublish}
+      buttonList={[
+        { title: "Cancel", click: handleClosePublish },
+        { title: "Publish", click: handlePublish, loading: loading },
+      ]}
+      width={"40vw"}
       PaperProps={{
         style: {
           maxHeight: "70vh",
         },
       }}
     >
-      <DialogTitle>Publish Product</DialogTitle>
-      <DialogContent className="pt-[20px]">
-        <div className="space-y-6">
+      <div className="space-y-6">
+        <TextField
+          fullWidth
+          size="small"
+          label="Title"
+          variant="outlined"
+          value={title}
+          InputLabelProps={{
+            style: { lineHeight: "1" },
+          }}
+          InputProps={{
+            style: { height: "32px" },
+          }}
+          sx={commonStyles}
+          onChange={(e) => setTitle(e.target.value)}
+        />
+        <TextField
+          fullWidth
+          label="Content"
+          variant="outlined"
+          multiline
+          rows={3}
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          sx={{ background: "var(--white)" }}
+        />
+
+        <FormControl
+          fullWidth
+          size="small"
+          style={{ height: "34px" }}
+          sx={commonStyles}
+        >
+          <InputLabel id="tag-label" className="h-full">
+            Tag
+          </InputLabel>
+          <Select
+            labelId="tag-label"
+            sx={{ background: "var(--white)", height: "100%" }}
+            variant="outlined"
+            value={selectedTags}
+            label="Tag"
+            onChange={handleSelectTag}
+            className="h-full"
+            multiple
+            renderValue={renderSelectedTags}
+            MenuProps={{
+              PaperProps: {
+                style: {
+                  maxHeight: "150px",
+                },
+              },
+            }}
+          >
+            {customTags.map((option) => (
+              <MenuItem
+                key={option.name}
+                value={option.name}
+                sx={{ padding: "0" }}
+              >
+                <Checkbox
+                  checked={selectedTags.includes(option.name)}
+                  size="small"
+                />
+                {option.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <div className="flex items-center gap-2 my-2">
           <TextField
             fullWidth
             size="small"
-            label="Title"
+            label="File"
+            id="outlined-disabled"
             variant="outlined"
-            value={title}
-            InputLabelProps={{
-              style: { lineHeight: "1" },
+            value={pdfUrl ? `${currentProjectRoot}.pdf` : ""}
+            sx={{
+              "& .MuiInputBase-readOnly": {
+                bgcolor: "#a49f9f33 !important", // 覆盖外边框的背景颜色
+              },
+              ...commonStyles,
             }}
             InputProps={{
-              style: { height: "32px" },
+              readOnly: true,
+              style: { background: "#a49f9f33" },
             }}
-            sx={commonStyles}
-            onChange={(e) => setTitle(e.target.value)}
           />
-          <TextField
-            fullWidth
-            label="Content"
-            variant="outlined"
-            multiline
-            rows={3}
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            sx={{ background: "var(--white)" }}
-          />
-
-          <FormControl
-            fullWidth
-            size="small"
-            style={{ height: "34px" }}
-            sx={commonStyles}
+          <Button
+            onClick={() => {
+              handleOpenPreview();
+            }}
+            variant="contained"
+            sx={{ height: "32px" }}
           >
-            <InputLabel id="tag-label" className="h-full">
-              Tag
-            </InputLabel>
-            <Select
-              labelId="tag-label"
-              sx={{ background: "var(--white)", height: "100%" }}
-              variant="outlined"
-              value={selectedTags}
-              label="Tag"
-              onChange={handleSelectTag}
-              className="h-full"
-              multiple
-              renderValue={renderSelectedTags}
-              MenuProps={{
-                PaperProps: {
-                  style: {
-                    maxHeight: "150px",
-                  },
-                },
-              }}
-            >
-              {customTags.map((option) => (
-                <MenuItem
-                  key={option.name}
-                  value={option.name}
-                  sx={{ padding: "0" }}
-                >
-                  <Checkbox
-                    checked={selectedTags.includes(option.name)}
-                    size="small"
-                  />
-                  {option.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <div className="flex items-center gap-2 my-2">
-            <TextField
-              fullWidth
-              size="small"
-              label="File"
-              id="outlined-disabled"
-              variant="outlined"
-              value={pdfUrl ? `${currentProjectRoot}.pdf` : ""}
-              sx={{
-                "& .MuiInputBase-readOnly": {
-                  bgcolor: "#a49f9f33 !important", // 覆盖外边框的背景颜色
-                },
-                ...commonStyles,
-              }}
-              InputProps={{
-                readOnly: true,
-                style: { background: "#a49f9f33" },
-              }}
-            />
-            <Button
-              onClick={() => {
-                handleOpenPreview();
-              }}
-              variant="contained"
-              sx={{ height: "32px" }}
-            >
-              Preview
-            </Button>
-          </div>
+            Preview
+          </Button>
         </div>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleClosePublish}>Cancel</Button>
-        <Button onClick={handlePublish}>Publish</Button>
-      </DialogActions>
+      </div>
       <PreviewPdf
         dialogStyle={{
           height: "90vh",
@@ -247,7 +251,7 @@ const ProductDialog = ({ open, pdfUrl, handleClosePublish }) => {
         setOpen={setPreviewOpen}
         pdfUrl={pdfUrl}
       />
-    </Dialog>
+    </ArDialog>
   );
 };
 

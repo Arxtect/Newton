@@ -42,35 +42,36 @@ export async function addAllFilesToGit(dir) {
 }
 
 export async function setupAndPushToRepo(projectRoot, remoteUrl, options) {
-  await git.init({ fs, dir: projectRoot });
-  await git.addRemote({
-    fs,
-    dir: projectRoot,
-    remote: "origin",
-    url: remoteUrl,
-  });
 
-  // 为了简单起见，直接使用文件系统操作来创建一个文件
-  // await writeFile(`${projectRoot}/main.tex`, "\\documentclass{article}\n");
-
-  // 将文件添加到Git跟踪
-  await addAllFilesToGit(projectRoot);
-
-  // 进行首次提交
-  await git.commit({
-    fs,
-    dir: projectRoot,
-    author: {
-      name: options.committerName,
-      email: options.committerEmail,
-    },
-    message: "arxtect initial commit",
-  });
-
-  await createBranch(projectRoot, "main");
-  await checkoutBranch(projectRoot, "main");
 
   try {
+    await git.init({ fs, dir: projectRoot });
+    await git.addRemote({
+      fs,
+      dir: projectRoot,
+      remote: "origin",
+      url: remoteUrl,
+    });
+
+    // 为了简单起见，直接使用文件系统操作来创建一个文件
+    // await writeFile(`${projectRoot}/main.tex`, "\\documentclass{article}\n");
+
+    // 将文件添加到Git跟踪
+    await addAllFilesToGit(projectRoot);
+
+    // 进行首次提交
+    await git.commit({
+      fs,
+      dir: projectRoot,
+      author: {
+        name: options.committerName,
+        email: options.committerEmail,
+      },
+      message: "arxtect initial commit",
+    });
+
+    await createBranch(projectRoot, "main");
+    await checkoutBranch(projectRoot, "main");
     await git.push({
       fs,
       dir: projectRoot,
@@ -80,7 +81,7 @@ export async function setupAndPushToRepo(projectRoot, remoteUrl, options) {
     });
   } catch (e) {
     console.log(e.message);
-    if (e.message.includes("force:true")) {
+    if (e.message.includes("force: true")) {
       throw new Error("Repository is not empty, please try clone.");
     }
   }

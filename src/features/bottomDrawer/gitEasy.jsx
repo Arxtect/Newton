@@ -14,10 +14,11 @@ import {
   getModifiedFilenames,
 } from "domain/git/queries/parseStatusMatrix";
 import { toast } from "react-toastify";
+import ArLoadingButton from "@/components/arLoadingButton";
 
 const GitEasy = () => {
   const [commitMessage, setCommitMessage] = useState("");
-
+  const [loading, setLoading] = useState(false)
   const {
     githubApiToken,
     currentBranch,
@@ -60,12 +61,15 @@ const GitEasy = () => {
   }
 
   const commitAndPush = async (commitMessage) => {
+    setLoading(true)
     commitAll({ message: commitMessage })
       .then(async () => {
         await pushCurrentBranchToOrigin();
+        setLoading(false)
         setCommitMessage("");
       })
       .catch((e) => {
+        setLoading(false)
         toast.error(e.message);
       });
   };
@@ -116,15 +120,16 @@ const GitEasy = () => {
                 onChange={(e) => setCommitMessage(e.target.value)}
                 placeholder="Commit message"
               />
-              <Button
+              <ArLoadingButton
                 variant="contained"
                 size="small"
                 disabled={!hasChanges}
                 onClick={() => commitAndPush(commitMessage)}
                 data-testid="commit-all-button"
+                loading={loading}
               >
                 Commit All
-              </Button>
+              </ArLoadingButton>
               {/* <Button
                 variant="contained"
                 size="small"

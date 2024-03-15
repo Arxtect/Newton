@@ -16,8 +16,11 @@ import { useFileStore } from "store";
 import { uploadZip } from "domain/filesystem";
 import { useNavigate } from "react-router-dom";
 import { getPreViewUrl } from "@/util";
+import ArLoadingButton from '@/components/arLoadingButton';
+
 
 const DocumentDetails = () => {
+  const [loading, setLoading] = useState(false)
   const { repoChanged } = useFileStore((state) => ({
     repoChanged: state.repoChanged,
   }));
@@ -77,7 +80,7 @@ const DocumentDetails = () => {
     const parts = zipFileName.split(/-|\./);
     return parts[parts.length - 2];
   }
-  const downloadZipAndUpload = async (url, dirpath, reload, projectName) => {
+  const downloadZipAndUpload = async (url, dirpath, reload, projectName, setLoading) => {
     console.log(url, "url");
     try {
       const response = await fetch(url);
@@ -89,21 +92,26 @@ const DocumentDetails = () => {
       projectName = extractProjectName(projectName) || "";
       // 调用 uploadZip 函数，传入下载的文件
       await uploadZip(blob, dirpath, reload, projectName);
+      setLoading(false)
       navigate("/arxtect");
     } catch (error) {
+      setLoading(false)
       console.error(`Failed to download or upload ZIP from ${url}:`, error);
     }
   };
 
   const handleOpenProject = async () => {
+    setLoading(true);
     console.log(zipUrl, "zipUrl");
     if (!zipUrl || zipUrl == "") {
       toast.warning("project source not exist yet");
+      setLoading(false);
       return;
     }
     try {
-      downloadZipAndUpload(zipUrl, ".", repoChanged, documentInfo?.storage_zip);
+      downloadZipAndUpload(zipUrl, ".", repoChanged, documentInfo?.storage_zip, setLoading);
     } catch (error) {
+      setLoading(false);
       toast.error(`get project source failed:${error}`);
     }
   };
@@ -116,15 +124,14 @@ const DocumentDetails = () => {
             <h1 className="text-4xl font-bold">Project Detail</h1>
           </div>
           <div className="mb-4 flex gap-2">
-            <Button
+            <ArLoadingButton
               variant="outlined"
-              color="secondary"
-              data-toggle="modal"
-              data-target="#modalViewSource"
               onClick={handleOpenProject}
+              loading={loading}
+              color="secondary"
             >
               Open Project
-            </Button>
+            </ArLoadingButton>
             {/* <Button
               variant="outlined"
               color="secondary"

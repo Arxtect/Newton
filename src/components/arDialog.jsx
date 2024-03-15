@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
+import ArLoadingButton from './arLoadingButton'
 
 const ArDialog = ({
   title,
@@ -54,9 +55,9 @@ const ArDialog = ({
       <DialogContent dividers>{children}</DialogContent>
       <DialogActions>
         {buttonList.map((button, index) => (
-          <Button key={index} onClick={button.click} color="primary">
+          <ArLoadingButton key={index} onClick={button.click} color="primary" loading={button?.loading}>
             {button.title}
-          </Button>
+          </ArLoadingButton>
         ))}
       </DialogActions>
     </Dialog>

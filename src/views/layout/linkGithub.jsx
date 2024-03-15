@@ -21,6 +21,7 @@ import { toast } from "react-toastify";
 import ArTextField from "@/components/arTextField";
 import path from "path";
 import { setupAndPushToRepo } from "domain/git";
+import { removeDirectory } from "domain/filesystem"
 
 const GithubProgressBar = ({ progress, messages }) => {
   return (
@@ -52,6 +53,8 @@ const GithubProgressBar = ({ progress, messages }) => {
 
 const LinkGithub = ({ dialogOpen, setDialogOpen, setIsExistsGit }) => {
   const [projectName, setProjectName] = useState("");
+  const [loading, setLoading] = useState(false)
+
   const [messages, setMessages] = useState("");
   const [progress, setProgress] = useState(0);
   const { currentProjectRoot } = useFileStore((state) => ({
@@ -83,7 +86,9 @@ const LinkGithub = ({ dialogOpen, setDialogOpen, setIsExistsGit }) => {
     setDialogOpen(false);
   };
   const handleSaveProject = () => {
+    setLoading(true);
     if (!projectName) {
+      setLoading(false);
       toast.warning("Please enter remote repository url");
       return;
     }
@@ -98,19 +103,29 @@ const LinkGithub = ({ dialogOpen, setDialogOpen, setIsExistsGit }) => {
         githubApiToken: gitConfig.githubApiToken,
       });
     } else {
+      setLoading(false);
       toast.warning("Please enter git config");
       return;
     }
-    linkRemoteRepo(projectName)
-      .then((res) => {
-        setDialogOpen(false);
-        toast.success("Link repository success from github");
-        setIsExistsGit(true);
-        initializeGitStatus({ projectRoot: currentProjectRoot });
-      })
-      .catch((error) => {
-        toast.warning(error.message);
-      });
+    setupAndPushToRepo(currentProjectRoot, projectName, {
+      singleBranch: false,
+      corsProxy: corsProxy,
+      token: gitConfig.githubApiToken,
+      committerName: gitConfig.committerName,
+      committerEmail: gitConfig.committerEmail,
+      onProgress,
+      onMessage,
+    }).then((res) => {
+      setDialogOpen(false);
+      toast.success("Link repository success from github");
+      setIsExistsGit(true);
+      initializeGitStatus({ projectRoot: currentProjectRoot });
+      setLoading(false);
+    }).catch((error) => {
+      toast.warning(error.message);
+      setLoading(false);
+      removeDirectory(path.join(currentProjectRoot, ".git"))
+    });
   };
 
   const onProgress = (progress) => {
@@ -122,17 +137,6 @@ const LinkGithub = ({ dialogOpen, setDialogOpen, setIsExistsGit }) => {
     setMessages(message);
     console.log(message, "message");
   };
-  const linkRemoteRepo = async (remoteUrl) => {
-    return await setupAndPushToRepo(currentProjectRoot, remoteUrl, {
-      singleBranch: false,
-      corsProxy: corsProxy,
-      token: gitConfig.githubApiToken,
-      committerName: gitConfig.committerName,
-      committerEmail: gitConfig.committerEmail,
-      onProgress,
-      onMessage,
-    });
-  };
 
   return (
     <ArDialog
@@ -141,7 +145,7 @@ const LinkGithub = ({ dialogOpen, setDialogOpen, setIsExistsGit }) => {
       handleCancel={handleCancelProject}
       buttonList={[
         { title: "Cancel", click: handleCancelProject },
-        { title: "Save", click: handleSaveProject },
+        { title: "Save", click: handleSaveProject, loading: loading },
       ]}
       width={"50vw"}
     >
