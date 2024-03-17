@@ -143,6 +143,7 @@ const LinkGithub = ({ dialogOpen, setDialogOpen, setIsExistsGit }) => {
       title="Link Remote Github Repository"
       dialogOpen={dialogOpen}
       handleCancel={handleCancelProject}
+      tooltipText={"Ensure that the remote repository is empty when you link it"}
       buttonList={[
         { title: "Cancel", click: handleCancelProject },
         { title: "Save", click: handleSaveProject, loading: loading },

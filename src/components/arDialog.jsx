@@ -16,6 +16,8 @@ import {
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import ArLoadingButton from './arLoadingButton'
+import Tooltip from '@mui/material/Tooltip';
+import GppMaybeIcon from '@mui/icons-material/GppMaybe';
 
 const ArDialog = ({
   title,
@@ -24,6 +26,7 @@ const ArDialog = ({
   handleCancel,
   buttonList,
   isIconClose = true,
+  tooltipText,
   width = "50vw",
 }) => {
   return (
@@ -37,7 +40,13 @@ const ArDialog = ({
         },
       }}
     >
-      <DialogTitle>{title}</DialogTitle>
+      <DialogTitle>{title}
+        {tooltipText && <Tooltip title={tooltipText}>
+          <IconButton aria-label="warning" >
+            <GppMaybeIcon fontSize="inherit" />
+          </IconButton>
+        </Tooltip>}
+      </DialogTitle>
       {isIconClose && (
         <IconButton
           aria-label="close"
