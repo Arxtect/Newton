@@ -51,7 +51,9 @@ const GithubProgressBar = ({ progress, messages }) => {
 };
 
 const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList }) => {
-  const [projectName, setProjectName] = useState("");
+  const [projectName, setProjectName] = useState(
+    "https://github.com/devixyz/example.git"
+  );
   const [messages, setMessages] = useState("");
   const [progress, setProgress] = useState(0);
   const { copyProject } = useFileStore((state) => ({
@@ -82,9 +84,9 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList }) => {
     setDialogOpen(false);
   };
   const handleSaveProject = () => {
-    setLoading(true)
+    setLoading(true);
     if (!projectName) {
-      setLoading(false)
+      setLoading(false);
       toast.warning("Please enter project name");
       return;
     }
@@ -99,7 +101,7 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList }) => {
         githubApiToken: gitConfig.githubApiToken,
       });
     } else {
-      setLoading(false)
+      setLoading(false);
       toast.warning("Please enter git config");
       return;
     }
@@ -107,12 +109,12 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList }) => {
       .then((res) => {
         console.log(res);
         getProjectList();
-        setLoading(false)
+        setLoading(false);
         setDialogOpen(false);
         toast.success("Import success from github");
       })
       .catch((error) => {
-        setLoading(false)
+        setLoading(false);
         toast.warning(error.message);
       });
   };
@@ -149,7 +151,7 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList }) => {
       onMessage,
     });
   };
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
 
   return (
     <ArDialog
@@ -167,7 +169,7 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList }) => {
           <ArTextField
             label="Github Repository Url"
             placeholder="please input github repository url"
-            defaultValue={""}
+            defaultValue={projectName}
             onChange={(event) => {
               setProjectName(event.target.value);
             }}
