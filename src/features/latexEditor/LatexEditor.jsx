@@ -33,7 +33,7 @@ const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
 const wsUrl = `${wsProtocol}//${host}/websockets`;
 // const wsUrl = "wss://arxtect.com/websockets"
 
-const LatexEditor = ({ handleChange, sourceCode }) => {
+const LatexEditor = ({ handleChange, sourceCode, filepath }) => {
   const latexRef = useRef(null);
   const { yText, undoManager } = useYText({ name: LATEX_NAME, doc });
   const [fragments, setFragments] = useState([]);
@@ -117,6 +117,8 @@ const LatexEditor = ({ handleChange, sourceCode }) => {
         showPrintMargin={false}
         // className="border border-black"
         ref={latexRef}
+        readOnly={filepath == "" ? true : false}
+        className={filepath == "" ? "disabled-editor" : ""}
       ></AceEditor>
       {/* <div className="input overlay">{fragments}</div> */}
       <div id="users"></div>

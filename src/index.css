@@ -58,3 +58,27 @@ body {
   overflow-x: hidden !important;
 }
 
+
+.disabled-editor  {
+  background-color: #f0f0f0;
+  color: #888888;
+  cursor: not-allowed;
+}
+
+.disabled-editor .ace_scroller {
+  cursor: not-allowed;
+}
+
+.disabled-editor .ace_content {
+  cursor: not-allowed;
+}
+
+.disabled-editor .ace_text-layer {
+  cursor: not-allowed;
+}
+
+.disabled-editor .ace_gutter {
+  background-color: #f5f5f5;
+  color: #888888;
+  cursor: not-allowed;
+}

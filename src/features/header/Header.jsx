@@ -145,6 +145,9 @@ export const Header = () => {
               <Link to="/">Home</Link>
             </Button>
             <Button className="text-black font-normal mr-4">
+              <Link to="/project">Newton</Link>
+            </Button>
+            <Button className="text-black font-normal mr-4">
               <Link to="/einstein">Einstein</Link>
             </Button>
             {/* <Button className="text-black font-normal  mr-4"> <Link to="/arxtect">newton demo</Link></Button> */}

@@ -31,7 +31,7 @@ import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-import { useFileStore } from "store";
+import { useFileStore, getInitialState } from "store";
 import ArMenu from "@/components/arMenu";
 import { findAllProjectInfo, downloadDirectoryAsZip } from "domain/filesystem";
 
@@ -54,12 +54,14 @@ function Project() {
     deleteProject,
     changeCurrentProjectRoot,
     getCurrentProjectPdf,
+    initFile,
   } = useFileStore((state) => ({
     allProject: state.allProject,
     currentProjectRoot: state.currentProjectRoot,
     deleteProject: state.deleteProject,
     changeCurrentProjectRoot: state.changeCurrentProjectRoot,
     getCurrentProjectPdf: state.getCurrentProjectPdf,
+    initFile: state.initFile
   }));
   const [tableWidth, setTableWidth] = useState(0);
   const tableContainerRef = useRef(null);
@@ -185,6 +187,7 @@ function Project() {
               projectRoot: params.value,
             });
             navigate(`/arxtect`);
+
           }}
         >
           <span

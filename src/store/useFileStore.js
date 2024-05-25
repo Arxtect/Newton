@@ -10,6 +10,15 @@ import { savePdfToIndexedDB, getPdfFromIndexedDB } from "@/util";
 
 export const FILE_STORE = "file_store";
 
+function debounce(func, wait) {
+  let timeout;
+  return function (...args) {
+    const context = this;
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(context, args), wait);
+  };
+}
+
 export const useFileStore = create()(
   persist(
     (set, get) => ({
@@ -89,6 +98,9 @@ export const useFileStore = create()(
         const initialState = getInitialState();
         set({ ...initialState, changed: false });
       },
+      debouncedUpdateFileContent: debounce((filepath, value) => {
+        get().updateFileContent(filepath, value);
+      }, 1000),
       changeValue: (value) => {
         const state = get();
         if (state.autosave) {
@@ -97,7 +109,8 @@ export const useFileStore = create()(
             lastSavedValue: value,
             changed: false,
           });
-          get().updateFileContent(state.filepath, value);
+          get().debouncedUpdateFileContent(state.filepath, value)
+
         } else {
           set({
             value,
@@ -184,7 +197,7 @@ export const useFileStore = create()(
         get().loadFile({ filepath }); // 假设 loadFile 已适配 Zustand
         get().startUpdate({ changedPath: filepath });
       },
-      changeFolderPath: ({}) => {},
+      changeFolderPath: ({ }) => { },
 
       createDirectory: async ({ dirname }) => {
         await FS.mkdir(dirname);
@@ -216,6 +229,7 @@ export const useFileStore = create()(
         set({ preRenamingDirpath: dirpath });
       },
       changeCurrentProjectRoot: ({ projectRoot }) => {
+        get().initFile()
         set({ currentProjectRoot: projectRoot, currentSelectDir: projectRoot });
         initializeGitStatus({ projectRoot });
       },
@@ -242,6 +256,10 @@ export const useFileStore = create()(
       updateAllProject: (allProject) => {
         set({ allProject });
       },
+      initFile: () => {
+        const initState = getInitialState()
+        set(initState)
+      }
     }),
     {
       name: FILE_STORE,

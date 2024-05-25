@@ -15,8 +15,9 @@ const NewProject = ({ dialogOpen, setDialogOpen }) => {
   let navigate = useNavigate();
 
   const [projectName, setProjectName] = useState("");
-  const { createProject } = useFileStore((state) => ({
+  const { createProject, initFile } = useFileStore((state) => ({
     createProject: state.createProject,
+    initFile: state.initFile
   }));
 
   const handleCancelProject = () => {

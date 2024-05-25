@@ -65,7 +65,7 @@ const uploadZip = async (file, dirpath, reload, projectName, onProgress) => {
 
     reload();
     console.log(firstFolderName, zipEntries, "zipEntries");
-    updateProgress("uploadSuccess");
+    onProgress && updateProgress("uploadSuccess");
     if ((dirpath === "." || projectName) && firstFolderName) {
       console.log(firstFolderName, "firstFolderName");
       changeCurrentProjectRoot({ projectRoot: firstFolderName });
