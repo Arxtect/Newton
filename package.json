@@ -2,6 +2,7 @@
   "name": "latextableviewer",
   "version": "0.1.0",
   "private": true,
+  "homepage": "/project/",
   "dependencies": {
     "@atlaskit/button": "^17.2.0",
     "@atlaskit/menu": "^2.1.4",
