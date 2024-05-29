@@ -29,7 +29,7 @@ const NavLinksLg = () => {
         </a>
         <a
           className="px-4 flex justify-center text-[1.2rem] font-[600] text-gray-900 hover:text-blue-900"
-          href="/project/einstein"
+          href="/project/#einstein"
         >
           Publishing
         </a>
@@ -92,7 +92,7 @@ const NavLinksSm = () => {
       </a>
       <a
         className="px-4 flex justify-center text-[1.2rem] font-[600] text-gray-900 hover:text-blue-900"
-        href="/project/einstein"
+        href="/project/#einstein"
       >
         Publishing
       </a>
