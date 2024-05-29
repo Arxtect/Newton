@@ -1,181 +1,56 @@
-/*
- * @Description:
- * @Author: Devin
- * @Date: 2023-06-26 09:57:49
- */
-import { Link, NavLink } from "react-router-dom";
-import { useEffect, useState } from "react";
-import {
-  Button,
-  AppBar,
-  Box,
-  Toolbar,
-  Typography,
-  IconButton,
-} from "@mui/material";
-import { Menu as MenuIcon } from "@mui/icons-material";
-import logo from "@/assets/logo.png";
-import { getMe } from "services";
-import { getCookie } from "@/util";
-import { useUserStore } from "store";
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import { logoutUser } from "@/services"
-import { toast } from "react-toastify"
-import ArMenu from "@/components/arMenu";
+import React, { useState, useEffect } from 'react';
+import { NavLinksSm, NavLinksLg } from './NavLinks';
+import { HashLink } from 'react-router-hash-link';
+import logo from "@/assets/website/logo.png";
 
-const UserMenu = ({ accessToken, username, onLogout }) => {
-  const [anchorEl, setAnchorEl] = useState(null);
-  const open = Boolean(anchorEl);
-
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const handleLogout = () => {
-    onLogout();
-    handleClose();
-  };
-
-  return (
-    <div>
-      {accessToken && username ? (
-        <>
-          <ArMenu
-            buttonCom={
-              <Button
-                className="text-black font-normal"
-                aria-controls="user-menu"
-                aria-haspopup="true"
-                aria-expanded={open ? 'true' : undefined}
-              >
-                {username}
-              </Button>
-            }
-            menuList={[
-              {
-                label: "Logout",
-                onClick: () => { handleLogout() },
-              },
-            ]}
-
-          >
-          </ArMenu>
-          {/* <Button
-            className="text-black font-normal"
-            aria-controls="user-menu"
-            aria-haspopup="true"
-            aria-expanded={open ? 'true' : undefined}
-            onClick={handleClick}
-          >
-            {username}
-          </Button> */}
-        </>
-      ) : (
-        <Button component={Link} to="/login" className="text-black font-normal">
-          Login
-        </Button>
-      )}
-    </div>
-  );
-};
 
 export const Header = () => {
-  const [username, setUsername] = useState("");
-  const { accessToken, updateAccessToken } = useUserStore((state) => ({
-    accessToken: state.accessToken,
-  }));
+    const [top, setTop] = useState(!window.scrollY);
+    const [isOpen, setisOpen] = React.useState(false);
+    function handleClick() {
+        setisOpen(!isOpen);
+    }
 
-  useEffect(() => {
-    getMe()
-      .then((res) => {
-        if (res?.data) {
-          setUsername(res.data.user.name);
-        } else {
-          setUsername("");
-        }
-      })
-      .catch((error) => {
-        setUsername("");
-      });
-  }, [accessToken]);
 
-  const onLogout = () => {
-    logoutUser().then((res) => {
-      setUsername("");
-    }).catch((error) => {
-      toast.error("Error logging out");
-    })
+    useEffect(() => {
+        const scrollHandler = () => {
+            window.pageYOffset > 10 ? setTop(false) : setTop(true)
+        };
+        window.addEventListener('scroll', scrollHandler);
+        return () => window.removeEventListener('scroll', scrollHandler);
+    }, [top]);
 
-  }
+    return (
+        <nav className={`top-0 w-full z-30 transition duration-300 ease-in-out  bg-arxOdd ${!top && 'bg-white shadow-lg'}`}>
+            <div className="flex flex-row justify-between items-center py-3">
+                <div className="flex flex-row justify-center md:px-12 md:mx-12 items-center text-center font-semibold">
+                    <HashLink smooth to="/#home"> <img src={logo} alt="" /></HashLink>
 
-  return (
-    <header className="flex justify-between items-center">
-      <Box sx={{ flexGrow: 1 }}>
-        <AppBar
-          position="static"
-          sx={{
-            backgroundColor: "var(--second) ",
-          }}
-        >
-          <Toolbar>
-            {/* <IconButton
-              size="large"
-              edge="start"
-              color="primary"
-              aria-label="menu"
-              sx={{ mr: 2 }}
-            >
-              <MenuIcon />
-            </IconButton> */}
-            <Typography
-              variant="h6"
-              component="div"
-              className="flex items-center"
-              sx={{ flexGrow: 1 }}
-            >
-              <img src={logo} alt="logo" className="h-12" />
-              {/* <div className="text-black font-medium">arXtect</div> */}
-            </Typography>
-            <Button className="text-black font-normal mr-4">
-              <Link to="/">Home</Link>
-            </Button>
-            <Button className="text-black font-normal mr-4">
-              <Link to="/project">Newton</Link>
-            </Button>
-            <Button className="text-black font-normal mr-4">
-              <Link to="/einstein">Einstein</Link>
-            </Button>
-            {/* <Button className="text-black font-normal  mr-4"> <Link to="/arxtect">newton demo</Link></Button> */}
-            {/* <Button className="text-black font-normal">
-              {accessToken && username ? (
-                username
-              ) : (
-                <Link to="/login">Login</Link>
-              )}
-            </Button> */}
-            <UserMenu accessToken={accessToken} username={username} onLogout={onLogout}>
+                </div>
+                <div className="group flex flex-col items-center">
+                    <button className="p-2 rounded-lg lg:hidden text-blue-900" onClick={handleClick}>
+                        <svg className="h-6 w-6 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            {isOpen && (
+                                <path fillRule="evenodd" clipRule="evenodd" d="M18.278 16.864a1 1 0 0 1-1.414 1.414l-4.829-4.828-4.828 4.828a1 1 0 0 1-1.414-1.414l4.828-4.829-4.828-4.828a1 1 0 0 1 1.414-1.414l4.829 4.828 4.828-4.828a1 1 0 1 1 1.414 1.414l-4.828 4.829 4.828 4.828z" />
+                            )}
+                            {!isOpen && (
+                                <path fillRule="evenodd" d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z" />
+                            )}
+                        </svg>
+                    </button>
+                    <div className='hidden space-x-6 lg:inline-block p-2'>
+                        <NavLinksLg />
+                    </div>
 
-            </UserMenu>
-          </Toolbar>
-        </AppBar>
-      </Box>
-      {/* <h1 className="inline-block font-bold text-4xl">
-        <Link to="/">LaTeX Table Viewer</Link>
-      </h1>
-      <nav>
-        <ul className="list-none inline-flex justify-around items-center gap-12 text-xl text-center">
-          <li>
-            <NavLink to="/">
-              <Button variant="contained">App</Button>
-            </NavLink>
-          </li>
-        </ul>
-      </nav> */}
-    </header>
-  );
-};
+                    <div className={`fixed transition-transform duration-300 ease-in-out transit flex justify-center left-0 w-full h-auto rounded-md p-4 bg-white lg:hidden shadow-xl top-14 z-999 ${isOpen ? "block" : "hidden"} `}>
+                        <div className='flex flex-col space-y-6'>
+                            <NavLinksSm />
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </nav>
+    )
+
+}

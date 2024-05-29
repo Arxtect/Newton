@@ -28,7 +28,7 @@ const routerConfig = [
     exact: true,
   },
   { path: "/git-test", name: "git-test", component: "git-test", exact: true },
-  { path: "/", redirect: "/home", exact: true },
+  { path: "/", redirect: "/project", exact: true },
 ];
 
 const noHeaderRoutes = [
