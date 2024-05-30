@@ -15,12 +15,8 @@ import {
 } from "@mui/material";
 import { Menu as MenuIcon } from "@mui/icons-material";
 import logo from "@/assets/logo.png";
-import { getMe } from "services";
-import { getCookie } from "@/util";
+import { getMe, logoutUser } from "services";
 import { useUserStore } from "store";
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import { logoutUser } from "@/services"
 import { toast } from "react-toastify"
 import ArMenu from "@/components/arMenu";
 

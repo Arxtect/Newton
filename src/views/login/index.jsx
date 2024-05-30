@@ -68,6 +68,8 @@ const LoginPage = ({ isDialog = false, handleClose }) => {
   // 从 location state 中获取重定向前的路径，如果没有则默认为首页 "/"
   const from = location.state?.from?.pathname || "/";
 
+  console.log(from, location, "from");
+
   const onSubmitHandler = async (values) => {
     setIsSubmitting(true);
     setLoginError(null);

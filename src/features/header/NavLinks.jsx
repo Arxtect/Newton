@@ -1,6 +1,7 @@
 import React from "react";
 import { HashLink } from "react-router-hash-link";
 import { Link } from "react-router-dom";
+import UserMenu from "./UserMenu";
 
 const NavLinksLg = () => {
   return (
@@ -46,22 +47,7 @@ const NavLinksLg = () => {
           Join us
         </a>
       </div>
-      <div className="flex item-center space-x-4 ml-20 ">
-        <HashLink
-          className="text-gray-900 hover:bg-white-hover inline-flex items-center justify-center px-8 py-2 text-lg font-bold shadow-xl rounded-[0.4rem] border border-gray-900"
-          smooth
-          to="/login"
-        >
-          Login
-        </HashLink>
-        <HashLink
-          className="text-white bg-arxTheme hover:bg-arx-theme-hover inline-flex items-center justify-center px-8 py-2 text-lg font-bold shadow-xl rounded-[0.4rem]"
-          smooth
-          to="/register"
-        >
-          Sign up
-        </HashLink>
-      </div>
+      <UserMenu></UserMenu>
     </div>
   );
 };
@@ -108,20 +94,7 @@ const NavLinksSm = () => {
       >
         Join us
       </a>
-      <HashLink
-        className="text-gray-900 hover:bg-white-hover inline-flex items-center justify-center px-8 py-2 text-lg font-bold shadow-xl rounded-[0.4rem] border border-gray-900"
-        smooth
-        to="/login"
-      >
-        Login
-      </HashLink>
-      <HashLink
-        className="text-white bg-arxTheme hover:bg-arx-theme-hover inline-flex items-center justify-center px-8 py-2 text-lg font-bold shadow-xl rounded-[0.4rem]"
-        smooth
-        to="/register"
-      >
-        Sign up
-      </HashLink>
+      <UserMenu></UserMenu>
     </>
   );
 };
