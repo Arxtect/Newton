@@ -6,7 +6,6 @@
 
 import { Link, NavLink } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { Button } from "@mui/material";
 import ArMenu from "@/components/arMenu";
 import { getMe, logoutUser } from "services";
 import { useUserStore } from "store";
@@ -95,7 +94,7 @@ const UserMenu = () => {
               Login
             </HashLink>
             <HashLink
-              className="text-white bg-arxTheme hover:bg-arx-theme-hover inline-flex items-center justify-center px-8 py-2 text-lg font-bold shadow-xl rounded-[0.4rem]"
+              className="text-white bg-arxTheme hover:bg-arx-theme-hover inline-flex items-center justify-center px-8 py-2 text-lg font-bold shadow-xl rounded-[0.4rem] whitespace-nowrap overflow-hidden text-ellipsis"
               smooth
               to="/register"
             >
@@ -111,7 +110,7 @@ const UserMenu = () => {
               Login
             </HashLink>
             <HashLink
-              className="block  text-white bg-arxTheme hover:bg-arx-theme-hover  items-center justify-center px-8 py-2 text-lg font-bold shadow-xl rounded-[0.4rem]"
+              className="block  text-white bg-arxTheme hover:bg-arx-theme-hover  items-center justify-center px-8 py-2 text-lg font-bold shadow-xl rounded-[0.4rem] whitespace-nowrap"
               smooth
               to="/register"
             >

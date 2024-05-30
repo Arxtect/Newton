@@ -8,14 +8,14 @@ const NavLinksLg = () => {
     <div className="flex justify-between items-center mr-10 ">
       <div className="flex items-center space-x-7">
         <a
-          className="px-4 flex justify-center text-[1.2rem] font-[600] text-dark hover:text-blue-900"
+          className="px-4 flex justify-center text-[1.2rem] font-[600] text-dark hover:text-blue-900 "
           smooth
           href="/"
         >
           Home
         </a>
         <a
-          className="px-4 flex justify-center text-[1.2rem] font-[600] text-gray-900 hover:text-blue-900"
+          className="px-4 flex justify-center text-[1.2rem] font-[600] text-gray-900 hover:text-blue-900 "
           smooth
           href="/#about"
         >
@@ -41,7 +41,7 @@ const NavLinksLg = () => {
           Social
         </a>
         <a
-          className="px-4 flex justify-center text-[1.2rem] font-[600] text-gray-900 hover:text-blue-900"
+          className="px-4 flex justify-center text-[1.2rem] font-[600] text-gray-900 hover:text-blue-900 whitespace-nowrap overflow-hidden text-ellipsis"
           href="/contact/#contact"
         >
           Join us
