@@ -6,14 +6,14 @@
 
 import { Link, NavLink } from "react-router-dom";
 import { useEffect, useState } from "react";
-import ArMenu from "@/components/arMenu";
+import ArMenuRadix from "@/components/arMenuRadix";
 import { getMe, logoutUser } from "services";
 import { useUserStore } from "store";
 import { toast } from "react-toastify";
 import { HashLink } from "react-router-hash-link";
 
 const UserMenu = () => {
-  const [username, setUsername] = useState("");
+  const [userInfo, setUserInfo] = useState({});
   const { accessToken, updateAccessToken } = useUserStore((state) => ({
     accessToken: state.accessToken,
   }));
@@ -22,20 +22,20 @@ const UserMenu = () => {
     getMe()
       .then((res) => {
         if (res?.data) {
-          setUsername(res.data.user.name);
+          setUserInfo(res.data.user);
         } else {
-          setUsername("");
+          setUserInfo({});
         }
       })
       .catch((error) => {
-        setUsername("");
+        setUserInfo({});
       });
   }, [accessToken]);
 
   const onLogout = () => {
     logoutUser()
       .then((res) => {
-        setUsername("");
+        setUserInfo("");
       })
       .catch((error) => {
         toast.error("Error logging out");
@@ -60,41 +60,45 @@ const UserMenu = () => {
 
   return (
     <div>
-      {accessToken && username ? (
+      {accessToken && userInfo?.email ? (
         <>
-          <ArMenu
-            buttonCom={
-              <a
-                className="lg:ml-8 px-4 flex justify-center text-[1.1rem] text-gray-900 font-[600] cursor-pointer  hover:text-blue-900"
-                aria-controls="user-menu"
-                aria-haspopup="true"
-                aria-expanded={open ? "true" : undefined}
-              >
-                {username}
-              </a>
-            }
-            menuList={[
-              {
-                label: "Logout",
-                onClick: () => {
-                  handleLogout();
+          <div className="lg:ml-8 px-4">
+            <ArMenuRadix
+              buttonClassName={
+                "bg-arxTheme hover:bg-arx-theme-hover text-[1.1rem] text-white font-bold py-2 shadow-xl rounded-[0.4rem] border border-arxTheme"
+              }
+              title={"Account"}
+              items={[
+                {
+                  label: userInfo?.email,
+                  onSelect: () => console.log("Email Selected"),
+                  separator: true,
                 },
-              },
-            ]}
-          ></ArMenu>
+                {
+                  label: "Account Settings",
+                  onSelect: () => console.log("Account Settings Selected"),
+                  separator: true,
+                },
+                {
+                  label: "Log Out",
+                  onSelect: () => handleLogout(),
+                },
+              ]}
+            ></ArMenuRadix>
+          </div>
         </>
       ) : (
         <>
           <div className="hidden lg:block lg:flex item-center space-x-4 ml-20">
             <HashLink
-              className="text-gray-900 hover:bg-white-hover inline-flex items-center justify-center px-8 py-2 text-lg font-bold shadow-xl rounded-[0.4rem] border border-gray-900"
+              className="text-gray-900 hover:bg-white-hover inline-flex items-center justify-center px-8 py-2 text-[1.1rem] font-bold shadow-xl rounded-[0.4rem] border border-gray-900"
               smooth
               to="/login"
             >
               Login
             </HashLink>
             <HashLink
-              className="text-white bg-arxTheme hover:bg-arx-theme-hover inline-flex items-center justify-center px-8 py-2 text-lg font-bold shadow-xl rounded-[0.4rem] whitespace-nowrap overflow-hidden text-ellipsis"
+              className="text-white bg-arxTheme hover:bg-arx-theme-hover inline-flex items-center justify-center px-8 py-2 text-[1.1rem] font-bold shadow-xl rounded-[0.4rem] whitespace-nowrap overflow-hidden text-ellipsis"
               smooth
               to="/register"
             >
@@ -103,14 +107,14 @@ const UserMenu = () => {
           </div>
           <div className="sm:block md:block lg:hidden space-y-6 ">
             <HashLink
-              className="block text-gray-900 hover:bg-white-hover  items-center justify-center px-8 py-2 text-lg font-bold shadow-xl rounded-[0.4rem] border border-gray-900"
+              className="block text-gray-900 hover:bg-white-hover  items-center justify-center px-8 py-2 text-[1.1rem] font-bold shadow-xl rounded-[0.4rem] border border-gray-900 text-center"
               smooth
               to="/login"
             >
               Login
             </HashLink>
             <HashLink
-              className="block  text-white bg-arxTheme hover:bg-arx-theme-hover  items-center justify-center px-8 py-2 text-lg font-bold shadow-xl rounded-[0.4rem] whitespace-nowrap"
+              className="block  text-white bg-arxTheme hover:bg-arx-theme-hover  items-center justify-center px-8 py-2 text-[1.1rem] font-bold shadow-xl rounded-[0.4rem] whitespace-nowrap"
               smooth
               to="/register"
             >
