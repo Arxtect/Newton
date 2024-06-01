@@ -1,8 +1,3 @@
-/*
- * @Description:
- * @Author: Devin
- * @Date: 2024-03-06 22:48:25
- */
 import JSZip from "jszip";
 import fs from "fs";
 import path from "path";
@@ -15,10 +10,11 @@ const writeFile = pify(fs.writeFile);
 
 // 处理 ZIP 文件上传
 const uploadZip = async (file, dirpath, reload, projectName, onProgress) => {
+  console.log(file, 'file');
   try {
     let firstFolderName;
     const zip = await JSZip.loadAsync(file); // 使用 JSZip 加载 ZIP 文件
-    const zipEntries = Object.keys(zip.files);
+    const zipEntries = Object.keys(zip.files).filter(entryName => !entryName.includes('.git')); // 过滤掉 .git 条目
     let loadedEntries = 0; // 已解压的条目数
 
     // 更新进度的函数
@@ -28,7 +24,7 @@ const uploadZip = async (file, dirpath, reload, projectName, onProgress) => {
       }
       loadedEntries++;
       const progress = loadedEntries / zipEntries.length;
-      onProgress && onProgress(progress > 1 ? 1 : progress, entryName);
+      onProgress(progress > 1 ? 1 : progress, entryName);
     };
 
     if (dirpath === "." && projectName) {
@@ -60,8 +56,10 @@ const uploadZip = async (file, dirpath, reload, projectName, onProgress) => {
       }
 
       // 更新进度
-      updateProgress(zipEntryName);
+      onProgress && updateProgress(zipEntryName);
     }
+
+    console.log('123');
 
     reload();
     console.log(firstFolderName, zipEntries, "zipEntries");

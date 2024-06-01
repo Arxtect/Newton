@@ -58,6 +58,10 @@ function addFilesToZip(dir, zipFolder, parentDir = "", rootpath = "", isMulti = 
   });
 
   dir.directories.forEach((subDir) => {
+    if (path.basename(subDir.path) === ".git") {
+      return; // 过滤掉 .git 文件夹
+    }
+
     // 计算子目录相对于 rootpath 的相对路径
     const relativeDirPath = path.relative(rootpath, subDir.path);
     // 计算子目录相对于 parentDir 的相对路径

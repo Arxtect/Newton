@@ -20,9 +20,8 @@ export const Header = () => {
 
   return (
     <nav
-      className={`top-0 w-full z-30 transition duration-300 ease-in-out  bg-arxOdd ${
-        !top && "bg-white shadow-lg"
-      }`}
+      className={`top-0 w-full z-30 transition duration-300 ease-in-out  bg-white ${!top && "bg-white shadow-lg"
+        }`}
     >
       <div className="flex flex-row justify-between items-center py-3">
         <div className="flex flex-row justify-center md:px-12 md:mx-12 items-center text-center font-semibold">
@@ -60,9 +59,8 @@ export const Header = () => {
           </div>
 
           <div
-            className={`fixed transition-transform duration-300 ease-in-out transit flex justify-center left-0 w-full h-auto rounded-md p-4 bg-white lg:hidden shadow-xl top-14 z-999 pb-8 ${
-              isOpen ? "block" : "hidden"
-            } `}
+            className={`fixed transition-transform duration-300 ease-in-out transit flex justify-center left-0 w-full h-auto rounded-md p-4 bg-white lg:hidden shadow-xl top-14 z-999 pb-8 ${isOpen ? "block" : "hidden"
+              } `}
           >
             <div className="flex flex-col space-y-6">
               <NavLinksSm />
