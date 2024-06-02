@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { NavLinksSm, NavLinksLg } from "./NavLinks";
 import { HashLink } from "react-router-hash-link";
-import logo from "@/assets/website/logo.png";
+import logo from "@/assets/website/logo.svg";
 
 export const Header = () => {
   const [top, setTop] = useState(!window.scrollY);
