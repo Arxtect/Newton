@@ -1,35 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { Box, Container, Typography } from "@mui/material";
-import { styled } from "@mui/material/styles";
-import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
-import { object, string, TypeOf } from "zod";
+import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { object, string } from "zod";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import * as layoutStyles from "@/styles";
-import FormInput from "@/components/FormInput";
-import { LoadingButton as _LoadingButton } from "@mui/lab";
-
 import { registerUser } from "services";
-
-const LoadingButton = styled(_LoadingButton)`
-  padding: 0.6rem 0;
-  background-color: var(--primary);
-  font-weight: 500;
-
-  &:hover {
-    background-color: var(--primary);
-    transform: translateY(-2px);
-  }
-`;
-
-const LinkItem = styled(Link)`
-  text-decoration: none;
-  color: var(--primary);
-  &:hover {
-    text-decoration: underline;
-  }
-`;
+import ArButton from "@/components/arButton";
+import ArInput from "@/components/arInput";
+import emailSvg from "@/assets/website/email.svg";
+import passwordSvg from "@/assets/website/password.svg";
+import usernameSvg from "@/assets/website/username.svg";
 
 const registerSchema = object({
   name: string().min(1, "Full username required").max(100),
@@ -52,11 +32,11 @@ const RegisterPage = () => {
   });
 
   const navigate = useNavigate();
-
   const {
     reset,
+    register,
     handleSubmit,
-    formState: { isSubmitSuccessful },
+    formState: { isSubmitSuccessful, errors },
   } = methods;
 
   const [isLoading, setIsLoading] = useState(false);
@@ -88,56 +68,76 @@ const RegisterPage = () => {
   };
 
   return (
-    <Container maxWidth={false} sx={layoutStyles.container}>
-      <Box sx={layoutStyles.box}>
-        <Typography
-          textAlign="center"
-          component="h1"
-          sx={layoutStyles.TypographySm}
-        >
+    <div className="flex items-center justify-center h-full overflow-auto bg-[#ffffff]">
+      <div
+        className="flex flex-col items-center justify-center bg-white p-8 rounded shadow-md"
+        style={{ maxWidth: "33rem", width: "100%" }}
+      >
+        <h1 className="text-4xl font-bold text-center mb-6 pt-2 text-arxTheme lg:text-5xl">
           Welcome to arXtect!
-        </Typography>
-        <Typography component="h2" sx={{ mb: 2 }}>
-          Sign up for your account!
-        </Typography>
+        </h1>
+        <h2 className="text-md mb-6">Sign up for your account!</h2>
 
         <FormProvider {...methods}>
-          <Box
-            component="form"
-            onSubmit={handleSubmit(onSubmitHandler)}
+          <form
             noValidate
             autoComplete="off"
-            maxWidth="27rem"
-            width="100%"
-            sx={layoutStyles.formBox}
+            className="w-full"
+            onSubmit={handleSubmit(onSubmitHandler)}
           >
-            <FormInput name="name" label={"username"} type="input" />
-            <FormInput name="email" label="email" type="email" />
-            <FormInput name="password" label="password" type="password" />
-            <FormInput
-              name="password_confirm"
-              label={"confirm password"}
-              type="password"
+            <ArInput
+              label="Username"
+              type="input"
+              name="name"
+              placeholder="Email"
+              register={register}
+              errors={errors}
+              icon={usernameSvg}
             />
-            <Typography sx={{ fontSize: "0.9rem", mb: "1rem" }}>
+            <ArInput
+              label="Email"
+              type="email"
+              name="email"
+              placeholder="Email"
+              register={register}
+              errors={errors}
+              icon={emailSvg}
+            />
+            <ArInput
+              label="Password"
+              type="password"
+              name="password"
+              placeholder="Password"
+              register={register}
+              errors={errors}
+              icon={passwordSvg}
+            />
+            <ArInput
+              label="Confirm Password"
+              type="password"
+              name="password_confirm"
+              placeholder="Confirm Password"
+              register={register}
+              errors={errors}
+              icon={passwordSvg}
+            />
+            <div className="my-4">
               Have an account already?
-              <LinkItem to="/login">Login Here</LinkItem>
-            </Typography>
-
-            <LoadingButton
-              variant="contained"
-              sx={{ mt: 1 }}
-              fullWidth
-              disableElevation
-              type="submit"
+              <Link to="/login" className="text-arxTheme hover:underline">
+                Login Here
+              </Link>
+            </div>
+            <ArButton
               loading={isLoading}
+              className="w-full bg-arxTheme text-white py-2 rounded hover:bg-primary-dark"
+              type="submit"
             >
-              {"register"}
-            </LoadingButton>
-          </Box>
+              Register
+            </ArButton>
+          </form>
         </FormProvider>
-      </Box>
-    </Container>
+      </div>
+    </div>
   );
 };
 

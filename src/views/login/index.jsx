@@ -1,8 +1,3 @@
-/*
- * @Description:
- * @Author: Devin
- * @Date: 2024-02-02 15:48:22
- */
 import {
   loginUser,
   registerUser,
@@ -20,7 +15,10 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { updateAccessToken } from "store";
 import { useUserStore } from "store";
-import * as layoutStyles from "@/styles";
+import emailSvg from "@/assets/website/email.svg";
+import passwordSvg from "@/assets/website/password.svg";
+import ArButton from "@/components/arButton";
+import ArInput from "@/components/arInput";
 
 const loginSchema = object({
   email: string()
@@ -35,7 +33,6 @@ const LoginPage = ({ isDialog = false, handleClose }) => {
   const methods = useForm({
     resolver: zodResolver(loginSchema),
   });
-
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loginError, setLoginError] = useState();
 
@@ -65,6 +62,12 @@ const LoginPage = ({ isDialog = false, handleClose }) => {
     }
   };
 
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = methods;
+
   return (
     <div className="flex items-center justify-center h-full overflow-auto bg-[#ffffff]">
       <div
@@ -78,33 +81,30 @@ const LoginPage = ({ isDialog = false, handleClose }) => {
 
         <FormProvider {...methods}>
           <form
-            onSubmit={methods.handleSubmit(onSubmitHandler)}
             noValidate
             autoComplete="off"
             className="w-full"
+            onSubmit={handleSubmit(onSubmitHandler)}
           >
-            <div className="mb-4">
-              <label className="block text-arxTextGray text-sm font-bold mb-1 font-sans">
-                Email
-              </label>
-              <input
-                type="email"
-                name="email"
-                placeholder="Email"
-                className="input-field w-full px-3 py-2 bg-transparent border-b-2 border-gray-300 transition-colors duration-300 focus:outline-none focus:border-green-500"
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-arxTextGray text-sm font-bold mb-1 font-sans">
-                Password
-              </label>
-              <input
-                type="password"
-                name="password"
-                placeholder="Password"
-                className="input-field w-full px-3 py-2 bg-transparent border-b-2 border-gray-300 transition-colors duration-300 focus:outline-none focus:border-green-500"
-              />
-            </div>
+            <ArInput
+              label="Email"
+              type="email"
+              name="email"
+              placeholder="Email"
+              register={register}
+              errors={errors}
+              icon={emailSvg}
+            />
+            <ArInput
+              label="Password"
+              type="password"
+              name="password"
+              placeholder="Password"
+              register={register}
+              errors={errors}
+              icon={passwordSvg}
+            />
+
             <div className="flex justify-end mb-4">
               {!isDialog ? (
                 <Link
@@ -124,13 +124,20 @@ const LoginPage = ({ isDialog = false, handleClose }) => {
                 </a>
               )}
             </div>
-            <button
+            {/* <button
               type="submit"
               className="w-full bg-arxTheme text-white py-2 rounded hover:bg-primary-dark"
               disabled={isSubmitting}
             >
               Log In
-            </button>
+            </button> */}
+            <ArButton
+              loading={isSubmitting}
+              className="w-full bg-arxTheme text-white py-2 rounded hover:bg-primary-dark"
+              type="submit"
+            >
+              Log In
+            </ArButton>
             <div className="mt-4">
               Need an account?{" "}
               {!isDialog ? (

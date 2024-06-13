@@ -1,26 +1,13 @@
-import { Box, Container, Typography } from "@mui/material";
-import { styled } from "@mui/material/styles";
+import React, { useEffect, useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
-import { object, string } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import FormInput from "@/components/FormInput";
-import { useEffect } from "react";
+import { object, string } from "zod";
 import { Link } from "react-router-dom";
-import { LoadingButton as _LoadingButton } from "@mui/lab";
 import { toast } from "react-toastify";
-import * as layoutStyles from "@/styles";
-import { forgotPassword } from "services"; // Import the service
-
-const LoadingButton = styled(_LoadingButton)`
-  padding: 0.6rem 0;
-  background-color: var(--primary);
-  font-weight: 500;
-
-  &:hover {
-    background-color: var(--primary);
-    transform: translateY(-2px);
-  }
-`;
+import { forgotPassword } from "services";
+import ArButton from "@/components/arButton";
+import ArInput from "@/components/arInput";
+import emailSvg from "@/assets/website/email.svg";
 
 const forgotPasswordSchema = object({
   email: string()
@@ -32,11 +19,13 @@ const ForgotPasswordPage = () => {
   const methods = useForm({
     resolver: zodResolver(forgotPasswordSchema),
   });
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     reset,
+    register,
     handleSubmit,
-    formState: { isSubmitSuccessful },
+    formState: { isSubmitSuccessful, errors },
   } = methods;
 
   useEffect(() => {
@@ -46,76 +35,66 @@ const ForgotPasswordPage = () => {
   }, [isSubmitSuccessful, reset]);
 
   const onSubmitHandler = (data) => {
+    setIsLoading(true);
     const { email } = data;
     forgotPassword(email)
       .then((response) => {
         toast.success(response.message);
+        setIsLoading(false);
       })
       .catch((error) => {
-        // Handle error
-        toast.error(error || "An error occurred");
+        setIsLoading(false);
+        const errorMessage =
+          error.response?.data?.message || "An error occurred";
+        toast.error(errorMessage);
       });
   };
 
   return (
-    <Container maxWidth={false} sx={layoutStyles.container}>
-      <Box sx={layoutStyles.box}>
-        <Typography
-          textAlign="center"
-          component="h1"
-          sx={layoutStyles.TypographySm}
-        >
+    <div className="flex items-center justify-center h-full overflow-auto bg-[#ffffff]">
+      <div
+        className="flex flex-col items-center justify-center bg-white p-8 rounded shadow-md"
+        style={{ maxWidth: "33rem", width: "100%" }}
+      >
+        <h1 className="text-4xl font-bold text-center mb-6 pt-2 text-arxTheme lg:text-5xl">
           Forget Password
-        </Typography>
-        <Typography
-          sx={{
-            fontSize: 15,
-            width: "100%",
-            textAlign: "center",
-            mb: "1rem",
-            color: "var(--primary)",
-          }}
-        >
+        </h1>
+        <h2 className="text-md mb-6">
           Enter your email address and we will send you a verification email
-        </Typography>
+        </h2>
 
         <FormProvider {...methods}>
-          <Box
-            component="form"
-            onSubmit={handleSubmit(onSubmitHandler)}
+          <form
             noValidate
             autoComplete="off"
-            maxWidth="27rem"
-            width="100%"
-            sx={layoutStyles.formBox}
+            className="w-full"
+            onSubmit={handleSubmit(onSubmitHandler)}
           >
-            <FormInput
-              name="email"
-              label="email"
+            <ArInput
+              label="Email"
               type="email"
-              style={{ color: "var(--primary)" }}
+              name="email"
+              placeholder="Email"
+              register={register}
+              errors={errors}
+              icon={emailSvg}
             />
-            <LoadingButton
-              variant="contained"
-              sx={{ mt: 1 }}
-              fullWidth
-              disableElevation
+            <ArButton
+              loading={isLoading}
+              className="w-full bg-arxTheme text-white py-2 rounded hover:bg-primary-dark"
               type="submit"
             >
-              Get the password reset link
-            </LoadingButton>
-
-            <Typography
-              sx={{ fontSize: "0.9rem", mt: "1rem", textAlign: "center" }}
-            >
-              <Link to="/login" style={{ color: "var(--primary)" }}>
-                Back Login
+              Get The Password Reset Link
+            </ArButton>
+            <div className="my-4 text-center">
+              <Link to="/login" className="text-arxTheme hover:underline">
+                Back to Login
               </Link>
-            </Typography>
-          </Box>
+            </div>
+          </form>
         </FormProvider>
-      </Box>
-    </Container>
+      </div>
+    </div>
   );
 };
 

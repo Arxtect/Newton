@@ -1,27 +1,18 @@
-import { Box, Container, Typography } from "@mui/material";
-import { styled } from "@mui/material/styles";
-import { FormProvider, useForm } from "react-hook-form";
-import { object, string } from "zod";
+/*
+ * @Description: 
+ * @Author: Devin
+ * @Date: 2024-05-28 13:48:03
+ */
+import React, { useEffect, useState } from "react";
+import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import FormInput from "@/components/FormInput";
-import { useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { LoadingButton as _LoadingButton } from "@mui/lab";
+import { object, string } from "zod";
+import { useNavigate, useParams, Link } from "react-router-dom";
 import { toast } from "react-toastify";
-import { Link } from "react-router-dom";
-import * as layoutStyles from "@/styles";
 import { verifyEmail } from "services";
-
-const LoadingButton = styled(_LoadingButton)`
-  padding: 0.6rem 0;
-  background-color: var(--primary);
-  font-weight: 500;
-
-  &:hover {
-    background-color: var(--primary);
-    transform: translateY(-2px);
-  }
-`;
+import ArButton from "@/components/arButton";
+import ArInput from "@/components/arInput";
+import usernameSvg from "@/assets/website/username.svg";
 
 const verificationCodeSchema = object({
   verificationCode: string().nonempty("Verification code is required"),
@@ -29,6 +20,7 @@ const verificationCodeSchema = object({
 
 const EmailVerificationPage = () => {
   const { verificationCode } = useParams();
+  const [isLoading, setIsLoading] = useState(false);
 
   const methods = useForm({
     resolver: zodResolver(verificationCodeSchema),
@@ -38,11 +30,10 @@ const EmailVerificationPage = () => {
 
   const {
     reset,
+    register,
     handleSubmit,
-    formState: { isSubmitSuccessful },
+    formState: { isSubmitSuccessful, errors },
   } = methods;
-
-  // Removed useVerifyEmailMutation and related state
 
   useEffect(() => {
     if (verificationCode) {
@@ -51,6 +42,7 @@ const EmailVerificationPage = () => {
   }, [verificationCode, reset]);
 
   const onSubmitHandler = async (data) => {
+    setIsLoading(true);
     try {
       const response = await verifyEmail(data.verificationCode);
       toast.success(response.message);
@@ -58,59 +50,54 @@ const EmailVerificationPage = () => {
     } catch (error) {
       const errorMessage = error.response?.data?.message || "An error occurred";
       toast.error(errorMessage);
+    } finally {
+      setIsLoading(false);
     }
   };
-  const LinkItem = styled(Link)`
-    text-decoration: underline;
-    color: var(--primary);
-  `;
 
   return (
-    <Container maxWidth={false} sx={layoutStyles.container}>
-      <Box sx={layoutStyles.box}>
-        <Typography
-          textAlign="center"
-          component="h1"
-          sx={layoutStyles.TypographySm}
-        >
+    <div className="flex items-center justify-center h-full overflow-auto bg-[#ffffff]">
+      <div
+        className="flex flex-col items-center justify-center bg-white p-8 rounded shadow-md"
+        style={{ maxWidth: "33rem", width: "100%" }}
+      >
+        <h1 className="text-4xl font-bold text-center mb-6 pt-2 text-arxTheme lg:text-5xl">
           Verification Email
-        </Typography>
+        </h1>
 
         <FormProvider {...methods}>
-          <Box
-            component="form"
-            onSubmit={handleSubmit(onSubmitHandler)}
+          <form
             noValidate
             autoComplete="off"
-            maxWidth="27rem"
-            width="100%"
-            sx={layoutStyles.formBox}
+            className="w-full"
+            onSubmit={handleSubmit(onSubmitHandler)}
           >
-            <FormInput
-              name="verificationCode"
-              label={"Verification Code"}
+            <ArInput
+              label="Verification Code"
               type="input"
+              name="verificationCode"
+              placeholder="Verification Code"
+              register={register}
+              errors={errors}
+              icon={usernameSvg}
             />
-            <LoadingButton
-              variant="contained"
-              sx={{ mt: 1 }}
-              fullWidth
-              disableElevation
+            <ArButton
+              loading={isLoading}
+              className="w-full bg-arxTheme text-white py-2 rounded hover:bg-primary-dark"
               type="submit"
             >
-              {"Verification Email"}
-            </LoadingButton>
-            <Typography
-              sx={{ fontSize: "0.9rem", mt: "1rem", textAlign: "center" }}
-            >
-              <LinkItem>
-                <Link to="/login">{"Back Login"}</Link>
-              </LinkItem>
-            </Typography>
-          </Box>
+              Verification Email
+            </ArButton>
+
+            <div className="my-4 text-center">
+              <Link to="/login" className="text-arxTheme hover:underline">
+                Back to Login
+              </Link>
+            </div>
+          </form>
         </FormProvider>
-      </Box>
-    </Container>
+      </div>
+    </div>
   );
 };
 
