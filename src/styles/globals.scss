@@ -1,3 +1,8 @@
+@font-face {
+  font-family: 'Lato';
+  src: url('./lato.woff2') format('woff2');
+}
+
 @mixin light {
   /* color */
   --white: white;
@@ -86,8 +91,11 @@ body {
   // justify-content: center;
   // align-items: center;
   user-select: none !important;
-  font-family: "Noto Sans SC", "SF Pro SC", "SF Pro Text", "SF Pro Icons",
-    "PingFang SC", "Helvetica Neue", "Helvetica", "Arial", sans-serif !important;
+  overflow-x: hidden;
+  // font-family: "Noto Sans SC", "SF Pro SC", "SF Pro Text", "SF Pro Icons",
+  //   "PingFang SC", "Helvetica Neue", "Helvetica", "Arial", sans-serif !important;
+  font-family: 'Lato',
+    sans-serif;;
 
   @media only screen and (max-width: 600px) {
     background-color: var(--second);
@@ -247,20 +255,13 @@ pre {
   }
 }
 
+
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
-textarea:-webkit-autofill,
-textarea:-webkit-autofill:hover,
-textarea:-webkit-autofill:focus {
-  // -webkit-box-shadow: 0 0 0px 1000px white inset;
-  // box-shadow: 0 0 0px 1000px white inset;
-}
-
-// .MuiPaper-root {
-//   background-color: var(--second) !important;
-// }
-
-body{
-  overflow-x: hidden;
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px white inset !important;
+  box-shadow: 0 0 0 30px white inset !important;
+  -webkit-text-fill-color: #000 !important;
+  caret-color: auto !important;
 }

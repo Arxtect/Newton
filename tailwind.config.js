@@ -8,6 +8,9 @@ module.exports = {
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ["Lato", "sans-serif"],
+      },
       colors: {
         link: "#13678a",
         primary: "#e7f8ff",
@@ -15,6 +18,7 @@ module.exports = {
         arxTheme: "#4caf4f",
         "arx-theme-hover": "#5daf4fde",
         arxThemeDark: "#18191F",
+        arxTextGray: "#000000f5",
         arxOdd: "#f5f7fa",
         "white-hover": "#edededcc",
         footer: "#263238",
@@ -26,7 +30,7 @@ module.exports = {
         "minus-125": "calc(100vh - 125px)",
       },
       zIndex: {
-        '999': '999',
+        999: "999",
       },
       width: {
         "1/9": "calc(100% / 9)",

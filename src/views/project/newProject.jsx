@@ -17,7 +17,7 @@ const NewProject = ({ dialogOpen, setDialogOpen }) => {
   const [projectName, setProjectName] = useState("");
   const { createProject, initFile } = useFileStore((state) => ({
     createProject: state.createProject,
-    initFile: state.initFile
+    initFile: state.initFile,
   }));
 
   const handleCancelProject = () => {
@@ -26,7 +26,7 @@ const NewProject = ({ dialogOpen, setDialogOpen }) => {
   const handleSaveProject = () => {
     createProject(projectName)
       .then(() => {
-        navigate("/arxtect");
+        navigate("/newton");
         setDialogOpen(false);
       })
       .catch((error) => {

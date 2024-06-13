@@ -93,7 +93,7 @@ const DocumentDetails = () => {
       // 调用 uploadZip 函数，传入下载的文件
       await uploadZip(blob, dirpath, reload, projectName);
       setLoading(false)
-      navigate("/arxtect");
+      navigate("/newton");
     } catch (error) {
       setLoading(false)
       console.error(`Failed to download or upload ZIP from ${url}:`, error);

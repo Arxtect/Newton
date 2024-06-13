@@ -72,7 +72,7 @@ const UploadProject = ({ dialogOpen, setDialogOpen }) => {
         .then(() => {
           toast.success("Project uploaded successfully");
           setDialogOpen(false);
-          navigate(`/arxtect`);
+          navigate(`/newton`);
         })
         .catch((error) => {
           toast.error(error.message);

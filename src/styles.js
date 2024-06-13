@@ -1,5 +1,5 @@
 /*
- * @Description: 
+ * @Description:
  * @Author: Devin
  * @Date: 2024-02-02 16:18:49
  */
@@ -33,3 +33,4 @@ export const formBox = {
   p: { xs: "1rem", sm: "2rem" },
   borderRadius: 2,
 };
+

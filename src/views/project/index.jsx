@@ -186,7 +186,7 @@ function Project() {
             changeCurrentProjectRoot({
               projectRoot: params.value,
             });
-            navigate(`/arxtect`);
+            navigate(`/newton`);
 
           }}
         >

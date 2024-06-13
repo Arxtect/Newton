@@ -33,7 +33,7 @@ const routerConfig = [
 
 const noHeaderRoutes = [
   { path: "/login", name: "login", component: "login" },
-  { path: "/arxtect", name: "arxtect", component: "layout" },
+  { path: "/newton", name: "newton", component: "layout" },
   {
     path: "/register",
     name: "register",
