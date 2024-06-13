@@ -5,7 +5,7 @@
  */
 import React, { useEffect } from "react";
 
-export default function useSwitchTheme() {
+export function useSwitchTheme() {
   const config = {
     theme: "light",
   };

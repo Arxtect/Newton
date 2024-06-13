@@ -39,7 +39,7 @@ const ResetPasswordPage = () => {
 
   useEffect(() => {
     if (isSubmitSuccessful) {
-      reset();
+      // reset();
     }
   }, [isSubmitSuccessful, reset]);
 

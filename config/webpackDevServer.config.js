@@ -114,8 +114,8 @@ module.exports = function (proxy, allowedHost) {
         pathRewrite: { "^/latex": "" },
       },
       "/api/v1": {
-        // target: "http://162.0.236.17:8012",
-        target: "http://206.190.239.91:8012",
+        target: "http://10.10.101.126:8012",
+        // target: "http://206.190.239.91:8012",
         changeOrigin: true,
         // pathRewrite: { "^/api/v1": "" }
       },

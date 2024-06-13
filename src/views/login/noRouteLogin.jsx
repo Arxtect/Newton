@@ -1,48 +1,20 @@
-/*
- * @Description:
- * @Author: Devin
- * @Date: 2024-02-02 15:48:22
- */
-import {
-  loginUser,
-  registerUser,
-  refreshAuth,
-  logoutUser,
-  getMe,
-} from "services";
+
 
 // LoginPage.js
 import React, { useState } from "react";
-import { Box, Container, Typography, Link as MuiLink } from "@mui/material";
-import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
-import { styled } from "@mui/material/styles";
+import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { object, string } from "zod";
-import FormInput from "@/components/FormInput";
-import { Link } from "react-router-dom";
-import { LoadingButton as _LoadingButton } from "@mui/lab";
 import { toast } from "react-toastify";
-import { setCookie } from "@/util";
-import { useUserStore, useLoginStore, updateAccessToken } from "store";
-import * as layoutStyles from "@/styles";
-
-const LoadingButton = styled(_LoadingButton)`
-  padding: 0.6rem 0;
-  background-color: var(--primary);
-  font-weight: 500;
-
-  &:hover {
-    background-color: var(--primary);
-    transform: translateY(-2px);
-  }
-`;
-
-const LinkItem = styled(Link)`
-  text-decoration: none;
-  &:hover {
-    text-decoration: underline;
-  }
-`;
+import { updateAccessToken } from "store";
+import {
+  loginUser,
+} from "@/services";
+import { useUserStore } from "store";
+import emailSvg from "@/assets/website/email.svg";
+import passwordSvg from "@/assets/website/password.svg";
+import ArButton from "@/components/arButton";
+import ArInput from "@/components/arInput";
 
 const loginSchema = object({
   email: string()
@@ -57,11 +29,14 @@ const NoRouteLogin = ({ handleClose }) => {
   const methods = useForm({
     resolver: zodResolver(loginSchema),
   });
-
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loginError, setLoginError] = useState();
 
   const updateUser = useUserStore((state) => state.updateUser);
+
+  const handleRouteClick = (href) => {
+    window.open(href, "_blank", "noopener,noreferrer");
+  };
 
   const onSubmitHandler = async (values) => {
     setIsSubmitting(true);
@@ -69,10 +44,8 @@ const NoRouteLogin = ({ handleClose }) => {
     try {
       const data = await loginUser(values);
       toast.success("You successfully logged in");
-      setCookie("mojolicious", data.access_token, 3000000);
       updateAccessToken(data.access_token);
       updateUser(data.user);
-      handleClose();
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "login failed";
@@ -82,87 +55,90 @@ const NoRouteLogin = ({ handleClose }) => {
       setLoginError(errorMessage);
     } finally {
       setIsSubmitting(false);
+      setTimeout(() => {
+        handleClose();
+      }, [0])
+
     }
   };
-  const { updateDialogLoginOpen } = useLoginStore((state) => ({
-    updateDialogLoginOpen: state.updateDialogLoginOpen,
-  }));
-  const handleRouteClick = (href) => {
-    // updateDialogLoginOpen(false);
-    window.open(href, "_blank", "noopener,noreferrer");
-  };
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = methods;
 
   return (
-    <Container>
-      <Box
-        sx={{
-          ...layoutStyles.box,
-          padding: "3rem 1rem 1rem 1rem",
-        }}
+    <div className="flex items-center justify-center h-full overflow-auto bg-[#ffffff]">
+      <div
+        className="flex flex-col items-center justify-center bg-white p-8 rounded shadow-md"
+        style={{ maxWidth: "33rem", width: "100%" }}
       >
-        <Typography
-          textAlign="center"
-          component="h1"
-          sx={layoutStyles.TypographySm}
-        >
+        <h1 className="text-4xl font-bold text-center mb-6 pt-2 text-arxTheme lg:text-5xl ">
           Welcome to arXtect!
-        </Typography>
-        <Typography variant="body1" component="h2" sx={{ mb: 2 }}>
-          Please log in to your account
-        </Typography>
+        </h1>
+        <h2 className="text-md mb-6">Please log in to your account</h2>
 
         <FormProvider {...methods}>
-          <Box
-            component="form"
-            onSubmit={methods.handleSubmit(onSubmitHandler)}
+          <form
             noValidate
             autoComplete="off"
-            maxWidth="27rem"
-            width="100%"
-            sx={layoutStyles.formBox}
+            className="w-full"
+            onSubmit={handleSubmit(onSubmitHandler)}
           >
-            <FormInput name="email" label="Email" type="email" />
-            <FormInput name="password" label="Password" type="password" />
+            <ArInput
+              label="Email"
+              type="email"
+              name="email"
+              placeholder="Email"
+              register={register}
+              errors={errors}
+              icon={emailSvg}
+            />
+            <ArInput
+              label="Password"
+              type="password"
+              name="password"
+              placeholder="Password"
+              register={register}
+              errors={errors}
+              icon={passwordSvg}
+            />
 
-            <Typography
-              sx={{ fontSize: "0.9rem", mb: "1rem", textAlign: "right" }}
-            >
-              <span
-                onClick={() => handleRouteClick("/#/forgotpassword")}
+            <div className="flex justify-end mb-4">
+              <a
+                href="/project/#/forgotpassword"
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{ color: "var(--primary)", cursor: "pointer" }}
+                className="text-arxTheme hover:underline"
               >
                 Forgot Password?
-              </span>
-            </Typography>
+              </a>
+            </div>
 
-            <LoadingButton
-              variant="contained"
-              sx={{ mt: 1 }}
-              fullWidth
-              disableElevation
-              type="submit"
+            <ArButton
               loading={isSubmitting}
+              className="w-full bg-arxTheme text-white py-2 rounded hover:bg-primary-dark"
+              type="submit"
             >
               Log In
-            </LoadingButton>
-
-            <Typography sx={{ fontSize: "0.9rem", mt: "1rem" }}>
+            </ArButton>
+            <div className="mt-4">
               Need an account?{" "}
-              <span
-                onClick={() => handleRouteClick("/#/register")}
+              <a
+                href="/project/#/register"
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{ color: "var(--primary)", cursor: "pointer" }}
+                className="text-arxTheme hover:underline"
               >
                 Register
-              </span>
-            </Typography>
-          </Box>
+              </a>
+
+            </div>
+          </form>
         </FormProvider>
-      </Box>
-    </Container>
+      </div>
+    </div>
   );
 };
 

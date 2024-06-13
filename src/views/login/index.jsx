@@ -3,7 +3,6 @@ import {
   registerUser,
   refreshAuth,
   logoutUser,
-  getMe,
 } from "services";
 
 // LoginPage.js
@@ -49,7 +48,6 @@ const LoginPage = ({ isDialog = false, handleClose }) => {
       toast.success("You successfully logged in");
       updateAccessToken(data.access_token);
       updateUser(data.user);
-      isDialog ? handleClose() : navigate(from, { replace: true });
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "login failed";
@@ -59,6 +57,10 @@ const LoginPage = ({ isDialog = false, handleClose }) => {
       setLoginError(errorMessage);
     } finally {
       setIsSubmitting(false);
+      setTimeout(() => {
+        isDialog ? handleClose() : navigate(from, { replace: true });
+      }, [0])
+
     }
   };
 

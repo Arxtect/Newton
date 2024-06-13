@@ -16,7 +16,7 @@ import { IndexeddbPersistence } from "y-indexeddb";
 import { WebsocketProvider } from "y-websocket";
 
 import latexSyncToYText from "./latexSyncToYText";
-import useYText from "@/useHooks/useYText";
+import { useYText } from "@/useHooks";
 import { AceBinding } from "./y-ace";
 import demo from "./demo";
 //constants

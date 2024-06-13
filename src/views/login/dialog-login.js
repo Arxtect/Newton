@@ -10,7 +10,7 @@ import { useLoginStore } from "store";
 import NoRouteLogin from "./noRouteLogin";
 const DialogLogin = ({
   dialogStyle = {
-    height: "65vh",
+    height: "75vh",
     width: "60vw",
   },
 }) => {

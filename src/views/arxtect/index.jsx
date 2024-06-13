@@ -11,7 +11,7 @@ import { PdfPreview } from "@/features/pdfPreview/PdfPreview";
 import { initializeLatexEngines } from "@/features/latexCompilation/latexCompilation";
 import { SplitPane } from "@/components/SplitPane";
 import { ButtonBarContainer } from "@/features/buttonBar/ButtonBarContainer";
-import useSwitchTheme from "@/useHooks/useSwitchTheme";
+import { useSwitchTheme } from "@/useHooks";
 import { ResizeSlider, ResizeRightSlider } from "./resizeSlider";
 import "./index.css";
 import { uploadDocument } from "services";

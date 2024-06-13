@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import * as Y from "yjs";
 
-export default function useYText({ name, doc }) {
+export function useYText({ name, doc }) {
   const { yDoc, yText, undoManager } = useMemo(() => {
     const _yText = doc.getText(name);
     const _undoManager = new Y.UndoManager(_yText, {

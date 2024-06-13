@@ -17,8 +17,6 @@ import {
 import Masonry from "@mui/lab/Masonry";
 import PreviewImage from "@/components/previewImage";
 import { getAllTags, documentSearch } from "services";
-import { Link, NavLink } from "react-router-dom";
-import { getCookie } from "@/util";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { updateDialogLoginOpen } from "@/store";

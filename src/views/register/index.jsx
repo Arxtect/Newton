@@ -44,9 +44,9 @@ const RegisterPage = () => {
 
   useEffect(() => {
     if (isSubmitSuccessful) {
-      reset();
+      // reset();
     }
-  }, [isSubmitSuccessful]);
+  }, [isSubmitSuccessful, reset]);
 
   const onSubmitHandler = async (values) => {
     setIsLoading(true);

@@ -12,7 +12,7 @@ import { toast } from "react-toastify";
 import { verifyEmail } from "services";
 import ArButton from "@/components/arButton";
 import ArInput from "@/components/arInput";
-import usernameSvg from "@/assets/website/username.svg";
+import codeSvg from "@/assets/website/code.svg";
 
 const verificationCodeSchema = object({
   verificationCode: string().nonempty("Verification code is required"),
@@ -79,7 +79,7 @@ const EmailVerificationPage = () => {
               placeholder="Verification Code"
               register={register}
               errors={errors}
-              icon={usernameSvg}
+              icon={codeSvg}
             />
             <ArButton
               loading={isLoading}

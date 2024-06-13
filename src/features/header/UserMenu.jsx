@@ -7,10 +7,11 @@
 import { Link, NavLink } from "react-router-dom";
 import { useEffect, useState } from "react";
 import ArMenuRadix from "@/components/arMenuRadix";
-import { getMe, logoutUser } from "services";
+import { logoutUser } from "services";
 import { useUserStore } from "store";
 import { toast } from "react-toastify";
 import { HashLink } from "react-router-hash-link";
+import { useAuth } from "@/useHooks"
 
 const UserMenu = () => {
   const [userInfo, setUserInfo] = useState({});
@@ -18,19 +19,12 @@ const UserMenu = () => {
     accessToken: state.accessToken,
   }));
 
+  const { user, auth } = useAuth()
+
+
   useEffect(() => {
-    getMe()
-      .then((res) => {
-        if (res?.data) {
-          setUserInfo(res.data.user);
-        } else {
-          setUserInfo({});
-        }
-      })
-      .catch((error) => {
-        setUserInfo({});
-      });
-  }, [accessToken]);
+    setUserInfo(user);
+  }, [auth]);
 
   const onLogout = () => {
     logoutUser()
@@ -42,25 +36,13 @@ const UserMenu = () => {
       });
   };
 
-  const [anchorEl, setAnchorEl] = useState(null);
-  const open = Boolean(anchorEl);
-
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
   const handleLogout = () => {
     onLogout();
-    handleClose();
   };
 
   return (
     <div>
-      {accessToken && userInfo?.email ? (
+      {auth ? (
         <>
           <div className="lg:ml-8 px-4">
             <ArMenuRadix

@@ -8,6 +8,7 @@ function getApiUrl(endpoint) {
   return `/api/v1${endpoint}`;
 }
 
+
 // 注册用户
 export async function registerUser(userData) {
   const response = await fetch(getApiUrl("/auth/register"), {
@@ -93,7 +94,6 @@ export async function logoutUser() {
 
 // 获取用户信息
 export async function getMe() {
-  await refreshAuth();
   const response = await fetch(getApiUrl("/users/me"), {
     method: "GET",
     credentials: "include",

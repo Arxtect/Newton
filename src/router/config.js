@@ -45,7 +45,7 @@ const noHeaderRoutes = [
     component: "verifyemail",
   },
   {
-    path: "/resetpassword",
+    path: "/resetpassword/:resetToken",
     name: "einstein",
     component: "resetPasswordPage",
   },
