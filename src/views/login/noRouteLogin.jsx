@@ -46,6 +46,10 @@ const NoRouteLogin = ({ handleClose }) => {
       toast.success("You successfully logged in");
       updateAccessToken(data.access_token);
       updateUser(data.user);
+
+      setTimeout(() => {
+        handleClose();
+      }, [0])
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "login failed";
@@ -55,10 +59,6 @@ const NoRouteLogin = ({ handleClose }) => {
       setLoginError(errorMessage);
     } finally {
       setIsSubmitting(false);
-      setTimeout(() => {
-        handleClose();
-      }, [0])
-
     }
   };
 

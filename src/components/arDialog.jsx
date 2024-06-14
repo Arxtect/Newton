@@ -64,7 +64,7 @@ const ArDialog = ({
       <DialogContent dividers>{children}</DialogContent>
       <DialogActions>
         {buttonList.map((button, index) => (
-          <ArLoadingButton key={index} onClick={button.click} color="primary" loading={button?.loading}>
+          <ArLoadingButton key={index} onClick={button.click} color="primary" loading={button?.loading} className="text-arxTheme">
             {button.title}
           </ArLoadingButton>
         ))}

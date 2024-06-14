@@ -1,20 +1,14 @@
 import React, { useMemo, useRef, useState, useEffect } from "react";
 import IconButton from '@mui/material/IconButton';
-import Divider from '@mui/material/Divider';
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import DeleteIcon from '@mui/icons-material/Delete';
-import PrintIcon from '@mui/icons-material/Print';
-import ShareIcon from '@mui/icons-material/Share';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Tooltip from '@mui/material/Tooltip';
-import Button from '@mui/material/Button';
-import ArMenu from "@/components/arMenu";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import ArDialog from "@/components/arDialog";
 import { toast } from "react-toastify";
 import { useFileStore } from "store"
 import { downloadMultiDirectoryAsZip } from "domain/filesystem"
+import ArMenuRadix from "@/components/arMenuRadix";
 
 function ActionBar({ handleCopy, handleRename, selectedRows, getProjectList }) {
     const {
@@ -166,48 +160,82 @@ function ActionBar({ handleCopy, handleRename, selectedRows, getProjectList }) {
             </ArMenu> */}
 
             {/* More button */}
-            {selectedRows.length == 1 && <ArMenu
-                buttonCom={
-                    <Button
-                        endIcon={<ExpandMoreIcon />}
-                        variant="outlined"
-                        className="rounded-full"
-                        sx={{
-                            borderColor: 'var(--black)',
-                            color: 'var(--black)',
-                            '&:hover': {
-                                borderColor: '#687384',
-                                backgroundColor: 'rgba(104, 115, 132, 0.04)'
-                            },
-                            fontWeight: 700,
-                        }}
-                    >
-                        <h3>More</h3>
-                    </Button>
-                }
-                menuList={[
-                    {
-                        label: "Rename",
-                        onClick: () => { handleRename(selectedRows?.[0]?.title) },
-                    },
-                    {
-                        label: "Make a copy",
-                        onClick: () => { handleCopy(selectedRows?.[0]?.title) },
-                    },
-                ]}
-                menuProps={{
-                    anchorOrigin: {
-                        vertical: 'bottom',
-                        horizontal: 'right',
-                    },
-                    transformOrigin: {
-                        vertical: 'top',
-                        horizontal: 'right',
+            {selectedRows.length == 1 &&
+                <ArMenuRadix
+                    align="left"
+                    buttonClassName={
+                        "border-1 border-black text-black hover:border-[#687384] hover:bg-[#687384]/[.04] font-bold rounded-xl px-2 py-1"
                     }
-                }}
-                widthExtend={false}
-            >
-            </ArMenu>}
+                    title={"More"}
+                    items={[
+                        {
+                            label: "Rename",
+                            onSelect: () => { handleRename(selectedRows?.[0]?.title) },
+                        },
+                        {
+                            label: "Make a copy",
+                            onSelect: () => { handleCopy(selectedRows?.[0]?.title) },
+                        },
+
+                        // {
+                        //   label: "Templates",
+                        //   separator: true,
+                        //   subMenu: [
+                        //     {
+                        //       label: "Academic Journal",
+                        //       onSelect: () => console.log("Academic Journal"),
+                        //     },
+                        //     {
+                        //       label: "Book",
+                        //       onSelect: () => console.log("Book"),
+                        //     },
+                        //   ],
+                        // },
+                    ]}
+                ></ArMenuRadix>
+                // <ArMenu
+                //     buttonCom={
+                //         <Button
+                //             endIcon={<ExpandMoreIcon />}
+                //             variant="outlined"
+                //             className="rounded-full"
+                //             sx={{
+                //                 borderColor: 'var(--black)',
+                //                 color: 'var(--black)',
+                //                 '&:hover': {
+                //                     borderColor: '#687384',
+                //                     backgroundColor: 'rgba(104, 115, 132, 0.04)'
+                //                 },
+                //                 fontWeight: 700,
+                //             }}
+                //         >
+                //             <h3>More</h3>
+                //         </Button>
+                //     }
+                //     menuList={[
+                //         {
+                //             label: "Rename",
+                //             onClick: () => { handleRename(selectedRows?.[0]?.title) },
+                //         },
+                //         {
+                //             label: "Make a copy",
+                //             onClick: () => { handleCopy(selectedRows?.[0]?.title) },
+                //         },
+                //     ]}
+                //     menuProps={{
+                //         anchorOrigin: {
+                //             vertical: 'bottom',
+                //             horizontal: 'right',
+                //         },
+                //         transformOrigin: {
+                //             vertical: 'top',
+                //             horizontal: 'right',
+                //         }
+                //     }}
+                //     widthExtend={false}
+                // >
+                // </ArMenu>
+            }
             <ArDialog
                 title="Delete Project"
                 dialogOpen={deleteDialogOpen}

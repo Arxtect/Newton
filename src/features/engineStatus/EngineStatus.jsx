@@ -3,12 +3,16 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ReactTooltip from "react-tooltip";
 import { useEffect } from "react";
 import { usePdfPreviewStore, useEngineStatusStore } from "store";
+import { CircularProgress } from "@mui/material";
+import ErrorSvg from "@/assets/website/error.svg";
+import SuccessSvg from "@/assets/website/success.svg";
+
 
 export const EngineStatus = ({ className }) => {
   const { engineStatus, selectFormattedEngineStatus } = useEngineStatusStore();
 
   const [showTooltip, setShowTooltip] = useState(true);
-  const { icon, color, tooltip } = selectFormattedEngineStatus();
+  const { color, tooltip } = selectFormattedEngineStatus();
   const { toggleCompilerLog, setShowCompilerLog } = usePdfPreviewStore(
     (state) => ({
       toggleCompilerLog: state.toggleCompilerLog,
@@ -28,30 +32,40 @@ export const EngineStatus = ({ className }) => {
     }
   };
 
+  useEffect(() => {
+    ReactTooltip.rebuild();
+  }, []);
+
+
   return (
     <div className={`flex justify-center items-center ${className}`}>
-      <FontAwesomeIcon
-        icon={icon}
-        className={` text-center  ${color} hover:cursor-pointer`}
-        size="xl"
+      <a
         data-tip={tooltip}
         data-for="engineStatus"
-        onMouseEnter={() => setShowTooltip(true)}
-        onMouseLeave={() => {
-          setShowTooltip(false);
-          setTimeout(() => setShowTooltip(true), 50);
-        }}
-        onClick={handleClick}
+      >
+        {engineStatus == 1 || engineStatus == 3 ?
+          <CircularProgress
+            size={20}
+            engineStatus={engineStatus}
+            className={`text-center ${color} hover:cursor-pointer mr-2 text-arxTheme`}
+            onClick={handleClick}
+          />
+          :
+          <img
+            src={engineStatus == 2 ? SuccessSvg : engineStatus == 4 ? ErrorSvg : ""}
+            engineStatus={engineStatus}
+            className={`text-center ${color} hover:cursor-pointer`}
+            onClick={handleClick}
+          />}
+      </a>
+
+      <ReactTooltip
+        id="engineStatus"
+        place="bottom"
+        type="dark"
+        effect="solid"
+        html={true}
       />
-      {showTooltip && (
-        <ReactTooltip
-          id="engineStatus"
-          place="bottom"
-          type="dark"
-          effect="solid"
-          html={true}
-        />
-      )}
     </div>
   );
 };

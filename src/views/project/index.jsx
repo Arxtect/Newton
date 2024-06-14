@@ -11,15 +11,9 @@ import {
   Button,
   IconButton,
   Paper,
-  List,
-  ListItem,
-  ListItemText,
-  Divider,
   Typography,
   TextField,
   InputAdornment,
-  Menu,
-  MenuItem,
   Tooltip,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
@@ -42,7 +36,7 @@ import RenameProject from "./renameProject";
 import Github from "./github";
 import Slider from "./slider";
 import ActionBar from "./actionBar";
-
+import ArButton from "@/components/arButton";
 import { toast } from "react-toastify";
 import { formatDate } from "@/util";
 
@@ -370,9 +364,9 @@ function Project() {
                     <Typography variant="body2" sx={{ mx: 2 }}>
                       You're on the free plan
                     </Typography>
-                    <Button variant="contained" color="primary" size="small">
-                      Upgrade
-                    </Button>
+                    <ArButton className="bg-arxTheme text-white py-2 rounded hover:bg-arx-theme-hover rounded-lg text-sm">
+                      UPGRADE
+                    </ArButton>
                   </React.Fragment>
                 )}
               </Box>

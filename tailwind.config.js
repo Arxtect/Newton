@@ -1,13 +1,11 @@
-/*
- * @Description:
- * @Author: Devin
- * @Date: 2024-01-25 12:25:23
- */
-/** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
+  important: false,
   theme: {
     extend: {
+      borderWidth: {
+        '1': '1px',
+      },
       fontFamily: {
         sans: ["Lato", "sans-serif"],
       },
@@ -22,9 +20,6 @@ module.exports = {
         arxOdd: "#f5f7fa",
         "white-hover": "#edededcc",
         footer: "#263238",
-        borderWidth: {
-          1: "1px", // 如果 Tailwind 默认没有提供 1px 宽度，可以在这里添加
-        },
       },
       height: {
         "minus-125": "calc(100vh - 125px)",

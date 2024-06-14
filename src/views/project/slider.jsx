@@ -1,5 +1,4 @@
 import React, { forwardRef, useImperativeHandle } from "react";
-import ArMenu from "@/components/arMenu";
 
 import {
   Box,
@@ -10,6 +9,7 @@ import {
   Divider,
   Typography,
 } from "@mui/material";
+import ArMenuRadix from "@/components/arMenuRadix";
 
 const Slider = forwardRef(
   (
@@ -49,17 +49,17 @@ const Slider = forwardRef(
       {
         id: "New Tag",
         title: "New Tag",
-        onClick: () => {},
+        onClick: () => { },
       },
       {
         id: "tag",
         title: "tag",
-        onClick: () => {},
+        onClick: () => { },
       },
       {
         id: "Uncategorized",
         title: "Uncategorized",
-        onClick: () => {},
+        onClick: () => { },
       },
     ];
 
@@ -73,37 +73,43 @@ const Slider = forwardRef(
         className="h-full"
       >
         <Box px={2} pb={1} pt={2}>
-          <ArMenu
-            buttonLabel="New Project"
-            buttonProps={{
-              size: "middle",
-              className: `w-full rounded-full`,
-            }}
-            menuList={[
+          <ArMenuRadix
+            isNeedIcon={false}
+            align="left"
+            buttonClassName={
+              "bg-arxTheme hover:bg-arx-theme-hover text-[1.1rem] text-white font-bold py-2 shadow-xl rounded-[0.4rem] border border-arxTheme"
+            }
+            title={"New Project"}
+            items={[
               {
                 label: "New Project",
-                onClick: () => setNewDialogOpen(true),
+                onSelect: () => setNewDialogOpen(true),
               },
               {
                 label: "Upload Project",
-                onClick: () => setUploadDialogOpen(true),
+                onSelect: () => setUploadDialogOpen(true),
               },
               {
                 label: "Import From GitHub",
-                onClick: () => setGithubDialogOpen(true),
+                onSelect: () => setGithubDialogOpen(true),
               },
+              // {
+              //   label: "Templates",
+              //   separator: true,
+              //   subMenu: [
+              //     {
+              //       label: "Academic Journal",
+              //       onSelect: () => console.log("Academic Journal"),
+              //     },
+              //     {
+              //       label: "Book",
+              //       onSelect: () => console.log("Book"),
+              //     },
+              //   ],
+              // },
             ]}
-            // templateItems={{
-            //   title: "Templates",
-            //   items: [
-            //     {
-            //       label: "Academic Journal",
-            //       onClick: () => console.log("Academic Journal clicked"),
-            //     },
-            //     { label: "Book", onClick: () => console.log("Book clicked") },
-            //   ],
-            // }}
-          />
+          ></ArMenuRadix>
+
         </Box>
         <nav className="overflow-auto">
           <List className="py-1">
@@ -113,9 +119,8 @@ const Slider = forwardRef(
                   button
                   component="a"
                   key={item.id}
-                  className={`py-[4px] ${
-                    currentSelectMenu === item.id && "bg-[#8776762e]"
-                  }`}
+                  className={`py-[4px] ${currentSelectMenu === item.id && "bg-[#8776762e]"
+                    }`}
                   onClick={() => handleCurrentSelectMenu(item.id)}
                 >
                   <ListItemText

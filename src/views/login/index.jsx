@@ -48,6 +48,10 @@ const LoginPage = ({ isDialog = false, handleClose }) => {
       toast.success("You successfully logged in");
       updateAccessToken(data.access_token);
       updateUser(data.user);
+      setTimeout(() => {
+        isDialog ? handleClose() : navigate(from, { replace: true });
+      }, [0])
+
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "login failed";
@@ -55,11 +59,9 @@ const LoginPage = ({ isDialog = false, handleClose }) => {
         position: "top-right",
       });
       setLoginError(errorMessage);
+
     } finally {
       setIsSubmitting(false);
-      setTimeout(() => {
-        isDialog ? handleClose() : navigate(from, { replace: true });
-      }, [0])
 
     }
   };

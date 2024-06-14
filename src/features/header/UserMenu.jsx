@@ -47,7 +47,7 @@ const UserMenu = () => {
           <div className="lg:ml-8 px-4">
             <ArMenuRadix
               buttonClassName={
-                "bg-arxTheme hover:bg-arx-theme-hover text-[1.1rem] text-white font-bold py-2 shadow-xl rounded-[0.4rem] border border-arxTheme"
+                "bg-arxTheme hover:bg-arx-theme-hover text-[1.1rem] text-white font-bold py-2 shadow-xl rounded-[0.4rem] border border-arxTheme px-4 py-2 rounded-md "
               }
               title={"Account"}
               items={[
