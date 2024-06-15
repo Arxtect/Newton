@@ -5,7 +5,7 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import { CircularProgress as Nprogress } from "@mui/material";
+import Nprogress from "./Nprogress"
 import config from "./config";
 
 const renderRoutes = (routes) => {

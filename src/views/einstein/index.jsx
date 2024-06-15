@@ -5,8 +5,6 @@ import {
   InputLabel,
   FormControl,
   TextField,
-  Button,
-  Grid,
   Box,
   Container,
   Paper,
@@ -22,6 +20,7 @@ import { useNavigate } from "react-router-dom";
 import { updateDialogLoginOpen } from "@/store";
 import { useUserStore } from "store";
 import { getPreViewUrl } from "@/util";
+import ArButton from "@/components/arButton";
 
 const Einstein = () => {
   const [page, setPage] = React.useState(1);
@@ -198,15 +197,12 @@ const Einstein = () => {
             onKeyDown={handleKeyDown}
           />
         </Box>
-        <Button
-          variant="contained"
-          color="primary"
-          size="small"
-          sx={{ ...commonStyles, ml: 2 }}
+        <ArButton
+          className="bg-arxTheme text-white !py-1 rounded hover:bg-primary-dark ml-2"
           onClick={() => searchDocuments(1, selectedTags, keyword)}
         >
           Search
-        </Button>
+        </ArButton>
       </Box>
       <h2 className="text-3xl font-semibold mb-6 mt-12">Recent</h2>
 
