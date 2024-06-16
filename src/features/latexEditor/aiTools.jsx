@@ -66,10 +66,8 @@ const AiTools = ({ editorRef }) => {
             setShowDropdown(true);
         } else if (showDropdown) {
             if (event.key === 'ArrowDown') {
-                console.log((activeIndex + 1) % options.length, 'activeIndex')
                 setActiveIndex((prevIndex) => (prevIndex + 1) % options.length);
             } else if (event.key === 'ArrowUp') {
-                console.log('12312')
                 setActiveIndex((prevIndex) => (prevIndex - 1 + options.length) % options.length);
             } else if (event.key === 'Enter') {
                 handleCommand(options[activeIndex].value);
