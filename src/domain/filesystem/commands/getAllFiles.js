@@ -8,6 +8,8 @@ const fsPify = {
   readdir: pify(fs.readdir),
   stat: pify(fs.stat),
   readFile: pify(fs.readFile),
+  mkdir: pify(fs.mkdir),
+  writeFile: pify(fs.writeFile)
 };
 
 
@@ -47,6 +49,25 @@ export async function readDirectoryTree(rootpath) {
 
   return readDirRecursive(rootpath);
 }
+
+export async function writeDirectoryTree(rootpath, tree) {
+  async function writeDirRecursive(currentPath, tree) {
+    await fsPify.mkdir(currentPath, { recursive: true });
+
+    await Promise.all(tree.files.map(async (file) => {
+      const filePath = path.join(currentPath, path.basename(file.path));
+      await fsPify.writeFile(filePath, file.content);
+    }));
+
+    await Promise.all(tree.directories.map(async (dir) => {
+      const dirPath = path.join(currentPath, path.basename(dir.path));
+      await writeDirRecursive(dirPath, dir);
+    }));
+  }
+
+  await writeDirRecursive(rootpath, tree);
+}
+
 function addFilesToZip(dir, zipFolder, parentDir = "", rootpath = "", isMulti = false) {
   dir.files.forEach((file) => {
     if (isMulti) {

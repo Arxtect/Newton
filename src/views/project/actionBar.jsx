@@ -178,63 +178,21 @@ function ActionBar({ handleCopy, handleRename, selectedRows, getProjectList }) {
                         },
 
                         // {
-                        //   label: "Templates",
-                        //   separator: true,
-                        //   subMenu: [
-                        //     {
-                        //       label: "Academic Journal",
-                        //       onSelect: () => console.log("Academic Journal"),
-                        //     },
-                        //     {
-                        //       label: "Book",
-                        //       onSelect: () => console.log("Book"),
-                        //     },
-                        //   ],
+                        //     label: "Templates",
+                        //     separator: true,
+                        //     subMenu: [
+                        //         {
+                        //             label: "Academic Journal",
+                        //             onSelect: () => console.log("Academic Journal"),
+                        //         },
+                        //         {
+                        //             label: "Book",
+                        //             onSelect: () => console.log("Book"),
+                        //         },
+                        //     ],
                         // },
                     ]}
                 ></ArMenuRadix>
-                // <ArMenu
-                //     buttonCom={
-                //         <Button
-                //             endIcon={<ExpandMoreIcon />}
-                //             variant="outlined"
-                //             className="rounded-full"
-                //             sx={{
-                //                 borderColor: 'var(--black)',
-                //                 color: 'var(--black)',
-                //                 '&:hover': {
-                //                     borderColor: '#687384',
-                //                     backgroundColor: 'rgba(104, 115, 132, 0.04)'
-                //                 },
-                //                 fontWeight: 700,
-                //             }}
-                //         >
-                //             <h3>More</h3>
-                //         </Button>
-                //     }
-                //     menuList={[
-                //         {
-                //             label: "Rename",
-                //             onClick: () => { handleRename(selectedRows?.[0]?.title) },
-                //         },
-                //         {
-                //             label: "Make a copy",
-                //             onClick: () => { handleCopy(selectedRows?.[0]?.title) },
-                //         },
-                //     ]}
-                //     menuProps={{
-                //         anchorOrigin: {
-                //             vertical: 'bottom',
-                //             horizontal: 'right',
-                //         },
-                //         transformOrigin: {
-                //             vertical: 'top',
-                //             horizontal: 'right',
-                //         }
-                //     }}
-                //     widthExtend={false}
-                // >
-                // </ArMenu>
             }
             <ArDialog
                 title="Delete Project"

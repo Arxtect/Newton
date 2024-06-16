@@ -83,7 +83,7 @@ const ArMenuRadix = ({ items, title, buttonClassName = "", isNeedIcon = true, al
         </DropdownMenu.Trigger>
 
         <DropdownMenu.Content
-          className="bg-white shadow-md rounded-md mt-2 py-2 z-50"
+          className="bg-white shadow-md rounded-md mt-2 py-2 z-50 DropdownMenuContent"
           align="end"
           sideOffset={5}
           style={{ minWidth: buttonWidth, width: 'auto' }}

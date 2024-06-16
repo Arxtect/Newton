@@ -11,7 +11,7 @@ const ArgButton = ({
   ...res
 }) => {
   const buttonClasses = `
-        font-bold py-2 px-4 rounded flex items-center justify-center
+        font-bold py-1 px-4 rounded flex items-center justify-center
         ${loading ? "cursor-not-allowed" : ""}
         ${className}
     `;

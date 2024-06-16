@@ -10,7 +10,7 @@ const NavLinksLg = () => {
         <a
           className="px-4 flex justify-center text-[1.1rem] font-[600] text-dark hover:text-blue-900 "
           smooth
-          href="/"
+          href="/#home"
         >
           Home
         </a>
@@ -58,7 +58,7 @@ const NavLinksSm = () => {
       <a
         className="px-4 flex justify-center text-[1.1rem] font-[600] text-dark hover:text-blue-900"
         smooth
-        href="/"
+        href="/#home"
       >
         Home
       </a>
