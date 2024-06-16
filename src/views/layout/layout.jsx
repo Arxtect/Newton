@@ -319,7 +319,7 @@ const Layout = ({
             ></div>
           </div>
         )}
-        <div className="right">
+        <div className="ar-right">
           <div className="right-before flex">
             {/* <div
               style={

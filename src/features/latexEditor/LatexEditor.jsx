@@ -6,9 +6,11 @@
 import React, { useLayoutEffect, useRef, useState } from "react";
 import AceEditor from "react-ace";
 import "ace-builds/src-noconflict/mode-latex";
-import "ace-builds/src-noconflict/theme-github";
-import "ace-builds/src-noconflict/theme-monokai";
-import "ace-builds/src-noconflict/ext-language_tools";
+// import "ace-builds/src-noconflict/theme-github";
+// import "ace-builds/src-noconflict/theme-monokai";
+import "ace-builds/src-min-noconflict/ext-language_tools";
+import "ace-builds/src-min-noconflict/ext-searchbox";
+import AiTools from "./aiTools";
 //yjs
 import { routerQuery, getRandomColor } from "@/util";
 import * as Y from "yjs";
@@ -101,8 +103,10 @@ const LatexEditor = ({ handleChange, sourceCode, filepath }) => {
   //   };
   // }, []);
 
+
   return (
-    <div className="h-full">
+    <div className="h-full relative" id="editor">
+      <AiTools editorRef={latexRef} />
       <AceEditor
         mode="latex"
         // theme="theme-github" //monokai
@@ -115,7 +119,14 @@ const LatexEditor = ({ handleChange, sourceCode, filepath }) => {
         onChange={handleChange}
         value={sourceCode}
         showPrintMargin={false}
-        // className="border border-black"
+        lineHeight={24}
+        setOptions={{
+          enableBasicAutocompletion: true,
+          enableLiveAutocompletion: true,
+          enableSnippets: true,
+          showLineNumbers: true,
+          tabSize: 2,
+        }}
         ref={latexRef}
         readOnly={filepath == "" ? true : false}
         className={filepath == "" ? "disabled-editor" : ""}
