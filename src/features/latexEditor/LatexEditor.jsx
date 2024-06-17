@@ -106,7 +106,6 @@ const LatexEditor = ({ handleChange, sourceCode, filepath }) => {
 
   return (
     <div className="h-full relative" id="editor">
-      <AiTools editorRef={latexRef} />
       <AceEditor
         mode="latex"
         // theme="theme-github" //monokai
@@ -130,10 +129,13 @@ const LatexEditor = ({ handleChange, sourceCode, filepath }) => {
         ref={latexRef}
         readOnly={filepath == "" ? true : false}
         className={filepath == "" ? "disabled-editor" : ""}
-      ></AceEditor>
+
+      >
+      </AceEditor>
+      <AiTools editorRef={latexRef} />
       {/* <div className="input overlay">{fragments}</div> */}
       <div id="users"></div>
-    </div>
+    </div >
   );
 };
 
