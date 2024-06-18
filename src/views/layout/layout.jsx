@@ -27,6 +27,8 @@ const Layout = ({
     toggleView,
     emitResize,
     showFooter,
+    setSideWidth,
+    sideWidth,
   } = useLayout();
 
   // Refs for DOM elements
@@ -40,7 +42,7 @@ const Layout = ({
   const reactive = useReactive({ resizeOrigin: null });
 
   useEffect(() => {
-    console.log(reactive.resizeOrigin, "resizeOri1gin");
+
   }, [reactive.resizeOrigin]);
 
   const resizeOutOfRange = (refName, outOfRange) => {
@@ -69,7 +71,7 @@ const Layout = ({
 
   // Helper functions for resizing logic
   const getContainerSibling = (ref, resizeOrigin) => {
-    console.log(ref.current, "ref.current");
+
     return resizeOrigin.type === "right"
       ? ref.current?.nextElementSibling
       : ref.current?.previousElementSibling;
@@ -101,7 +103,7 @@ const Layout = ({
       clearResize();
       return;
     }
-    console.log(reactive.resizeOrigin, "resizeOrigin");
+
     if (!reactive.resizeOrigin) {
       return;
     }
@@ -112,7 +114,7 @@ const Layout = ({
       terminal: terminalRef,
     }[reactive.resizeOrigin.ref].current;
 
-    console.log(ref, "ref");
+
 
     const checkOutOfRange = (value) => {
       if (
@@ -177,7 +179,7 @@ const Layout = ({
   };
 
   const resizeDone = () => {
-    console.log(reactive.resizeOrigin, "2");
+
     if (!reactive.resizeOrigin) {
       return;
     }
@@ -232,7 +234,7 @@ const Layout = ({
       editor: editorRef,
       terminal: terminalRef,
     }[refName].current;
-    console.log(reactive.resizeOrigin, "resizeOrigin");
+
 
     if (!reactive.resizeOrigin && type) {
       // setResizeOrigin({
@@ -265,7 +267,7 @@ const Layout = ({
   };
 
   const initEditorResize = (e) => {
-    console.log(contentRef.current, "contentRef.current");
+
     if (contentRef.current) {
       const maxWidth = contentRef.current.clientWidth - 270;
       initResize("right", "editor", 200, maxWidth, e);
@@ -304,13 +306,20 @@ const Layout = ({
     }
   }, [showEditor, showView, editorRef.current?.offsetWidth]);
 
+  useEffect(() => {
+
+    setSideWidth(asideRef.current?.offsetWidth ?? 0)
+  }, [asideRef.current?.offsetWidth, showSide])
+
+
+
   // Convert Vue's template syntax to JSX
   return (
     <div className={`layout ${presentation ? "presentation" : ""}`}>
       {showHeader && <div className="header">{header}</div>}
       <div className="main">
         {showSide && (
-          <div className="left" ref={asideRef}>
+          <div className="left" ref={asideRef} id="left">
             {left}
             <div
               className="sash-right"

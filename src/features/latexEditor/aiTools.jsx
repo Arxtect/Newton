@@ -1,5 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { AiOutlineEdit, AiOutlineQuestionCircle, AiOutlineTranslation, AiOutlinePicture } from 'react-icons/ai';
+import { useLayout } from "store";
+
 
 const DropdownMenu = ({ options, onSelect, activeIndex }) => {
     return (
@@ -24,28 +26,51 @@ const AiTools = ({ editorRef }) => {
     const [activeIndex, setActiveIndex] = useState(0);
     const [originalKeyHandler, setOriginalKeyHandler] = useState(null);
 
+    const {
+        sideWidth,
+    } = useLayout();
+
     const handleCommand = (command) => {
         const editor = editorRef.current.editor;
+        const cursorPosition = editor.getCursorPosition();
+        const session = editor.getSession();
+        const line = session.getLine(cursorPosition.row);
+
+        const previousChar = line.charAt(cursorPosition.column - 1);
+
+        // Only remove the / character if it is actually there
+        if (previousChar === '/') {
+            // Move the cursor back one position
+            editor.moveCursorToPosition({ row: cursorPosition.row, column: cursorPosition.column - 1 });
+        }
+
         switch (command) {
             case 'section':
-                editor.insert('\\section{章节标题}\n');
+                editor.remove('/');
+                editor.insert('\\section{title}\n');
                 break;
             case 'itemize':
-                editor.insert('\\begin{itemize}\n  \\item 项目1\n  \\item 项目2\n\\end{itemize}\n');
+                editor.remove('/');
+                editor.insert('\\begin{itemize}\n  \\item project1\n  \\item project2\n\\end{itemize}\n');
                 break;
             default:
                 break;
         }
     };
 
+    const sideWidthRef = useRef()
+
+    useEffect(() => {
+        sideWidthRef.current = sideWidth
+    }, [sideWidth])
+
     const handleCursorChange = (selection) => {
         const editor = editorRef.current.editor;
         const cursorPosition = editor.getCursorPosition();
-        const renderer = editor.renderer;
-        const lineHeight = renderer.lineHeight;
-        const editorRect = editor.container.getBoundingClientRect();
-        const toolbarTop = editorRect.top + (cursorPosition.row - 1) * lineHeight;
-        const toolbarLeft = editorRect.left;
+        const screenCoordinates = editor.renderer.textToScreenCoordinates(cursorPosition.row, cursorPosition.column);
+
+        const toolbarTop = screenCoordinates.pageY - editor.renderer.layerConfig.lineHeight;
+        const toolbarLeft = screenCoordinates.pageX - sideWidthRef.current;
 
         setToolbarPosition({ top: toolbarTop, left: toolbarLeft });
 
@@ -53,8 +78,6 @@ const AiTools = ({ editorRef }) => {
         const line = session.getLine(cursorPosition.row);
         const previousChar = line.charAt(cursorPosition.column - 1);
         const previousChar2 = line.charAt(cursorPosition.column - 2);
-
-        console.log(previousChar2, 'previousChar2')
 
         if (previousChar === '/' && previousChar2 !== "/") {
             setShowDropdown(true);
