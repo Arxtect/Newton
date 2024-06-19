@@ -47,6 +47,7 @@ export async function readFileStats(projectRoot, dirpath) {
   const stat = pify(fs.stat);
 
   const filenames = await readdir(dirpath);
+  console.log(filenames, 'filenames')
 
   const ret = await Promise.all(
     filenames.map(async (name) => {

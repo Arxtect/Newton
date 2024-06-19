@@ -39,6 +39,69 @@ const LatexEditor = ({ handleChange, sourceCode, filepath }) => {
   const latexRef = useRef(null);
   const { yText, undoManager } = useYText({ name: LATEX_NAME, doc });
   const [fragments, setFragments] = useState([]);
+  // useLayoutEffect(() => {
+  //   const db = new IndexeddbPersistence("latexDemo", doc);
+  // db.on("synced", (idbPersistence) => {
+  //   if (latexRef.current) {
+  //     handleChange(yText.toString() ?? sourceCode);
+  //   }
+  // });
+
+  //   const wsProvider = new WebsocketProvider(wsUrl, ROOM_NAME, doc, {
+  //     connect: true,
+  //   });
+  //   wsProvider.on("status", (event) => {
+  //     if (event.status === "connected") {
+  //     } else {
+  //     }
+  //   });
+
+  //   window.wsProvider = wsProvider;
+  //   console.log(window.wsProvider, "321");
+
+  //   const type = doc.getText(ROOM_NAME);
+
+  //   const binding = new AceBinding(
+  //     type,
+  //     latexRef.current.editor,
+  //     wsProvider.awareness
+  //   );
+
+  //   window.binding = binding;
+
+  //   let user = {
+  //     name: "user:" + Math.random().toString(36).substring(7),
+  //     color: "#" + Math.floor(Math.random() * 16777215).toString(16),
+  //   };
+
+  //   // Define user name and user name
+  //   wsProvider.awareness.setLocalStateField("user", user);
+
+  //   wsProvider.awareness.on("change", function () {
+  //     let userCount = wsProvider.awareness.getStates().size;
+  //     let userIcon = "👤 ";
+  //     if (userCount > 1) {
+  //       userIcon = "👥 ";
+  //     } else {
+  //       // dispatch(setBody(demo));
+  //     }
+  //     document.getElementById("users").innerHTML =
+  //       userIcon + userCount + " users";
+  //   });
+
+  // if (latexRef.current.editor) {
+  //   unlisten = latexSyncToYText({
+  //     yText,
+  //     latex: latexRef.current.editor,
+  //     undoManager,
+  //     awareness,
+  //     handleChange,
+  //   });
+  // }
+  //   return () => {
+  //     wsProvider.destroy();
+  //   };
+  // }, []);
 
 
   return (
