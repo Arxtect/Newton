@@ -36,4 +36,4 @@ export const useUserStore = create()(
   )
 );
 
-export const { updateAccessToken } = useUserStore.getState();
+export const { updateAccessToken, user } = useUserStore.getState();

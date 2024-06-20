@@ -1,5 +1,5 @@
 /*
- * @Description: 
+ * @Description:
  * @Author: Devin
  * @Date: 2024-01-25 13:51:21
  */
@@ -8,7 +8,6 @@
 // import orderBy from "lodash/orderBy";
 // import path from "path";
 // import pify from "pify";
-
 
 // export async function readFileStats(projectRoot, dirpath) {
 //   const filenames = await pify(fs.readdir)(dirpath);
@@ -41,16 +40,18 @@ import fs from "fs";
 import path from "path";
 import pify from "pify";
 import orderBy from "lodash/orderBy";
+import { projectInfoExists } from "../commands/projectInfo";
 
-export async function readFileStats(projectRoot, dirpath) {
+export async function readFileStats(dirpath) {
   const readdir = pify(fs.readdir);
   const stat = pify(fs.stat);
 
   const filenames = await readdir(dirpath);
-  console.log(filenames, 'filenames')
+  console.log(filenames, "filenames");
 
   const ret = await Promise.all(
     filenames.map(async (name) => {
+      // if (projectInfoExists(name)) return null;
       const childPath = path.join(dirpath, name);
       const stats = await stat(childPath);
 

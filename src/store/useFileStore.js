@@ -7,6 +7,7 @@ import {
   updateStatusMatrixOnSaveFile,
 } from "./useGitRepo";
 import { savePdfToIndexedDB, getPdfFromIndexedDB } from "@/util";
+import { user } from "./user";
 
 export const FILE_STORE = "file_store";
 
@@ -80,9 +81,11 @@ export const useFileStore = create()(
           changed: false,
         }));
       },
-      saveFile: async (filepath, value, withReload = false) => {
+      saveFile: async (filepath, value, withReload = false,isSaveState = true) => {
         await FS.writeFile(filepath, value);
-        get().saveFileState(value);
+        if (isSaveState) {
+          get().saveFileState(value);
+        }
         await updateStatusMatrixOnSaveFile({
           projectRoot: get().currentProjectRoot,
         });
@@ -109,8 +112,7 @@ export const useFileStore = create()(
             lastSavedValue: value,
             changed: false,
           });
-          get().debouncedUpdateFileContent(state.filepath, value)
-
+          get().debouncedUpdateFileContent(state.filepath, value);
         } else {
           set({
             value,
@@ -187,6 +189,7 @@ export const useFileStore = create()(
         set({ dirCreatingDir: null });
       },
       finishDirCreating: async ({ dirpath }) => {
+        console.log(dirpath, "finishDirCreating");
         await FS.mkdir(dirpath);
         get().endDirCreating({ dirpath });
         get().startUpdate({ changedPath: dirpath, isDir: true });
@@ -197,7 +200,7 @@ export const useFileStore = create()(
         get().loadFile({ filepath }); // 假设 loadFile 已适配 Zustand
         get().startUpdate({ changedPath: filepath });
       },
-      changeFolderPath: ({ }) => { },
+      changeFolderPath: ({}) => {},
 
       createDirectory: async ({ dirname }) => {
         await FS.mkdir(dirname);
@@ -229,7 +232,7 @@ export const useFileStore = create()(
         set({ preRenamingDirpath: dirpath });
       },
       changeCurrentProjectRoot: ({ projectRoot }) => {
-        get().initFile()
+        get().initFile();
         set({ currentProjectRoot: projectRoot, currentSelectDir: projectRoot });
         initializeGitStatus({ projectRoot });
       },
@@ -238,6 +241,10 @@ export const useFileStore = create()(
 
         if (!isExists) {
           await FS.mkdir(newProjectRoot);
+          await FS.createProjectInfo(newProjectRoot, {
+            name: "YOU",
+            ...user,
+          });
         } else {
           throw new Error("Project name is already exists");
         }
@@ -257,9 +264,9 @@ export const useFileStore = create()(
         set({ allProject });
       },
       initFile: () => {
-        const initState = getInitialState()
-        set(initState)
-      }
+        const initState = getInitialState();
+        set(initState);
+      },
     }),
     {
       name: FILE_STORE,

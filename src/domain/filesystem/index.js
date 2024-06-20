@@ -22,3 +22,5 @@ export * from "./commands/upLoadFolder";
 export * from "./commands/uploadZip";
 export * from "./commands/copyProject";
 export * from "./commands/copyFile";
+export * from "./commands/stat";
+export * from "./commands/projectInfo";

@@ -9,9 +9,8 @@ const fsPify = {
   stat: pify(fs.stat),
   readFile: pify(fs.readFile),
   mkdir: pify(fs.mkdir),
-  writeFile: pify(fs.writeFile)
+  writeFile: pify(fs.writeFile),
 };
-
 
 export async function readDirectoryTree(rootpath) {
   async function readDirRecursive(currentPath) {
@@ -54,24 +53,34 @@ export async function writeDirectoryTree(rootpath, tree) {
   async function writeDirRecursive(currentPath, tree) {
     await fsPify.mkdir(currentPath, { recursive: true });
 
-    await Promise.all(tree.files.map(async (file) => {
-      const filePath = path.join(currentPath, path.basename(file.path));
-      await fsPify.writeFile(filePath, file.content);
-    }));
+    await Promise.all(
+      tree.files.map(async (file) => {
+        const filePath = path.join(currentPath, path.basename(file.path));
+        await fsPify.writeFile(filePath, file.content);
+      })
+    );
 
-    await Promise.all(tree.directories.map(async (dir) => {
-      const dirPath = path.join(currentPath, path.basename(dir.path));
-      await writeDirRecursive(dirPath, dir);
-    }));
+    await Promise.all(
+      tree.directories.map(async (dir) => {
+        const dirPath = path.join(currentPath, path.basename(dir.path));
+        await writeDirRecursive(dirPath, dir);
+      })
+    );
   }
 
   await writeDirRecursive(rootpath, tree);
 }
 
-function addFilesToZip(dir, zipFolder, parentDir = "", rootpath = "", isMulti = false) {
+function addFilesToZip(
+  dir,
+  zipFolder,
+  parentDir = "",
+  rootpath = "",
+  isMulti = false
+) {
   dir.files.forEach((file) => {
     if (isMulti) {
-      const relativeFilePath = path.basename(file.path)
+      const relativeFilePath = path.basename(file.path);
       zipFolder.file(relativeFilePath, file.content);
     } else {
       zipFolder.file(path.basename(file.path), file.content);
@@ -90,7 +99,7 @@ function addFilesToZip(dir, zipFolder, parentDir = "", rootpath = "", isMulti = 
       ? path.relative(parentDir, relativeDirPath)
       : relativeDirPath;
     const subFolder = zipFolder.folder(zipDirPath);
-    addFilesToZip(subDir, subFolder, relativeDirPath, rootpath, isMulti); // 递归调用时更新 
+    addFilesToZip(subDir, subFolder, relativeDirPath, rootpath, isMulti); // 递归调用时更新
   });
 }
 export async function downloadDirectoryAsZip(rootpath) {
@@ -109,19 +118,18 @@ export const getRandomString = () => {
   const randomPart = Math.random().toString(36).substring(2, 15);
   const timestamp = new Date().getTime();
   const randomName = `${timestamp}-${randomPart}`;
-  return randomName
-}
+  return randomName;
+};
 
 export async function downloadMultiDirectoryAsZip(rootpathList) {
   const zip = new JSZip();
 
   for (let rootpath of rootpathList) {
     const directoryTree = await readDirectoryTree(rootpath);
-    const zipFolder = zip.folder(rootpath)
-    console.log(directoryTree, rootpathList, 'directoryTree')
+    const zipFolder = zip.folder(rootpath);
+    console.log(directoryTree, rootpathList, "directoryTree");
     addFilesToZip(directoryTree, zipFolder, "", rootpath, true);
   }
-
 
   zip.generateAsync({ type: "blob" }).then(function (blob) {
     saveAs(blob, `${getRandomString()}.zip`);

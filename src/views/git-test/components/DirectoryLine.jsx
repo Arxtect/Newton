@@ -30,13 +30,10 @@ const LinkedLines = ({
   editingFilepath,
   ...res
 }) => {
-
-
   return (
     <>
       {fileList.map((f) => {
         const filepath = path.join(dirpath, f.name);
-        console.log(filepath, 'filepath')
         if (f.type === "file") {
           return (
             <FileLine
@@ -106,7 +103,7 @@ const DirectoryLineContent = ({
 
     const updateChildren = async () => {
       try {
-        const fileList = await readFileStats(root, dirpath);
+        const fileList = await readFileStats(dirpath);
 
         if (!unmounted) {
           setFileList(fileList);
@@ -220,8 +217,9 @@ const DirectoryLineContent = ({
             onMouseOver={handleMouseOver}
             onMouseLeave={handleMouseLeave}
             onClick={(e) => handleClick(e, dirpath)}
-            className={`hover:bg-gray-100 transition duration-300 ${hovered || currentSelectDir == dirpath ? "bg-gray-100" : ""
-              }`}
+            className={`hover:bg-gray-100 transition duration-300 ${
+              hovered || currentSelectDir == dirpath ? "bg-gray-100" : ""
+            }`}
             style={{
               padding: "3px 0px 3px 0px",
               paddingLeft: `${depth * 8}px`,

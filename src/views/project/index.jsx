@@ -39,9 +39,7 @@ import ActionBar from "./actionBar";
 import ArButton from "@/components/arButton";
 import { toast } from "react-toastify";
 import { formatDate } from "@/util";
-
-import { create } from "@/convergence/create"
-import { collab } from "@/convergence/collab"
+import { syncTest } from "@/convergence";
 
 function Project() {
   const navigate = useNavigate();
@@ -58,7 +56,7 @@ function Project() {
     deleteProject: state.deleteProject,
     changeCurrentProjectRoot: state.changeCurrentProjectRoot,
     getCurrentProjectPdf: state.getCurrentProjectPdf,
-    initFile: state.initFile
+    initFile: state.initFile,
   }));
   const [tableWidth, setTableWidth] = useState(0);
   const tableContainerRef = useRef(null);
@@ -138,6 +136,10 @@ function Project() {
   //github
   const [githubDialogOpen, setGithubDialogOpen] = useState(false);
 
+  useEffect(() => {
+    syncTest();
+  }, []);
+
   // download pdf
   const downloadPdf = async (projectName) => {
     const blobUrl = await getCurrentProjectPdf(projectName);
@@ -184,7 +186,6 @@ function Project() {
               projectRoot: params.value,
             });
             navigate(`/newton`);
-
           }}
         >
           <span
