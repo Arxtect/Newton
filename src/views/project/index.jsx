@@ -39,7 +39,7 @@ import ActionBar from "./actionBar";
 import ArButton from "@/components/arButton";
 import { toast } from "react-toastify";
 import { formatDate } from "@/util";
-import { syncTest } from "@/convergence";
+import { ProjectSync } from "@/convergence";
 
 function Project() {
   const navigate = useNavigate();
@@ -73,9 +73,6 @@ function Project() {
     );
   };
 
-  useEffect(() => {
-    getProjectList();
-  }, []);
 
   // 根据父容器宽度计算列宽度
 
@@ -136,9 +133,7 @@ function Project() {
   //github
   const [githubDialogOpen, setGithubDialogOpen] = useState(false);
 
-  useEffect(() => {
-    syncTest();
-  }, []);
+
 
   // download pdf
   const downloadPdf = async (projectName) => {
@@ -316,6 +311,45 @@ function Project() {
       sliderRef.current.getMainMenuTitleViaId(currentSelectMenu)
     );
   }, []);
+
+  const initShareProject = async () => {
+    const hash = window.location.hash;
+    const queryString = hash.includes("?") ? hash.split("?")[1] : "";
+    const searchParams = new URLSearchParams(queryString);
+
+    const project = searchParams.get("project");
+    const roomId = searchParams.get("roomId");
+
+    console.log(roomId, project, 'ject#/project?project=inform7&&roomId=user1');
+    if (!project || !roomId) return
+    const user = {
+      id: 'user1',
+      name: 'user1',
+      email: 'user@example.com',
+      color: "#ff0000"
+    }
+    const projectSync = await new ProjectSync(
+      project,
+      user,
+      roomId,
+      (filePath, content) => {
+        console.log("File changed:", filePath, content);
+      },
+      getProjectList
+    );
+
+    // setInterval(async () => {
+    //   // 同步整个文件夹
+    //   await projectSync.syncFolderToYMapRootPath();;
+    // }, [1000])
+
+  }
+
+  useEffect(() => {
+    initShareProject();
+    getProjectList();
+  }, []);
+
 
   return (
     <React.Fragment>

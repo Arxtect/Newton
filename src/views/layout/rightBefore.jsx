@@ -11,23 +11,9 @@ import RightBeforeLeft from "./rightBeforeLeft";
 import { existsPath } from "domain/filesystem";
 import path from "path";
 import LinkGithub from "./linkGithub";
+import Share from "./share";
 
 function RightBefore() {
-  const {
-    filepath,
-    createProject,
-    currentSelectDir,
-    repoChanged,
-    deleteProject,
-    allProject,
-  } = useFileStore((state) => ({
-    filepath: state.filepath,
-    createProject: state.createProject,
-    currentSelectDir: state.currentSelectDir,
-    repoChanged: state.repoChanged,
-    deleteProject: state.deleteProject,
-    allProject: state.allProject,
-  }));
 
   const { pdfUrl, toggleCompilerLog } = usePdfPreviewStore((state) => ({
     pdfUrl: state.pdfUrl,
@@ -67,6 +53,7 @@ function RightBefore() {
 
   // link
   const [githubDialogOpen, setGithubDialogOpen] = useState(false);
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
 
   return (
     <div className="flex h-full w-full justify-between px-2">
@@ -97,6 +84,18 @@ function RightBefore() {
           <EngineStatus className="text-[12px]" />
         </div>
         <div>
+          <Tooltip title="Share to collaborate">
+            <Button
+              color="inherit"
+              aria-label="log"
+              size="small"
+              onClick={() => setShareDialogOpen(true)}
+            >
+              <span className="flex items-center justify-center w-[20px] h-[20px] text-[14px]">
+                Share
+              </span>
+            </Button>
+          </Tooltip>
           {!!isExistsGit ? (
             <Tooltip title="Sync">
               <Button
@@ -135,6 +134,17 @@ function RightBefore() {
         setDialogOpen={setGithubDialogOpen}
         setIsExistsGit={setIsExistsGit}
       ></LinkGithub>
+      <Share
+        dialogOpen={shareDialogOpen}
+        setDialogOpen={setShareDialogOpen}
+        rootPath={currentProjectRoot}
+        user={{
+          id: 'user1',
+          name: 'user1',
+          email: 'user@example.com',
+          color: "#ff0000"
+        }}
+      ></Share>
       <BottomDrawer isOpen={isOpen} toggleDrawer={toggleDrawer} />
     </div>
   );

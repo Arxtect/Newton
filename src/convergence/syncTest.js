@@ -1,30 +1,14 @@
-import * as Y from "yjs";
-import { WebsocketProvider } from "y-websocket";
 import { ProjectSync } from "./projectSync";
 
-const host = "206.190.239.91:9008";
-const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-const wsUrl = `${wsProtocol}//${host}/websockets`;
-
-// 创建 Y.Doc 实例
-const yDoc = new Y.Doc();
-const provider = new WebsocketProvider(wsUrl, "file-sync", yDoc);
-const awareness = provider.awareness;
-
 // 创建 ProjectSync 实例
-const createProjectSync = (rootPath) => {
+const createProjectSync = (rootPath, user) => {
   const projectSync = new ProjectSync(
     rootPath,
-    yDoc,
-    awareness,
+    user,
     (filePath, content) => {
       console.log("File changed:", filePath, content);
     },
-    provider
   );
-
-  // 同步整个文件夹
-  projectSync.syncFolderToYMapRootPath();
 
   return projectSync;
 };
@@ -41,13 +25,24 @@ const testFileSync = async (projectSync, filePath, content) => {
 };
 
 export const syncTest = () => {
-  const fileSync = createProjectSync("inform7");
+  const user = {
+    id: "user1",
+    name: "John Doe",
+    color: "#ff0000"
+  };
+  const fileSync = createProjectSync("inform7", user);
 
   testFileSync(fileSync, "inform7/test.txt", "Hello, world!");
+
 };
 
 export const syncTestCo = () => {
-  const fileSync = createProjectSync("inform7");
+  const user = {
+    id: "user2",
+    name: "Jane Doe",
+    color: "#00ff00"
+  };
+  const fileSync = createProjectSync("inform7", user);
 
   testFileSync(fileSync, "inform7/test22.txt", "Hello, world!");
 };

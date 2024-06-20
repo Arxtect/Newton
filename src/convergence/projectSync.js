@@ -4,17 +4,36 @@ import { useFileStore } from "@/store"; // 假设 Zustand 文件操作在这里�
 import path from "path";
 import * as FS from "domain/filesystem";
 
+const host = "206.190.239.91:9008";
+const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+const wsUrl = `${wsProtocol}//${host}/websockets`;
+
 class ProjectSync {
-  constructor(rootPath, yDoc, awareness, handleChange, websocketProvider) {
+  constructor(rootPath, user, roomId, handleChange, otherOperation) {
     this.rootPath = rootPath;
-    this.yDoc = yDoc;
-    this.awareness = awareness;
+    this.yDoc = new Y.Doc();
     this.handleChange = handleChange;
-    this.websocketProvider = websocketProvider;
+    this.websocketProvider = new WebsocketProvider(wsUrl, this.rootPath + roomId, this.yDoc);
+    this.user = user;
+    this.userList = [];
+    this.awareness = this.websocketProvider.awareness;
+    this.syncLock = false; // 初始化锁
 
     // 使用 rootPath 作为命名空间
-    this.yMap = this.yDoc.getMap(rootPath);
+    this.yMap = this.yDoc.getMap(this.rootPath + roomId);
     this.yMap.observe(this.yMapObserveHandler.bind(this));
+
+    // 设置用户信息
+    this.setUserAwareness(user);
+
+    // 监听 awareness 变化
+    this.awareness.on('change', this.awarenessChangeHandler.bind(this));
+    setTimeout(() => otherOperation && otherOperation(), 500);
+  }
+
+  // 设置用户信息到 awareness
+  setUserAwareness(user) {
+    this.awareness.setLocalStateField('user', user);
   }
 
   // 读取文件内容
@@ -76,6 +95,11 @@ class ProjectSync {
 
   // 同步整个文件夹到 Yjs Map
   async syncFolderToYMap(folderPath) {
+    if (this.syncLock) {
+      console.log("Sync is already in progress. Please wait.");
+      return;
+    }
+
     try {
       const files = await FS.readFileStats(folderPath);
       console.log(files, "files");
@@ -96,12 +120,39 @@ class ProjectSync {
     }
   }
 
+  // 等待锁释放
+  async waitForUnlock() {
+    while (this.syncLock) {
+      await new Promise(resolve => setTimeout(resolve, 100)); // 每100ms检查一次锁状态
+    }
+  }
+
+
+
   async syncFolderToYMapRootPath() {
-    this.syncFolderToYMap(this.rootPath);
+    await this.waitForUnlock(); // 等待锁释放
+    await this.syncFolderToYMap(this.rootPath);
+  }
+
+  // 同步单个文件到 Yjs Map
+  async syncFileToYMap(filePath) {
+    await this.waitForUnlock(); // 等待锁释放
+    this.syncLock = true; // 加锁
+
+    try {
+      const content = await this.readFile(filePath);
+      this.syncToYMap(filePath, content);
+    } catch (err) {
+      console.error(`Error syncing file ${filePath}:`, err);
+      throw err;
+    } finally {
+      this.syncLock = false; // 解锁
+    }
   }
 
   // Yjs Map 观察者处理函数
   async yMapObserveHandler(event) {
+    this.syncLock = true; // 解锁
     event.keysChanged.forEach(async (key) => {
       const content = this.yMap.get(key);
       try {
@@ -113,13 +164,45 @@ class ProjectSync {
         // this.handleChange(key, content);
       } catch (err) {
         console.error(err);
+      } finally {
+        this.syncLock = false; // 解锁
       }
     });
+  }
+
+  // Awareness 变化处理函数
+  awarenessChangeHandler({ added, updated, removed }) {
+    const states = this.awareness.getStates();
+    const uniqueUsers = new Set();
+
+    states.forEach(state => {
+      if (state.user) {
+        uniqueUsers.add(JSON.stringify(state.user)); // 使用 JSON 字符串来确保唯一性
+      }
+    });
+    // 将 Set 转换回数组并解析 JSON 字符串
+    this.userList = Array.from(uniqueUsers).map(user => JSON.parse(user));
+
+    // console.log("Users added:", added.map(id => states.get(id)));
+    // console.log("Users updated:", updated.map(id => states.get(id)));
+    // console.log("Users removed:", removed.map(id => states.get(id)));
+    console.log(this.userList, 'users added')
+  }
+
+  // 获取当前在线用户信息
+  getCurrentUsers() {
+    const states = this.awareness.getStates();
+    const users = [];
+    states.forEach((state, clientID) => {
+      users.push({ clientID, ...state.user });
+    });
+    return users;
   }
 
   // 清理函数
   cleanup() {
     this.yMap.unobserve(this.yMapObserveHandler);
+    this.awareness.off('change', this.awarenessChangeHandler);
   }
 
   // 彻底关闭协作进程
