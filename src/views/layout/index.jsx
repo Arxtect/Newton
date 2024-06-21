@@ -17,6 +17,7 @@ const Index = () => {
   useLayoutEffect(() => {
     initializeLatexEngines();
   }, []);
+
   return (
     <Layout
       left={<GitTest></GitTest>}

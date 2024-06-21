@@ -6,22 +6,9 @@
 // Hooks
 import React, { useLayoutEffect, useEffect, useState } from "react";
 import RootDirectory from "./components/RootDirectory";
-import {
-  mkdir,
-  readDirectoryTree,
-  downloadDirectoryAsZip,
-  findAllProject,
-} from "domain/filesystem";
+import { findAllProject, getProjectInfo } from "domain/filesystem";
 import { useFileStore } from "store";
-import { IconButton, Tooltip } from "@mui/material";
-import IosShareIcon from "@mui/icons-material/IosShare";
-import MoreMenu from "./components/moreMenu.js";
-
-import { FileUploader, FolderUploader } from "./upload.jsx";
-import DropdownFormWithIcon from "./components/DropdownFormWithIcon.jsx";
-
-import { gitClone, linkRepo, commitFile, gitPush } from "./gitclone.js";
-import BottomDrawer from "@/features/bottomDrawer/bottomDrawer";
+import { ProjectSync } from "@/convergence";
 import RightBeforeLeft from "@/views/layout/rightBeforeLeft";
 
 const GitTest = () => {
@@ -50,6 +37,7 @@ const GitTest = () => {
     deleteProject,
     allProject,
     updateAllProject,
+    updateProjectSync,
   } = useFileStore((state) => ({
     filepath: state.filepath,
     currentProjectRoot: state.currentProjectRoot,
@@ -75,6 +63,7 @@ const GitTest = () => {
     deleteProject: state.deleteProject,
     allProject: state.allProject,
     updateAllProject: state.updateAllProject,
+    updateProjectSync: state.updateProjectSync,
   }));
   const getAllProject = async () => {
     let projectLists = await findAllProject(".");
@@ -93,6 +82,35 @@ const GitTest = () => {
   const toggleDrawer = (open) => {
     setIsOpen(open);
   };
+
+  const initShareProject = async () => {
+    const projectInfo = await getProjectInfo(currentProjectRoot);
+
+    const project = projectInfo["rootPath"];
+    const roomId = projectInfo["userId"];
+
+    if (!project || !roomId) return;
+    const user = {
+      id: "user1",
+      name: "user1",
+      email: "user@example.com",
+      color: "#ff0000",
+    };
+    const projectSync = await new ProjectSync(
+      project,
+      user,
+      roomId,
+      (filePath, content) => {
+        console.log("File changed:", filePath, content);
+      }
+    );
+    updateProjectSync(projectSync);
+    await projectSync.setObserveHandler();
+  };
+
+  useEffect(() => {
+    initShareProject();
+  }, []);
 
   return (
     <main className="max-w-[100%]">

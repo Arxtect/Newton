@@ -21,7 +21,6 @@ class ProjectSync {
     this.user = user;
     this.userList = [];
     this.awareness = this.websocketProvider.awareness;
-    this.syncLock = false; // 初始化锁
     this.currentFilePath = "";
     this.isLocalChange = true; // 是否本地变更
 
@@ -47,6 +46,10 @@ class ProjectSync {
       rootPath: this.rootPath,
       userId: this.roomId,
     });
+  }
+
+  async removeProjectSyncInfo() {
+    await FS.removeProjectInfo(this.rootPath);
   }
 
   // 设置用户信息到 awareness
@@ -132,7 +135,6 @@ class ProjectSync {
   // 同步单个文件到 Yjs Map
   async syncFileToYMap(filePath, content) {
     await this.waitForUnlock(); // 等待锁释放
-    this.syncLock = true; // 加锁
 
     try {
       this.syncToYMap(filePath, content);
@@ -140,7 +142,6 @@ class ProjectSync {
       console.error(`Error syncing file ${filePath}:`, err);
       throw err;
     } finally {
-      this.syncLock = false; // 解锁
     }
   }
 
@@ -186,11 +187,10 @@ class ProjectSync {
 
   // Yjs Map 观察者处理函数
   async yMapObserveHandler(editor, event) {
-    this.syncLock = true; // 解锁
     event.keysChanged.forEach(async (key) => {
       const content = this.yMap.get(key);
       try {
-        console.log(key, "key");
+        console.log("YMap event:", event); // 打印事件对象
         const dirpath = path.dirname(key);
         await FS.ensureDir(dirpath);
         if (this.isCurrentFile(editor, key)) {
@@ -202,7 +202,6 @@ class ProjectSync {
       } catch (err) {
         console.error(err);
       } finally {
-        this.syncLock = false; // 解锁
       }
     });
   }

@@ -62,14 +62,26 @@ function Project() {
   const tableContainerRef = useRef(null);
   const [projectData, setProjectData] = useState([]);
 
-  const getProjectList = async () => {
+  const getProjectList = async (currentSelectMenu) => {
+    console.log(currentSelectMenu, "currentSelectMenu");
     const project = await findAllProjectInfo();
+
     console.log(project, "project");
     setProjectData(
-      project.map((item, index) => ({
-        id: index + 1,
-        ...item,
-      }))
+      project
+        .map((item, index) => {
+          if (currentSelectMenu == 3 && !item?.userId && !item?.rootPath) {
+            return null;
+          }
+          if (currentSelectMenu == 2 && (item?.userId || item?.rootPath)) {
+            return null;
+          }
+          return {
+            id: index + 1,
+            ...item,
+          };
+        })
+        .filter((item) => item !== null)
     );
   };
 
@@ -196,6 +208,9 @@ function Project() {
       headerAlign: "center",
       align: "center",
       sortable: false,
+      renderCell: (params, index, item) => {
+        return params.row?.userId ? params.row?.userId : params.value;
+      },
     },
     {
       field: "lastModified",
@@ -317,7 +332,6 @@ function Project() {
     const project = searchParams.get("project");
     const roomId = searchParams.get("roomId");
 
-    console.log(roomId, project, "ject#/project?project=inform7&&roomId=user1");
     if (!project || !roomId) return;
     const user = {
       id: "user1",
@@ -341,6 +355,10 @@ function Project() {
     initShareProject();
     getProjectList();
   }, []);
+
+  useEffect(() => {
+    getProjectList(currentSelectMenu);
+  }, [currentSelectMenu]);
 
   return (
     <React.Fragment>

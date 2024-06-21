@@ -120,7 +120,7 @@ export const useFileStore = create()(
       debouncedUpdateFileContent: debounce((filepath, value) => {
         get().updateFileContent(filepath, value);
       }, 1000),
-      changeValue: (value,autosave=true) => {
+      changeValue: (value, autosave = true) => {
         const state = get();
         if (state.autosave && autosave) {
           set({
@@ -249,24 +249,24 @@ export const useFileStore = create()(
       },
       changeCurrentProjectRoot: async ({ projectRoot }) => {
         set({ projectSync: null });
-        const projectInfo = await FS.getProjectInfo(projectRoot);
-        if (projectInfo?.rootPath && projectInfo?.userId) {
-          const projectSync = new ProjectSync(
-            projectInfo.rootPath,
-            {
-              id: "user1",
-              name: "user1",
-              email: "user@example.com",
-              color: "#ff0000",
-            },
-            projectInfo?.userId,
-            (filePath, content) => {
-              console.log("File changed:", filePath, content);
-            }
-          );
-          set({ projectSync: projectSync });
-          projectSync.setObserveHandler();
-        }
+        // const projectInfo = await FS.getProjectInfo(projectRoot);
+        // if (projectInfo?.rootPath && projectInfo?.userId) {
+        //   const projectSync = new ProjectSync(
+        //     projectInfo.rootPath,
+        //     {
+        //       id: "user1",
+        //       name: "user1",
+        //       email: "user@example.com",
+        //       color: "#ff0000",
+        //     },
+        //     projectInfo?.userId,
+        //     (filePath, content) => {
+        //       console.log("File changed:", filePath, content);
+        //     }
+        //   );
+        //   set({ projectSync: projectSync });
+        //   projectSync.setObserveHandler();
+        // }
         get().initFile();
         set({ currentProjectRoot: projectRoot, currentSelectDir: projectRoot });
         initializeGitStatus({ projectRoot });

@@ -30,7 +30,7 @@ const LatexEditor = ({ handleChange, sourceCode, filepath }) => {
       console.log("Cleaning up editor reference");
       updateEditor(null);
     };
-  }, []);
+  }, [latexRef]);
 
   return (
     <div className="h-full relative" id="editor">
