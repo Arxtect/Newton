@@ -8,6 +8,8 @@ import {
 } from "./useGitRepo";
 import { savePdfToIndexedDB, getPdfFromIndexedDB } from "@/util";
 import { user } from "./user";
+import { ProjectSync } from "@/convergence";
+import { useEditor } from "./useEditor";
 
 export const FILE_STORE = "file_store";
 
@@ -36,11 +38,14 @@ export const useFileStore = create()(
       dirCreatingDir: null,
       renamingPathname: null,
       currentProjectRoot: "",
+      projectSync: null,
       touchCounter: 0,
       currentSelectDir: "",
       preRenamingDirpath: "",
       allProject: [],
-
+      updateProjectSync: (projectSync) => {
+        set({ projectSync });
+      },
       updateProject: async (pdfBlob) => {
         const projectRoot = get().currentProjectRoot;
         // 保存PDF到IndexedDB
@@ -59,7 +64,13 @@ export const useFileStore = create()(
       // Actions
       setAutosave: (autosave) => set({ autosave }),
       loadFile: async ({ filepath }) => {
+        const { editor } = useEditor.getState();
         const fileContent = await FS.readFile(filepath);
+        const projectSync = get().projectSync;
+        console.log(editor, "editor");
+        if (projectSync && editor != null && filepath) {
+          projectSync.updateEditorAndCurrentFilePath(filepath, editor);
+        }
         set({
           filepath,
           filetype: FS.extToFileType(filepath), // You will need to define extToFileType function
@@ -81,7 +92,12 @@ export const useFileStore = create()(
           changed: false,
         }));
       },
-      saveFile: async (filepath, value, withReload = false,isSaveState = true) => {
+      saveFile: async (
+        filepath,
+        value,
+        withReload = false,
+        isSaveState = true
+      ) => {
         await FS.writeFile(filepath, value);
         if (isSaveState) {
           get().saveFileState(value);
@@ -104,9 +120,9 @@ export const useFileStore = create()(
       debouncedUpdateFileContent: debounce((filepath, value) => {
         get().updateFileContent(filepath, value);
       }, 1000),
-      changeValue: (value) => {
+      changeValue: (value,autosave=true) => {
         const state = get();
-        if (state.autosave) {
+        if (state.autosave && autosave) {
           set({
             value,
             lastSavedValue: value,
@@ -122,10 +138,10 @@ export const useFileStore = create()(
       },
       updateFileContent: async (filepath, value, withReload = false) => {
         const state = get();
-        if (state.autosave) {
-          await state.saveFile(filepath, value, withReload);
-        } else {
-          get().changeValue(value);
+        const projectSync = get().projectSync;
+        await state.saveFile(filepath, value, withReload);
+        if (projectSync && filepath) {
+          projectSync.syncFileToYMap(filepath, value);
         }
       },
 
@@ -231,7 +247,26 @@ export const useFileStore = create()(
         console.log(dirpath, "changePreRenamingDirpath");
         set({ preRenamingDirpath: dirpath });
       },
-      changeCurrentProjectRoot: ({ projectRoot }) => {
+      changeCurrentProjectRoot: async ({ projectRoot }) => {
+        set({ projectSync: null });
+        const projectInfo = await FS.getProjectInfo(projectRoot);
+        if (projectInfo?.rootPath && projectInfo?.userId) {
+          const projectSync = new ProjectSync(
+            projectInfo.rootPath,
+            {
+              id: "user1",
+              name: "user1",
+              email: "user@example.com",
+              color: "#ff0000",
+            },
+            projectInfo?.userId,
+            (filePath, content) => {
+              console.log("File changed:", filePath, content);
+            }
+          );
+          set({ projectSync: projectSync });
+          projectSync.setObserveHandler();
+        }
         get().initFile();
         set({ currentProjectRoot: projectRoot, currentSelectDir: projectRoot });
         initializeGitStatus({ projectRoot });

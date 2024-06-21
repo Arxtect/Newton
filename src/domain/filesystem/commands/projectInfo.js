@@ -43,6 +43,7 @@ export const getProjectInfo = async (projectRoot) => {
     return JSON.parse(fileContent); // 解析 JSON 字符串为对象
   } catch (err) {
     console.log("Error reading or parsing project info file: " + err);
+    return null
   }
 };
 

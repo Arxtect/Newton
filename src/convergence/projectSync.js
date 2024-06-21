@@ -9,88 +9,139 @@ const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
 const wsUrl = `${wsProtocol}//${host}/websockets`;
 
 class ProjectSync {
-  constructor(rootPath, user, roomId, handleChange, otherOperation) {
+  constructor(rootPath, user, roomId, otherOperation) {
     this.rootPath = rootPath;
+    this.roomId = roomId;
     this.yDoc = new Y.Doc();
-    this.handleChange = handleChange;
-    this.websocketProvider = new WebsocketProvider(wsUrl, this.rootPath + roomId, this.yDoc);
+    this.websocketProvider = new WebsocketProvider(
+      wsUrl,
+      this.rootPath + this.roomId,
+      this.yDoc
+    );
     this.user = user;
     this.userList = [];
     this.awareness = this.websocketProvider.awareness;
     this.syncLock = false; // 初始化锁
-
-    // 使用 rootPath 作为命名空间
-    this.yMap = this.yDoc.getMap(this.rootPath + roomId);
-    this.yMap.observe(this.yMapObserveHandler.bind(this));
+    this.currentFilePath = "";
+    this.isLocalChange = true; // 是否本地变更
 
     // 设置用户信息
     this.setUserAwareness(user);
 
+    // 使用 rootPath 作为命名空间
+    this.yMap = this.yDoc.getMap(this.rootPath + this.roomId);
+    // this.setObserveHandler();
+
     // 监听 awareness 变化
-    this.awareness.on('change', this.awarenessChangeHandler.bind(this));
+    this.awareness.on("change", this.awarenessChangeHandler.bind(this));
     setTimeout(() => otherOperation && otherOperation(), 500);
+  }
+
+  // set observe handler
+  setObserveHandler(editor) {
+    this.yMap.observe(this.yMapObserveHandler.bind(this, editor));
+  }
+
+  async saveProjectSyncInfoToJson() {
+    await FS.createProjectInfo(this.rootPath, {
+      rootPath: this.rootPath,
+      userId: this.roomId,
+    });
   }
 
   // 设置用户信息到 awareness
   setUserAwareness(user) {
-    this.awareness.setLocalStateField('user', user);
+    this.awareness.setLocalStateField("user", user);
   }
 
-  // 读取文件内容
-  async readFile(filePath) {
-    try {
-      const fileContent = await FS.readFile(filePath);
-      return fileContent.toString();
-    } catch (err) {
-      console.error(err);
-      throw err;
-    }
-  }
-
-  // 写入文件内容
-  async writeFile(filePath, content) {
-    try {
-      console.log(content, "content");
-      await FS.writeFile(filePath, content);
-      this.syncToYMap(filePath, content);
-    } catch (err) {
-      console.error(err);
-      throw err;
-    }
-  }
-
-  // 删除文件
-  async deleteFile(filePath) {
-    try {
-      const fileStore = useFileStore.getState();
-      await fileStore.deleteFile({ filename: filePath });
-      this.yDoc.transact(() => {
-        this.yMap.delete(filePath);
-      });
-    } catch (err) {
-      console.error(err);
-      throw err;
-    }
-  }
-
-  // 创建文件夹
-  async createFolder(folderPath) {
-    try {
-      const fileStore = useFileStore.getState();
-      await fileStore.finishDirCreating({
-        dirpath: folderPath,
-      });
-    } catch (err) {
-      console.error(err);
-      throw err;
-    }
-  }
-
-  // 同步文件内容到 Yjs Map
+  //同步文件内容到 Yjs Map
   syncToYMap(filePath, content) {
     this.yDoc.transact(() => {
       this.yMap.set(filePath, content);
     });
+  }
+
+  setEditorContent(content) {
+    const handleChange = useFileStore.getState().changeValue;
+    handleChange(content, false);
+  }
+
+  handleInput(e) {
+    if (!this.currentFilePath) {
+      console.error("No file is currently being edited.");
+      return;
+    }
+
+    console.log(e, "e");
+    const { action, lines, start } = e;
+    const position = start.row * start.column; // 计算插入位置
+
+    console.log(action, "inputType");
+    const newVal = this.getVal(); // 假设getVal是一个方法
+    const newRange = this.getRange(); // 假设getRange是一个方法
+    if (action == "insert") {
+      this.yDoc.transact(() => {
+        let length = this.yText.toString().length;
+        new Promise((resolve, reject) => {
+          this.yText.delete(0, length);
+          this.undoManager.redo();
+          resolve();
+        }).then(() => {
+          console.log(this.yText.toString(), "de");
+        });
+      }, this.yDoc.clientID);
+    } else if (action == "remove") {
+      this.yDoc.transact(() => {
+        let length = this.yText.toString().length;
+        this.yText.delete(0, length);
+        this.undoManager.undo();
+        this.yText.insert(0, this.getVal());
+      }, this.yDoc.clientID);
+    } else if (action === "historyUndo") {
+      this.undoManager.undo();
+    } else if (action === "historyRedo") {
+      this.undoManager.redo();
+    }
+  }
+
+  isCurrentFile(editor, filePath) {
+    return (
+      editor != null && this.currentFilePath && filePath == this.currentFilePath
+    );
+  }
+
+  updateEditorAndCurrentFilePath(filePath, editor) {
+    this.currentFilePath = filePath;
+    this.yText = this.yDoc.getText(filePath);
+    this.undoManager = new Y.UndoManager(this.yText);
+    console.log(editor, filePath, "editor1231231");
+    this.setObserveHandler(editor);
+    editor.getSession().on("change", (e) => this.handleInput(e));
+  }
+  getVal() {
+    // 实现获取当前文本内容的方法
+    return this.yText.toString();
+  }
+
+  getRange() {
+    // 实现获取当前选择范围的方法
+    // 这里假设返回一个默认值
+    return [0, this.yText.length];
+  }
+
+  // 同步单个文件到 Yjs Map
+  async syncFileToYMap(filePath, content) {
+    await this.waitForUnlock(); // 等待锁释放
+    this.syncLock = true; // 加锁
+
+    try {
+      this.syncToYMap(filePath, content);
+    } catch (err) {
+      console.error(`Error syncing file ${filePath}:`, err);
+      throw err;
+    } finally {
+      this.syncLock = false; // 解锁
+    }
   }
 
   // 同步整个文件夹到 Yjs Map
@@ -123,35 +174,18 @@ class ProjectSync {
   // 等待锁释放
   async waitForUnlock() {
     while (this.syncLock) {
-      await new Promise(resolve => setTimeout(resolve, 100)); // 每100ms检查一次锁状态
+      await new Promise((resolve) => setTimeout(resolve, 100)); // 每100ms检查一次锁状态
     }
   }
-
-
 
   async syncFolderToYMapRootPath() {
     await this.waitForUnlock(); // 等待锁释放
+    await this.saveProjectSyncInfoToJson(this.rootPath); // 保存项目信息
     await this.syncFolderToYMap(this.rootPath);
   }
 
-  // 同步单个文件到 Yjs Map
-  async syncFileToYMap(filePath) {
-    await this.waitForUnlock(); // 等待锁释放
-    this.syncLock = true; // 加锁
-
-    try {
-      const content = await this.readFile(filePath);
-      this.syncToYMap(filePath, content);
-    } catch (err) {
-      console.error(`Error syncing file ${filePath}:`, err);
-      throw err;
-    } finally {
-      this.syncLock = false; // 解锁
-    }
-  }
-
   // Yjs Map 观察者处理函数
-  async yMapObserveHandler(event) {
+  async yMapObserveHandler(editor, event) {
     this.syncLock = true; // 解锁
     event.keysChanged.forEach(async (key) => {
       const content = this.yMap.get(key);
@@ -159,9 +193,12 @@ class ProjectSync {
         console.log(key, "key");
         const dirpath = path.dirname(key);
         await FS.ensureDir(dirpath);
-        const fileStore = useFileStore.getState();
-        await fileStore.saveFile(key, content, false, false);
-        // this.handleChange(key, content);
+        if (this.isCurrentFile(editor, key)) {
+          this.setEditorContent(content);
+        } else {
+          const fileStore = useFileStore.getState();
+          await fileStore.saveFile(key, content, false, false);
+        }
       } catch (err) {
         console.error(err);
       } finally {
@@ -172,21 +209,11 @@ class ProjectSync {
 
   // Awareness 变化处理函数
   awarenessChangeHandler({ added, updated, removed }) {
-    const states = this.awareness.getStates();
-    const uniqueUsers = new Set();
-
-    states.forEach(state => {
-      if (state.user) {
-        uniqueUsers.add(JSON.stringify(state.user)); // 使用 JSON 字符串来确保唯一性
-      }
-    });
-    // 将 Set 转换回数组并解析 JSON 字符串
-    this.userList = Array.from(uniqueUsers).map(user => JSON.parse(user));
-
+    this.userList = this.getCurrentUsers();
     // console.log("Users added:", added.map(id => states.get(id)));
     // console.log("Users updated:", updated.map(id => states.get(id)));
     // console.log("Users removed:", removed.map(id => states.get(id)));
-    console.log(this.userList, 'users added')
+    console.log(this.userList, "users added");
   }
 
   // 获取当前在线用户信息
@@ -202,7 +229,7 @@ class ProjectSync {
   // 清理函数
   cleanup() {
     this.yMap.unobserve(this.yMapObserveHandler);
-    this.awareness.off('change', this.awarenessChangeHandler);
+    this.awareness.off("change", this.awarenessChangeHandler);
   }
 
   // 彻底关闭协作进程

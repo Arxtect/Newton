@@ -5,20 +5,21 @@
  */
 import React, { useEffect, useState } from "react";
 import ArDialog from "@/components/arDialog";
-import {
-  TextField,
-  Box,
-} from "@mui/material";
+import { TextField, Box } from "@mui/material";
 import { toast } from "react-toastify";
 import { ProjectSync } from "@/convergence";
-
+import { useFileStore } from "store";
 
 const Share = ({ dialogOpen, setDialogOpen, rootPath, user }) => {
   const [loading, setLoading] = useState(false);
   const [link, setLink] = useState("");
 
+  const { updateProjectSync } = useFileStore((state) => ({
+    updateProjectSync: state.updateProjectSync,
+  }));
+
   useEffect(() => {
-    console.log(rootPath, 'rootPath')
+    console.log(rootPath, "rootPath");
     const generatedLink = `${window.location.origin}/project#/project?project=${rootPath}&&roomId=${user.id}`;
     setLink(generatedLink);
   }, []);
@@ -34,16 +35,11 @@ const Share = ({ dialogOpen, setDialogOpen, rootPath, user }) => {
       user.id,
       (filePath, content) => {
         console.log("File changed:", filePath, content);
-      },
+      }
     );
-
-    setInterval(async () => {
-      // 同步整个文件夹
-      await projectSync.syncFileToYMap('inform7/uuid.txt');;
-    }, [2000])
-
+    updateProjectSync(projectSync);
+    await projectSync.syncFolderToYMapRootPath(rootPath);
   };
-
 
   const handleSaveProject = async () => {
     setLoading(true);
@@ -54,7 +50,7 @@ const Share = ({ dialogOpen, setDialogOpen, rootPath, user }) => {
       await navigator.clipboard.writeText(link);
       toast.success("Link copied to clipboard!");
       setLoading(false);
-      handleCancelProject()
+      handleCancelProject();
     } catch (error) {
       toast.error("Failed to copy link!");
     } finally {

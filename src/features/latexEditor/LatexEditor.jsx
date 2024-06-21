@@ -3,7 +3,7 @@
  * @Author: Devin
  * @Date: 2023-06-26 09:57:49
  */
-import React, { useLayoutEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import AceEditor from "react-ace";
 import "ace-builds/src-noconflict/mode-latex";
 // import "ace-builds/src-noconflict/theme-github";
@@ -11,35 +11,26 @@ import "ace-builds/src-noconflict/mode-latex";
 import "ace-builds/src-min-noconflict/ext-language_tools";
 import "ace-builds/src-min-noconflict/ext-searchbox";
 import AiTools from "./aiTools";
-//yjs
-import { routerQuery, getRandomColor } from "@/util";
-import * as Y from "yjs";
-import { IndexeddbPersistence } from "y-indexeddb";
-import { WebsocketProvider } from "y-websocket";
-
-import latexSyncToYText from "./latexSyncToYText";
-import { useYText } from "@/useHooks";
-import { AceBinding } from "./y-ace";
-import demo from "./demo";
-//constants
-const LATEX_NAME = "latex-demo1";
-const ROOM_NAME = "latex-demo1";
-
-const doc = new Y.Doc();
-// @ts-ignore
-window.doc = doc;
-
-// const host = window.location.hostname;
-const host = "206.190.239.91:9008";
-const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-const wsUrl = `${wsProtocol}//${host}/websockets`;
-// const wsUrl = "wss://arxtect.com/websockets"
+import { useEditor } from "@/store";
 
 const LatexEditor = ({ handleChange, sourceCode, filepath }) => {
   const latexRef = useRef(null);
-  const { yText, undoManager } = useYText({ name: LATEX_NAME, doc });
-  const [fragments, setFragments] = useState([]);
 
+  const { updateEditor } = useEditor((state) => ({
+    updateEditor: state.updateEditor,
+  }));
+
+  useEffect(() => {
+    console.log(latexRef.current, "latexRef.current");
+    if (latexRef.current && latexRef.current.editor) {
+      console.log("Updating editor reference", latexRef.current.editor);
+      updateEditor(latexRef.current.editor);
+    }
+    return () => {
+      console.log("Cleaning up editor reference");
+      updateEditor(null);
+    };
+  }, []);
 
   return (
     <div className="h-full relative" id="editor">
@@ -66,13 +57,11 @@ const LatexEditor = ({ handleChange, sourceCode, filepath }) => {
         ref={latexRef}
         readOnly={filepath == "" ? true : false}
         className={filepath == "" ? "disabled-editor" : ""}
-
-      >
-      </AceEditor>
+      ></AceEditor>
       <AiTools editorRef={latexRef} />
       {/* <div className="input overlay">{fragments}</div> */}
       <div id="users"></div>
-    </div >
+    </div>
   );
 };
 

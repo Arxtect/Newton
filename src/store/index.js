@@ -6,3 +6,4 @@ export * from "./engineStatus.js";
 export * from "./loginStore.js";
 export * from "./useGitRepo.js";
 export * from "./layout.js";
+export * from "./useEditor.js";

@@ -73,7 +73,6 @@ function Project() {
     );
   };
 
-
   // 根据父容器宽度计算列宽度
 
   const [selectedRows, setSelectedRows] = React.useState([]);
@@ -132,8 +131,6 @@ function Project() {
 
   //github
   const [githubDialogOpen, setGithubDialogOpen] = useState(false);
-
-
 
   // download pdf
   const downloadPdf = async (projectName) => {
@@ -320,14 +317,14 @@ function Project() {
     const project = searchParams.get("project");
     const roomId = searchParams.get("roomId");
 
-    console.log(roomId, project, 'ject#/project?project=inform7&&roomId=user1');
-    if (!project || !roomId) return
+    console.log(roomId, project, "ject#/project?project=inform7&&roomId=user1");
+    if (!project || !roomId) return;
     const user = {
-      id: 'user1',
-      name: 'user1',
-      email: 'user@example.com',
-      color: "#ff0000"
-    }
+      id: "user1",
+      name: "user1",
+      email: "user@example.com",
+      color: "#ff0000",
+    };
     const projectSync = await new ProjectSync(
       project,
       user,
@@ -337,19 +334,13 @@ function Project() {
       },
       getProjectList
     );
-
-    // setInterval(async () => {
-    //   // 同步整个文件夹
-    //   await projectSync.syncFolderToYMapRootPath();;
-    // }, [1000])
-
-  }
+    await projectSync.setObserveHandler();
+  };
 
   useEffect(() => {
     initShareProject();
     getProjectList();
   }, []);
-
 
   return (
     <React.Fragment>
