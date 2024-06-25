@@ -54,6 +54,7 @@ class ProjectSync {
     await FS.createProjectInfo(this.rootPath, {
       rootPath: this.rootPath,
       userId: this.roomId,
+      isSync: true,
       ...otherInfo,
     });
   }
@@ -79,7 +80,7 @@ class ProjectSync {
     handleChange(content, false);
   }
 
-  handleInput(e) {
+  handleInput(e, editor) {
     if (!this.currentFilePath) {
       console.error("No file is currently being edited.");
       return;
@@ -115,6 +116,10 @@ class ProjectSync {
     } else if (action === "historyRedo") {
       this.undoManager.redo();
     }
+    if (this.isCurrentFile(editor, this.currentFilePath)) {
+      this.aceBinding._cursorObserver(editor);
+    }
+
   }
 
   isCurrentFile(editor, filePath) {
@@ -131,9 +136,15 @@ class ProjectSync {
     this.setObserveHandler(editor);
 
     // Initialize AceBinding for cursor synchronization
-    this.aceBinding.init(editor); // 初始化AceBinding实例
+    if (this.isCurrentFile(editor, this.currentFilePath)) {
+      // Initialize AceBinding for cursor synchronization
+      this.aceBinding.init(editor, this.yText); // 初始化 AceBinding 实例
+    }
 
-    editor.getSession().on("change", (e) => this.handleInput(e));
+    editor.getSession().on("change", (e) => {
+      this.handleInput(e, editor)
+    });
+
   }
 
   getVal() {

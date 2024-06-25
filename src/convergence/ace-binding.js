@@ -41,7 +41,7 @@ class AceCursors {
         }
         continue;
       } else if (pos.row > end) {
-        let el = document.getElementById(this.self.aceID + "_cursor_" + pos.id);
+        let el = document.getElementById(this.aceID + "_cursor_" + pos.id);
         if (el) {
           el.style.opacity = 0;
         }
@@ -173,7 +173,6 @@ class AceCursors {
     }
   }
 }
-
 export class AceBinding {
   /**
    * @param {Awareness} [awareness]
@@ -202,8 +201,9 @@ export class AceBinding {
 
     this._cursorObserver = (ace) => {
       let user = this.awareness.getLocalState().user; // 获取本地用户信息
-      console.log(user, "user");
+
       let curSel = ace.getSession().selection;
+
       let cursor = {
         id: user.id,
         name: user.name,
@@ -236,7 +236,7 @@ export class AceBinding {
         if (this.awareness.getLocalState() !== null) {
           this.awareness.setLocalStateField(
             "cursor",
-            /** @type {any} */ (null)
+            /** @type {any} */(null)
           );
         }
       } else {
@@ -250,18 +250,51 @@ export class AceBinding {
         }
       }
     };
+
+    this._aceObserver = (ace) => {
+      this._cursorObserver(ace);
+    };
+
+    this._typeObserver = (event, ace) => {
+      const aceDocument = ace.getSession().getDocument();
+      mux(() => {
+        const delta = event.delta;
+        let currentPos = 0;
+        for (const op of delta) {
+          if (op.retain) {
+            currentPos += op.retain;
+          } else if (op.insert) {
+            const start = aceDocument.indexToPosition(currentPos, 0);
+            aceDocument.insert(start, op.insert);
+            currentPos += op.insert.length;
+          } else if (op.delete) {
+            const start = aceDocument.indexToPosition(currentPos, 0);
+            const end = aceDocument.indexToPosition(currentPos + op.delete, 0);
+            const range = new Range(
+              start.row,
+              start.column,
+              end.row,
+              end.column
+            );
+            aceDocument.remove(range);
+          }
+        }
+        this._cursorObserver(ace);
+      });
+    };
+
   }
 
-  init(ace) {
+  init(ace, type) {
     this.aceCursors = new AceCursors(ace);
     this.aceCursors.init(ace);
     ace.session.getUndoManager().reset();
 
-    console.log(ace, "ace");
-
     ace.getSession().selection.on("changeCursor", () => {
       this._cursorObserver(ace);
     });
+
+    // type.observe((event) => this._typeObserver(event, ace));
 
     if (this.awareness) {
       this.awareness.on("change", (e) => this._awarenessChange(e, ace));

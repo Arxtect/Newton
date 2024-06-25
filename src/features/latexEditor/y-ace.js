@@ -28,25 +28,19 @@ class AceCursors {
 
       for (let i = 0; i < cursors.length; i++) {
         let pos = this.cursors[i];
-        if (pos.row < start) {
-          let el = document.getElementById(
-            this.self.aceID + "_cursor_" + pos.id
-          );
+        if (pos.row < start || pos.row > end) {
+          let el = document.getElementById(this.aceID + "_cursor_" + pos.id);
           if (el) {
             el.style.opacity = 0;
           }
           continue;
         } else if (pos.row > end) {
-          let el = document.getElementById(
-            this.self.aceID + "_cursor_" + pos.id
-          );
+          let el = document.getElementById(this.self.aceID + "_cursor_" + pos.id);
           if (el) {
             el.style.opacity = 0;
           }
           continue;
         } else {
-          // compute cursor position on screen
-          // this code is based on ace/layer/marker.js
           let screenPos = session.documentToScreenPosition(pos.row, pos.column);
           let aceGutter =
             document.getElementsByClassName("ace_gutter")[0].offsetWidth;
