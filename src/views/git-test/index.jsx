@@ -88,15 +88,11 @@ const GitTest = () => {
   const initShareProject = async () => {
     const projectInfo = await getProjectInfo(currentProjectRoot);
 
-    const project = projectInfo["rootPath"];
-    const roomId = projectInfo["userId"];
+    const project = projectInfo?.["rootPath"];
+    const roomId = projectInfo?.["userId"];
 
     if (!project || !roomId) return;
-    const projectSync = await new ProjectSync(
-      project,
-      user,
-      roomId
-    );
+    const projectSync = await new ProjectSync(project, user, roomId);
     updateProjectSync(projectSync);
     // await projectSync.setObserveHandler();
   };

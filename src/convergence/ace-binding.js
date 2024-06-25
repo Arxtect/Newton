@@ -199,6 +199,7 @@ export class AceBinding {
 
     this._cursorObserver = (ace) => {
       let user = this.awareness.getLocalState().user; // 获取本地用户信息
+      console.log(user, "user");
       let curSel = ace.getSession().selection;
       let cursor = {
         id: user.id,

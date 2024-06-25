@@ -19,21 +19,24 @@ class ProjectSync {
       this.rootPath + this.roomId,
       this.yDoc
     );
-    this.user = user;
+    this.user = {
+      ...user,
+      color: "#" + Math.floor(Math.random() * 16777215).toString(16),
+    };
     this.userList = [];
     this.awareness = this.websocketProvider.awareness;
     this.currentFilePath = "";
     this.isLocalChange = true; // 是否本地变更
 
     // 设置用户信息
-    this.setUserAwareness(user);
+    this.setUserAwareness(this.user);
 
     // 使用 rootPath 作为命名空间
     this.yMap = this.yDoc.getMap(this.rootPath + this.roomId);
     // this.setObserveHandler();
 
     // 监听 awareness 变化
-    this.awareness.on("change", this.awarenessChangeHandler.bind(this));
+    // this.awareness.on("change", this.awarenessChangeHandler.bind(this));
     this.otherOperation = otherOperation && otherOperation; // 保存回调函数
     this.isExistAllFile = false;
 
