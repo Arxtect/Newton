@@ -51,7 +51,7 @@ export async function readFileStats(dirpath) {
 
   const ret = await Promise.all(
     filenames.map(async (name) => {
-      // if (projectInfoExists(name)) return null;
+      if (!!projectInfoExists(name)) return null;
       const childPath = path.join(dirpath, name);
       const stats = await stat(childPath);
 
@@ -62,5 +62,8 @@ export async function readFileStats(dirpath) {
     })
   );
 
-  return orderBy(ret, [(s) => s.type + "" + s.name]);
+  return orderBy(
+    ret.filter((x) => x !== null),
+    [(s) => s.type + "" + s.name]
+  );
 }

@@ -23,20 +23,23 @@ function RightBefore() {
     pdfUrl: state.pdfUrl,
     toggleCompilerLog: state.toggleCompilerLog,
   }));
-  const { projectSync, sourceCode, changeValue, currentProjectRoot } =
+  const { projectSync, sourceCode, currentProjectRoot, filepath, loadFile } =
     useFileStore((state) => ({
       projectSync: state.projectSync,
       sourceCode: state.value,
-      changeValue: state.changeValue,
       currentProjectRoot: state.currentProjectRoot,
+      filepath: state.filepath,
+      loadFile: state.loadFile,
     }));
 
   useEffect(() => {
     return () => {
       console.log(projectSync, "projectSync");
-      projectSync && projectSync.leaveCollaboration();
+      projectSync?.leaveCollaboration && projectSync?.leaveCollaboration();
     };
   }, [projectSync]);
+
+ 
 
   const compile = () => compileLatex(sourceCode, currentProjectRoot);
 
@@ -75,25 +78,9 @@ function RightBefore() {
     setShareDialogOpen(true);
   };
 
-  useEffect(() => {
-    return () => {
-      projectSync && projectSync.leaveCollaboration();
-    };
-  }, []);
-
   return (
     <div className="flex h-full w-full justify-between px-2">
-      <div className="w-1/2  flex items-center">
-        {/* <RightBeforeLeft
-          createProject={createProject}
-          currentProject={currentProjectRoot}
-          deleteProject={deleteProject}
-          projectLists={allProject}
-          reload={repoChanged}
-          filepath={filepath}
-          currentSelectDir={currentSelectDir}
-        ></RightBeforeLeft> */}
-      </div>
+      <div className="w-1/2  flex items-center"></div>
       <div className="w-1/2 flex justify-between items-center pr-2">
         <div className="flex justify-center items-center">
           <Button
@@ -149,9 +136,6 @@ function RightBefore() {
               </Button>
             </Tooltip>
           )}
-          {/* <IconButton color="inherit" aria-label="settings" size="small">
-            <SettingsIcon fontSize="small" />
-          </IconButton> */}
           <Controls></Controls>
         </div>
       </div>
@@ -164,12 +148,6 @@ function RightBefore() {
         dialogOpen={shareDialogOpen}
         setDialogOpen={setShareDialogOpen}
         rootPath={currentProjectRoot}
-        // user={{
-        //   id: "user1",
-        //   name: "user1",
-        //   email: "user@example.com",
-        //   color: "#ff0000",
-        // }}
         user={user}
       ></Share>
       <BottomDrawer isOpen={isOpen} toggleDrawer={toggleDrawer} />

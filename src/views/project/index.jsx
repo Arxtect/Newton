@@ -391,7 +391,7 @@ function Project() {
     getProjectList();
     return () => {
       if (projectSync) {
-        projectSync.leaveCollaboration();
+        projectSync?.leaveCollaboration && projectSync?.leaveCollaboration();
       }
     };
   }, []);

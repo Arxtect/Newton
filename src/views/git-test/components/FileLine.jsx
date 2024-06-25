@@ -39,13 +39,21 @@ const FileLine = ({
 }) => {
   const [hovered, setHovered] = useState(false);
 
-  const { deleteFile, editingFilepath, currentSelectDir, renamingPathname } =
-    useFileStore((state) => ({
-      editingFilepath: state.filepath,
-      currentSelectDir: state.currentSelectDir,
-      deleteFile: state.deleteFile,
-      renamingPathname: state.renamingPathname,
-    }));
+  const {
+    editorValue,
+    saveFile,
+    deleteFile,
+    editingFilepath,
+    currentSelectDir,
+    renamingPathname,
+  } = useFileStore((state) => ({
+    editorValue: state.value,
+    saveFile: state.saveFile,
+    editingFilepath: state.filepath,
+    currentSelectDir: state.currentSelectDir,
+    deleteFile: state.deleteFile,
+    renamingPathname: state.renamingPathname,
+  }));
   const basename = path.basename(filepath);
 
   const handleRenameConfirm = async (value) => {
@@ -146,8 +154,8 @@ const FileLine = ({
           selected={editingFilepath === filepath && currentSelectDir == ""}
         >
           <div
-            onClick={() => {
-              loadFile({ filepath });
+            onClick={async () => {
+              await loadFile({ filepath });
               if (isMobile) {
                 pushScene({ nextScene: "edit" });
               }

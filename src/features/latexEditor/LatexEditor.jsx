@@ -11,13 +11,17 @@ import "ace-builds/src-noconflict/mode-latex";
 import "ace-builds/src-min-noconflict/ext-language_tools";
 import "ace-builds/src-min-noconflict/ext-searchbox";
 import AiTools from "./aiTools";
-import { useEditor } from "@/store";
+import { useEditor, useFileStore } from "@/store";
 
 const LatexEditor = ({ handleChange, sourceCode, filepath }) => {
   const latexRef = useRef(null);
 
-  const { updateEditor } = useEditor((state) => ({
+  const { editor, updateEditor } = useEditor((state) => ({
     updateEditor: state.updateEditor,
+  }));
+
+  const { loadFile } = useFileStore((state) => ({
+    loadFile: state.loadFile,
   }));
 
   useEffect(() => {
@@ -31,6 +35,11 @@ const LatexEditor = ({ handleChange, sourceCode, filepath }) => {
       updateEditor(null);
     };
   }, [latexRef]);
+
+  useEffect(() => {
+    if (!editor && !filepath) return;
+    loadFile({ filepath: filepath });
+  }, [editor]);
 
   return (
     <div className="h-full relative" id="editor">

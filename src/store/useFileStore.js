@@ -69,6 +69,7 @@ export const useFileStore = create()(
         const projectSync = get().projectSync;
         console.log(editor, "editor");
         if (projectSync && editor != null && filepath) {
+          console.log("12312132");
           projectSync.updateEditorAndCurrentFilePath(filepath, editor);
         }
         set({
@@ -92,16 +93,8 @@ export const useFileStore = create()(
           changed: false,
         }));
       },
-      saveFile: async (
-        filepath,
-        value,
-        withReload = false,
-        isSaveState = true
-      ) => {
+      saveFile: async (filepath, value, withReload = false) => {
         await FS.writeFile(filepath, value);
-        if (isSaveState) {
-          get().saveFileState(value);
-        }
         await updateStatusMatrixOnSaveFile({
           projectRoot: get().currentProjectRoot,
         });
@@ -117,12 +110,12 @@ export const useFileStore = create()(
         const initialState = getInitialState();
         set({ ...initialState, changed: false });
       },
-      debouncedUpdateFileContent: debounce((filepath, value) => {
-        get().updateFileContent(filepath, value);
-      }, 1000),
-      changeValue: (value, autosave = true) => {
+      debouncedUpdateFileContent: debounce((filepath, value, isSync) => {
+        get().updateFileContent(filepath, value, isSync);
+      }, 500),
+      changeValue: (value, isSync = true) => {
         const state = get();
-        if (state.autosave && autosave) {
+        if (state.autosave && isSync) {
           set({
             value,
             lastSavedValue: value,
@@ -134,13 +127,20 @@ export const useFileStore = create()(
             value,
             changed: state.lastSavedValue !== value,
           });
+          get().debouncedUpdateFileContent(state.filepath, value, isSync);
         }
       },
-      updateFileContent: async (filepath, value, withReload = false) => {
+      updateFileContent: async (
+        filepath,
+        value,
+        isSync = true,
+        withReload = false
+      ) => {
         const state = get();
-        const projectSync = get().projectSync;
         await state.saveFile(filepath, value, withReload);
-        if (projectSync && filepath) {
+        if (!isSync) return;
+        const projectSync = get().projectSync;
+        if (projectSync && filepath && isSync) {
           projectSync.syncFileToYMap(filepath, value);
         }
       },

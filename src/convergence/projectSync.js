@@ -3,6 +3,7 @@ import { WebsocketProvider } from "y-websocket";
 import { useFileStore } from "@/store"; // 假设 Zustand 文件操作在这里定义
 import path from "path";
 import * as FS from "domain/filesystem";
+import { AceBinding } from "./ace-binding"; // 导入AceBinding
 
 const host = "206.190.239.91:9008";
 const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
@@ -35,6 +36,9 @@ class ProjectSync {
     this.awareness.on("change", this.awarenessChangeHandler.bind(this));
     this.otherOperation = otherOperation && otherOperation; // 保存回调函数
     this.isExistAllFile = false;
+
+    // 初始化光标同步实例
+    this.aceBinding = new AceBinding(this.awareness);
   }
 
   // set observe handler
@@ -122,8 +126,13 @@ class ProjectSync {
     this.undoManager = new Y.UndoManager(this.yText);
     console.log(editor, filePath, "editor1231231");
     this.setObserveHandler(editor);
+
+    // Initialize AceBinding for cursor synchronization
+    this.aceBinding.init(editor); // 初始化AceBinding实例
+
     editor.getSession().on("change", (e) => this.handleInput(e));
   }
+
   getVal() {
     // 实现获取当前文本内容的方法
     return this.yText.toString();
@@ -250,6 +259,11 @@ class ProjectSync {
     // 清理本地用户状态
     if (this.awareness) {
       this.awareness.setLocalState(null);
+    }
+
+    // 销毁 AceBinding
+    if (this.aceBinding) {
+      this.aceBinding.destroy();
     }
   }
 
