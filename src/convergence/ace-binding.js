@@ -40,6 +40,12 @@ class AceCursors {
           el.style.opacity = 0;
         }
         continue;
+      } else if (pos.row > end) {
+        let el = document.getElementById(this.self.aceID + "_cursor_" + pos.id);
+        if (el) {
+          el.style.opacity = 0;
+        }
+        continue;
       } else {
         let screenPos = session.documentToScreenPosition(pos.row, pos.column);
         let aceGutter =
@@ -165,9 +171,6 @@ class AceCursors {
         }
       }
     }
-
-    // Redraw the markers to reflect the changes
-    this.redraw();
   }
 }
 
