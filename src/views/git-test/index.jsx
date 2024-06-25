@@ -7,7 +7,7 @@
 import React, { useLayoutEffect, useEffect, useState } from "react";
 import RootDirectory from "./components/RootDirectory";
 import { findAllProject, getProjectInfo } from "domain/filesystem";
-import { useFileStore } from "store";
+import { useFileStore, useUserStore } from "store";
 import { ProjectSync } from "@/convergence";
 import RightBeforeLeft from "@/views/layout/rightBeforeLeft";
 import { useAuth } from "@/useHooks";
@@ -73,7 +73,9 @@ const GitTest = () => {
       updateAllProject(projectLists);
     }
   };
-  const { user } = useAuth();
+  const { user } = useUserStore(state => ({
+    user: state.user
+  }))
 
   useEffect(() => {
     getAllProject();

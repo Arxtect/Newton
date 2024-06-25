@@ -40,8 +40,7 @@ import ArButton from "@/components/arButton";
 import { toast } from "react-toastify";
 import { formatDate } from "@/util";
 import { ProjectSync } from "@/convergence";
-import { useAuth } from "@/useHooks";
-import { updateDialogLoginOpen } from "@/store";
+import { updateDialogLoginOpen, useUserStore } from "@/store";
 import Share from "./share";
 
 function Project() {
@@ -64,7 +63,15 @@ function Project() {
   const [tableWidth, setTableWidth] = useState(0);
   const tableContainerRef = useRef(null);
   const [projectData, setProjectData] = useState([]);
-  const { user } = useAuth();
+
+  const { user, accessToken } = useUserStore(state => ({
+    user: state.user,
+    accessToken: state.accessToken
+  }))
+
+  useEffect(() => {
+    console.log(accessToken, user, 'accessToken')
+  }, [user, accessToken])
 
   const getProjectList = async (currentSelectMenu) => {
     console.log(currentSelectMenu, "currentSelectMenu");
@@ -141,6 +148,7 @@ function Project() {
   const [shareProjectName, setShareProjectName] = useState("");
 
   const controlShare = (project) => {
+    console.log(user, accessToken, 'user')
     if (!user || JSON.stringify(user) === "{}") {
       toast.warning("Please login");
       updateDialogLoginOpen(true);
@@ -332,7 +340,7 @@ function Project() {
         width: tableWidth * column.width,
       }))
     );
-  }, [tableWidth]);
+  }, [tableWidth, user, accessToken]);
 
   // search
   const [searchInput, setSearchInput] = useState("");

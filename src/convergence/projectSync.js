@@ -41,7 +41,7 @@ class ProjectSync {
     this.isExistAllFile = false;
 
     // 初始化光标同步实例
-    this.aceBinding = new AceBinding(this.awareness);
+    // this.aceBinding = new AceBinding(this.awareness);
   }
 
   // set observe handler
@@ -117,7 +117,7 @@ class ProjectSync {
       this.undoManager.redo();
     }
     if (this.isCurrentFile(editor, this.currentFilePath)) {
-      this.aceBinding._cursorObserver(editor);
+      // this.aceBinding._cursorObserver(editor);
     }
 
   }
@@ -138,7 +138,7 @@ class ProjectSync {
     // Initialize AceBinding for cursor synchronization
     if (this.isCurrentFile(editor, this.currentFilePath)) {
       // Initialize AceBinding for cursor synchronization
-      this.aceBinding.init(editor, this.yText); // 初始化 AceBinding 实例
+      // this.aceBinding.init(editor, this.yText); // 初始化 AceBinding 实例
     }
 
     editor.getSession().on("change", (e) => {
@@ -277,7 +277,7 @@ class ProjectSync {
 
     // 销毁 AceBinding
     if (this.aceBinding) {
-      this.aceBinding.destroy();
+      // this.aceBinding.destroy();
     }
   }
 

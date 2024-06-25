@@ -341,6 +341,7 @@ const Layout = ({
             </div>
             <div className="right-before-right">{rightBeforeRight}</div> */}
             {rightBefore}
+
           </div>
           <div className="content" ref={contentRef}>
             {showEditor && (

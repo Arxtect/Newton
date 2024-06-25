@@ -1,7 +1,7 @@
 // 假设你有这些辅助函数
 import { setCookie, deleteCookie } from "@/util";
 import { toast } from "react-toastify"; // 假设你已经安装了react-toastify
-import { updateAccessToken } from "store";
+import { updateAccessToken, updateUser } from "store";
 
 // 辅助函数：生成带有统一前缀的URL
 function getApiUrl(endpoint) {
@@ -71,6 +71,7 @@ export async function refreshAuth() {
     // });
     // deleteCookie("mojolicious");
     updateAccessToken("");
+    updateUser({});
     setTimeout(() => {
       //   window.location.reload();
     }, 1500);
@@ -87,6 +88,7 @@ export async function logoutUser() {
   if (response.ok) {
     // deleteCookie("mojolicious");
     updateAccessToken("");
+    updateUser({});
   } else {
     throw new Error("Logout failed");
   }
@@ -107,6 +109,7 @@ export async function getMe() {
   } else if (response.status === 401) {
     // deleteCookie("mojolicious");
     updateAccessToken("");
+    updateUser({});
     // toast.error("Login has expired. Please log in again", {
     //   position: "top-right",
     // });
@@ -130,6 +133,7 @@ export async function verifyEmail(verificationCode) {
   } else if (response.status === 401) {
     // deleteCookie("mojolicious");
     updateAccessToken("");
+    updateUser({});
     toast.error("Login has expired. Please log in again", {
       position: "top-right",
     });
@@ -154,6 +158,7 @@ export async function forgotPassword(email) {
   } else if (response.status === 401) {
     // deleteCookie("mojolicious");
     updateAccessToken("");
+    updateUser({});
     toast.error("Login has expired. Please log in again", {
       position: "top-right",
     });
@@ -178,6 +183,7 @@ export async function resetPassword({ resetToken, password, password_confirm }) 
   } else if (response.status === 401) {
     // deleteCookie("mojolicious");
     updateAccessToken("");
+    updateUser({});
     toast.error("Login has expired. Please log in again", {
       position: "top-right",
     });

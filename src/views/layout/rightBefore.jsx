@@ -14,10 +14,13 @@ import LinkGithub from "./linkGithub";
 import Share from "./share";
 import { useAuth } from "@/useHooks";
 import { toast } from "react-toastify";
-import { updateDialogLoginOpen } from "@/store";
+import { updateDialogLoginOpen, useUserStore } from "@/store";
 
 function RightBefore() {
-  const { user } = useAuth();
+
+  const { user } = useUserStore((state) => ({
+    user: state.user,
+  }));
 
   const { pdfUrl, toggleCompilerLog } = usePdfPreviewStore((state) => ({
     pdfUrl: state.pdfUrl,
@@ -39,7 +42,7 @@ function RightBefore() {
     };
   }, [projectSync]);
 
- 
+
 
   const compile = () => compileLatex(sourceCode, currentProjectRoot);
 
@@ -102,7 +105,7 @@ function RightBefore() {
               color="inherit"
               aria-label="log"
               size="small"
-              onClick={() => controlShare(true)}
+              onClick={() => controlShare()}
             >
               <span className="flex items-center justify-center w-[20px] h-[20px] text-[14px]">
                 Share

@@ -21,6 +21,7 @@ const DialogLogin = ({
 
   const handleClosePreview = () => {
     updateDialogLoginOpen(false);
+    // window.location.reload();
   };
 
   return (

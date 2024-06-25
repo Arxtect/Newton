@@ -15,8 +15,10 @@ import { useAuth } from "@/useHooks"
 
 const UserMenu = () => {
   const [userInfo, setUserInfo] = useState({});
-  const { accessToken, updateAccessToken } = useUserStore((state) => ({
+  const { updateUser,accessToken, updateAccessToken } = useUserStore((state) => ({
+    updateUser:state.updateUser,
     accessToken: state.accessToken,
+    updateAccessToken: state.updateAccessToken
   }));
 
   const { user, auth } = useAuth()
@@ -30,6 +32,8 @@ const UserMenu = () => {
     logoutUser()
       .then((res) => {
         setUserInfo("");
+        updateAccessToken("")
+        updateUser({})
       })
       .catch((error) => {
         toast.error("Error logging out");
