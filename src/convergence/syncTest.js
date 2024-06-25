@@ -1,14 +1,13 @@
+/*
+ * @Description:
+ * @Author: Devin
+ * @Date: 2024-06-20 11:23:53
+ */
 import { ProjectSync } from "./projectSync";
 
 // 创建 ProjectSync 实例
 const createProjectSync = (rootPath, user) => {
-  const projectSync = new ProjectSync(
-    rootPath,
-    user,
-    (filePath, content) => {
-      console.log("File changed:", filePath, content);
-    },
-  );
+  const projectSync = new ProjectSync(rootPath, user);
 
   return projectSync;
 };
@@ -28,19 +27,18 @@ export const syncTest = () => {
   const user = {
     id: "user1",
     name: "John Doe",
-    color: "#ff0000"
+    color: "#ff0000",
   };
   const fileSync = createProjectSync("inform7", user);
 
   testFileSync(fileSync, "inform7/test.txt", "Hello, world!");
-
 };
 
 export const syncTestCo = () => {
   const user = {
     id: "user2",
     name: "Jane Doe",
-    color: "#00ff00"
+    color: "#00ff00",
   };
   const fileSync = createProjectSync("inform7", user);
 

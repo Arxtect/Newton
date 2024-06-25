@@ -1,5 +1,3 @@
-
-
 // LoginPage.js
 import React, { useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
@@ -7,9 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { object, string } from "zod";
 import { toast } from "react-toastify";
 import { updateAccessToken } from "store";
-import {
-  loginUser,
-} from "@/services";
+import { loginUser, getMe } from "@/services";
 import { useUserStore } from "store";
 import emailSvg from "@/assets/website/email.svg";
 import passwordSvg from "@/assets/website/password.svg";
@@ -45,11 +41,11 @@ const NoRouteLogin = ({ handleClose }) => {
       const data = await loginUser(values);
       toast.success("You successfully logged in");
       updateAccessToken(data.access_token);
-      updateUser(data.user);
-
+      const { data: userData } = await getMe();
+      updateUser(userData.user);
       setTimeout(() => {
         handleClose();
-      }, [0])
+      }, [0]);
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "login failed";
@@ -133,7 +129,6 @@ const NoRouteLogin = ({ handleClose }) => {
               >
                 Register
               </a>
-
             </div>
           </form>
         </FormProvider>

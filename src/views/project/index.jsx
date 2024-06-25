@@ -21,12 +21,12 @@ import ArDialog from "@/components/arDialog";
 
 import { Search as SearchIcon } from "@mui/icons-material";
 import FileCopyIcon from "@mui/icons-material/FileCopy";
+import ShareIcon from "@mui/icons-material/Share";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import DeleteIcon from "@mui/icons-material/Delete";
 
 import { useFileStore, getInitialState } from "store";
-import ArMenu from "@/components/arMenu";
 import { findAllProjectInfo, downloadDirectoryAsZip } from "domain/filesystem";
 
 import NewProject from "./newProject";
@@ -40,6 +40,9 @@ import ArButton from "@/components/arButton";
 import { toast } from "react-toastify";
 import { formatDate } from "@/util";
 import { ProjectSync } from "@/convergence";
+import { useAuth } from "@/useHooks";
+import { updateDialogLoginOpen } from "@/store";
+import Share from "./share";
 
 function Project() {
   const navigate = useNavigate();
@@ -61,6 +64,7 @@ function Project() {
   const [tableWidth, setTableWidth] = useState(0);
   const tableContainerRef = useRef(null);
   const [projectData, setProjectData] = useState([]);
+  const { user } = useAuth();
 
   const getProjectList = async (currentSelectMenu) => {
     console.log(currentSelectMenu, "currentSelectMenu");
@@ -130,6 +134,20 @@ function Project() {
   const handleCopy = (title) => {
     setSourceProject(title);
     setCopyDialogOpen(true);
+  };
+
+  // share project
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [shareProjectName, setShareProjectName] = useState("");
+
+  const controlShare = (project) => {
+    if (!user || JSON.stringify(user) === "{}") {
+      toast.warning("Please login");
+      updateDialogLoginOpen(true);
+      return;
+    }
+    setShareProjectName(project);
+    setShareDialogOpen(true);
   };
 
   //rename project
@@ -209,7 +227,7 @@ function Project() {
       align: "center",
       sortable: false,
       renderCell: (params, index, item) => {
-        return params.row?.userId ? params.row?.userId : params.value;
+        return params.row?.userId ? params.row?.name : params.value;
       },
     },
     {
@@ -261,6 +279,17 @@ function Project() {
               }}
             >
               <PictureAsPdfIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="SHARE">
+            <IconButton
+              size="small"
+              onClick={(e) => {
+                e.stopPropagation();
+                controlShare(params.row.title);
+              }}
+            >
+              <ShareIcon />
             </IconButton>
           </Tooltip>
           <Tooltip title="Delete">
@@ -324,7 +353,9 @@ function Project() {
     );
   }, []);
 
-  const initShareProject = async () => {
+  const [projectSync, setProjectSync] = useState(null);
+
+  const initShareProject = async (user, getProjectList) => {
     const hash = window.location.hash;
     const queryString = hash.includes("?") ? hash.split("?")[1] : "";
     const searchParams = new URLSearchParams(queryString);
@@ -333,27 +364,36 @@ function Project() {
     const roomId = searchParams.get("roomId");
 
     if (!project || !roomId) return;
-    const user = {
-      id: "user1",
-      name: "user1",
-      email: "user@example.com",
-      color: "#ff0000",
-    };
-    const projectSync = await new ProjectSync(
-      project,
-      user,
-      roomId,
-      (filePath, content) => {
-        console.log("File changed:", filePath, content);
-      },
-      getProjectList
-    );
+
+    if (!user || JSON.stringify(user) === "{}") {
+      toast.warning("Please login");
+      updateDialogLoginOpen(true);
+      return;
+    }
+    // const user = {
+    //   id: "user1",
+    //   name: "user1",
+    //   email: "user@example.com",
+    //   color: "#ff0000",
+    // };
+    const projectSync = new ProjectSync(project, user, roomId, getProjectList);
     await projectSync.setObserveHandler();
+    return projectSync;
   };
 
   useEffect(() => {
-    initShareProject();
+    const init = async () => {
+      const projectSyncInstance = await initShareProject(user, getProjectList);
+      setProjectSync(projectSyncInstance);
+    };
+
+    init();
     getProjectList();
+    return () => {
+      if (projectSync) {
+        projectSync.leaveCollaboration();
+      }
+    };
   }, []);
 
   useEffect(() => {
@@ -508,6 +548,12 @@ function Project() {
         Are you sure you want to delete the project：
         <span className="text-red-500 mr-1">{deleteProjectName}</span>
       </ArDialog>
+      <Share
+        dialogOpen={shareDialogOpen}
+        setDialogOpen={setShareDialogOpen}
+        rootPath={shareProjectName}
+        user={user}
+      ></Share>
     </React.Fragment>
   );
 }

@@ -1,12 +1,7 @@
-import {
-  loginUser,
-  registerUser,
-  refreshAuth,
-  logoutUser,
-} from "services";
+import { loginUser, registerUser, refreshAuth, logoutUser } from "services";
 
 // LoginPage.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { object, string } from "zod";
@@ -18,6 +13,7 @@ import emailSvg from "@/assets/website/email.svg";
 import passwordSvg from "@/assets/website/password.svg";
 import ArButton from "@/components/arButton";
 import ArInput from "@/components/arInput";
+import { getMe } from "@/services";
 
 const loginSchema = object({
   email: string()
@@ -40,6 +36,12 @@ const LoginPage = ({ isDialog = false, handleClose }) => {
   const location = useLocation();
   const from = location.state?.from?.pathname || "/";
 
+  const user = useUserStore((state) => state.user);
+
+  useEffect(() => {
+    console.log(user, "user");
+  }, [user]);
+
   const onSubmitHandler = async (values) => {
     setIsSubmitting(true);
     setLoginError(null);
@@ -47,11 +49,12 @@ const LoginPage = ({ isDialog = false, handleClose }) => {
       const data = await loginUser(values);
       toast.success("You successfully logged in");
       updateAccessToken(data.access_token);
-      updateUser(data.user);
+
+      const { data: userData } = await getMe();
+      updateUser(userData.user);
       setTimeout(() => {
         isDialog ? handleClose() : navigate(from, { replace: true });
-      }, [0])
-
+      }, [0]);
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "login failed";
@@ -59,10 +62,8 @@ const LoginPage = ({ isDialog = false, handleClose }) => {
         position: "top-right",
       });
       setLoginError(errorMessage);
-
     } finally {
       setIsSubmitting(false);
-
     }
   };
 

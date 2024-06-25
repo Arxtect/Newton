@@ -14,10 +14,9 @@ const Share = ({ dialogOpen, setDialogOpen, rootPath, user }) => {
   const [loading, setLoading] = useState(false);
   const [link, setLink] = useState("");
 
-  const { updateProjectSync, filepath, loadFile } = useFileStore((state) => ({
+  const { projectSync, updateProjectSync } = useFileStore((state) => ({
+    projectSync: state.projectSync,
     updateProjectSync: state.updateProjectSync,
-    filepath: state.filepath,
-    loadFile: state.loadFile,
   }));
 
   useEffect(() => {
@@ -31,15 +30,11 @@ const Share = ({ dialogOpen, setDialogOpen, rootPath, user }) => {
   };
 
   const createProjectSync = async (rootPath, user) => {
-    const projectSync = new ProjectSync(rootPath, user, user.id);
+    const projectSync = await new ProjectSync(rootPath, user, user.id);
     updateProjectSync(projectSync);
     await projectSync.syncFolderToYMapRootPath(rootPath);
-    setTimeout(() => {
-      filepath && loadFile({ filepath: filepath });
-    }, [500]);
   };
 
-  
   const handleSaveProject = async () => {
     setLoading(true);
     try {

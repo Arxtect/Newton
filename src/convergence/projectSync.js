@@ -33,7 +33,8 @@ class ProjectSync {
 
     // 监听 awareness 变化
     this.awareness.on("change", this.awarenessChangeHandler.bind(this));
-    setTimeout(() => otherOperation && otherOperation(), 500);
+    this.otherOperation = otherOperation && otherOperation; // 保存回调函数
+    this.isExistAllFile = false;
   }
 
   // set observe handler
@@ -42,9 +43,11 @@ class ProjectSync {
   }
 
   async saveProjectSyncInfoToJson() {
+    const { id, ...otherInfo } = this.user;
     await FS.createProjectInfo(this.rootPath, {
       rootPath: this.rootPath,
       userId: this.roomId,
+      ...otherInfo,
     });
   }
 
@@ -154,14 +157,15 @@ class ProjectSync {
 
     try {
       const files = await FS.readFileStats(folderPath);
+
       console.log(files, "files");
 
       for (const file of files) {
         const filePath = path.join(folderPath, file.name); // 使用 path.join 进行路径拼接
 
         if (file.type == "file") {
-          const content = await this.readFile(filePath);
-          this.syncToYMap(filePath, content); // 只同步相对路径
+          const content = await FS.readFile(filePath);
+          this.syncToYMap(filePath, content.toString()); // 只同步相对路径
         } else if (file.type == "dir") {
           await this.syncFolderToYMap(filePath); // 递归同步子文件夹
         }
@@ -199,6 +203,14 @@ class ProjectSync {
           const fileStore = useFileStore.getState();
           await fileStore.saveFile(key, content, false, false);
         }
+
+        const allFilesSynced = Array.from(this.yMap.keys()).every((key) => {
+          return FS.existsPath(key);
+        });
+        if (allFilesSynced && this.isExistAllFile == false) {
+          this.otherOperation && this.otherOperation();
+          this.isExistAllFile = true;
+        }
       } catch (err) {
         console.error(err);
       } finally {
@@ -220,6 +232,7 @@ class ProjectSync {
     const states = this.awareness.getStates();
     const users = [];
     states.forEach((state, clientID) => {
+      console.log(state, clientID, "state.user");
       users.push({ clientID, ...state.user });
     });
     return users;
@@ -227,8 +240,17 @@ class ProjectSync {
 
   // 清理函数
   cleanup() {
-    this.yMap.unobserve(this.yMapObserveHandler);
-    this.awareness.off("change", this.awarenessChangeHandler);
+    if (this.yMap && this.yMapObserveHandler) {
+      this.yMap.unobserve(this.yMapObserveHandler);
+    }
+
+    if (this.awareness && this.awarenessChangeHandler) {
+      this.awareness.off("change", this.awarenessChangeHandler);
+    }
+    // 清理本地用户状态
+    if (this.awareness) {
+      this.awareness.setLocalState(null);
+    }
   }
 
   // 彻底关闭协作进程
@@ -254,9 +276,6 @@ class ProjectSync {
       };
       this.websocketProvider.ws.send(JSON.stringify(message));
     }
-
-    // 通知服务器协作已经关闭并清除服务器数据
-    await this.notifyServer("collaborationClosed");
   }
 
   // 清空指定命名空间下的 Yjs 数据
@@ -275,17 +294,6 @@ class ProjectSync {
     // 断开 WebSocket 连接
     if (this.websocketProvider) {
       this.websocketProvider.disconnect();
-    }
-
-    // 通知协作人员
-    if (this.websocketProvider && this.websocketProvider.wsconnected) {
-      const message = {
-        type: "collaboratorLeft",
-        payload: {
-          message: "A collaborator has left the session.",
-        },
-      };
-      this.websocketProvider.ws.send(JSON.stringify(message));
     }
   }
 }

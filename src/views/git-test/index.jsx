@@ -10,6 +10,7 @@ import { findAllProject, getProjectInfo } from "domain/filesystem";
 import { useFileStore } from "store";
 import { ProjectSync } from "@/convergence";
 import RightBeforeLeft from "@/views/layout/rightBeforeLeft";
+import { useAuth } from "@/useHooks";
 
 const GitTest = () => {
   const {
@@ -72,6 +73,7 @@ const GitTest = () => {
       updateAllProject(projectLists);
     }
   };
+  const { user } = useAuth();
 
   useEffect(() => {
     getAllProject();
@@ -90,22 +92,13 @@ const GitTest = () => {
     const roomId = projectInfo["userId"];
 
     if (!project || !roomId) return;
-    const user = {
-      id: "user1",
-      name: "user1",
-      email: "user@example.com",
-      color: "#ff0000",
-    };
     const projectSync = await new ProjectSync(
       project,
       user,
-      roomId,
-      (filePath, content) => {
-        console.log("File changed:", filePath, content);
-      }
+      roomId
     );
     updateProjectSync(projectSync);
-    await projectSync.setObserveHandler();
+    // await projectSync.setObserveHandler();
   };
 
   useEffect(() => {
@@ -125,53 +118,6 @@ const GitTest = () => {
           currentSelectDir={currentSelectDir}
         ></RightBeforeLeft>
       </div>
-      {/* <div className="flex justify-between items-center h-[52px] border-gradient-top border-b border-g-color-87 border-1">
-        <div className="flex gap-2 w-4/5 ">
-          <DropdownFormWithIcon
-            currentProjectRoot={currentProjectRoot}
-            projectList={allProject}
-            changeCurrentProjectRoot={changeCurrentProjectRoot}
-          />
-        </div>
-        <div className="flex w-1/5 items-center">
-          <MoreMenu
-            createProject={createProject}
-            currentProject={currentProjectRoot}
-            deleteProject={deleteProject}
-            projectLists={allProject}
-            reload={repoChanged}
-            filepath={filepath}
-            currentSelectDir={currentSelectDir}
-          ></MoreMenu>
-        <FolderUploader
-            reload={repoChanged}
-            filepath={filepath}
-            currentSelectDir={currentSelectDir}
-          ></FolderUploader>
-          <FileUploader
-            reload={repoChanged}
-            filepath={filepath}
-            currentSelectDir={currentSelectDir}
-          ></FileUploader>
-        </div>
-      </div> */}
-      {/* <button onClick={() => gitClone()}>git clone </button> <div></div>
-      <button onClick={() => linkRepo()}>git link </button> <div></div>
-      <button onClick={() => commitFile(currentProjectRoot, "test commit")}>
-        commit
-      </button>
-      <div></div>
-      <button onClick={() => gitPush(currentProjectRoot, "test commit")}>
-        push
-      </button>
-      <div></div>
-      <button
-        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition duration-300"
-        onClick={() => toggleDrawer(true)}
-      >
-        打开抽屉
-      </button> */}
-      {/* <BottomDrawer isOpen={isOpen} toggleDrawer={toggleDrawer} /> */}
       <RootDirectory
         key={currentProjectRoot}
         root={currentProjectRoot}

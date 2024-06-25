@@ -12,20 +12,31 @@ import { existsPath } from "domain/filesystem";
 import path from "path";
 import LinkGithub from "./linkGithub";
 import Share from "./share";
+import { useAuth } from "@/useHooks";
+import { toast } from "react-toastify";
+import { updateDialogLoginOpen } from "@/store";
 
 function RightBefore() {
+  const { user } = useAuth();
 
   const { pdfUrl, toggleCompilerLog } = usePdfPreviewStore((state) => ({
     pdfUrl: state.pdfUrl,
     toggleCompilerLog: state.toggleCompilerLog,
   }));
-  const { sourceCode, changeValue, currentProjectRoot } = useFileStore(
-    (state) => ({
+  const { projectSync, sourceCode, changeValue, currentProjectRoot } =
+    useFileStore((state) => ({
+      projectSync: state.projectSync,
       sourceCode: state.value,
       changeValue: state.changeValue,
       currentProjectRoot: state.currentProjectRoot,
-    })
-  );
+    }));
+
+  useEffect(() => {
+    return () => {
+      console.log(projectSync, "projectSync");
+      projectSync && projectSync.leaveCollaboration();
+    };
+  }, [projectSync]);
 
   const compile = () => compileLatex(sourceCode, currentProjectRoot);
 
@@ -54,6 +65,21 @@ function RightBefore() {
   // link
   const [githubDialogOpen, setGithubDialogOpen] = useState(false);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
+
+  const controlShare = () => {
+    if (!user || JSON.stringify(user) === "{}") {
+      toast.warning("Please login");
+      updateDialogLoginOpen(true);
+      return;
+    }
+    setShareDialogOpen(true);
+  };
+
+  useEffect(() => {
+    return () => {
+      projectSync && projectSync.leaveCollaboration();
+    };
+  }, []);
 
   return (
     <div className="flex h-full w-full justify-between px-2">
@@ -89,7 +115,7 @@ function RightBefore() {
               color="inherit"
               aria-label="log"
               size="small"
-              onClick={() => setShareDialogOpen(true)}
+              onClick={() => controlShare(true)}
             >
               <span className="flex items-center justify-center w-[20px] h-[20px] text-[14px]">
                 Share
@@ -138,12 +164,13 @@ function RightBefore() {
         dialogOpen={shareDialogOpen}
         setDialogOpen={setShareDialogOpen}
         rootPath={currentProjectRoot}
-        user={{
-          id: 'user1',
-          name: 'user1',
-          email: 'user@example.com',
-          color: "#ff0000"
-        }}
+        // user={{
+        //   id: "user1",
+        //   name: "user1",
+        //   email: "user@example.com",
+        //   color: "#ff0000",
+        // }}
+        user={user}
       ></Share>
       <BottomDrawer isOpen={isOpen} toggleDrawer={toggleDrawer} />
     </div>
