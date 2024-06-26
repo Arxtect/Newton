@@ -109,7 +109,7 @@ const GitTest = () => {
         <RightBeforeLeft
           createProject={createProject}
           currentProject={currentProjectRoot}
-          deleteProject={deleteProject}
+          deleteProject={() => deleteProject()}
           projectLists={allProject}
           reload={repoChanged}
           filepath={filepath}
