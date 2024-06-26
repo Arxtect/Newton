@@ -14,13 +14,21 @@ const DialogLogin = ({
     width: "60vw",
   },
 }) => {
-  const { dialogLoginOpen, updateDialogLoginOpen } = useLoginStore((state) => ({
+  const {
+    dialogLoginOpen,
+    updateDialogLoginOpen,
+    otherOperation,
+    updateOtherOperation,
+  } = useLoginStore((state) => ({
     dialogLoginOpen: state.dialogLoginOpen,
     updateDialogLoginOpen: state.updateDialogLoginOpen,
+    otherOperation: state.otherOperation,
+    updateOtherOperation: state.updateOtherOperation,
   }));
 
   const handleClosePreview = () => {
     updateDialogLoginOpen(false);
+    updateOtherOperation(null);
     // window.location.reload();
   };
 

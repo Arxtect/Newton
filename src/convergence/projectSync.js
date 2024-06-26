@@ -119,7 +119,6 @@ class ProjectSync {
     if (this.isCurrentFile(editor, this.currentFilePath)) {
       // this.aceBinding._cursorObserver(editor);
     }
-
   }
 
   isCurrentFile(editor, filePath) {
@@ -142,9 +141,8 @@ class ProjectSync {
     }
 
     editor.getSession().on("change", (e) => {
-      this.handleInput(e, editor)
+      this.handleInput(e, editor);
     });
-
   }
 
   getVal() {
@@ -206,10 +204,12 @@ class ProjectSync {
     }
   }
 
-  async syncFolderToYMapRootPath() {
+  async syncFolderToYMapRootPath(callback) {
     await this.waitForUnlock(); // 等待锁释放
-    await this.saveProjectSyncInfoToJson(this.rootPath); // 保存项目信息
-    await this.syncFolderToYMap(this.rootPath);
+    this.saveProjectSyncInfoToJson(this.rootPath).then((res) => {
+      this.syncFolderToYMap(this.rootPath); // 保存项目信息
+      callback && callback()
+    });
   }
 
   // Yjs Map 观察者处理函数

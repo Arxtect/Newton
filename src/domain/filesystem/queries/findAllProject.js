@@ -6,7 +6,7 @@
 import fs from "fs";
 import path from "path";
 import pify from "pify";
-import { getProjectInfo } from "../commands/projectInfo";
+import { getProjectInfo, createProjectInfo } from "../commands/projectInfo";
 
 export async function findAllProject(currentDir = ".") {
   try {
@@ -39,12 +39,18 @@ export async function findAllProjectInfo(currentDir = ".") {
       const entryPath = path.join(currentDir, entry);
       const stat = await pify(fs.stat)(entryPath);
       console.log(stat);
-      const projectInfo = await getProjectInfo(entryPath);
+      let projectInfo = await getProjectInfo(entryPath);
+      if (!projectInfo || JSON.stringify(projectInfo) === "{}") {
+        await createProjectInfo(entryPath, {
+          name: "YOU",
+        });
+        projectInfo = await getProjectInfo(entryPath);
+      } // TODO:remove
       // 如果条目是一个目录，返回其名称，否则返回null
       return {
         ...stat,
         title: stat.isDirectory() ? entry : null,
-        owner: "You",
+        name: "YOU",
         lastModified: stat?.mtime,
         ...projectInfo,
       };

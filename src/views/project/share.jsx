@@ -10,7 +10,13 @@ import { toast } from "react-toastify";
 import { ProjectSync } from "@/convergence";
 import { useFileStore } from "store";
 
-const Share = ({ dialogOpen, setDialogOpen, rootPath, user }) => {
+const Share = ({
+  dialogOpen,
+  setDialogOpen,
+  rootPath,
+  user,
+  getProjectList,
+}) => {
   const [loading, setLoading] = useState(false);
   const [link, setLink] = useState("");
 
@@ -32,7 +38,7 @@ const Share = ({ dialogOpen, setDialogOpen, rootPath, user }) => {
   const createProjectSync = async (rootPath, user) => {
     const projectSync = await new ProjectSync(rootPath, user, user.id);
     updateProjectSync(projectSync);
-    await projectSync.syncFolderToYMapRootPath(rootPath);
+    projectSync.syncFolderToYMapRootPath(getProjectList);
   };
 
   const handleSaveProject = async () => {

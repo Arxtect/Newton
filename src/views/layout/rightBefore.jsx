@@ -8,7 +8,7 @@ import { compileLatex } from "@/features/latexCompilation/latexCompilation";
 import Controls from "./controls";
 import BottomDrawer from "@/features/bottomDrawer/bottomDrawer";
 import RightBeforeLeft from "./rightBeforeLeft";
-import { existsPath } from "domain/filesystem";
+import { findAllProject, getProjectInfo, existsPath } from "domain/filesystem";
 import path from "path";
 import LinkGithub from "./linkGithub";
 import Share from "./share";
@@ -17,7 +17,6 @@ import { toast } from "react-toastify";
 import { updateDialogLoginOpen, useUserStore } from "@/store";
 
 function RightBefore() {
-
   const { user } = useUserStore((state) => ({
     user: state.user,
   }));
@@ -41,8 +40,6 @@ function RightBefore() {
       projectSync?.leaveCollaboration && projectSync?.leaveCollaboration();
     };
   }, [projectSync]);
-
-
 
   const compile = () => compileLatex(sourceCode, currentProjectRoot);
 
@@ -72,7 +69,12 @@ function RightBefore() {
   const [githubDialogOpen, setGithubDialogOpen] = useState(false);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
 
-  const controlShare = () => {
+  const controlShare = async () => {
+    const info = await getProjectInfo(currentProjectRoot);
+    if (info.userId && info.userId != user.id) {
+      toast.warning("This project is collaborative and cannot be shared");
+      return;
+    }
     if (!user || JSON.stringify(user) === "{}") {
       toast.warning("Please login");
       updateDialogLoginOpen(true);

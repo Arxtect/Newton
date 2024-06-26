@@ -73,9 +73,9 @@ const GitTest = () => {
       updateAllProject(projectLists);
     }
   };
-  const { user } = useUserStore(state => ({
-    user: state.user
-  }))
+  const { user } = useUserStore((state) => ({
+    user: state.user,
+  }));
 
   useEffect(() => {
     getAllProject();
@@ -92,11 +92,11 @@ const GitTest = () => {
 
     const project = projectInfo?.["rootPath"];
     const roomId = projectInfo?.["userId"];
+    const isSync = projectInfo?.["isSync"];
 
-    if (!project || !roomId) return;
+    if (!isSync || !project || !roomId) return;
     const projectSync = await new ProjectSync(project, user, roomId);
     updateProjectSync(projectSync);
-    // await projectSync.setObserveHandler();
   };
 
   useEffect(() => {

@@ -7,8 +7,12 @@ import create from "zustand";
 
 export const useLoginStore = create((set) => ({
   dialogLoginOpen: false,
+  otherOperation: null,
   updateDialogLoginOpen(dialogLoginOpen) {
     set((state) => ({ dialogLoginOpen: dialogLoginOpen }));
+  },
+  updateOtherOperation(otherOperation) {
+    set((state) => ({ otherOperation: otherOperation }));
   },
 }));
 

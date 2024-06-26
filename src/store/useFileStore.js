@@ -7,7 +7,7 @@ import {
   updateStatusMatrixOnSaveFile,
 } from "./useGitRepo";
 import { savePdfToIndexedDB, getPdfFromIndexedDB } from "@/util";
-import { user } from "./user";
+import { useUserStore } from "./user";
 import { ProjectSync } from "@/convergence";
 import { useEditor } from "./useEditor";
 
@@ -257,6 +257,7 @@ export const useFileStore = create()(
         let isExists = await FS.existsPath(newProjectRoot);
 
         if (!isExists) {
+          const user = useUserStore.getState().user;
           await FS.mkdir(newProjectRoot);
           await FS.createProjectInfo(newProjectRoot, {
             name: "YOU",
@@ -271,7 +272,12 @@ export const useFileStore = create()(
         let isExists = await FS.existsPath(copyProjectRoot);
 
         if (!isExists) {
+          const user = useUserStore.getState().user;
           await FS.copyProject(projectRoot, copyProjectRoot);
+          await FS.createProjectInfo(copyProjectRoot, {
+            name: "YOU",
+            ...user,
+          });
         } else {
           throw new Error("Project name is already exists");
         }

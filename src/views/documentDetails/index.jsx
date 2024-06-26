@@ -12,17 +12,21 @@ import { Container } from "@mui/material";
 import PreviewPdf from "@/components/previewPdf";
 import { toast } from "react-toastify";
 import { getPreviewPdfUrl, getDocumentById } from "services";
-import { useFileStore } from "store";
+import { useFileStore, useUserStore } from "store";
 import { uploadZip } from "domain/filesystem";
 import { useNavigate } from "react-router-dom";
 import { getPreViewUrl } from "@/util";
-import ArLoadingButton from '@/components/arLoadingButton';
-
+import ArLoadingButton from "@/components/arLoadingButton";
 
 const DocumentDetails = () => {
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
   const { repoChanged } = useFileStore((state) => ({
     repoChanged: state.repoChanged,
+  }));
+
+  const { user, accessToken } = useUserStore((state) => ({
+    user: state.user,
+    accessToken: state.accessToken,
   }));
 
   // Fetching the route parameter `id`
@@ -80,7 +84,13 @@ const DocumentDetails = () => {
     const parts = zipFileName.split(/-|\./);
     return parts[parts.length - 2];
   }
-  const downloadZipAndUpload = async (url, dirpath, reload, projectName, setLoading) => {
+  const downloadZipAndUpload = async (
+    url,
+    dirpath,
+    reload,
+    projectName,
+    setLoading
+  ) => {
     console.log(url, "url");
     try {
       const response = await fetch(url);
@@ -91,11 +101,11 @@ const DocumentDetails = () => {
       // 或者使用 response.arrayBuffer() 如果你需要 ArrayBuffer
       projectName = extractProjectName(projectName) || "";
       // 调用 uploadZip 函数，传入下载的文件
-      await uploadZip(blob, dirpath, reload, projectName);
-      setLoading(false)
+      await uploadZip(blob, dirpath, reload, projectName, null, user);
+      setLoading(false);
       navigate("/newton");
     } catch (error) {
-      setLoading(false)
+      setLoading(false);
       console.error(`Failed to download or upload ZIP from ${url}:`, error);
     }
   };
@@ -109,7 +119,13 @@ const DocumentDetails = () => {
       return;
     }
     try {
-      downloadZipAndUpload(zipUrl, ".", repoChanged, documentInfo?.storage_zip, setLoading);
+      downloadZipAndUpload(
+        zipUrl,
+        ".",
+        repoChanged,
+        documentInfo?.storage_zip,
+        setLoading
+      );
     } catch (error) {
       setLoading(false);
       toast.error(`get project source failed:${error}`);

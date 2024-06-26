@@ -1,6 +1,13 @@
+/*
+ * @Description:
+ * @Author: Devin
+ * @Date: 2024-06-20 17:08:37
+ */
 import { writeFile } from "./writeFile";
 import { readFile } from "../queries/readFile";
 import { unlink } from "./unlink";
+import path from "path";
+
 
 const has = "hasOwnProperty-arxtect-projectInfo";
 
@@ -20,10 +27,12 @@ export const createProjectInfo = async (projectRoot, additionalInfo = {}) => {
     }
   }
 
+  const { id, ...newAdditionalInfo } = additionalInfo;
+
   // 合并新的信息和现有的信息
   const projectInfo = {
     ...existingInfo,
-    ...additionalInfo,
+    ...newAdditionalInfo,
     createdAt: existingInfo.createdAt || new Date().toISOString(), // 保留原始创建时间
   };
 
@@ -43,14 +52,15 @@ export const getProjectInfo = async (projectRoot) => {
     return JSON.parse(fileContent); // 解析 JSON 字符串为对象
   } catch (err) {
     console.log("Error reading or parsing project info file: " + err);
-    return null
+    return null;
   }
 };
 
 // 检查项目信息文件是否存在的函数
 export const projectInfoExists = (filename) => {
   const projectInfoPath = `project-${has}.json`;
-  if (filename == projectInfoPath) return true;
+  const basename = path.basename(filename);
+  if (basename == projectInfoPath) return true;
   return false;
 };
 

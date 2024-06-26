@@ -7,6 +7,7 @@ import fs from "fs";
 import path from "path";
 import pify from "pify";
 import { copyFile } from "./copyFile";
+import { projectInfoExists } from "./projectInfo";
 
 const fsPify = {
   mkdir: pify(fs.mkdir),
@@ -32,6 +33,7 @@ export async function copyProject(projectRoot, copyProjectRoot) {
         // 如果是目录，则递归复制
         await copyDirRecursive(sourceEntryPath, destEntryPath);
       } else if (entryStats.isFile()) {
+        if (!!projectInfoExists(sourceEntryPath)) return null;
         // 如果是文件，则直接复制
         await fsPify.copyFile(sourceEntryPath, destEntryPath);
       }

@@ -48,7 +48,7 @@ const UploadProgressBar = ({ progress }) => {
   );
 };
 
-const UploadProject = ({ dialogOpen, setDialogOpen }) => {
+const UploadProject = ({ dialogOpen, setDialogOpen, user }) => {
   const navigate = useNavigate();
   const { repoChanged } = useFileStore((state) => ({
     repoChanged: state.repoChanged,
@@ -68,7 +68,7 @@ const UploadProject = ({ dialogOpen, setDialogOpen }) => {
         setUploadProgress(progress);
       };
       const projectName = path.parse(file.name)?.name;
-      await uploadZip(file, ".", repoChanged, projectName, onProgress)
+      await uploadZip(file, ".", repoChanged, projectName, onProgress, user)
         .then(() => {
           toast.success("Project uploaded successfully");
           setDialogOpen(false);

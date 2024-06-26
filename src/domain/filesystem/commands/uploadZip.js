@@ -1,20 +1,35 @@
+/*
+ * @Description:
+ * @Author: Devin
+ * @Date: 2024-05-28 13:48:03
+ */
 import JSZip from "jszip";
 import fs from "fs";
 import path from "path";
 import pify from "pify";
 import { ensureDir } from "./upLoadFolder";
 import { changeCurrentProjectRoot } from "store";
+import { createProjectInfo } from "./projectInfo";
 
 // 将 fs 的方法转换为返回 Promise 的方法
 const writeFile = pify(fs.writeFile);
 
 // 处理 ZIP 文件上传
-const uploadZip = async (file, dirpath, reload, projectName, onProgress) => {
-  console.log(file, 'file');
+const uploadZip = async (
+  file,
+  dirpath,
+  reload,
+  projectName,
+  onProgress,
+  user = {}
+) => {
+  console.log(file, "file");
   try {
     let firstFolderName;
     const zip = await JSZip.loadAsync(file); // 使用 JSZip 加载 ZIP 文件
-    const zipEntries = Object.keys(zip.files).filter(entryName => !entryName.includes('.git')); // 过滤掉 .git 条目
+    const zipEntries = Object.keys(zip.files).filter(
+      (entryName) => !entryName.includes(".git")
+    ); // 过滤掉 .git 条目
     let loadedEntries = 0; // 已解压的条目数
 
     // 更新进度的函数
@@ -59,13 +74,15 @@ const uploadZip = async (file, dirpath, reload, projectName, onProgress) => {
       onProgress && updateProgress(zipEntryName);
     }
 
-    console.log('123');
+    console.log("123");
 
     reload();
-    console.log(firstFolderName, zipEntries, "zipEntries");
     onProgress && updateProgress("uploadSuccess");
+    await createProjectInfo(firstFolderName, {
+      name: "YOU",
+      ...user,
+    });
     if ((dirpath === "." || projectName) && firstFolderName) {
-      console.log(firstFolderName, "firstFolderName");
       changeCurrentProjectRoot({ projectRoot: firstFolderName });
     }
   } catch (error) {

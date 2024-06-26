@@ -16,11 +16,12 @@ import {
   CircularProgress,
   LinearProgress,
 } from "@mui/material";
-import { useFileStore, useGitRepo } from "store";
+import { useFileStore, useGitRepo, useUserStore } from "store";
 import { toast } from "react-toastify";
 import ArTextField from "@/components/arTextField";
 import path from "path";
 import { cloneRepository } from "domain/git";
+import { createProjectInfo } from "domain/filesystem";
 
 const GithubProgressBar = ({ progress, messages }) => {
   return (
@@ -51,9 +52,7 @@ const GithubProgressBar = ({ progress, messages }) => {
 };
 
 const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList }) => {
-  const [projectName, setProjectName] = useState(
-    "https://github.com/devixyz/example.git"
-  );
+  const [projectName, setProjectName] = useState("");
   const [messages, setMessages] = useState("");
   const [progress, setProgress] = useState(0);
   const { copyProject } = useFileStore((state) => ({
@@ -108,7 +107,14 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList }) => {
     gitClone(projectName)
       .then((res) => {
         console.log(res);
-        getProjectList();
+        const user = useUserStore.getState().user;
+        console.log(user, res, "user");
+        createProjectInfo(res, {
+          name: "YOU",
+          ...user,
+        }).then((res) => {
+          getProjectList();
+        });
         setLoading(false);
         setDialogOpen(false);
         toast.success("Import success from github");
@@ -143,12 +149,15 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList }) => {
     const destPath = path.join("/", repo);
     console.log(destPath, "destPath");
 
-    return await cloneRepository(destPath, clonePath, {
-      singleBranch: false,
-      corsProxy: corsProxy,
-      token: gitConfig.githubApiToken,
-      onProgress,
-      onMessage,
+    return new Promise(async (resolve, reject) => {
+      await cloneRepository(destPath, clonePath, {
+        singleBranch: false,
+        corsProxy: corsProxy,
+        token: gitConfig.githubApiToken,
+        onProgress,
+        onMessage,
+      });
+      resolve(destPath);
     });
   };
   const [loading, setLoading] = useState(false);

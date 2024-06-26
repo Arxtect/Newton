@@ -27,7 +27,11 @@ import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import DeleteIcon from "@mui/icons-material/Delete";
 
 import { useFileStore, getInitialState } from "store";
-import { findAllProjectInfo, downloadDirectoryAsZip } from "domain/filesystem";
+import {
+  findAllProjectInfo,
+  downloadDirectoryAsZip,
+  getProjectInfo,
+} from "domain/filesystem";
 
 import NewProject from "./newProject";
 import UploadProject from "./uploadProject";
@@ -40,7 +44,7 @@ import ArButton from "@/components/arButton";
 import { toast } from "react-toastify";
 import { formatDate } from "@/util";
 import { ProjectSync } from "@/convergence";
-import { updateDialogLoginOpen, useUserStore } from "@/store";
+import { useUserStore, useLoginStore } from "@/store";
 import Share from "./share";
 
 function Project() {
@@ -64,14 +68,17 @@ function Project() {
   const tableContainerRef = useRef(null);
   const [projectData, setProjectData] = useState([]);
 
-  const { user, accessToken } = useUserStore(state => ({
+  const { user, accessToken } = useUserStore((state) => ({
     user: state.user,
-    accessToken: state.accessToken
-  }))
+    accessToken: state.accessToken,
+  }));
 
-  useEffect(() => {
-    console.log(accessToken, user, 'accessToken')
-  }, [user, accessToken])
+  const { updateDialogLoginOpen, updateOtherOperation } = useLoginStore(
+    (state) => ({
+      updateDialogLoginOpen: state.updateDialogLoginOpen,
+      updateOtherOperation: state.updateOtherOperation,
+    })
+  );
 
   const getProjectList = async (currentSelectMenu) => {
     console.log(currentSelectMenu, "currentSelectMenu");
@@ -81,10 +88,17 @@ function Project() {
     setProjectData(
       project
         .map((item, index) => {
-          if (currentSelectMenu == 3 && !item?.userId && !item?.rootPath) {
+          if (
+            currentSelectMenu == 3 &&
+            (item?.userId == user?.id || !item?.isSync)
+          ) {
             return null;
           }
-          if (currentSelectMenu == 2 && (item?.userId || item?.rootPath)) {
+          if (
+            currentSelectMenu == 2 &&
+            item?.userId &&
+            item?.userId != user?.id
+          ) {
             return null;
           }
           return {
@@ -135,7 +149,6 @@ function Project() {
   };
 
   //copy project
-
   const [sourceProject, setSourceProject] = useState("");
   const [copyDialogOpen, setCopyDialogOpen] = useState(false);
   const handleCopy = (title) => {
@@ -148,7 +161,7 @@ function Project() {
   const [shareProjectName, setShareProjectName] = useState("");
 
   const controlShare = (project) => {
-    console.log(user, accessToken, 'user')
+    console.log(user, accessToken, "user");
     if (!user || JSON.stringify(user) === "{}") {
       toast.warning("Please login");
       updateDialogLoginOpen(true);
@@ -188,6 +201,16 @@ function Project() {
     }, 30000);
   };
 
+  const auth = (condition, callback) => {
+    if (condition) {
+      toast.warning("Nonanonymous project，Please login first");
+      updateDialogLoginOpen(true);
+      updateOtherOperation(callback);
+      return true;
+    }
+    return false;
+  };
+
   // table
   const columns = [
     {
@@ -210,7 +233,19 @@ function Project() {
           style={{ cursor: "pointer", color: "inherit" }}
           onMouseOver={(e) => (e.target.style.textDecoration = "underline")}
           onMouseOut={(e) => (e.target.style.textDecoration = "none")}
-          onClick={(e) => {
+          onClick={async (e) => {
+            const isAuth = auth(
+              params.row.name != "YOU" &&
+                (!user || JSON.stringify(user) === "{}"),
+              () => {
+                e.stopPropagation();
+                changeCurrentProjectRoot({
+                  projectRoot: params.value,
+                });
+                navigate(`/newton`);
+              }
+            );
+            if (isAuth) return;
             e.stopPropagation();
             changeCurrentProjectRoot({
               projectRoot: params.value,
@@ -228,15 +263,15 @@ function Project() {
       ),
     },
     {
-      field: "owner",
+      field: "name",
       headerName: "Owner",
       width: 0.15,
       headerAlign: "center",
       align: "center",
       sortable: false,
-      renderCell: (params, index, item) => {
-        return params.row?.userId ? params.row?.name : params.value;
-      },
+      // renderCell: (params, index, item) => {
+      //   return params.row?.userId ? params.row?.name : params.value;
+      // },
     },
     {
       field: "lastModified",
@@ -261,6 +296,14 @@ function Project() {
               size="small"
               onClick={(e) => {
                 e.stopPropagation();
+                const isAuth = auth(
+                  params.row.name != "YOU" &&
+                    (!user || JSON.stringify(user) === "{}"),
+                  () => {
+                    handleCopy(params.row.title);
+                  }
+                );
+                if (isAuth) return;
                 handleCopy(params.row.title);
               }}
             >
@@ -272,6 +315,14 @@ function Project() {
               size="small"
               onClick={(e) => {
                 e.stopPropagation();
+                const isAuth = auth(
+                  params.row.name != "YOU" &&
+                    (!user || JSON.stringify(user) === "{}"),
+                  () => {
+                    downloadDirectoryAsZip(params.row.title);
+                  }
+                );
+                if (isAuth) return;
                 downloadDirectoryAsZip(params.row.title);
               }}
             >
@@ -283,6 +334,14 @@ function Project() {
               size="small"
               onClick={(e) => {
                 e.stopPropagation();
+                const isAuth = auth(
+                  params.row.name != "YOU" &&
+                    (!user || JSON.stringify(user) === "{}"),
+                  () => {
+                    downloadPdf(params.row.title);
+                  }
+                );
+                if (isAuth) return;
                 downloadPdf(params.row.title);
               }}
             >
@@ -294,6 +353,21 @@ function Project() {
               size="small"
               onClick={(e) => {
                 e.stopPropagation();
+                console.log(params.row.userId, user.id, "params.row");
+                if (params.row.userId && params.row.userId != user.id) {
+                  toast.warning(
+                    "This project is collaborative and cannot be shared"
+                  );
+                  return;
+                }
+                const isAuth = auth(
+                  params.row.name != "YOU" &&
+                    (!user || JSON.stringify(user) === "{}"),
+                  () => {
+                    controlShare(params.row.title);
+                  }
+                );
+                if (isAuth) return;
                 controlShare(params.row.title);
               }}
             >
@@ -305,6 +379,14 @@ function Project() {
               size="small"
               onClick={(e) => {
                 e.stopPropagation();
+                const isAuth = auth(
+                  params.row.name != "YOU" &&
+                    (!user || JSON.stringify(user) === "{}"),
+                  () => {
+                    handleDeleteProject(params.row.title);
+                  }
+                );
+                if (isAuth) return;
                 handleDeleteProject(params.row.title);
               }}
             >
@@ -361,9 +443,35 @@ function Project() {
     );
   }, []);
 
+  // sync project
   const [projectSync, setProjectSync] = useState(null);
 
-  const initShareProject = async (user, getProjectList) => {
+  const [syncDialogOpen, setSyncDialogOpen] = useState(false);
+
+  const [syncParams, setSyncParams] = useState({});
+
+  const handleSyncProject = (syncProjectName, roomId) => {
+    setSyncParams({ roomId, project: syncProjectName });
+    setSyncDialogOpen(true);
+  };
+
+  const handleConfirmSync = async () => {
+    const projectSync = new ProjectSync(
+      syncParams.project,
+      user,
+      syncParams.roomId,
+      getProjectList
+    );
+    await projectSync.setObserveHandler();
+
+    setProjectSync(projectSync);
+    setSyncDialogOpen(false);
+  };
+  const handleCancelSync = () => {
+    setSyncDialogOpen(false);
+  };
+
+  const initShareProject = async () => {
     const hash = window.location.hash;
     const queryString = hash.includes("?") ? hash.split("?")[1] : "";
     const searchParams = new URLSearchParams(queryString);
@@ -378,21 +486,13 @@ function Project() {
       updateDialogLoginOpen(true);
       return;
     }
-    // const user = {
-    //   id: "user1",
-    //   name: "user1",
-    //   email: "user@example.com",
-    //   color: "#ff0000",
-    // };
-    const projectSync = new ProjectSync(project, user, roomId, getProjectList);
-    await projectSync.setObserveHandler();
-    return projectSync;
+
+    handleSyncProject(project, roomId);
   };
 
   useEffect(() => {
     const init = async () => {
-      const projectSyncInstance = await initShareProject(user, getProjectList);
-      setProjectSync(projectSyncInstance);
+      await initShareProject(getProjectList);
     };
 
     init();
@@ -410,12 +510,6 @@ function Project() {
 
   return (
     <React.Fragment>
-      {/* <div>
-        <button onClick={() => { create() }}>sadasdas</button>
-      </div>
-      <div>
-        <button onClick={() => { collab() }}>collab</button>
-      </div> */}
       <Box
         display="flex"
         className="h-[calc(100vh-64px)]"
@@ -524,6 +618,7 @@ function Project() {
       <UploadProject
         dialogOpen={uploadDialogOpen}
         setDialogOpen={setUploadDialogOpen}
+        user={user}
       />
       <CopyProject
         dialogOpen={copyDialogOpen}
@@ -556,11 +651,24 @@ function Project() {
         Are you sure you want to delete the project：
         <span className="text-red-500 mr-1">{deleteProjectName}</span>
       </ArDialog>
+      <ArDialog
+        title="Sync Project"
+        dialogOpen={syncDialogOpen}
+        handleCancel={handleCancelSync}
+        buttonList={[
+          { title: "Cancel", click: handleCancelSync },
+          { title: "Confirm", click: handleConfirmSync },
+        ]}
+      >
+        Whether to enter the collaboration project:
+        <span className="text-red-500 mr-1">{syncParams.project}</span>
+      </ArDialog>
       <Share
         dialogOpen={shareDialogOpen}
         setDialogOpen={setShareDialogOpen}
         rootPath={shareProjectName}
         user={user}
+        getProjectList={getProjectList}
       ></Share>
     </React.Fragment>
   );

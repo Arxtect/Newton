@@ -6,7 +6,7 @@ import { object, string } from "zod";
 import { toast } from "react-toastify";
 import { updateAccessToken } from "store";
 import { loginUser, getMe } from "@/services";
-import { useUserStore } from "store";
+import { useUserStore, useLoginStore } from "store";
 import emailSvg from "@/assets/website/email.svg";
 import passwordSvg from "@/assets/website/password.svg";
 import ArButton from "@/components/arButton";
@@ -28,7 +28,13 @@ const NoRouteLogin = ({ handleClose }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loginError, setLoginError] = useState();
 
-  const updateUser = useUserStore((state) => state.updateUser);
+  const { updateUser } = useUserStore((state) => ({
+    updateUser: state.updateUser,
+  }));
+
+  const { otherOperation } = useLoginStore((state) => ({
+    otherOperation: state.otherOperation,
+  }));
 
   const handleRouteClick = (href) => {
     window.open(href, "_blank", "noopener,noreferrer");
@@ -45,6 +51,8 @@ const NoRouteLogin = ({ handleClose }) => {
       updateUser(userData.user);
       setTimeout(() => {
         handleClose();
+
+        otherOperation && otherOperation();
       }, [0]);
     } catch (error) {
       const errorMessage =
