@@ -224,17 +224,22 @@ export const useGitRepo = create()(
         }
       },
       updateStatusMatrixOnSaveFile: async ({ projectRoot }) => {
-        let isExists = await existsPath(path.join(projectRoot, ".git"));
-        if (!isExists) {
-          return;
+        try {
+          let isExists = await existsPath(path.join(projectRoot, ".git"));
+          console.log(isExists, 'isExists')
+          if (!isExists) {
+            return;
+          }
+          const { statusMatrix } = get();
+          const newMat = await Git.updateStatusMatrix(
+            projectRoot,
+            statusMatrix,
+            []
+          );
+          set({ statusMatrix: newMat });
+        } catch (e) {
+          console.log(e, 'updateStatusMatrixOnSaveFile')
         }
-        const { statusMatrix } = get();
-        const newMat = await Git.updateStatusMatrix(
-          projectRoot,
-          statusMatrix,
-          []
-        );
-        set({ statusMatrix: newMat });
       },
       pushCurrentBranchToOrigin: async () => {
         const state = get();

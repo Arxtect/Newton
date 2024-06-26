@@ -5,9 +5,11 @@ import path from "path";
 import * as FS from "domain/filesystem";
 import { AceBinding } from "./ace-binding"; // 导入AceBinding
 
-const host = "206.190.239.91:9008";
+const host = window.location.hostname;
+// const host = "206.190.239.91:9008";
 const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-const wsUrl = `${wsProtocol}//${host}/websockets`;
+// const wsUrl = `${wsProtocol}//${host}/websockets`;
+const wsUrl = `wss://arxtect.com/websockets`
 
 class ProjectSync {
   constructor(rootPath, user, roomId, otherOperation) {
@@ -177,7 +179,7 @@ class ProjectSync {
     }
 
     try {
-      const files = await FS.readFileStats(folderPath);
+      const files = await FS.readFileStats(folderPath, false);
 
       console.log(files, "files");
 

@@ -42,7 +42,7 @@ import pify from "pify";
 import orderBy from "lodash/orderBy";
 import { projectInfoExists } from "../commands/projectInfo";
 
-export async function readFileStats(dirpath) {
+export async function readFileStats(dirpath, isNotSync = true) {
   const readdir = pify(fs.readdir);
   const stat = pify(fs.stat);
 
@@ -51,7 +51,7 @@ export async function readFileStats(dirpath) {
 
   const ret = await Promise.all(
     filenames.map(async (name) => {
-      if (!!projectInfoExists(name)) return null; // TODO: remove
+      if (!!projectInfoExists(name) && isNotSync) return null; // TODO: remove
       const childPath = path.join(dirpath, name);
       const stats = await stat(childPath);
 
