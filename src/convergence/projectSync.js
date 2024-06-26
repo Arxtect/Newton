@@ -4,12 +4,14 @@ import { useFileStore } from "@/store"; // 假设 Zustand 文件操作在这里�
 import path from "path";
 import * as FS from "domain/filesystem";
 import { AceBinding } from "./ace-binding"; // 导入AceBinding
+import { fromUint8Array, toUint8Array } from "js-base64";
 
 const host = window.location.hostname;
-// const host = "206.190.239.91:9008";
 const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-// const wsUrl = `${wsProtocol}//${host}/websockets`;
-const wsUrl = `wss://arxtect.com/websockets`
+const wsUrl = `wss://arxtect.com/websockets`;
+
+// 常见的资产文件扩展名
+const assetExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'pdf', 'mp4', 'mp3', 'wav'];
 
 class ProjectSync {
   constructor(rootPath, user, roomId, otherOperation) {
@@ -35,15 +37,9 @@ class ProjectSync {
 
     // 使用 rootPath 作为命名空间
     this.yMap = this.yDoc.getMap(this.rootPath + this.roomId);
-    // this.setObserveHandler();
 
-    // 监听 awareness 变化
-    // this.awareness.on("change", this.awarenessChangeHandler.bind(this));
     this.otherOperation = otherOperation && otherOperation; // 保存回调函数
     this.isExistAllFile = false;
-
-    // 初始化光标同步实例
-    // this.aceBinding = new AceBinding(this.awareness);
   }
 
   // set observe handler
@@ -71,9 +67,19 @@ class ProjectSync {
   }
 
   //同步文件内容到 Yjs Map
-  syncToYMap(filePath, content) {
+  async syncToYMap(filePath, content) {
+    const ext = path.extname(filePath).slice(1).toLowerCase(); // 获取文件扩展名并转换为小写
+    let contentToStore = content;
+    if (assetExtensions.includes(ext)) {
+      // 如果是资产文件类型，则转换为 Base64 编码
+      contentToStore = fromUint8Array(content);
+    } else {
+      // 否则将内容转换为字符串
+      contentToStore = content.toString();
+    }
+
     this.yDoc.transact(() => {
-      this.yMap.set(filePath, content);
+      this.yMap.set(filePath, contentToStore);
     });
   }
 
@@ -163,7 +169,7 @@ class ProjectSync {
     await this.waitForUnlock(); // 等待锁释放
 
     try {
-      this.syncToYMap(filePath, content);
+      await this.syncToYMap(filePath, content);
     } catch (err) {
       console.error(`Error syncing file ${filePath}:`, err);
       throw err;
@@ -188,7 +194,7 @@ class ProjectSync {
 
         if (file.type == "file") {
           const content = await FS.readFile(filePath);
-          this.syncToYMap(filePath, content.toString()); // 只同步相对路径
+          await this.syncToYMap(filePath, content); // 只同步相对路径
         } else if (file.type == "dir") {
           await this.syncFolderToYMap(filePath); // 递归同步子文件夹
         }
@@ -222,11 +228,19 @@ class ProjectSync {
         console.log("YMap event:", event); // 打印事件对象
         const dirpath = path.dirname(key);
         await FS.ensureDir(dirpath);
-        if (this.isCurrentFile(editor, key)) {
-          this.setEditorContent(content);
+
+        const ext = path.extname(key).slice(1).toLowerCase();
+        if (assetExtensions.includes(ext)) {
+          // 如果是资产文件类型，则将 Base64 编码的字符串转换回文件数据
+          const fileData = toUint8Array(content);
+          await FS.writeFile(key, Buffer.from(fileData));
         } else {
-          const fileStore = useFileStore.getState();
-          await fileStore.saveFile(key, content, false, false);
+          if (this.isCurrentFile(editor, key)) {
+            this.setEditorContent(content);
+          } else {
+            const fileStore = useFileStore.getState();
+            await fileStore.saveFile(key, content, false, false);
+          }
         }
 
         const allFilesSynced = Array.from(this.yMap.keys()).every((key) => {
@@ -246,9 +260,6 @@ class ProjectSync {
   // Awareness 变化处理函数
   awarenessChangeHandler({ added, updated, removed }) {
     this.userList = this.getCurrentUsers();
-    // console.log("Users added:", added.map(id => states.get(id)));
-    // console.log("Users updated:", updated.map(id => states.get(id)));
-    // console.log("Users removed:", removed.map(id => states.get(id)));
     console.log(this.userList, "users added");
   }
 
