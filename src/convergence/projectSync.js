@@ -208,7 +208,7 @@ class ProjectSync {
     await this.waitForUnlock(); // 等待锁释放
     this.saveProjectSyncInfoToJson(this.rootPath).then((res) => {
       this.syncFolderToYMap(this.rootPath); // 保存项目信息
-      callback && callback()
+      callback && callback();
     });
   }
 

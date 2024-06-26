@@ -484,6 +484,7 @@ function Project() {
     if (!user || JSON.stringify(user) === "{}") {
       toast.warning("Please login");
       updateDialogLoginOpen(true);
+      updateOtherOperation(() => handleSyncProject(project, roomId));
       return;
     }
 
@@ -553,6 +554,8 @@ function Project() {
                     handleRename={handleRename}
                     selectedRows={selectedRows}
                     getProjectList={getProjectList}
+                    auth={auth}
+                    user={user}
                   />
                 ) : (
                   <React.Fragment>

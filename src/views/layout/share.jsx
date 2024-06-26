@@ -33,7 +33,7 @@ const Share = ({ dialogOpen, setDialogOpen, rootPath, user }) => {
   const createProjectSync = async (rootPath, user) => {
     const projectSync = new ProjectSync(rootPath, user, user.id);
     updateProjectSync(projectSync);
-    await projectSync.syncFolderToYMapRootPath(rootPath);
+    await projectSync.syncFolderToYMapRootPath();
     setTimeout(() => {
       filepath && loadFile({ filepath: filepath });
     }, [500]);
