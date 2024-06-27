@@ -43,7 +43,8 @@ export const useFileStore = create()(
       currentSelectDir: "",
       preRenamingDirpath: "",
       allProject: [],
-      updateProjectSync: (projectSync) => {
+      updateProjectSync: async (projectSync) => {
+        await (projectSync && projectSync.setObserveHandler());
         set({ projectSync });
       },
       updateProject: async (pdfBlob) => {
@@ -224,14 +225,28 @@ export const useFileStore = create()(
       },
 
       deleteFile: async ({ filename }) => {
+        set({ filepath: "", value: "" });
         await FS.unlink(filename);
+        const projectSync = get().projectSync;
+        if (projectSync && filename) {
+          projectSync.deleteFile(filename);
+        }
         get().startUpdate({ changedPath: filename });
       },
       deleteDirectory: async ({ dirpath }) => {
-        const files = await FS.getFilesRecursively(dirpath);
-        await FS.removeDirectory(dirpath);
-        get().startUpdate({ changedPath: files });
-        // TODO: 这里可能需要更新 Git 状态，根据你的应用逻辑进行调整
+        try {
+          set({ filepath: "", value: "", currentSelectDir: "" });
+          const files = await FS.getFilesRecursively(dirpath);
+          const projectSync = get().projectSync;
+          if (projectSync && dirpath) {
+            projectSync.deleteFolder(dirpath);
+          }
+          await FS.removeDirectory(dirpath);
+          get().startUpdate({ changedPath: files });
+          // TODO: 这里可能需要更新 Git 状态，根据你的应用逻辑进行调整
+        } catch (err) {
+          console.log(err);
+        }
       },
 
       fileMoved: async ({ fromPath, destPath }) => {

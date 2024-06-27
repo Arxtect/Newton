@@ -11,7 +11,26 @@ const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
 const wsUrl = `wss://arxtect.com/websockets`;
 
 // 常见的资产文件扩展名
-const assetExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'pdf', 'mp4', 'mp3', 'wav'];
+const assetExtensions = [
+  "jpg",
+  "jpeg",
+  "png",
+  "gif",
+  "bmp",
+  "pdf",
+  "mp4",
+  "mp3",
+  "wav",
+];
+
+function debounce(func, wait) {
+  let timeout;
+  return function (...args) {
+    const context = this;
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(context, args), wait);
+  };
+}
 
 class ProjectSync {
   constructor(rootPath, user, roomId, otherOperation) {
@@ -40,11 +59,21 @@ class ProjectSync {
 
     this.otherOperation = otherOperation && otherOperation; // 保存回调函数
     this.isExistAllFile = false;
+
+    // 保存当前的观察者句柄
+    this.currentObserver = null;
   }
 
   // set observe handler
-  setObserveHandler(editor) {
-    this.yMap.observe(this.yMapObserveHandler.bind(this, editor));
+  setObserveHandler(editor = "default-editor") {
+    // 清理旧的观察者
+    if (this.currentObserver) {
+      this.yMap.unobserve(this.currentObserver);
+    }
+
+    // 设置新的观察者
+    this.currentObserver = this.yMapObserveHandler.bind(this, editor);
+    this.yMap.observe(this.currentObserver);
   }
 
   async saveProjectSyncInfoToJson() {
@@ -81,6 +110,30 @@ class ProjectSync {
     this.yDoc.transact(() => {
       this.yMap.set(filePath, contentToStore);
     });
+  }
+  // 删除文件
+  async deleteFile(filePath, otherInfo = {}) {
+    this.yDoc.transact(() => {
+      this.yMap.set(filePath, { _delete: true, ...otherInfo });
+    });
+  }
+  async deleteFolder(folderPath) {
+    try {
+      const files = await FS.readFileStats(folderPath, false);
+
+      for (const file of files) {
+        const filePath = path.join(folderPath, file.name); // 使用 path.join 进行路径拼接
+
+        if (file.type == "file") {
+          await this.deleteFile(filePath, { dir: folderPath }); // 删除文件
+        } else if (file.type == "dir") {
+          await this.deleteFolder(filePath); // 递归删除子文件夹
+        }
+      }
+    } catch (err) {
+      console.error(`Error deleting folder ${folderPath}:`, err);
+      throw err;
+    }
   }
 
   setEditorContent(content) {
@@ -211,6 +264,9 @@ class ProjectSync {
       await new Promise((resolve) => setTimeout(resolve, 100)); // 每100ms检查一次锁状态
     }
   }
+  debouncedRepoChanged = debounce(() => {
+    useFileStore.getState().repoChanged();
+  }, 500);
 
   async syncFolderToYMapRootPath(callback) {
     await this.waitForUnlock(); // 等待锁释放
@@ -225,21 +281,34 @@ class ProjectSync {
     event.keysChanged.forEach(async (key) => {
       const content = this.yMap.get(key);
       try {
-        console.log("YMap event:", event); // 打印事件对象
-        const dirpath = path.dirname(key);
-        await FS.ensureDir(dirpath);
+        console.log("YMap event:", event, key); // 打印事件对象
 
-        const ext = path.extname(key).slice(1).toLowerCase();
-        if (assetExtensions.includes(ext)) {
-          // 如果是资产文件类型，则将 Base64 编码的字符串转换回文件数据
-          const fileData = toUint8Array(content);
-          await FS.writeFile(key, Buffer.from(fileData));
+        if (content?._delete || content == undefined) {
+          // 如果内容为空，则删除文件
+          await useFileStore.getState().deleteFile({ filename: key });
+          if (!!content?.dir) {
+            const files = await FS.readFileStats(content?.dir, false);
+            if (files.length == 0) {
+              useFileStore.getState().deleteDirectory({ dirpath: content.dir });
+            }
+          }
+          console.log(`File ${key} deleted successfully.`);
+          return;
         } else {
-          if (this.isCurrentFile(editor, key)) {
-            this.setEditorContent(content);
+          const dirpath = path.dirname(key);
+          await FS.ensureDir(dirpath);
+          const ext = path.extname(key).slice(1).toLowerCase();
+          if (assetExtensions.includes(ext)) {
+            // 如果是资产文件类型，则将 Base64 编码的字符串转换回文件数据
+            const fileData = toUint8Array(content);
+            await FS.writeFile(key, Buffer.from(fileData));
           } else {
-            const fileStore = useFileStore.getState();
-            await fileStore.saveFile(key, content, false, false);
+            if (this.isCurrentFile(editor, key)) {
+              this.setEditorContent(content);
+            } else {
+              const fileStore = useFileStore.getState();
+              await fileStore.saveFile(key, content, false, false);
+            }
           }
         }
 
@@ -253,6 +322,8 @@ class ProjectSync {
       } catch (err) {
         console.error(err);
       } finally {
+        // 调用需要防抖处理的函数
+        this.debouncedRepoChanged();
       }
     });
   }
@@ -276,8 +347,8 @@ class ProjectSync {
 
   // 清理函数
   cleanup() {
-    if (this.yMap && this.yMapObserveHandler) {
-      this.yMap.unobserve(this.yMapObserveHandler);
+    if (this.yMap && this.currentObserver) {
+      this.yMap.unobserve(this.currentObserver);
     }
 
     if (this.awareness && this.awarenessChangeHandler) {

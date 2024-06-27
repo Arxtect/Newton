@@ -37,7 +37,6 @@ const Share = ({
 
   const createProjectSync = async (rootPath, user) => {
     const projectSync = await new ProjectSync(rootPath, user, user.id);
-    updateProjectSync(projectSync);
     projectSync.syncFolderToYMapRootPath(getProjectList);
   };
 
