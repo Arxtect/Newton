@@ -1,3 +1,8 @@
+/*
+ * @Description:
+ * @Author: Devin
+ * @Date: 2024-05-28 13:48:03
+ */
 import fs from "fs";
 import path from "path";
 import pify from "pify";
@@ -40,4 +45,8 @@ async function removeDirectoryRecursively(node) {
     // console.log("rmdir", "rmd")
     await pify(fs.rmdir)(node.pathname);
   }
+}
+
+export async function removeDir(dirpath) {
+  await pify(fs.rmdir)(dirpath);
 }

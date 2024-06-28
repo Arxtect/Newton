@@ -34,6 +34,7 @@ function debounce(func, wait) {
 
 class ProjectSync {
   constructor(rootPath, user, roomId, otherOperation) {
+    this.folderMapName = `${rootPath}_folder_map_list_${roomId}`;
     this.rootPath = rootPath;
     this.roomId = roomId;
     this.yDoc = new Y.Doc();
@@ -94,48 +95,6 @@ class ProjectSync {
   setUserAwareness(user) {
     this.awareness.setLocalStateField("user", user);
   }
-
-  //同步文件内容到 Yjs Map
-  async syncToYMap(filePath, content) {
-    const ext = path.extname(filePath).slice(1).toLowerCase(); // 获取文件扩展名并转换为小写
-    let contentToStore = content;
-    if (assetExtensions.includes(ext)) {
-      // 如果是资产文件类型，则转换为 Base64 编码
-      contentToStore = fromUint8Array(content);
-    } else {
-      // 否则将内容转换为字符串
-      contentToStore = content.toString();
-    }
-
-    this.yDoc.transact(() => {
-      this.yMap.set(filePath, contentToStore);
-    });
-  }
-  // 删除文件
-  async deleteFile(filePath, otherInfo = {}) {
-    this.yDoc.transact(() => {
-      this.yMap.set(filePath, { _delete: true, ...otherInfo });
-    });
-  }
-  async deleteFolder(folderPath) {
-    try {
-      const files = await FS.readFileStats(folderPath, false);
-
-      for (const file of files) {
-        const filePath = path.join(folderPath, file.name); // 使用 path.join 进行路径拼接
-
-        if (file.type == "file") {
-          await this.deleteFile(filePath, { dir: folderPath }); // 删除文件
-        } else if (file.type == "dir") {
-          await this.deleteFolder(filePath); // 递归删除子文件夹
-        }
-      }
-    } catch (err) {
-      console.error(`Error deleting folder ${folderPath}:`, err);
-      throw err;
-    }
-  }
-
   setEditorContent(content) {
     const handleChange = useFileStore.getState().changeValue;
     handleChange(content, false);
@@ -217,17 +176,86 @@ class ProjectSync {
     return [0, this.yText.length];
   }
 
+  //同步文件内容到 Yjs Map
+  async syncToYMap(filePath, content) {
+    const ext = path.extname(filePath).slice(1).toLowerCase(); // 获取文件扩展名并转换为小写
+    let contentToStore = content;
+    if (assetExtensions.includes(ext)) {
+      // 如果是资产文件类型，则转换为 Base64 编码
+      contentToStore = fromUint8Array(content);
+    } else {
+      // 否则将内容转换为字符串
+      contentToStore = content.toString();
+    }
+
+    this.yDoc.transact(() => {
+      this.yMap.set(filePath, contentToStore);
+    });
+  }
+  // 删除文件
+  async deleteFile(filePath, otherInfo = {}) {
+    this.yDoc.transact(() => {
+      this.yMap.set(filePath, { _delete: true, ...otherInfo });
+    });
+  }
+  // 删除文件夹
+  async deleteFolder(folderPath) {
+    try {
+      if (!(await FS.existsPath(folderPath))) return;
+      const files = await FS.readFileStats(folderPath, false);
+      this.removeFolderInfo(folderPath);
+
+      for (const file of files) {
+        const filePath = path.join(folderPath, file.name); // 使用 path.join 进行路径拼接
+
+        if (file.type == "file") {
+          await this.deleteFile(filePath, { dir: folderPath }); // 删除文件
+        } else if (file.type == "dir") {
+          await this.deleteFolder(filePath); // 递归删除子文件夹
+        }
+      }
+      await FS.removeDir(folderPath);
+    } catch (err) {
+      console.error(`Error deleting folder ${folderPath}:`, err);
+      // throw err;
+    }
+  }
+
   // 同步单个文件到 Yjs Map
   async syncFileToYMap(filePath, content) {
     await this.waitForUnlock(); // 等待锁释放
 
     try {
       await this.syncToYMap(filePath, content);
+      const folderPath = path.dirname(filePath);
+      this.syncFolderInfo(folderPath);
     } catch (err) {
       console.error(`Error syncing file ${filePath}:`, err);
       throw err;
     } finally {
     }
+  }
+
+  // 同步文件夹列表
+  syncFolderInfo(folderPath) {
+    console.log(folderPath, "folderPath");
+    this.yDoc.transact(() => {
+      let folderMap = this.yMap.get(this.folderMapName) || [];
+      folderMap = [...folderMap, folderPath];
+      console.log(folderMap, "folderMap");
+      this.yMap.set(this.folderMapName, [...new Set(folderMap)]);
+    });
+  }
+
+  // 从 Yjs Map 中删除文件夹
+  removeFolderInfo(folderPath) {
+    this.yDoc.transact(() => {
+      let folderMap = this.yMap.get(this.folderMapName) || [];
+      if (folderMap.includes(folderPath)) {
+        folderMap = folderMap.filter((item) => item != folderPath);
+        this.yMap.set(this.folderMapName, [...new Set(folderMap)]);
+      }
+    });
   }
 
   // 同步整个文件夹到 Yjs Map
@@ -238,6 +266,7 @@ class ProjectSync {
     }
 
     try {
+      this.syncFolderInfo(folderPath);
       const files = await FS.readFileStats(folderPath, false);
 
       console.log(files, "files");
@@ -276,13 +305,50 @@ class ProjectSync {
     });
   }
 
+  async handleFolderInfo(folderPath, key, content) {
+    const files = await FS.readFileStats(folderPath, false);
+    const fileNames = new Set(files.map((f) => f.name));
+    const contentNames = new Set(content);
+
+    // 删除 files 中有但 content 中没有的文件夹
+    for (const file of files) {
+      const filePath = path.join(folderPath, file.name);
+      if (file.type == "dir" && !contentNames.has(filePath)) {
+        await this.deleteFolder(filePath);
+        console.log(`Deleted folder ${filePath}`);
+      }
+    }
+
+    // 创建 content 中有但 files 中没有的文件夹
+    for (const folderName of contentNames) {
+      if (!fileNames.has(folderName)) {
+        await FS.ensureDir(folderName);
+        console.log(`Created folder ${folderName}`);
+      }
+    }
+
+    // 递归处理子文件夹
+    for (const file of files) {
+      if (file.type == "dir" && contentNames.has(file.name)) {
+        const filePath = path.join(folderPath, file.name);
+        await this.handleFolderInfo(filePath, key, content);
+      }
+    }
+  }
+
   // Yjs Map 观察者处理函数
   async yMapObserveHandler(editor, event) {
     event.keysChanged.forEach(async (key) => {
       const content = this.yMap.get(key);
+
       try {
         console.log("YMap event:", event, key); // 打印事件对象
-
+        if (key == this.folderMapName) {
+          await FS.ensureDir(this.rootPath);
+          console.log(content, "content");
+          this.handleFolderInfo(this.rootPath, key, content);
+          return;
+        }
         if (content?._delete || content == undefined) {
           // 如果内容为空，则删除文件
           await useFileStore.getState().deleteFile({ filename: key });

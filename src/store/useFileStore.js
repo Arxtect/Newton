@@ -226,6 +226,7 @@ export const useFileStore = create()(
 
       deleteFile: async ({ filename }) => {
         set({ filepath: "", value: "" });
+        if (!(await FS.existsPath(filename))) return;
         await FS.unlink(filename);
         const projectSync = get().projectSync;
         if (projectSync && filename) {

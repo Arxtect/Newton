@@ -9,7 +9,6 @@ export * from "./commands/unlink";
 export * from "./commands/writeFile";
 export * from "./queries/existsPath";
 export * from "./queries/getFileRecursively";
-export * from "./queries/readDirectories";
 export * from "./queries/readFile";
 export * from "./queries/readFileStats";
 
