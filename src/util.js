@@ -212,3 +212,31 @@ export async function pdfToImageFirst(pdfUrl) {
   const blob = await dataURLtoBlob(pdf);
   return blob;
 }
+
+export const assetExtensions = [
+  "jpg",
+  "jpeg",
+  "png",
+  "gif",
+  "bmp",
+  "pdf",
+  "mp4",
+  "mp3",
+  "wav",
+];
+
+export const mimeTypes = {
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  png: 'image/png',
+  gif: 'image/gif',
+  bmp: 'image/bmp',
+  pdf: 'application/pdf',
+  mp4: 'video/mp4',
+  mp3: 'audio/mpeg',
+  wav: 'audio/wav',
+};
+
+export function getMimeType(extension) {
+  return mimeTypes[extension.toLowerCase()] || 'application/octet-stream';
+}
