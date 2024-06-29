@@ -35,7 +35,6 @@
     "@testing-library/user-event": "^13.5.0",
     "ace-builds": "^1.6.0",
     "ahooks": "^3.7.10",
-    "aws-sdk": "^2.1650.0",
     "babel-jest": "^27.4.2",
     "babel-loader": "^9.1.2",
     "babel-plugin-named-asset-import": "^0.3.8",
