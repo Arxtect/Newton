@@ -171,3 +171,51 @@ export async function uploadDocument({
     throw new Error("Document upload failed");
   }
 }
+
+
+export async function uploadToS3({
+  filePath,
+  blob,
+  type
+}) {
+  await refreshAuth();
+
+  const formData = new FormData();
+  console.log(blob, 'fileBuffer')
+  const file = new File([blob], filePath, {
+    type: type,
+  });
+  console.log(filePath, type)
+  formData.append("file", file);
+  formData.append("filename", filePath);
+
+  // Perform the fetch operation to upload the form data
+  const uploadResponse = await fetch(getApiUrl("/uploadToS3"), {
+    method: "POST",
+    body: formData,
+  });
+
+  // Check the response status and return the response or throw an error
+  if (uploadResponse.ok) {
+    return uploadResponse.json();
+  } else if (uploadResponse.status === 401) {
+    // deleteCookie("mojolicious");
+    updateAccessToken("");
+    toast.error("Login has expired. Please log in again", {
+      position: "top-right",
+    });
+  } else {
+    throw new Error("Document upload failed");
+  }
+}
+
+
+export async function downloadFileFromS3(key) {
+  const response = await fetch(getApiUrl(`/pre/download/${key}`));
+  const blob = await response.blob();
+  const arrayBuffer = await blob.arrayBuffer();
+
+  // 将 arrayBuffer 转换为 Uint8Array
+  const uint8Array = new Uint8Array(arrayBuffer);
+  return Buffer.from(uint8Array)
+}
