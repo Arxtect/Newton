@@ -172,7 +172,7 @@ class ProjectSync {
     let contentToStore = content;
     if (assetExtensions.includes(ext)) {
       // 如果是资产文件类型，则转换为 Base64 编码
-      contentToStore = await uploadFile(filePath)
+      contentToStore = await uploadFile(filePath, content)
     } else {
       // 否则将内容转换为字符串
       contentToStore = content.toString();
