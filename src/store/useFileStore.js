@@ -79,7 +79,7 @@ export const useFileStore = create()(
             filepath: "",
             lastSavedValue: "",
             changed: false,
-            currentSelectDir: "",
+            // currentSelectDir: "",
           })
           return
         }
@@ -340,8 +340,13 @@ export function getInitialState() {
     value: "",
     lastSavedValue: "",
     reloadCounter: 0,
+    autosave: true,
+    assetsFilePath: "",
+    assetValue: "",
+    lastSavedValue: "",
   };
 }
+
 
 export const { changeCurrentProjectRoot, startUpdate } =
   useFileStore.getState();

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
 import "./index.scss";
 import { useLayout } from "store";
 import { useReactive } from "ahooks";
+import { useFileStore, revokeCompiledPdfUrl, setCompilerLog } from "store";
 
 const Layout = ({
   header,
@@ -310,6 +311,18 @@ const Layout = ({
 
     setSideWidth(asideRef.current?.offsetWidth ?? 0)
   }, [asideRef.current?.offsetWidth, showSide])
+
+  const { initFile } = useFileStore((state) => ({
+    initFile: state.initFile,
+  }));
+
+  useEffect(() => {
+    return () => {
+      initFile()
+      revokeCompiledPdfUrl()
+      setCompilerLog("")
+    }
+  }, [])
 
 
 
