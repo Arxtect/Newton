@@ -5,7 +5,8 @@
  */
 // Hooks
 import { useEffect, useState } from "react";
-import { usePdfPreviewStore } from "store";
+import { usePdfPreviewStore, useFileStore } from "store";
+import AssetPreview from "../assetPreview/assetPreview"
 
 export const PdfPreview = () => {
   const { pdfUrl, compilerLog, showCompilerLog, setCompiledPdfUrl } =
@@ -14,6 +15,12 @@ export const PdfPreview = () => {
       compilerLog: state.compilerLog,
       showCompilerLog: state.showCompilerLog,
       setCompiledPdfUrl: state.setCompiledPdfUrl,
+    }));
+
+  const { assetValue, assetsFilePath } =
+    useFileStore((state) => ({
+      assetValue: state.assetValue,
+      assetsFilePath: state.assetsFilePath,
     }));
 
   const [resizing, setResizing] = useState(false);
@@ -63,8 +70,7 @@ export const PdfPreview = () => {
 
   return (
     <div className="h-full">
-      {pdfUrl !== "" && !showCompilerLog && pdfEmbed}
-      {(pdfUrl === "" || showCompilerLog) && formattedCompilerLog}
+      {!!assetValue && !!assetsFilePath ? <AssetPreview filename={assetsFilePath} content={assetValue} /> : pdfUrl === "" || showCompilerLog ? formattedCompilerLog : pdfEmbed}
     </div>
   );
 };

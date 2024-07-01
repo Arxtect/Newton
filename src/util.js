@@ -24,6 +24,7 @@ import { openDB } from "idb";
 import ini from "ini";
 import { format } from "date-fns";
 import { pdfjs } from "react-pdf";
+import path from "path";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
@@ -223,7 +224,16 @@ export const assetExtensions = [
   "mp4",
   "mp3",
   "wav",
+  "svg"
 ];
+
+export function isAssetExtension(filename) {
+  const ext = path.extname(filename).slice(1).toLowerCase();
+  if (assetExtensions.includes(ext)) {
+    return true;
+  }
+  return false;
+}
 
 export const mimeTypes = {
   jpg: 'image/jpeg',

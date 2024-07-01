@@ -10,6 +10,7 @@ import { savePdfToIndexedDB, getPdfFromIndexedDB } from "@/util";
 import { useUserStore } from "./user";
 import { ProjectSync } from "@/convergence";
 import { useEditor } from "./useEditor";
+import { isAssetExtension } from "@/util"
 
 export const FILE_STORE = "file_store";
 
@@ -27,9 +28,11 @@ export const useFileStore = create()(
     (set, get) => ({
       autosave: true,
       filepath: "",
+      assetsFilePath: "",
       filetype: "text",
       changed: false,
       value: "",
+      assetValue: "",
       lastSavedValue: "",
       reloadCounter: 0,
 
@@ -67,14 +70,28 @@ export const useFileStore = create()(
       loadFile: async ({ filepath }) => {
         const { editor } = useEditor.getState();
         const fileContent = await FS.readFile(filepath);
+
+        if (isAssetExtension(filepath)) {
+          set({
+            assetsFilePath: filepath,
+            assetValue: fileContent,
+            value: "",
+            filepath: "",
+            lastSavedValue: "",
+            changed: false,
+            currentSelectDir: "",
+          })
+          return
+        }
         const projectSync = get().projectSync;
-        console.log(editor, "editor");
         if (projectSync && editor != null && filepath) {
           console.log("12312132");
           projectSync.updateEditorAndCurrentFilePath(filepath, editor);
         }
         set({
           filepath,
+          assetsFilePath: "",
+          fileContent: "",
           filetype: FS.extToFileType(filepath), // You will need to define extToFileType function
           value: fileContent.toString(),
           lastSavedValue: fileContent.toString(),
@@ -217,7 +234,7 @@ export const useFileStore = create()(
         get().loadFile({ filepath }); // 假设 loadFile 已适配 Zustand
         get().startUpdate({ changedPath: filepath });
       },
-      changeFolderPath: ({}) => {},
+      changeFolderPath: ({ }) => { },
 
       createDirectory: async ({ dirname }) => {
         await FS.mkdir(dirname);
