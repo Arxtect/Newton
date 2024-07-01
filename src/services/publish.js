@@ -172,43 +172,55 @@ export async function uploadDocument({
   }
 }
 
-
-export async function uploadToS3({
-  filePath,
-  blob,
-  type
-}) {
+export async function uploadToS3({ filePath, blob, type }) {
   await refreshAuth();
 
+  const uploadUrlData = await generateS3UploadURL({ filePath });
+  const uploadUrl = uploadUrlData["upload_url"];
+  const fileKey = uploadUrlData["key"];
+  console.log(uploadUrlData, fileKey, uploadUrl, "data");
+
   const formData = new FormData();
-  console.log(blob, 'fileBuffer')
+  console.log(blob, "fileBuffer");
   const file = new File([blob], filePath, {
     type: type,
   });
-  console.log(filePath, type)
+  console.log(filePath, type);
   formData.append("file", file);
-  formData.append("filename", filePath);
 
   // Perform the fetch operation to upload the form data
-  const uploadResponse = await fetch(getApiUrl("/uploadToS3"), {
-    method: "POST",
-    body: formData,
+  const uploadResponse = await fetch(uploadUrl, {
+    method: "PUT",
+    body: file,
   });
 
   // Check the response status and return the response or throw an error
   if (uploadResponse.ok) {
-    return uploadResponse.json();
-  } else if (uploadResponse.status === 401) {
-    // deleteCookie("mojolicious");
-    updateAccessToken("");
-    toast.error("Login has expired. Please log in again", {
-      position: "top-right",
-    });
+    return fileKey;
   } else {
-    throw new Error("Document upload failed");
+    throw new Error(`Failed to upload file: ${uploadResponse.statusText}`);
   }
 }
 
+export async function generateS3UploadURL({ filePath }) {
+  // Perform the fetch operation to upload the form data
+  const response = await fetch(getApiUrl("/generateS3UploadURL"), {
+    method: "POST",
+    body: JSON.stringify({
+      filename: filePath,
+    }),
+  });
+
+  // Check the response status and return the response or throw an error
+  if (response.ok) {
+    const data = await response.json();
+    return data;
+  } else {
+    const data = await response.json();
+    console.log(data);
+    throw new Error(`register failed: ${data.message}`);
+  }
+}
 
 export async function downloadFileFromS3(key) {
   const response = await fetch(getApiUrl(`/pre/download/${key}`));
@@ -217,5 +229,5 @@ export async function downloadFileFromS3(key) {
 
   // 将 arrayBuffer 转换为 Uint8Array
   const uint8Array = new Uint8Array(arrayBuffer);
-  return Buffer.from(uint8Array)
+  return Buffer.from(uint8Array);
 }
