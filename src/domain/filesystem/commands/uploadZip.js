@@ -1,9 +1,13 @@
-
+/*
+ * @Description:
+ * @Author: Devin
+ * @Date: 2024-05-28 13:48:03
+ */
 import JSZip from "jszip";
 import fs from "fs";
 import path from "path";
 import pify from "pify";
-import { ensureDir } from "./upLoadFolder";
+import { ensureDir } from "./ensureDir";
 import { changeCurrentProjectRoot } from "store";
 import { createProjectInfo } from "./projectInfo";
 
@@ -19,7 +23,7 @@ const uploadZip = async (
   onProgress,
   user = {}
 ) => {
-  console.log(file, "file");
+  let filePaths = [];
   try {
     let firstFolderName;
     const zip = await JSZip.loadAsync(file); // 使用 JSZip 加载 ZIP 文件
@@ -63,6 +67,7 @@ const uploadZip = async (
         // 确保目标文件夹存在
         await ensureDir(path.dirname(targetPath));
         // 写入文件
+        filePaths.push(targetPath);
         await writeFile(targetPath, content);
       }
 
@@ -74,13 +79,15 @@ const uploadZip = async (
 
     reload();
     onProgress && updateProgress("uploadSuccess");
-    await createProjectInfo(firstFolderName, {
-      name: "YOU",
-      ...user,
-    });
+
     if ((dirpath === "." || projectName) && firstFolderName) {
+      await createProjectInfo(firstFolderName, {
+        name: "YOU",
+        ...user,
+      });
       changeCurrentProjectRoot({ projectRoot: firstFolderName });
     }
+    return filePaths;
   } catch (error) {
     console.error(`Failed to upload ZIP ${file.name}:`, error);
   }

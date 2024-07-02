@@ -10,7 +10,7 @@ import { savePdfToIndexedDB, getPdfFromIndexedDB } from "@/util";
 import { useUserStore } from "./user";
 import { ProjectSync } from "@/convergence";
 import { useEditor } from "./useEditor";
-import { isAssetExtension } from "@/util"
+import { isAssetExtension } from "@/util";
 
 export const FILE_STORE = "file_store";
 
@@ -80,12 +80,11 @@ export const useFileStore = create()(
             lastSavedValue: "",
             changed: false,
             // currentSelectDir: "",
-          })
-          return
+          });
+          return;
         }
         const projectSync = get().projectSync;
         if (projectSync && editor != null && filepath) {
-          console.log("12312132");
           projectSync.updateEditorAndCurrentFilePath(filepath, editor);
         }
         set({
@@ -234,7 +233,7 @@ export const useFileStore = create()(
         get().loadFile({ filepath }); // 假设 loadFile 已适配 Zustand
         get().startUpdate({ changedPath: filepath });
       },
-      changeFolderPath: ({ }) => { },
+      changeFolderPath: ({}) => {},
 
       createDirectory: async ({ dirname }) => {
         await FS.mkdir(dirname);
@@ -346,7 +345,6 @@ export function getInitialState() {
     lastSavedValue: "",
   };
 }
-
 
 export const { changeCurrentProjectRoot, startUpdate } =
   useFileStore.getState();

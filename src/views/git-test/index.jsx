@@ -38,6 +38,7 @@ const GitTest = () => {
     deleteProject,
     allProject,
     updateAllProject,
+    projectSync,
     updateProjectSync,
   } = useFileStore((state) => ({
     filepath: state.filepath,
@@ -64,6 +65,7 @@ const GitTest = () => {
     deleteProject: state.deleteProject,
     allProject: state.allProject,
     updateAllProject: state.updateAllProject,
+    projectSync: state.projectSync,
     updateProjectSync: state.updateProjectSync,
   }));
   const getAllProject = async () => {
@@ -114,6 +116,7 @@ const GitTest = () => {
           reload={repoChanged}
           filepath={filepath}
           currentSelectDir={currentSelectDir}
+          projectSync={projectSync}
         ></RightBeforeLeft>
       </div>
       <RootDirectory

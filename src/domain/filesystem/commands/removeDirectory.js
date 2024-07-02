@@ -7,6 +7,7 @@ import fs from "fs";
 import path from "path";
 import pify from "pify";
 import { unlink } from "./unlink";
+import { existsPath } from "../queries/existsPath";
 
 export async function removeDirectory(dirpath) {
   const node = await readRecursiveFileNodeWithGit(dirpath);
@@ -48,5 +49,6 @@ async function removeDirectoryRecursively(node) {
 }
 
 export async function removeDir(dirpath) {
+  if (!(await existsPath(dirpath))) return;
   await pify(fs.rmdir)(dirpath);
 }

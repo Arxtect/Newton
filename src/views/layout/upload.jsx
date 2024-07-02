@@ -15,16 +15,36 @@ import UploadFileIcon from "@mui/icons-material/UploadFileRounded";
 import path from "path";
 import DriveFolderUploadIcon from "@mui/icons-material/DriveFolderUploadRounded";
 import { IconButton, Tooltip } from "@mui/material";
+import { readFile } from "domain/filesystem";
 
 const FileUploader = forwardRef(
-  ({ reload, filepath, currentSelectDir, ...props }, ref) => {
-    const handleFileChange = (event) => {
+  (
+    {
+      reload,
+      filepath,
+      currentSelectDir,
+      currentProject,
+      projectSync,
+      ...props
+    },
+    ref
+  ) => {
+    const handleFileChange = async (event) => {
       const currentPath = currentSelectDir
         ? currentSelectDir
-        : path.dirname(filepath);
+        : !!filepath
+        ? path.dirname(filepath)
+        : currentProject;
       const fileList = event.target.files;
       const filesArray = Array.from(fileList);
-      uploadFile(filesArray, currentPath, reload);
+      const filePaths = await uploadFile(filesArray, currentPath, reload);
+      if (!!projectSync) {
+        for (const filePath of filePaths) {
+          const content = await readFile(filePath);
+          projectSync.syncFileToYMap(filePath, content);
+        }
+      }
+      console.log(filePaths, "filePaths");
     };
 
     const fileUploaderRef = useRef(null);
@@ -56,16 +76,36 @@ const FileUploader = forwardRef(
 );
 
 const FolderUploader = forwardRef(
-  ({ reload, filepath, currentSelectDir, ...props }, ref) => {
+  (
+    {
+      reload,
+      filepath,
+      currentSelectDir,
+      currentProject,
+      projectSync,
+      ...props
+    },
+    ref
+  ) => {
     const folderUploaderRef = useRef(null);
 
-    const handleFolderChange = (event) => {
+    const handleFolderChange = async (event) => {
       const currentPath = currentSelectDir
         ? currentSelectDir
-        : path.dirname(filepath);
+        : !!filepath
+        ? path.dirname(filepath)
+        : currentProject;
       const folderList = event.target.files;
       const foldersArray = Array.from(folderList);
-      uploadFolder(foldersArray, currentPath, reload);
+
+      const filePaths = await uploadFolder(foldersArray, currentPath, reload);
+      if (!!projectSync) {
+        for (const filePath of filePaths) {
+          const content = await readFile(filePath);
+          projectSync.syncFileToYMap(filePath, content);
+        }
+      }
+      console.log(filePaths, "filePaths");
     };
 
     const handleButtonClick = () => {

@@ -23,3 +23,5 @@ export * from "./commands/copyProject";
 export * from "./commands/copyFile";
 export * from "./commands/stat";
 export * from "./commands/projectInfo";
+export * from "./commands/ensureDir";
+export * from "./commands/writeInBrowser";

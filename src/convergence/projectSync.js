@@ -5,13 +5,12 @@ import path from "path";
 import * as FS from "domain/filesystem";
 import { AceBinding } from "./ace-binding"; // 导入AceBinding
 import { fromUint8Array, toUint8Array } from "js-base64";
-import { uploadFile, downloadFile } from "./minio"
-import { assetExtensions } from '@/util'
+import { uploadFile, downloadFile } from "./minio";
+import { assetExtensions } from "@/util";
 
 const host = window.location.hostname;
 const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
 const wsUrl = `wss://arxtect.com/websockets`;
-
 
 function debounce(func, wait) {
   let timeout;
@@ -172,7 +171,7 @@ class ProjectSync {
     let contentToStore = content;
     if (assetExtensions.includes(ext)) {
       // 如果是资产文件类型，则转换为 Base64 编码
-      contentToStore = await uploadFile(filePath, content)
+      contentToStore = await uploadFile(filePath, content);
     } else {
       // 否则将内容转换为字符串
       contentToStore = content.toString();
@@ -357,7 +356,7 @@ class ProjectSync {
           if (assetExtensions.includes(ext)) {
             // 如果是资产文件类型，则将 Base64 编码的字符串转换回文件数据
             const fileData = await downloadFile(content, key);
-            console.log(content, 'content')
+            console.log(content, "content");
             // await FS.writeFile(key, Buffer.from(fileData));
           } else {
             if (this.isCurrentFile(editor, key)) {
@@ -377,7 +376,7 @@ class ProjectSync {
           this.isExistAllFile = true;
         }
       } catch (err) {
-        console.error(err);
+        console.error(err, key);
       } finally {
         // 调用需要防抖处理的函数
         this.debouncedRepoChanged();

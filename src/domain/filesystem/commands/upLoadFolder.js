@@ -1,56 +1,31 @@
-import fs from "fs";
+/*
+ * @Description:
+ * @Author: Devin
+ * @Date: 2024-05-28 13:48:03
+ */
+import { uploadZip } from "./uploadZip";
+import { writeInBrowser } from "./writeInBrowser";
 import path from "path";
-import pify from "pify";
-
-// 将 fs 的方法转换为返回 Promise 的方法
-const writeFile = pify(fs.writeFile);
-const mkdir = pify(fs.mkdir);
-const readdir = pify(fs.readdir);
-const stat = pify(fs.stat);
-
-// 递归创建目录
-const ensureDir = async (dirpath) => {
-  const parentDir = path.dirname(dirpath);
-  if (parentDir !== dirpath) {
-    await ensureDir(parentDir);
-  }
-
-  try {
-    await mkdir(dirpath);
-  } catch (error) {
-    if (error.code !== "EEXIST") throw error;
-  }
-};
-
-// 处理二进制文件上传
-const writeInBrowser = async (file, dirpath, reload) => {
-  try {
-    // 使用 FileReader 读取文件的二进制内容
-    const data = await new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = reject;
-      reader.readAsArrayBuffer(file);
-    });
-
-    const filename = file.webkitRelativePath || file.name;
-    const browserPath = path.join(dirpath, filename);
-
-    // 确保目录存在
-    await ensureDir(path.dirname(browserPath));
-
-    // 使用 Buffer 写入文件内容
-    await writeFile(browserPath, Buffer.from(data));
-    reload();
-  } catch (error) {
-    console.error(`failed to upload ${file.name}:`, error);
-  }
-};
 
 const uploadFolder = async (fileList, dirpath, reload) => {
+  let filePaths = []; // 用于收集所有生成的 filePath
+
   for (const file of fileList) {
-    await writeInBrowser(file, dirpath, reload);
+    console.log(fileList, "fileList");
+    console.log(file, "file");
+    if (file.name.endsWith(".zip")) {
+      const zipFilePath = path.dirname(file.webkitRelativePath || file.name);
+      const zipDirPath = path.join(dirpath, zipFilePath);
+      const filePathsList = await uploadZip(file, zipDirPath, reload); // 处理 ZIP 文件
+      filePaths = [...filePaths, ...filePathsList];
+    } else {
+      await writeInBrowser(file, dirpath, reload); // 处理普通文件或文件夹
+      const filePath = await writeInBrowser(file, dirpath, reload);
+      filePaths.push(filePath); // 收集生成的 filePath
+    }
   }
+  console.log(filePaths, "filePaths");
+  return filePaths; // 返回所有生成的 filePath
 };
 
-export { uploadFolder, ensureDir };
+export { uploadFolder };

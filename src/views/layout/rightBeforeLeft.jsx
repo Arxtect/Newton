@@ -24,6 +24,7 @@ const RightBeforeLeft = ({
   deleteProject,
   currentProject,
   projectLists,
+  projectSync,
   ...props
 }) => {
   const navigate = useNavigate();
@@ -154,9 +155,11 @@ const RightBeforeLeft = ({
         reload={reload}
         filepath={filepath}
         currentSelectDir={currentSelectDir}
+        currentProject={currentProject}
         fontSize="small"
         ref={fileUploaderRef}
         title={"Upload File"}
+        projectSync={projectSync}
       ></FileUploader>
       <FolderUploader
         onClick={() => folderUploaderRef.current.click()}
@@ -165,6 +168,8 @@ const RightBeforeLeft = ({
         currentSelectDir={currentSelectDir}
         fontSize="small"
         ref={folderUploaderRef}
+        currentProject={currentProject}
+        projectSync={projectSync}
         title="Upload Folder"
       ></FolderUploader>
       {actionList.map((item) => {

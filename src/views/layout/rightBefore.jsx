@@ -7,7 +7,6 @@ import { usePdfPreviewStore, useFileStore } from "@/store";
 import { compileLatex } from "@/features/latexCompilation/latexCompilation";
 import Controls from "./controls";
 import BottomDrawer from "@/features/bottomDrawer/bottomDrawer";
-import RightBeforeLeft from "./rightBeforeLeft";
 import { findAllProject, getProjectInfo, existsPath } from "domain/filesystem";
 import path from "path";
 import LinkGithub from "./linkGithub";
