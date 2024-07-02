@@ -31,6 +31,7 @@ class AceCursors {
     let start = config.firstRow,
       end = config.lastRow;
     let cursors = this.marker.cursors;
+    console.log(this.marker.cursors, '111rs')
 
     for (let i = 0; i < cursors.length; i++) {
       let pos = cursors[i];
@@ -97,8 +98,10 @@ class AceCursors {
   }
 
   updateCursors(cur, cid, ace) {
+
     if (cur !== undefined && cur.hasOwnProperty("cursor")) {
       let c = cur.cursor;
+
       let pos = ace.getSession().doc.indexToPosition(c.pos);
 
       let curCursor = {
@@ -108,7 +111,8 @@ class AceCursors {
         id: c.id,
         name: c.name,
       };
-
+      console.log(cur.cursor, curCursor, c.pos, 'cur.cursor')
+      console.log(c.sel, 'c.sel')
       if (c.sel) {
         if (
           this.markerID[c.id] !== undefined &&
@@ -186,6 +190,8 @@ export class AceBinding {
     this._awarenessChange = ({ added, removed, updated }, ace) => {
       this.aceCursors.marker.cursors = [];
       const states = /** @type {Awareness} */ (this.awareness).getStates();
+      console.log(this.aceCursors, states, added, removed, updated, ' this.aceCursors.marker.cursors')
+
       added.forEach((id) => {
         this.aceCursors.updateCursors(states.get(id), id, ace);
       });
@@ -195,6 +201,7 @@ export class AceBinding {
       removed.forEach((id) => {
         this.aceCursors.updateCursors(states.get(id), id, ace);
       });
+
 
       this.aceCursors.redraw();
     };

@@ -4,7 +4,6 @@ import { useFileStore } from "@/store"; // 假设 Zustand 文件操作在这里�
 import path from "path";
 import * as FS from "domain/filesystem";
 import { AceBinding } from "./ace-binding"; // 导入AceBinding
-import { fromUint8Array, toUint8Array } from "js-base64";
 import { uploadFile, downloadFile } from "./minio";
 import { assetExtensions } from "@/util";
 
@@ -125,9 +124,7 @@ class ProjectSync {
     } else if (action === "historyRedo") {
       this.undoManager.redo();
     }
-    if (this.isCurrentFile(editor, this.currentFilePath)) {
-      // this.aceBinding._cursorObserver(editor);
-    }
+
   }
 
   isCurrentFile(editor, filePath) {
@@ -146,7 +143,8 @@ class ProjectSync {
     // Initialize AceBinding for cursor synchronization
     if (this.isCurrentFile(editor, this.currentFilePath)) {
       // Initialize AceBinding for cursor synchronization
-      // this.aceBinding.init(editor, this.yText); // 初始化 AceBinding 实例
+      this.aceBinding = new AceBinding(this.awareness)
+      this.aceBinding.init(editor, this.yText); // 初始化 AceBinding 实例
     }
 
     editor.getSession().on("change", (e) => {
@@ -361,6 +359,8 @@ class ProjectSync {
           } else {
             if (this.isCurrentFile(editor, key)) {
               this.setEditorContent(content);
+
+              // this.aceBinding._cursorObserver && this.aceBinding._cursorObserver(editor)
             } else {
               const fileStore = useFileStore.getState();
               await fileStore.saveFile(key, content, false, false);
@@ -417,7 +417,7 @@ class ProjectSync {
 
     // 销毁 AceBinding
     if (this.aceBinding) {
-      // this.aceBinding.destroy();
+      this.aceBinding.destroy();
     }
   }
 
