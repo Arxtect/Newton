@@ -30,6 +30,7 @@ const Layout = ({
     showFooter,
     setSideWidth,
     sideWidth,
+    setWillResizing,
   } = useLayout();
 
   // Refs for DOM elements
@@ -42,9 +43,7 @@ const Layout = ({
   // const [resizeOrigin, setResizeOrigin] = useState(null);
   const reactive = useReactive({ resizeOrigin: null });
 
-  useEffect(() => {
-
-  }, [reactive.resizeOrigin]);
+  useEffect(() => {}, [reactive.resizeOrigin]);
 
   const resizeOutOfRange = (refName, outOfRange) => {
     if (refName === "aside" && outOfRange === "min") {
@@ -72,7 +71,6 @@ const Layout = ({
 
   // Helper functions for resizing logic
   const getContainerSibling = (ref, resizeOrigin) => {
-
     return resizeOrigin.type === "right"
       ? ref.current?.nextElementSibling
       : ref.current?.previousElementSibling;
@@ -114,8 +112,6 @@ const Layout = ({
       editor: editorRef,
       terminal: terminalRef,
     }[reactive.resizeOrigin.ref].current;
-
-
 
     const checkOutOfRange = (value) => {
       if (
@@ -180,7 +176,6 @@ const Layout = ({
   };
 
   const resizeDone = () => {
-
     if (!reactive.resizeOrigin) {
       return;
     }
@@ -236,7 +231,6 @@ const Layout = ({
       terminal: terminalRef,
     }[refName].current;
 
-
     if (!reactive.resizeOrigin && type) {
       // setResizeOrigin({
       //   min,
@@ -268,7 +262,6 @@ const Layout = ({
   };
 
   const initEditorResize = (e) => {
-
     if (contentRef.current) {
       const maxWidth = contentRef.current.clientWidth - 270;
       initResize("right", "editor", 200, maxWidth, e);
@@ -308,9 +301,8 @@ const Layout = ({
   }, [showEditor, showView, editorRef.current?.offsetWidth]);
 
   useEffect(() => {
-
-    setSideWidth(asideRef.current?.offsetWidth ?? 0)
-  }, [asideRef.current?.offsetWidth, showSide])
+    setSideWidth(asideRef.current?.offsetWidth ?? 0);
+  }, [asideRef.current?.offsetWidth, showSide]);
 
   const { initFile } = useFileStore((state) => ({
     initFile: state.initFile,
@@ -318,13 +310,11 @@ const Layout = ({
 
   useEffect(() => {
     return () => {
-      initFile()
-      revokeCompiledPdfUrl()
-      setCompilerLog("")
-    }
-  }, [])
-
-
+      initFile();
+      revokeCompiledPdfUrl();
+      setCompilerLog("");
+    };
+  }, []);
 
   // Convert Vue's template syntax to JSX
   return (
@@ -354,7 +344,6 @@ const Layout = ({
             </div>
             <div className="right-before-right">{rightBeforeRight}</div> */}
             {rightBefore}
-
           </div>
           <div className="content" ref={contentRef}>
             {showEditor && (
@@ -367,8 +356,13 @@ const Layout = ({
                 {showView && showEditor && (
                   <div
                     className="sash-left"
+                    id="sash-left"
                     onDoubleClick={() => resetSize("right", "editor")}
-                    onMouseDown={initEditorResize}
+                    onMouseDown={(e) => {
+                      initEditorResize(e);
+                      setWillResizing(true);
+                    }}
+                    onMouseUp={() => setWillResizing(false)}
                   ></div>
                 )}
                 {preview}
