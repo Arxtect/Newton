@@ -224,7 +224,7 @@ export const assetExtensions = [
   "mp4",
   "mp3",
   "wav",
-  "svg"
+  "svg",
 ];
 
 export function isAssetExtension(filename) {
@@ -236,17 +236,26 @@ export function isAssetExtension(filename) {
 }
 
 export const mimeTypes = {
-  jpg: 'image/jpeg',
-  jpeg: 'image/jpeg',
-  png: 'image/png',
-  gif: 'image/gif',
-  bmp: 'image/bmp',
-  pdf: 'application/pdf',
-  mp4: 'video/mp4',
-  mp3: 'audio/mpeg',
-  wav: 'audio/wav',
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  png: "image/png",
+  gif: "image/gif",
+  bmp: "image/bmp",
+  pdf: "application/pdf",
+  mp4: "video/mp4",
+  mp3: "audio/mpeg",
+  wav: "audio/wav",
 };
 
 export function getMimeType(extension) {
-  return mimeTypes[extension.toLowerCase()] || 'application/octet-stream';
+  return mimeTypes[extension.toLowerCase()] || "application/octet-stream";
+}
+
+export function debounce(func, wait) {
+  let timeout;
+  return function (...args) {
+    const context = this;
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(context, args), wait);
+  };
 }

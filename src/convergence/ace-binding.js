@@ -1,11 +1,9 @@
-/**
- * @module bindings/ace
- */
-
 import { createMutex } from "lib0/mutex.js";
 import * as Y from "yjs"; // eslint-disable-line
 import { Awareness } from "y-protocols/awareness.js"; // eslint-disable-line
 import Ace from "ace-builds/src-min-noconflict/ace";
+import { debounce } from "@/util";
+
 const Range = Ace.require("ace/range").Range;
 
 class AceCursors {
@@ -27,21 +25,19 @@ class AceCursors {
     this.marker.session.addDynamicMarker(this.marker, true);
   }
 
+  redraw() {
+    this.marker.session._signal("changeFrontMarker");
+  }
+
   markerUpdate(html, markerLayer, session, config, ace) {
     let start = config.firstRow,
-      end = config.lastRow;
+      end = config.lastRow; //视图显示区域
     let cursors = this.marker.cursors;
-    console.log(this.marker.cursors, '111rs')
+    console.log(this.marker.cursors, config, "111rs");
 
     for (let i = 0; i < cursors.length; i++) {
       let pos = cursors[i];
       if (pos.row < start || pos.row > end) {
-        let el = document.getElementById(this.aceID + "_cursor_" + pos.id);
-        if (el) {
-          el.style.opacity = 0;
-        }
-        continue;
-      } else if (pos.row > end) {
         let el = document.getElementById(this.aceID + "_cursor_" + pos.id);
         if (el) {
           el.style.opacity = 0;
@@ -93,12 +89,7 @@ class AceCursors {
     }
   }
 
-  redraw() {
-    this.marker.session._signal("changeFrontMarker");
-  }
-
   updateCursors(cur, cid, ace) {
-
     if (cur !== undefined && cur.hasOwnProperty("cursor")) {
       let c = cur.cursor;
 
@@ -111,8 +102,9 @@ class AceCursors {
         id: c.id,
         name: c.name,
       };
-      console.log(cur.cursor, curCursor, c.pos, 'cur.cursor')
-      console.log(c.sel, 'c.sel')
+
+      console.log(curCursor, "curCursor");
+
       if (c.sel) {
         if (
           this.markerID[c.id] !== undefined &&
@@ -185,25 +177,72 @@ export class AceBinding {
     const mux = createMutex();
     this.mux = mux;
     this.aceCursors = null;
+    this.added = [];
+    this.updated = [];
+    this.removed = [];
 
     this.awareness = awareness;
+    this.handleAwarenessChange = async (ace, clientId) => {
+      this.aceCursors.marker.cursors = [];
+      const states = /** @type {Awareness} */ (this.awareness).getStates();
+      console.log(
+        ace,
+        clientId,
+        this.added,
+        this.updated,
+        this.removed,
+        "ace, clientId"
+      );
+
+      Promise.all([
+        ...Array.from(states.keys()).map((id) => {
+          console.log(this.updated, states, "states.get(id)", clientId);
+
+          this.aceCursors.updateCursors(states.get(id), id, ace);
+        }),
+      ]).then(() => {
+        this.aceCursors.redraw();
+      });
+
+      // 使用 Promise.all 确保所有更新操作完成后再继续
+      // Promise.all([
+      //   ...this.added.map((id) => {
+      //     // if (clientId && clientId !== id) return;
+      //     this.aceCursors.updateCursors(states.get(id), id, ace);
+      //   }),
+      //   ...this.updated.map((id) => {
+      //     // if (clientId && clientId !== id) return;
+      //     console.log(
+      //       states.get(id),
+      //       this.updated,
+      //       states,
+      //       "states.get(id)",
+      //       clientId
+      //     );
+
+      //     this.aceCursors.updateCursors(states.get(id), id, ace);
+      //   }),
+      //   ...this.removed.map((id) => {
+      //     // if (clientId && clientId !== id) return;
+      //     this.aceCursors.updateCursors(states.get(id), id, ace);
+      //   }),
+      // ]).then(() => {
+      //   this.aceCursors.redraw();
+      // });
+    };
+
     this._awarenessChange = ({ added, removed, updated }, ace) => {
       this.aceCursors.marker.cursors = [];
       const states = /** @type {Awareness} */ (this.awareness).getStates();
-      console.log(this.aceCursors, states, added, removed, updated, ' this.aceCursors.marker.cursors')
+      Promise.all([
+        ...Array.from(states.keys()).map((id) => {
+          console.log(this.updated, states, "states.get(id)");
 
-      added.forEach((id) => {
-        this.aceCursors.updateCursors(states.get(id), id, ace);
+          this.aceCursors.updateCursors(states.get(id), id, ace);
+        }),
+      ]).then(() => {
+        this.aceCursors.redraw();
       });
-      updated.forEach((id) => {
-        this.aceCursors.updateCursors(states.get(id), id, ace);
-      });
-      removed.forEach((id) => {
-        this.aceCursors.updateCursors(states.get(id), id, ace);
-      });
-
-
-      this.aceCursors.redraw();
     };
 
     this._cursorObserver = (ace) => {
@@ -243,7 +282,7 @@ export class AceBinding {
         if (this.awareness.getLocalState() !== null) {
           this.awareness.setLocalStateField(
             "cursor",
-            /** @type {any} */(null)
+            /** @type {any} */ (null)
           );
         }
       } else {
@@ -257,39 +296,6 @@ export class AceBinding {
         }
       }
     };
-
-    this._aceObserver = (ace) => {
-      this._cursorObserver(ace);
-    };
-
-    this._typeObserver = (event, ace) => {
-      const aceDocument = ace.getSession().getDocument();
-      mux(() => {
-        const delta = event.delta;
-        let currentPos = 0;
-        for (const op of delta) {
-          if (op.retain) {
-            currentPos += op.retain;
-          } else if (op.insert) {
-            const start = aceDocument.indexToPosition(currentPos, 0);
-            aceDocument.insert(start, op.insert);
-            currentPos += op.insert.length;
-          } else if (op.delete) {
-            const start = aceDocument.indexToPosition(currentPos, 0);
-            const end = aceDocument.indexToPosition(currentPos + op.delete, 0);
-            const range = new Range(
-              start.row,
-              start.column,
-              end.row,
-              end.column
-            );
-            aceDocument.remove(range);
-          }
-        }
-        this._cursorObserver(ace);
-      });
-    };
-
   }
 
   init(ace, type) {
@@ -298,10 +304,8 @@ export class AceBinding {
     ace.session.getUndoManager().reset();
 
     ace.getSession().selection.on("changeCursor", () => {
-      this._cursorObserver(ace);
+      this.mux(() => this._cursorObserver(ace));
     });
-
-    // type.observe((event) => this._typeObserver(event, ace));
 
     if (this.awareness) {
       this.awareness.on("change", (e) => this._awarenessChange(e, ace));
@@ -310,7 +314,7 @@ export class AceBinding {
 
   destroy(ace) {
     if (this.awareness) {
-      this.awareness.off("change", this._awarenessChange, ace);
+      this.awareness.off("change", (e) => this._awarenessChange(e, ace));
     }
   }
 }
