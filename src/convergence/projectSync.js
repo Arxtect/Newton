@@ -89,8 +89,8 @@ class ProjectSync {
   updateEditorAndCurrentFilePath(filePath, editor) {
     this.currentFilePath = filePath;
     this.yText = this.yDoc.getText(filePath);
+    console.log(this.yText, 'this.yText')
     this.undoManager = new Y.UndoManager(this.yText);
-    console.log(editor, filePath, "editor1231231");
     this.setObserveHandler(editor);
 
     // Initialize AceBinding for cursor synchronization
@@ -335,10 +335,8 @@ class ProjectSync {
             // 等待所有内容同步完成后再进行光标同步
             Promise.all(contentSyncedPromises).then(() => {
               this.otherOperation && this.otherOperation();
-              // this.aceBinding?.handleAwarenessChange &&
-              //   this.aceBinding.handleAwarenessChange(editor);
-              // this.aceBinding?.aceCursors?.redraw &&
-              //   this.aceBinding.aceCursors.redraw();
+              this.aceBinding?.handleAwarenessChange &&
+                this.aceBinding.handleAwarenessChange(editor);
             });
             resolve(); // 同步完成后，Promise 解决
           }
@@ -352,7 +350,6 @@ class ProjectSync {
     const states = this.awareness.getStates();
     const users = [];
     states.forEach((state, clientID) => {
-      console.log(state, clientID, "state.user");
       users.push({ clientID, ...state.user });
     });
     return users;

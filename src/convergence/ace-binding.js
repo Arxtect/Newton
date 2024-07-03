@@ -15,6 +15,7 @@ class AceCursors {
 
     // Bind the marker update function to this context
     this.marker.update = (html, markerLayer, session, config) => {
+
       this.markerUpdate(html, markerLayer, session, config, ace);
     };
   }
@@ -33,7 +34,6 @@ class AceCursors {
     let start = config.firstRow,
       end = config.lastRow; //视图显示区域
     let cursors = this.marker.cursors;
-    console.log(this.marker.cursors, config, "111rs");
 
     for (let i = 0; i < cursors.length; i++) {
       let pos = cursors[i];
@@ -93,17 +93,17 @@ class AceCursors {
     if (cur !== undefined && cur.hasOwnProperty("cursor")) {
       let c = cur.cursor;
 
-      let pos = ace.getSession().doc.indexToPosition(c.pos);
+      // let pos = ace.getSession().doc.indexToPosition(c.pos);
 
-      let curCursor = {
-        row: pos.row,
-        column: pos.column,
-        color: c.color,
-        id: c.id,
-        name: c.name,
-      };
+      let curCursor = cur.cursor
+      // {
+      //   row: pos.row,
+      //   column: pos.column,
+      //   color: c.color,
+      //   id: c.id,
+      //   name: c.name,
+      // };
 
-      console.log(curCursor, "curCursor");
 
       if (c.sel) {
         if (
@@ -182,62 +182,35 @@ export class AceBinding {
     this.removed = [];
 
     this.awareness = awareness;
-    this.handleAwarenessChange = async (ace, clientId) => {
+    this.handleAwarenessChange = async (ace) => {
       this.aceCursors.marker.cursors = [];
       const states = /** @type {Awareness} */ (this.awareness).getStates();
-      console.log(
-        ace,
-        clientId,
-        this.added,
-        this.updated,
-        this.removed,
-        "ace, clientId"
-      );
+
 
       Promise.all([
         ...Array.from(states.keys()).map((id) => {
-          console.log(this.updated, states, "states.get(id)", clientId);
+          if (this.awareness.clientId == id) return;
 
           this.aceCursors.updateCursors(states.get(id), id, ace);
         }),
       ]).then(() => {
         this.aceCursors.redraw();
       });
-
-      // 使用 Promise.all 确保所有更新操作完成后再继续
-      // Promise.all([
-      //   ...this.added.map((id) => {
-      //     // if (clientId && clientId !== id) return;
-      //     this.aceCursors.updateCursors(states.get(id), id, ace);
-      //   }),
-      //   ...this.updated.map((id) => {
-      //     // if (clientId && clientId !== id) return;
-      //     console.log(
-      //       states.get(id),
-      //       this.updated,
-      //       states,
-      //       "states.get(id)",
-      //       clientId
-      //     );
-
-      //     this.aceCursors.updateCursors(states.get(id), id, ace);
-      //   }),
-      //   ...this.removed.map((id) => {
-      //     // if (clientId && clientId !== id) return;
-      //     this.aceCursors.updateCursors(states.get(id), id, ace);
-      //   }),
-      // ]).then(() => {
-      //   this.aceCursors.redraw();
-      // });
     };
 
     this._awarenessChange = ({ added, removed, updated }, ace) => {
+      console.log(added, removed, updated, 'added, removed, updated')
       this.aceCursors.marker.cursors = [];
       const states = /** @type {Awareness} */ (this.awareness).getStates();
       Promise.all([
-        ...Array.from(states.keys()).map((id) => {
-          console.log(this.updated, states, "states.get(id)");
-
+        ...added.map((id) => {
+          this.aceCursors.updateCursors(states.get(id), id, ace);
+        }),
+        ...updated.map((id) => {
+          if (this.awareness.clientId == id) return;
+          this.aceCursors.updateCursors(states.get(id), id, ace);
+        }),
+        ...removed.map((id) => {
           this.aceCursors.updateCursors(states.get(id), id, ace);
         }),
       ]).then(() => {
@@ -277,12 +250,18 @@ export class AceBinding {
         cursor.sel = false;
       }
 
+      let newPos = ace.getSession().doc.indexToPosition(cursor.pos);
+      console.log(newPos, 'newPos')
+      cursor.row = newPos.row;
+      cursor.column = newPos.column;
+
+
       const aw = /** @type {any} */ (this.awareness.getLocalState());
       if (curSel === null) {
         if (this.awareness.getLocalState() !== null) {
           this.awareness.setLocalStateField(
             "cursor",
-            /** @type {any} */ (null)
+            /** @type {any} */(null)
           );
         }
       } else {
