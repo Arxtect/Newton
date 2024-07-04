@@ -89,20 +89,16 @@ class ProjectSync {
   updateEditorAndCurrentFilePath(filePath, editor) {
     this.currentFilePath = filePath;
     this.yText = this.yDoc.getText(filePath);
-    console.log(this.yText, 'this.yText')
+    console.log(this.yText, "this.yText");
     this.undoManager = new Y.UndoManager(this.yText);
     this.setObserveHandler(editor);
 
-    // Initialize AceBinding for cursor synchronization
-    if (this.isCurrentFile(editor, this.currentFilePath)) {
-      // Initialize AceBinding for cursor synchronization
+    if (this.aceBinding) {
+      this.aceBinding.updateCurrentFilePath(filePath, editor);
+    } else {
       this.aceBinding = new AceBinding(this.awareness);
-      this.aceBinding.init(editor, this.yText); // 初始化 AceBinding 实例
+      this.aceBinding.init(editor, filePath); // 初始化 AceBinding 实例
     }
-
-    // editor.getSession().on("change", (e) => {
-    //   this.handleInput(e, editor);
-    // });
   }
 
   getVal() {
