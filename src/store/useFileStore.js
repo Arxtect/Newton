@@ -129,7 +129,7 @@ export const useFileStore = create()(
       },
       debouncedUpdateFileContent: debounce((filepath, value, isSync) => {
         get().updateFileContent(filepath, value, isSync);
-      }, 500),
+      }, 300),
       changeValue: (value, isSync = true) => {
         const state = get();
         if (state.autosave && isSync) {
@@ -233,7 +233,7 @@ export const useFileStore = create()(
         get().loadFile({ filepath }); // 假设 loadFile 已适配 Zustand
         get().startUpdate({ changedPath: filepath });
       },
-      changeFolderPath: ({}) => {},
+      changeFolderPath: ({ }) => { },
 
       createDirectory: async ({ dirname }) => {
         await FS.mkdir(dirname);

@@ -259,3 +259,8 @@ export function debounce(func, wait) {
     timeout = setTimeout(() => func.apply(context, args), wait);
   };
 }
+
+
+export function isNullOrUndefined(value) {
+  return value === undefined || value === null;
+}

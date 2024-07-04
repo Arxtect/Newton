@@ -2,8 +2,7 @@ import { createMutex } from "lib0/mutex.js";
 import * as Y from "yjs"; // eslint-disable-line
 import { Awareness } from "y-protocols/awareness.js"; // eslint-disable-line
 import Ace from "ace-builds/src-min-noconflict/ace";
-import { debounce } from "@/util";
-
+import { isNullOrUndefined } from "@/util"
 const Range = Ace.require("ace/range").Range;
 
 class AceCursors {
@@ -34,6 +33,7 @@ class AceCursors {
     let start = config.firstRow,
       end = config.lastRow; //视图显示区域
     let cursors = this.marker.cursors;
+    console.log(cursors, 'cursors')
 
     for (let i = 0; i < cursors.length; i++) {
       let pos = cursors[i];
@@ -49,7 +49,8 @@ class AceCursors {
         }
         continue;
       } else {
-        if (!pos.row || !pos.column) {
+        if (isNullOrUndefined(pos.row) || isNullOrUndefined(pos.column)) {
+          console.log(pos, 'element')
           continue;
         }
         let screenPos = session.documentToScreenPosition(pos.row, pos.column);
@@ -92,6 +93,7 @@ class AceCursors {
           });
           ace.container.appendChild(el); // Use ace to append the cursor element
         } else {
+          console.log(pos, 'element')
           el.style.height = height + "px";
           el.style.width = width + "px";
           el.style.top = top + "px";
@@ -174,6 +176,7 @@ class AceCursors {
       this.marker.cursors.push(curCursor);
     } else {
       let el = document.getElementById(this.aceID + "_cursor_" + cid);
+
       if (el) {
         el.parentNode.removeChild(el);
         if (
@@ -270,16 +273,17 @@ export class AceBinding {
       }
 
       let newPos = ace.getSession().doc.indexToPosition(cursor.pos);
-      console.log(newPos, "newPos");
-      cursor.row = newPos.row == 0 ? undefined : newPos.row;
-      cursor.column = newPos.column == 0 ? undefined : newPos.column;
+      let isNot0 = newPos.row == 0 && newPos.column == 0
+      console.log(newPos, cursor.pos, isNot0, newPos.row, cursor.column == 0, newPos.row == 0, cursor.column, "newPos");
+      cursor.row = isNot0 ? undefined : newPos.row;
+      cursor.column = isNot0 ? undefined : newPos.column;
 
       const aw = /** @type {any} */ (this.awareness.getLocalState());
       if (curSel === null) {
         if (this.awareness.getLocalState() !== null) {
           this.awareness.setLocalStateField(
             "cursor",
-            /** @type {any} */ (null)
+            /** @type {any} */(null)
           );
         }
       } else {
@@ -321,7 +325,7 @@ export class AceBinding {
     setTimeout(() => {
       this.awareness.setLocalStateField("cursor", null);
       this.handleAwarenessChange && this.handleAwarenessChange(editor, false);
-    }, 100);
+    }, 200);
   }
 
   destroy(ace) {

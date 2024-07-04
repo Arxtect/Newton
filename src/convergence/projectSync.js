@@ -159,8 +159,6 @@ class ProjectSync {
 
   // 同步单个文件到 Yjs Map
   async syncFileToYMap(filePath, content) {
-    await this.waitForUnlock(); // 等待锁释放
-
     try {
       await this.syncToYMap(filePath, content);
       const folderPath = path.dirname(filePath);
@@ -196,10 +194,6 @@ class ProjectSync {
 
   // 同步整个文件夹到 Yjs Map
   async syncFolderToYMap(folderPath) {
-    if (this.syncLock) {
-      console.log("Sync is already in progress. Please wait.");
-      return;
-    }
 
     try {
       this.syncFolderInfo(folderPath);
@@ -223,18 +217,12 @@ class ProjectSync {
     }
   }
 
-  // 等待锁释放
-  async waitForUnlock() {
-    while (this.syncLock) {
-      await new Promise((resolve) => setTimeout(resolve, 100)); // 每100ms检查一次锁状态
-    }
-  }
+
   debouncedRepoChanged = debounce(() => {
     useFileStore.getState().repoChanged();
-  }, 500);
+  }, 200);
 
   async syncFolderToYMapRootPath(callback) {
-    await this.waitForUnlock(); // 等待锁释放
     this.saveProjectSyncInfoToJson(this.rootPath).then((res) => {
       this.syncFolderToYMap(this.rootPath); // 保存项目信息
       callback && callback();
