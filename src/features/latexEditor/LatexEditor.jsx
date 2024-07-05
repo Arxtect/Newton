@@ -62,10 +62,10 @@ const LatexEditor = ({ handleChange, sourceCode, filepath }) => {
           enableSnippets: true,
           showLineNumbers: true,
           tabSize: 2,
+          readOnly: filepath === "",
         }}
         ref={latexRef}
-        readOnly={filepath == "" ? true : false}
-        className={filepath == "" ? "disabled-editor" : ""}
+        className={filepath === "" ? "disabled-editor" : "ace_editor ace-tm"}
       ></AceEditor>
       <AiTools editorRef={latexRef} />
       {/* <div className="input overlay">{fragments}</div> */}

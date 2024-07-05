@@ -20,7 +20,7 @@ body {
 
 .disabled-editor  {
   background-color: #f0f0f0;
-  color: #888888;
+    color: #888888;
   cursor: not-allowed;
 }
 
@@ -33,7 +33,7 @@ body {
 }
 
 .disabled-editor .ace_text-layer {
-  cursor: not-allowed;
+  cursor: not-allowed; 
 }
 
 .disabled-editor .ace_gutter {

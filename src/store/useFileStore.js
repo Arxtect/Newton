@@ -85,6 +85,7 @@ export const useFileStore = create()(
         }
         const projectSync = get().projectSync;
         if (projectSync && editor != null && filepath) {
+          editor.blur && editor.blur();
           projectSync.updateEditorAndCurrentFilePath(filepath, editor);
         }
         set({
@@ -233,7 +234,7 @@ export const useFileStore = create()(
         get().loadFile({ filepath }); // 假设 loadFile 已适配 Zustand
         get().startUpdate({ changedPath: filepath });
       },
-      changeFolderPath: ({ }) => { },
+      changeFolderPath: ({}) => {},
 
       createDirectory: async ({ dirname }) => {
         await FS.mkdir(dirname);

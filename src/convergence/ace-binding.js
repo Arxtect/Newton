@@ -2,7 +2,7 @@ import { createMutex } from "lib0/mutex.js";
 import * as Y from "yjs"; // eslint-disable-line
 import { Awareness } from "y-protocols/awareness.js"; // eslint-disable-line
 import Ace from "ace-builds/src-min-noconflict/ace";
-import { isNullOrUndefined } from "@/util"
+import { isNullOrUndefined } from "@/util";
 const Range = Ace.require("ace/range").Range;
 
 class AceCursors {
@@ -33,14 +33,16 @@ class AceCursors {
     let start = config.firstRow,
       end = config.lastRow; //视图显示区域
     let cursors = this.marker.cursors;
-    console.log(cursors, 'cursors')
+    console.log(cursors, "cursors");
 
     for (let i = 0; i < cursors.length; i++) {
       let pos = cursors[i];
       if (
         pos.row < start ||
         pos.row > end ||
-        pos?.currentFilePath != this.currentFilePath
+        pos?.currentFilePath != this.currentFilePath ||
+        isNullOrUndefined(pos.row) ||
+        isNullOrUndefined(pos.column)
       ) {
         let el = document.getElementById(this.aceID + "_cursor_" + pos.id);
 
@@ -49,10 +51,6 @@ class AceCursors {
         }
         continue;
       } else {
-        if (isNullOrUndefined(pos.row) || isNullOrUndefined(pos.column)) {
-          console.log(pos, 'element')
-          continue;
-        }
         let screenPos = session.documentToScreenPosition(pos.row, pos.column);
         let aceGutter =
           document.getElementsByClassName("ace_gutter")[0].offsetWidth;
@@ -93,7 +91,7 @@ class AceCursors {
           });
           ace.container.appendChild(el); // Use ace to append the cursor element
         } else {
-          console.log(pos, 'element')
+          console.log(pos, "element");
           el.style.height = height + "px";
           el.style.width = width + "px";
           el.style.top = top + "px";
@@ -272,9 +270,11 @@ export class AceBinding {
         cursor.sel = false;
       }
 
+      const isFocus = ace.isFocused();
+
       let newPos = ace.getSession().doc.indexToPosition(cursor.pos);
-      let isNot0 = newPos.row == 0 && newPos.column == 0
-      console.log(newPos, cursor.pos, isNot0, newPos.row, cursor.column == 0, newPos.row == 0, cursor.column, "newPos");
+      let isNot0 = newPos.row == 0 && newPos.column == 0 && !isFocus;
+
       cursor.row = isNot0 ? undefined : newPos.row;
       cursor.column = isNot0 ? undefined : newPos.column;
 
@@ -283,7 +283,7 @@ export class AceBinding {
         if (this.awareness.getLocalState() !== null) {
           this.awareness.setLocalStateField(
             "cursor",
-            /** @type {any} */(null)
+            /** @type {any} */ (null)
           );
         }
       } else {
