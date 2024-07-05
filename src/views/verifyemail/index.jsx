@@ -1,5 +1,5 @@
 /*
- * @Description: 
+ * @Description:
  * @Author: Devin
  * @Date: 2024-05-28 13:48:03
  */
@@ -19,7 +19,7 @@ const verificationCodeSchema = object({
 });
 
 const EmailVerificationPage = () => {
-  const { verificationCode } = useParams();
+  const { verifyCode } = useParams();
   const [isLoading, setIsLoading] = useState(false);
 
   const methods = useForm({
@@ -36,10 +36,10 @@ const EmailVerificationPage = () => {
   } = methods;
 
   useEffect(() => {
-    if (verificationCode) {
-      reset({ verificationCode });
+    if (verifyCode) {
+      reset({ verificationCode: verifyCode });
     }
-  }, [verificationCode, reset]);
+  }, [verifyCode, reset]);
 
   const onSubmitHandler = async (data) => {
     setIsLoading(true);
@@ -86,7 +86,7 @@ const EmailVerificationPage = () => {
               className="w-full bg-arxTheme text-white py-2 rounded hover:bg-primary-dark"
               type="submit"
             >
-              Verification Email
+              Verify Email
             </ArButton>
 
             <div className="my-4 text-center">

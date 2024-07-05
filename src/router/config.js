@@ -40,18 +40,23 @@ const noHeaderRoutes = [
     component: "register",
   },
   {
+    path: "/verifyemail/:verifyCode",
+    name: "verifyemail",
+    component: "verifyemail",
+  },
+  {
     path: "/verifyemail",
-    name: "einstein",
+    name: "verifyemail",
     component: "verifyemail",
   },
   {
     path: "/resetpassword/:resetToken",
-    name: "einstein",
+    name: "resetPasswordPage",
     component: "resetPasswordPage",
   },
   {
     path: "/forgotpassword",
-    name: "einstein",
+    name: "forgotPassword",
     component: "forgotPassword",
   },
 ];
