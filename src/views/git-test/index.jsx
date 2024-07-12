@@ -106,7 +106,7 @@ const GitTest = () => {
   }, []);
 
   return (
-    <main className="max-w-[100%]">
+    <main className="max-w-[100%] h-full">
       <div className="right-before flex pl-2 overflow-hidden">
         <RightBeforeLeft
           createProject={createProject}
@@ -119,30 +119,33 @@ const GitTest = () => {
           projectSync={projectSync}
         ></RightBeforeLeft>
       </div>
-      <RootDirectory
-        key={currentProjectRoot}
-        root={currentProjectRoot}
-        dirpath={currentProjectRoot}
-        depth={0}
-        touchCounter={touchCounter}
-        isFileCreating={isFileCreating}
-        isDirCreating={isDirCreating}
-        fileMoved={fileMoved}
-        startFileCreating={startFileCreating}
-        startDirCreating={startDirCreating}
-        deleteDirectory={deleteDirectory}
-        editingFilepath={editingFilepath}
-        open={true}
-        loadFile={loadFile}
-        currentSelectDir={currentSelectDir}
-        changeCurrentSelectDir={changeCurrentSelectDir}
-        startRenaming={startRenaming}
-        endRenaming={endRenaming}
-        renamingPathname={renamingPathname}
-        preRenamingDirpath={preRenamingDirpath}
-        changePreRenamingDirpath={changePreRenamingDirpath}
-        changeCurrentProjectRoot={changeCurrentProjectRoot}
-      />
+
+      <div className="overflow-auto" style={{ height: "calc(100% - 32px)" }}>
+        <RootDirectory
+          key={currentProjectRoot}
+          root={currentProjectRoot}
+          dirpath={currentProjectRoot}
+          depth={0}
+          touchCounter={touchCounter}
+          isFileCreating={isFileCreating}
+          isDirCreating={isDirCreating}
+          fileMoved={fileMoved}
+          startFileCreating={startFileCreating}
+          startDirCreating={startDirCreating}
+          deleteDirectory={deleteDirectory}
+          editingFilepath={editingFilepath}
+          open={true}
+          loadFile={loadFile}
+          currentSelectDir={currentSelectDir}
+          changeCurrentSelectDir={changeCurrentSelectDir}
+          startRenaming={startRenaming}
+          endRenaming={endRenaming}
+          renamingPathname={renamingPathname}
+          preRenamingDirpath={preRenamingDirpath}
+          changePreRenamingDirpath={changePreRenamingDirpath}
+          changeCurrentProjectRoot={changeCurrentProjectRoot}
+        />
+      </div>
     </main>
   );
 };
