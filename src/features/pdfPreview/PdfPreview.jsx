@@ -7,6 +7,7 @@
 import { useEffect, useState } from "react";
 import { usePdfPreviewStore, useFileStore, useLayout } from "store";
 import AssetPreview from "../assetPreview/assetPreview";
+import Viewer from "./viewer";
 
 export const PdfPreview = () => {
   const { pdfUrl, compilerLog, showCompilerLog, setCompiledPdfUrl } =
@@ -55,7 +56,8 @@ export const PdfPreview = () => {
       ) : pdfUrl === "" || showCompilerLog ? (
         formattedCompilerLog
       ) : (
-        pdfEmbed
+        // pdfEmbed
+        <Viewer url={pdfUrl}></Viewer>
       )}
 
       {willResizing && (
