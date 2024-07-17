@@ -42,6 +42,71 @@ body {
   cursor: not-allowed;
 }
 
+.ace_gutter-cell{
+  font-size: 14px;
+  font-weight: 100;
+  text-align: center;
+  background: #FFFFFF;
+  color: #A0A0A0;;
+}
+.ace_gutter-active-line.ace_gutter-cell{
+  background-color: #f4f4f4;
+}
+
+.ace_editor {
+  flex: 1;
+  position: relative;
+  /* 使伪元素相对于此容器定位 */
+  overflow: hidden;
+  /* 防止溢出 */
+}
+
+/* 自定义活动行背景颜色扩展 */
+.ace_editor .ace_marker-layer .ace_active-line {
+  background-color: #f4f4f4;
+  /* 移除默认背景 */
+}
+
+.ace_content{
+  border-left: 0.5px solid #D7D7D7;
+}
+
+/* scrollbar handle */
+.ace_editor ::-webkit-scrollbar {
+  width: 10px;
+  /* Width of the scrollbar */
+}
+
+.ace_editor ::-webkit-scrollbar-track {
+  background-color: #f4f4f4;
+    /* background: #fff; */
+  /* Background of the track */
+}
+
+
+
+.ace_editor ::-webkit-scrollbar-thumb {
+  background: #ccc;
+  /* Background of the scrollbar handle */
+  border-radius: 5px;
+  /* Rounded corners for the scrollbar handle */
+}
+
+.ace_editor ::-webkit-scrollbar-thumb:hover {
+  background: #b3b3b3;
+  /* Background of the scrollbar handle on hover */
+}
+
+.ace_editor::-webkit-scrollbar-thumb {
+  background: #ccc;
+  /* Background of the scrollbar handle */
+  border-radius: 5px;
+  /* Rounded corners for the scrollbar handle */
+}
+
+
+
+
 .DropdownMenuContent {
   animation-duration: 0.6s;
   animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);

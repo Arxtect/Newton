@@ -36,10 +36,9 @@ export const PdfPreview = () => {
   const pdfEmbed = (
     <embed
       src={pdfUrl}
-      width="100%"
       type="application/pdf"
-      className="h-full"
-    ></embed>
+      style={{ width: "100%", height: "100%" }}
+    />
   );
 
   useEffect(() => {

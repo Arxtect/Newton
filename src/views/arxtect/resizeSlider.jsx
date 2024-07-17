@@ -24,7 +24,7 @@ import {
   RightSidebar,
   useLeftSidebarFlyoutLock,
 } from "@atlaskit/page-layout";
-import GitTest from "../git-test";
+// import GitTest from "../git-test";
 
 import Tooltip from "@atlaskit/tooltip";
 
@@ -99,7 +99,7 @@ const ResizeSlider = ({ children }) => {
           }}
         >
           <SideNavigation label="Project navigation" testId="side-navigation">
-            <GitTest></GitTest>
+            {/* <GitTest></GitTest> */}
           </SideNavigation>
         </LeftSidebar>
         <Main className="ml-2"> {children}</Main>

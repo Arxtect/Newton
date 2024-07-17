@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { IconButton, Button, Menu, MenuItem, Tooltip } from "@mui/material";
-import SettingsIcon from "@mui/icons-material/Settings";
-import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import { EngineStatus } from "@/features/engineStatus/EngineStatus";
 import { usePdfPreviewStore, useFileStore } from "@/store";
 import { compileLatex } from "@/features/latexCompilation/latexCompilation";

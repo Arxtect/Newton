@@ -3,6 +3,9 @@ import "./index.scss";
 import { useLayout } from "store";
 import { useReactive } from "ahooks";
 import { useFileStore, revokeCompiledPdfUrl, setCompilerLog } from "store";
+import dotsLine from "@/assets/dots-line.svg";
+import rightLine from "@/assets/right-line.svg";
+import leftLine from "@/assets/left-line.svg";
 
 const Layout = ({
   header,
@@ -119,20 +122,12 @@ const Layout = ({
         value > reactive.resizeOrigin.max
       ) {
         ref.style.filter = "opacity(0.5)";
-        // setResizeOrigin((origin) => ({
-        //   ...origin,
-        //   outOfRange: value < resizeOrigin.min ? "min" : "max",
-        // }));
         reactive.resizeOrigin = {
           ...reactive.resizeOrigin,
           outOfRange: value < reactive.resizeOrigin.min ? "min" : "max",
         };
       } else {
         ref.style.filter = "";
-        // setResizeOrigin((origin) => ({
-        //   ...origin,
-        //   outOfRange: null,
-        // }));
         reactive.resizeOrigin = {
           ...reactive.resizeOrigin,
           outOfRange: null,
@@ -140,7 +135,6 @@ const Layout = ({
       }
     };
 
-    // Prevent pointer events when mouse in container range
     const sibling = getContainerSibling(ref, reactive.resizeOrigin);
     if (sibling) {
       ref.style.pointerEvents = "none";
@@ -171,8 +165,6 @@ const Layout = ({
         Math.max(reactive.resizeOrigin.min, height)
       )}px`;
     }
-
-    // emitResize();
   };
 
   const resizeDone = () => {
@@ -232,19 +224,6 @@ const Layout = ({
     }[refName].current;
 
     if (!reactive.resizeOrigin && type) {
-      // setResizeOrigin({
-      //   min,
-      //   max,
-      //   type,
-      //   ref: refName,
-      //   mouseX: e.clientX,
-      //   mouseY: e.clientY,
-      //   targetWidth: ref.clientWidth,
-      //   targetHeight: ref.clientHeight,
-      //   targetLeft: ref.clientLeft,
-      //   targetTop: ref.clientTop,
-      //   outOfRange: null,
-      // });
       reactive.resizeOrigin = {
         min,
         max,
@@ -326,9 +305,29 @@ const Layout = ({
             {left}
             <div
               className="sash-right"
+              id="sash-right"
               onDoubleClick={() => resetSize("right", "aside")}
               onMouseDown={(e) => initResize("right", "aside", 130, 700, e)}
-            ></div>
+            >
+              <div className="icon-container">
+                <div className="icon-arrow" onClick={() => toggleSide()}>
+                  <img
+                    src={leftLine}
+                    alt="right arrow"
+                    className="arrow-img"
+                    draggable="false"
+                  />
+                </div>
+                <div className="icon-dots">
+                  <img
+                    src={dotsLine}
+                    alt="dots"
+                    className="dots-img"
+                    draggable="false"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         )}
         <div className="ar-right">
@@ -347,27 +346,42 @@ const Layout = ({
           </div>
           <div className="content" ref={contentRef}>
             {showEditor && (
-              <div className="editor pt-[3px]" ref={editorRef}>
+              <div className="editor" ref={editorRef}>
                 {content}
               </div>
             )}
-            {showView && (
-              <div className="preview">
-                {showView && showEditor && (
-                  <div
-                    className="sash-left"
-                    id="sash-left"
-                    onDoubleClick={() => resetSize("right", "editor")}
-                    onMouseDown={(e) => {
-                      initEditorResize(e);
-                      setWillResizing(true);
-                    }}
-                    onMouseUp={() => setWillResizing(false)}
-                  ></div>
-                )}
-                {preview}
+            {showView && showEditor && (
+              <div
+                className="sash-left"
+                id="sash-left"
+                onDoubleClick={() => resetSize("right", "editor")}
+                onMouseDown={(e) => {
+                  initEditorResize(e);
+                  setWillResizing(true);
+                }}
+                onMouseUp={() => setWillResizing(false)}
+              >
+                <div className="icon-container">
+                  <div className="icon-arrow" onClick={() => toggleView()}>
+                    <img
+                      src={rightLine}
+                      alt="right arrow"
+                      className="arrow-img"
+                      draggable="false"
+                    />
+                  </div>
+                  <div className="icon-dots">
+                    <img
+                      src={dotsLine}
+                      alt="dots"
+                      className="dots-img"
+                      draggable="false"
+                    />
+                  </div>
+                </div>
               </div>
             )}
+            {showView && <div className="preview">{preview}</div>}
           </div>
           {showXterm && (
             <div className="terminal" ref={terminalRef}>
@@ -381,7 +395,7 @@ const Layout = ({
           )}
         </div>
       </div>
-      {showFooter && <div className="footer">{footer}</div>}
+      {/* {showFooter && <div className="footer">{footer}</div>} */}
     </div>
   );
 };

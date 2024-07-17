@@ -13,7 +13,7 @@ export const useLayout = create((set) => ({
   showView: true,
   showXterm: false,
   showFooter: true,
-  sideWidth: 200, // 初始侧边栏宽度
+  sideWidth: 220, // 初始侧边栏宽度
   xtermHeight: 150, // 初始底部面板高度
   willResizing: false,
 

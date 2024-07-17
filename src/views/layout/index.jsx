@@ -5,7 +5,7 @@
  */
 import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
 import Layout from "./layout";
-import GitTest from "../git-test";
+import FileSystem from "./fileSystem";
 import { LatexEditorContainer } from "@/features/latexEditor/LatexEditorContainer";
 import { initializeLatexEngines } from "@/features/latexCompilation/latexCompilation";
 
@@ -20,7 +20,7 @@ const Index = () => {
 
   return (
     <Layout
-      left={<GitTest></GitTest>}
+      left={<FileSystem />}
       rightBefore={<RightBefore />}
       // rightBeforeRight={<ButtonBarContainer />}
       content={<LatexEditorContainer />}

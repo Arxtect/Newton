@@ -8,12 +8,6 @@ import Layout from "./Layout";
 
 const routerConfig = [
   { path: "/home", name: "home", component: "home" },
-  // {
-  //   path: "/arxtect",
-  //   name: "/arxtect",
-  //   component: "arxtect",
-  //   exact: true,
-  // },
   {
     path: "/project",
     name: "/project",
@@ -27,7 +21,6 @@ const routerConfig = [
     component: "documentDetails",
     exact: true,
   },
-  { path: "/git-test", name: "git-test", component: "git-test", exact: true },
   { path: "/", redirect: "/project", exact: true },
 ];
 

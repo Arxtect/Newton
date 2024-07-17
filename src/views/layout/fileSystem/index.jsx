@@ -12,7 +12,7 @@ import { ProjectSync } from "@/convergence";
 import RightBeforeLeft from "@/views/layout/rightBeforeLeft";
 import { useAuth } from "@/useHooks";
 
-const GitTest = () => {
+const FileSystem = () => {
   const {
     filepath,
     currentProjectRoot,
@@ -150,4 +150,4 @@ const GitTest = () => {
   );
 };
 
-export default React.memo(GitTest);
+export default React.memo(FileSystem);
