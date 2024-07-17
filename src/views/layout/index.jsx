@@ -12,6 +12,7 @@ import { initializeLatexEngines } from "@/features/latexCompilation/latexCompila
 import { PdfPreview } from "@/features/pdfPreview/PdfPreview";
 import { ButtonBarContainer } from "@/features/buttonBar/ButtonBarContainer";
 import RightBefore from "./rightBefore";
+import TopBar from "./topBar";
 
 const Index = () => {
   useLayoutEffect(() => {
@@ -19,13 +20,16 @@ const Index = () => {
   }, []);
 
   return (
-    <Layout
-      left={<FileSystem />}
-      rightBefore={<RightBefore />}
-      // rightBeforeRight={<ButtonBarContainer />}
-      content={<LatexEditorContainer />}
-      preview={<PdfPreview />}
-    ></Layout>
+    <React.Fragment>
+      <TopBar></TopBar>
+      <Layout
+        left={<FileSystem />}
+        rightBefore={<RightBefore />}
+        // rightBeforeRight={<ButtonBarContainer />}
+        content={<LatexEditorContainer />}
+        preview={<PdfPreview />}
+      ></Layout>
+    </React.Fragment>
   );
 };
 
