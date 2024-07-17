@@ -56,8 +56,8 @@ export const PdfPreview = () => {
       ) : pdfUrl === "" || showCompilerLog ? (
         formattedCompilerLog
       ) : (
-        // pdfEmbed
-        <Viewer url={pdfUrl}></Viewer>
+        pdfEmbed
+        // <Viewer url={pdfU/rl}></Viewer>
       )}
 
       {willResizing && (

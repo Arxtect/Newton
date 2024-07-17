@@ -590,6 +590,7 @@ module.exports = function (webpackEnv) {
         process: "processGlobal",
         Buffer: "bufferGlobal",
       }),
+
       // Generates an `index.html` file with the <script> injected.
       new CopyWebpackPlugin({
         patterns: [
