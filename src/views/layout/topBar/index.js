@@ -1,4 +1,3 @@
-
 import React from "react";
 import download from "@/assets/download.svg";
 import down from "@/assets/down.svg";
@@ -8,7 +7,7 @@ import publish from "@/assets/publish.svg";
 import share from "@/assets/share.svg";
 import ellipsis from "@/assets/ellipsis.svg";
 import left from "@/assets/left.svg";
-import logoIcon from "@/assets/logo-icon.svg"
+import logoIcon from "@/assets/logo-icon.svg";
 
 const maxDisplayCount = 3; // 最大显示的名字数量
 
@@ -29,7 +28,7 @@ const TopBar = (props) => {
 
   const handleClick = (type) => {
     console.log("handleClick", type);
-  }
+  };
 
   const buttonData = [
     { src: review, label: "Review", click: handleClick },
@@ -42,17 +41,14 @@ const TopBar = (props) => {
 
   return (
     <div className="flex items-center justify-between bg-gray-100 p-2">
-      <div className="flex items-center pl-4">
+      <div className="flex items-center pl-4 space-x-4">
         <img
           src={left}
           alt=""
-          onClick={() => { }}
-          className="cursor-pointer hover:opacity-75"
-        />        <img
-          src={logoIcon}
-          alt="icon"
-          className="mx-2"
+          onClick={() => {}}
+          className="cursor-pointer hover:opacity-50"
         />
+        <img src={logoIcon} alt="icon" className="mx-2" />
         <span className="ml-2 text-black font-bold">Project</span>
       </div>
       <div className="flex items-center space-x-10 mr-4">
@@ -60,7 +56,9 @@ const TopBar = (props) => {
           {buttonData.map((button, index) => (
             <button
               key={index}
-              className={`flex items-center text-gray-700 px-2 py-1 hover:bg-gray-200 active:bg-[#9fd5a2] space-x-1 ${index === 0 ? "rounded-l-lg" : ""}`}
+              className={`flex items-center text-gray-700 px-2 py-1 hover:bg-gray-200 active:bg-[#9fd5a2] space-x-1 ${
+                index === 0 ? "rounded-l-lg" : ""
+              }`}
               onClick={button.click}
             >
               <img src={button.src} alt="" className="w-4 h-4" />
@@ -98,7 +96,6 @@ const TopBar = (props) => {
           )}
         </div>
       </div>
-
     </div>
   );
 };

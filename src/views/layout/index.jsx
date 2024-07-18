@@ -13,6 +13,7 @@ import { PdfPreview } from "@/features/pdfPreview/PdfPreview";
 import { ButtonBarContainer } from "@/features/buttonBar/ButtonBarContainer";
 import RightBefore from "./rightBefore";
 import TopBar from "./topBar";
+import ContentTopBar from "./content/topBar";
 
 const Index = () => {
   useLayoutEffect(() => {
@@ -24,7 +25,8 @@ const Index = () => {
       <TopBar></TopBar>
       <Layout
         left={<FileSystem />}
-        rightBefore={<RightBefore />}
+        // rightBefore={<RightBefore />}
+        rightBefore={<ContentTopBar />}
         // rightBeforeRight={<ButtonBarContainer />}
         content={<LatexEditorContainer />}
         preview={<PdfPreview />}
