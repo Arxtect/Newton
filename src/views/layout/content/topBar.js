@@ -14,9 +14,27 @@ import searchSvg from "@/assets/layout/search.svg";
 import undoSvg from "@/assets/layout/undo.svg";
 import uploadFileSvg from "@/assets/layout/uploadFile.svg";
 import successSvg from "@/assets/layout/success.svg";
-import { Select, MenuItem } from "@mui/material";
+import { Select, MenuItem, IconButton } from "@mui/material";
+import Controls from "./controls";
+import { useLayout } from "store";
 
 const ContentTopBar = (props) => {
+  const {
+    showView,
+    showXterm,
+    showSide,
+    showEditor,
+    presentation,
+    showHeader,
+
+    toggleSide,
+    toggleXterm,
+    toggleEditor,
+    toggleView,
+    emitResize,
+    showFooter,
+  } = useLayout();
+
   const widthOption = [
     {
       value: "100%",
@@ -37,7 +55,7 @@ const ContentTopBar = (props) => {
   ];
 
   return (
-    <div className="flex items-center justify-between bg-[#e8f9ef] w-full">
+    <div className="flex items-center justify-between bg-[#e8f9ef] w-full h-[2.2rem]">
       <div className="flex items-center pl-4 space-x-4 w-1/2">
         <img
           src={pickUpSvg}
@@ -76,7 +94,7 @@ const ContentTopBar = (props) => {
         />
       </div>
       <div className="flex items-center  justify-between space-x-10 mr-4 w-1/2 pl-2">
-        <button className="bg-[#81c784] text-black px-2 py-0.5 rounded-md flex items-center space-x-2 h-6">
+        <button className="bg-[#81c784] text-black px-2 rounded-md flex items-center space-x-2 ">
           <span>Compile</span>
           <img src={successSvg} alt="" className="w-4 h-4" />
         </button>
@@ -110,16 +128,20 @@ const ContentTopBar = (props) => {
               </MenuItem>
             ))}
           </Select>
-          <img
-            src={previewSvg}
-            alt=""
-            className="w-5 h-5 cursor-pointer hover:opacity-75"
-          />
-          <img
-            src={layoutSvg}
-            alt=""
-            className="w-5 h-5 cursor-pointer hover:opacity-75"
-          />
+          <IconButton
+            color="#inherit"
+            aria-label="toggleView"
+            size="small"
+            onClick={toggleView}
+          >
+            <img
+              src={previewSvg}
+              alt=""
+              className="w-5 h-5 cursor-pointer hover:opacity-75"
+            />
+          </IconButton>
+
+          <Controls></Controls>
         </div>
       </div>
     </div>

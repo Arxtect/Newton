@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { IconButton, Button, Menu, MenuItem, Tooltip } from "@mui/material";
 import { EngineStatus } from "@/features/engineStatus/EngineStatus";
-import { usePdfPreviewStore, useFileStore } from "@/store";
 import { compileLatex } from "@/features/latexCompilation/latexCompilation";
 import Controls from "./controls";
 import BottomDrawer from "@/features/bottomDrawer/bottomDrawer";
@@ -11,7 +10,12 @@ import LinkGithub from "./linkGithub";
 import Share from "./share";
 import { useAuth } from "@/useHooks";
 import { toast } from "react-toastify";
-import { updateDialogLoginOpen, useUserStore } from "@/store";
+import {
+  updateDialogLoginOpen,
+  useUserStore,
+  usePdfPreviewStore,
+  useFileStore,
+} from "@/store";
 
 function RightBefore() {
   const { user } = useUserStore((state) => ({

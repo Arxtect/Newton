@@ -26,6 +26,7 @@ import BorderColorTwoToneIcon from "@mui/icons-material/BorderColorTwoTone";
 import WebAssetIcon from "@mui/icons-material/WebAsset";
 import { Box, Tooltip } from "@mui/material";
 import { useLayout } from "store";
+import layoutSvg from "@/assets/layout/layout.svg";
 
 const WebAssetIconRotate = (props) => {
   return (
@@ -99,14 +100,20 @@ const CustomDropdownMenu = forwardRef((props, ref) => {
 
   return (
     <React.Fragment>
-      {/* <IconButton
+      <IconButton
         color="#inherit"
         aria-label="controls"
         size="small"
         onClick={handleClick}
       >
-        <TuneIcon fontSize="small" className="text-[#000]" />
-      </IconButton> */}
+        {/* <TuneIcon fontSize="small" className="text-[#000]" />
+         */}
+        <img
+          src={layoutSvg}
+          alt=""
+          className="w-5 h-5 cursor-pointer hover:opacity-75"
+        />
+      </IconButton>
 
       <Popover
         id={id}

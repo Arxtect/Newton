@@ -1,17 +1,26 @@
-import React from "react";
+import React, { useState } from "react";
 import download from "@/assets/download.svg";
 import down from "@/assets/down.svg";
 import review from "@/assets/review.svg";
 import history from "@/assets/history.svg";
-import publish from "@/assets/publish.svg";
-import share from "@/assets/share.svg";
 import ellipsis from "@/assets/ellipsis.svg";
 import left from "@/assets/left.svg";
 import logoIcon from "@/assets/logo-icon.svg";
+import Share from "../share";
+import PublishDocument from "../publishDocument";
+import { useUserStore, useFileStore } from "@/store";
+import { downloadDirectoryAsZip } from "domain/filesystem";
 
 const maxDisplayCount = 3; // 最大显示的名字数量
 
 const TopBar = (props) => {
+  const { user } = useUserStore((state) => ({
+    user: state.user,
+  }));
+  const { currentProjectRoot } = useFileStore((state) => ({
+    currentProjectRoot: state.currentProjectRoot,
+  }));
+
   //   const getRandomColor = () => {
   //     const letters = "0123456789ABCDEF";
   //     let color = "#";
@@ -27,16 +36,27 @@ const TopBar = (props) => {
   const collaborators = ["AA", "cc", "aa", "ss", "aa", "a"];
 
   const handleClick = (type) => {
+    switch (type) {
+      case "Review":
+        break;
+      case "History":
+        break;
+      case "Download":
+        downloadDirectoryAsZip(currentProjectRoot);
+        break;
+      case "Down":
+        break;
+    }
     console.log("handleClick", type);
   };
 
   const buttonData = [
-    { src: review, label: "Review", click: handleClick },
-    { src: history, label: "History", click: handleClick },
-    { src: publish, label: "Publish", click: handleClick },
-    { src: share, label: "Share", click: handleClick },
-    { src: download, label: "", click: handleClick },
-    { src: down, label: "", click: handleClick },
+    { key: "Review", src: review, label: "Review", click: handleClick },
+    { key: "History", src: history, label: "History", click: handleClick },
+    { key: "Publish", src: "", label: "Publish", click: handleClick },
+    { key: "Share", src: "", label: "Share", click: handleClick },
+    { key: "Download", src: download, label: "", click: handleClick },
+    { key: "Down", src: down, label: "", click: handleClick },
   ];
 
   return (
@@ -53,18 +73,29 @@ const TopBar = (props) => {
       </div>
       <div className="flex items-center space-x-10 mr-4">
         <div className="flex items-center bg-white rounded-lg shadow">
-          {buttonData.map((button, index) => (
-            <button
-              key={index}
-              className={`flex items-center text-gray-700 px-2 py-1 hover:bg-gray-200 active:bg-[#9fd5a2] space-x-1 ${
-                index === 0 ? "rounded-l-lg" : ""
-              }`}
-              onClick={button.click}
-            >
-              <img src={button.src} alt="" className="w-4 h-4" />
-              <span>{button.label || "\u00A0"}</span> {/* 使用空格字符 */}
-            </button>
-          ))}
+          {buttonData.map((button, index) => {
+            if (button.key === "Share") {
+              return <Share rootPath={currentProjectRoot} user={user}></Share>;
+            }
+            if (button.key === "Publish") {
+              return <PublishDocument></PublishDocument>;
+            }
+            return (
+              <button
+                key={index}
+                className={`flex items-center text-gray-700 px-2 py-1 hover:bg-gray-200 active:bg-[#9fd5a2] ${
+                  index === 0 ? "rounded-l-lg" : ""
+                } ${button.label ? "space-x-1" : ""}`}
+                onClick={() => {
+                  button.click(button.key);
+                }}
+              >
+                {!button.label && <span>{"\u00A0"}</span>}
+                <img src={button.src} alt="" className="w-4 h-4" />
+                <span>{button.label || "\u00A0"}</span> {/* 使用空格字符 */}
+              </button>
+            );
+          })}
         </div>
         <div className="flex items-center">
           {collaborators.slice(0, maxDisplayCount).map((name, index) => (
