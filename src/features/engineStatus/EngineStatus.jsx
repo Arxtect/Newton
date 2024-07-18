@@ -5,8 +5,7 @@ import { useEffect } from "react";
 import { usePdfPreviewStore, useEngineStatusStore } from "store";
 import { CircularProgress } from "@mui/material";
 import ErrorSvg from "@/assets/website/error.svg";
-import SuccessSvg from "@/assets/website/success.svg";
-
+import SuccessSvg from "@/assets/layout/success.svg";
 
 export const EngineStatus = ({ className }) => {
   const { engineStatus, selectFormattedEngineStatus } = useEngineStatusStore();
@@ -36,27 +35,26 @@ export const EngineStatus = ({ className }) => {
     ReactTooltip.rebuild();
   }, []);
 
-
   return (
     <div className={`flex justify-center items-center ${className}`}>
-      <a
-        data-tip={tooltip}
-        data-for="engineStatus"
-      >
-        {engineStatus == 1 || engineStatus == 3 ?
+      <a data-tip={tooltip} data-for="engineStatus">
+        {engineStatus == 1 || engineStatus == 3 ? (
           <CircularProgress
             size={20}
             engineStatus={engineStatus}
-            className={`text-center ${color} hover:cursor-pointer mr-2 text-arxTheme`}
+            className={`text-center ${color} hover:cursor-pointer text-arxTheme h-4 w-4 flex justify-center items-center`}
             onClick={handleClick}
           />
-          :
+        ) : (
           <img
-            src={engineStatus == 2 ? SuccessSvg : engineStatus == 4 ? ErrorSvg : ""}
+            src={
+              engineStatus == 2 ? SuccessSvg : engineStatus == 4 ? ErrorSvg : ""
+            }
             engineStatus={engineStatus}
-            className={`text-center ${color} hover:cursor-pointer`}
+            className={`text-center ${color} hover:cursor-pointer h-4 w-4`}
             onClick={handleClick}
-          />}
+          />
+        )}
       </a>
 
       <ReactTooltip

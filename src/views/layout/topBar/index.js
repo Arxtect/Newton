@@ -10,6 +10,7 @@ import Share from "../share";
 import PublishDocument from "../publishDocument";
 import { useUserStore, useFileStore } from "@/store";
 import { downloadDirectoryAsZip } from "domain/filesystem";
+import { useNavigate } from "react-router-dom";
 
 const maxDisplayCount = 3; // 最大显示的名字数量
 
@@ -17,9 +18,15 @@ const TopBar = (props) => {
   const { user } = useUserStore((state) => ({
     user: state.user,
   }));
-  const { currentProjectRoot } = useFileStore((state) => ({
-    currentProjectRoot: state.currentProjectRoot,
-  }));
+  const navigate = useNavigate();
+  const { projectSync, sourceCode, currentProjectRoot, filepath, loadFile } =
+    useFileStore((state) => ({
+      projectSync: state.projectSync,
+      sourceCode: state.value,
+      currentProjectRoot: state.currentProjectRoot,
+      filepath: state.filepath,
+      loadFile: state.loadFile,
+    }));
 
   //   const getRandomColor = () => {
   //     const letters = "0123456789ABCDEF";
@@ -60,12 +67,14 @@ const TopBar = (props) => {
   ];
 
   return (
-    <div className="flex items-center justify-between bg-gray-100 p-2">
+    <div className="flex items-center justify-between bg-gray-100 p-2 bg-[#f9fdfd]">
       <div className="flex items-center pl-4 space-x-4">
         <img
           src={left}
           alt=""
-          onClick={() => {}}
+          onClick={() => {
+            navigate("/project");
+          }}
           className="cursor-pointer hover:opacity-50"
         />
         <img src={logoIcon} alt="icon" className="mx-2" />

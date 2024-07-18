@@ -100,20 +100,20 @@ const CustomDropdownMenu = forwardRef((props, ref) => {
 
   return (
     <React.Fragment>
-      <IconButton
-        color="#inherit"
-        aria-label="controls"
-        size="small"
-        onClick={handleClick}
-      >
-        {/* <TuneIcon fontSize="small" className="text-[#000]" />
-         */}
-        <img
-          src={layoutSvg}
-          alt=""
-          className="w-5 h-5 cursor-pointer hover:opacity-75"
-        />
-      </IconButton>
+      <Tooltip title={"Layout"}>
+        <IconButton
+          color="#inherit"
+          aria-label="controls"
+          size="small"
+          onClick={handleClick}
+        >
+          <img
+            src={layoutSvg}
+            alt=""
+            className="w-5 h-5 cursor-pointer hover:opacity-75"
+          />
+        </IconButton>
+      </Tooltip>
 
       <Popover
         id={id}

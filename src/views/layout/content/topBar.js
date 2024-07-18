@@ -14,9 +14,11 @@ import searchSvg from "@/assets/layout/search.svg";
 import undoSvg from "@/assets/layout/undo.svg";
 import uploadFileSvg from "@/assets/layout/uploadFile.svg";
 import successSvg from "@/assets/layout/success.svg";
-import { Select, MenuItem, IconButton } from "@mui/material";
+import { Select, MenuItem, IconButton, Tooltip } from "@mui/material";
 import Controls from "./controls";
-import { useLayout } from "store";
+import { useLayout, useFileStore } from "store";
+import { compileLatex } from "@/features/latexCompilation/latexCompilation";
+import { EngineStatus } from "@/features/engineStatus/EngineStatus";
 
 const ContentTopBar = (props) => {
   const {
@@ -34,6 +36,17 @@ const ContentTopBar = (props) => {
     emitResize,
     showFooter,
   } = useLayout();
+
+  const { projectSync, sourceCode, currentProjectRoot, filepath, loadFile } =
+    useFileStore((state) => ({
+      projectSync: state.projectSync,
+      sourceCode: state.value,
+      currentProjectRoot: state.currentProjectRoot,
+      filepath: state.filepath,
+      loadFile: state.loadFile,
+    }));
+
+  const compile = () => compileLatex(sourceCode, currentProjectRoot);
 
   const widthOption = [
     {
@@ -54,52 +67,80 @@ const ContentTopBar = (props) => {
     },
   ];
 
+  const handleActionClick = (key) => {
+    switch (key) {
+      case "pickUp":
+        toggleSide();
+        break;
+      case "newFile":
+        break;
+      case "newFolder":
+        break;
+      case "uploadFile":
+        break;
+      case "redo":
+        break;
+      case "undo":
+        break;
+      case "search":
+        break;
+      default:
+        break;
+    }
+  };
+
+  const actionList = [
+    { key: "pickUp", src: pickUpSvg, alt: "Pick Up", click: handleActionClick },
+    {
+      key: "newFile",
+      src: newFileSvg,
+      alt: "New File",
+      click: handleActionClick,
+    },
+    {
+      key: "newFolder",
+      src: newFolderSvg,
+      alt: "New Folder",
+      click: handleActionClick,
+    },
+    {
+      key: "uploadFile",
+      src: uploadFileSvg,
+      alt: "Upload File",
+      click: handleActionClick,
+    },
+    { key: "redo", src: redoSvg, alt: "Redo", click: handleActionClick },
+    { key: "undo", src: undoSvg, alt: "Undo", click: handleActionClick },
+    { key: "search", src: searchSvg, alt: "Search", click: handleActionClick },
+  ];
+
   return (
     <div className="flex items-center justify-between bg-[#e8f9ef] w-full h-[2.2rem]">
-      <div className="flex items-center pl-4 space-x-4 w-1/2">
-        <img
-          src={pickUpSvg}
-          alt=""
-          className="w-5 h-5 cursor-pointer hover:opacity-75"
-        />
-        <img
-          src={newFileSvg}
-          alt=""
-          className="w-5 h-5 cursor-pointer hover:opacity-75"
-        />
-        <img
-          src={newFolderSvg}
-          alt=""
-          className="w-5 h-5 cursor-pointer hover:opacity-75"
-        />
-        <img
-          src={uploadFileSvg}
-          alt=""
-          className="w-5 h-5 cursor-pointer hover:opacity-75"
-        />
-        <img
-          src={redoSvg}
-          alt=""
-          className="w-5 h-5 cursor-pointer hover:opacity-75"
-        />
-        <img
-          src={undoSvg}
-          alt=""
-          className="w-5 h-5 cursor-pointer hover:opacity-75"
-        />
-        <img
-          src={searchSvg}
-          alt=""
-          className="w-5 h-5 cursor-pointer hover:opacity-75"
-        />
+      <div className="flex items-center pl-2 w-1/2">
+        {actionList.map((icon) => (
+          <Tooltip title={icon.alt} id={icon.key}>
+            <IconButton
+              color="#inherit"
+              aria-label="toggleView"
+              size="small"
+              onClick={() => icon.click(icon.key)}
+            >
+              <img
+                src={icon.src}
+                alt={icon.alt}
+                className="w-5 h-5 cursor-pointer hover:opacity-75"
+              />
+            </IconButton>
+          </Tooltip>
+        ))}
       </div>
       <div className="flex items-center  justify-between space-x-10 mr-4 w-1/2 pl-2">
-        <button className="bg-[#81c784] text-black px-2 rounded-md flex items-center space-x-2 ">
-          <span>Compile</span>
-          <img src={successSvg} alt="" className="w-4 h-4" />
+        <button className="bg-[#81C784] text-black px-2 rounded-md flex items-center space-x-4">
+          <span onClick={compile}>Compile</span>
+          <EngineStatus className="text-[12px]" />
         </button>
-        <div className="flex items-center space-x-4">
-          <Select
+        <div className="flex items-center space-x-2">
+          {/* <Select
             labelId="tag-label"
             id="demo-simple-select"
             variant="outlined"
@@ -127,19 +168,22 @@ const ContentTopBar = (props) => {
                 {option.name}
               </MenuItem>
             ))}
-          </Select>
-          <IconButton
-            color="#inherit"
-            aria-label="toggleView"
-            size="small"
-            onClick={toggleView}
-          >
-            <img
-              src={previewSvg}
-              alt=""
-              className="w-5 h-5 cursor-pointer hover:opacity-75"
-            />
-          </IconButton>
+          </Select> */}
+
+          <Tooltip title={"Preview"}>
+            <IconButton
+              color="#inherit"
+              aria-label="toggleView"
+              size="small"
+              onClick={toggleView}
+            >
+              <img
+                src={previewSvg}
+                alt=""
+                className="w-5 h-5 cursor-pointer hover:opacity-75"
+              />
+            </IconButton>
+          </Tooltip>
 
           <Controls></Controls>
         </div>
