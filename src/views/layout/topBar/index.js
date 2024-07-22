@@ -67,7 +67,7 @@ const TopBar = (props) => {
   ];
 
   return (
-    <div className="flex items-center justify-between bg-gray-100 p-2 bg-[#f9fdfd]">
+    <div className="flex items-center justify-between p-2 bg-[#f9fdfd]">
       <div className="flex items-center pl-4 space-x-4">
         <img
           src={left}

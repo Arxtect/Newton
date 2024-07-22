@@ -3,7 +3,7 @@ import { IconButton, Button, Menu, MenuItem, Tooltip } from "@mui/material";
 import { EngineStatus } from "@/features/engineStatus/EngineStatus";
 import { compileLatex } from "@/features/latexCompilation/latexCompilation";
 import Controls from "./controls";
-import BottomDrawer from "@/features/bottomDrawer/bottomDrawer";
+
 import { findAllProject, getProjectInfo, existsPath } from "domain/filesystem";
 import path from "path";
 import LinkGithub from "./linkGithub";
@@ -59,7 +59,6 @@ function RightBefore() {
   }, [currentProjectRoot]);
 
   //git control
-
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleDrawer = (open) => {
@@ -115,48 +114,12 @@ function RightBefore() {
               </span>
             </Button>
           </Tooltip>
-          {!!isExistsGit ? (
-            <Tooltip title="Sync">
-              <Button
-                color="inherit"
-                aria-label="log"
-                size="small"
-                onClick={() => toggleDrawer(true)}
-              >
-                <span className="flex items-center justify-center w-[20px] h-[20px] text-[14px]">
-                  sync
-                </span>
-              </Button>
-            </Tooltip>
-          ) : (
-            <Tooltip title="Link a git repository">
-              <Button
-                color="inherit"
-                aria-label="log"
-                size="small"
-                onClick={() => setGithubDialogOpen(true)}
-              >
-                <span className="flex items-center justify-center w-[20px] h-[20px] text-[14px]">
-                  Link
-                </span>
-              </Button>
-            </Tooltip>
-          )}
+          <LinkGithub></LinkGithub>
           <Controls></Controls>
         </div>
       </div>
-      <LinkGithub
-        dialogOpen={githubDialogOpen}
-        setDialogOpen={setGithubDialogOpen}
-        setIsExistsGit={setIsExistsGit}
-      ></LinkGithub>
-      <Share
-        dialogOpen={shareDialogOpen}
-        setDialogOpen={setShareDialogOpen}
-        rootPath={currentProjectRoot}
-        user={user}
-      ></Share>
-      <BottomDrawer isOpen={isOpen} toggleDrawer={toggleDrawer} />
+
+      <Share rootPath={currentProjectRoot} user={user}></Share>
     </div>
   );
 }

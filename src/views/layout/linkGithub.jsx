@@ -5,7 +5,7 @@
  */
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import { IconButton, Button, Menu, MenuItem, Tooltip } from "@mui/material";
 import ArDialog from "@/components/arDialog";
 import {
   Card,
@@ -21,7 +21,8 @@ import { toast } from "react-toastify";
 import ArTextField from "@/components/arTextField";
 import path from "path";
 import { setupAndPushToRepo } from "domain/git";
-import { removeDirectory } from "domain/filesystem"
+import { removeDirectory, existsPath } from "domain/filesystem";
+import BottomDrawer from "@/features/bottomDrawer/bottomDrawer";
 
 const GithubProgressBar = ({ progress, messages }) => {
   return (
@@ -51,9 +52,15 @@ const GithubProgressBar = ({ progress, messages }) => {
   );
 };
 
-const LinkGithub = ({ dialogOpen, setDialogOpen, setIsExistsGit }) => {
+const LinkGithub = (props) => {
+  // link
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  // sync
+  const [isExistsGit, setIsExistsGit] = useState(false);
+
   const [projectName, setProjectName] = useState("");
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
 
   const [messages, setMessages] = useState("");
   const [progress, setProgress] = useState(0);
@@ -61,6 +68,15 @@ const LinkGithub = ({ dialogOpen, setDialogOpen, setIsExistsGit }) => {
     currentProjectRoot: state.currentProjectRoot,
   }));
   const { initializeGitStatus } = useGitRepo();
+
+  const getIsExistGit = async () => {
+    const isExistsGit = await existsPath(path.join(currentProjectRoot, ".git"));
+    setIsExistsGit(isExistsGit);
+  };
+
+  useEffect(() => {
+    getIsExistGit();
+  }, [currentProjectRoot]);
 
   const {
     committerName,
@@ -115,17 +131,19 @@ const LinkGithub = ({ dialogOpen, setDialogOpen, setIsExistsGit }) => {
       committerEmail: gitConfig.committerEmail,
       onProgress,
       onMessage,
-    }).then((res) => {
-      setDialogOpen(false);
-      toast.success("Link repository success from github");
-      setIsExistsGit(true);
-      initializeGitStatus({ projectRoot: currentProjectRoot });
-      setLoading(false);
-    }).catch((error) => {
-      toast.warning(error.message);
-      setLoading(false);
-      removeDirectory(path.join(currentProjectRoot, ".git"))
-    });
+    })
+      .then((res) => {
+        setDialogOpen(false);
+        toast.success("Link repository success from github");
+        setIsExistsGit(true);
+        initializeGitStatus({ projectRoot: currentProjectRoot });
+        setLoading(false);
+      })
+      .catch((error) => {
+        toast.warning(error.message);
+        setLoading(false);
+        removeDirectory(path.join(currentProjectRoot, ".git"));
+      });
   };
 
   const onProgress = (progress) => {
@@ -138,94 +156,133 @@ const LinkGithub = ({ dialogOpen, setDialogOpen, setIsExistsGit }) => {
     console.log(message, "message");
   };
 
-  return (
-    <ArDialog
-      title="Link Remote Github Repository"
-      dialogOpen={dialogOpen}
-      handleCancel={handleCancelProject}
-      tooltipText={"Ensure that the remote repository is empty when you link it"}
-      buttonList={[
-        { title: "Cancel", click: handleCancelProject },
-        { title: "Save", click: handleSaveProject, loading: loading },
-      ]}
-      width={"50vw"}
-    >
-      <Box component="form" noValidate autoComplete="off">
-        <div className="w-[100%]">
-          <ArTextField
-            label="Remote Repository Url"
-            placeholder="please input remote repository url"
-            defaultValue={""}
-            onChange={(event) => {
-              setProjectName(event.target.value);
-            }}
-            margin="normal"
-            fullWidth
-            className="my-3"
-            inputSize="middle"
-          />
-          {progress > 0 && (
-            <GithubProgressBar progress={progress} messages={messages} />
-          )}
-        </div>
-        {!committerName && (
-          <div className="w-[100%]">
-            <ArTextField
-              label="Git: Committer Name"
-              placeholder="Your committer name"
-              defaultValue={committerName}
-              onChange={(event) => {
-                setGitConfig({
-                  ...gitConfig,
-                  committerName: event.target.value,
-                });
-              }}
-              sx={{ width: "100%" }}
-              className="my-3"
-              inputSize="middle"
-            />
-          </div>
-        )}
-        {!committerEmail && (
-          <div className="w-[100%]">
-            <ArTextField
-              label="Git: Committer Email"
-              variant="outlined"
-              placeholder="Your email"
-              defaultValue={committerEmail}
-              onChange={(event) =>
-                setGitConfig({
-                  ...gitConfig,
-                  committerEmail: event.target.value,
-                })
-              }
-              sx={{ width: "100%" }}
-              className="my-3"
-              inputSize="middle"
-            />
-          </div>
-        )}
+  //git control
+  const [isOpen, setIsOpen] = useState(false);
 
-        {!githubApiToken && (
+  const toggleDrawer = (open) => {
+    setIsOpen(open);
+  };
+
+  return (
+    <React.Fragment>
+      {!!isExistsGit ? (
+        <Tooltip title="Sync">
+          <Button
+            color="inherit"
+            aria-label="log"
+            size="small"
+            onClick={() => toggleDrawer(true)}
+          >
+            <span className="flex items-center justify-center w-[20px] h-[20px] text-[14px]">
+              sync
+            </span>
+          </Button>
+        </Tooltip>
+      ) : (
+        <Tooltip title="Link a git repository">
+          <Button
+            color="inherit"
+            aria-label="log"
+            size="small"
+            onClick={() => setDialogOpen(true)}
+          >
+            <span className="flex items-center justify-center w-[20px] h-[20px] text-[14px]">
+              Link
+            </span>
+          </Button>
+        </Tooltip>
+      )}
+      <ArDialog
+        title="Link Remote Github Repository"
+        dialogOpen={dialogOpen}
+        handleCancel={handleCancelProject}
+        tooltipText={
+          "Ensure that the remote repository is empty when you link it"
+        }
+        buttonList={[
+          { title: "Cancel", click: handleCancelProject },
+          { title: "Save", click: handleSaveProject, loading: loading },
+        ]}
+        width={"50vw"}
+      >
+        <Box component="form" noValidate autoComplete="off">
           <div className="w-[100%]">
             <ArTextField
-              label="GitHub: Private Access Token"
-              variant="outlined"
-              defaultValue={githubApiToken}
-              onChange={(event) =>
-                setGitConfig({
-                  ...gitConfig,
-                  githubApiToken: event.target.value,
-                })
-              }
+              label="Remote Repository Url"
+              placeholder="please input remote repository url"
+              defaultValue={""}
+              onChange={(event) => {
+                setProjectName(event.target.value);
+              }}
+              margin="normal"
+              fullWidth
               className="my-3"
-              sx={{ width: "100%" }}
               inputSize="middle"
             />
+            {progress > 0 && (
+              <GithubProgressBar progress={progress} messages={messages} />
+            )}
           </div>
-        )}
-      </Box>
-    </ArDialog>
+          {!committerName && (
+            <div className="w-[100%]">
+              <ArTextField
+                label="Git: Committer Name"
+                placeholder="Your committer name"
+                defaultValue={committerName}
+                onChange={(event) => {
+                  setGitConfig({
+                    ...gitConfig,
+                    committerName: event.target.value,
+                  });
+                }}
+                sx={{ width: "100%" }}
+                className="my-3"
+                inputSize="middle"
+              />
+            </div>
+          )}
+          {!committerEmail && (
+            <div className="w-[100%]">
+              <ArTextField
+                label="Git: Committer Email"
+                variant="outlined"
+                placeholder="Your email"
+                defaultValue={committerEmail}
+                onChange={(event) =>
+                  setGitConfig({
+                    ...gitConfig,
+                    committerEmail: event.target.value,
+                  })
+                }
+                sx={{ width: "100%" }}
+                className="my-3"
+                inputSize="middle"
+              />
+            </div>
+          )}
+
+          {!githubApiToken && (
+            <div className="w-[100%]">
+              <ArTextField
+                label="GitHub: Private Access Token"
+                variant="outlined"
+                defaultValue={githubApiToken}
+                onChange={(event) =>
+                  setGitConfig({
+                    ...gitConfig,
+                    githubApiToken: event.target.value,
+                  })
+                }
+                className="my-3"
+                sx={{ width: "100%" }}
+                inputSize="middle"
+              />
+            </div>
+          )}
+        </Box>
+      </ArDialog>
+      <BottomDrawer isOpen={isOpen} toggleDrawer={toggleDrawer} />
+    </React.Fragment>
   );
 };
 
