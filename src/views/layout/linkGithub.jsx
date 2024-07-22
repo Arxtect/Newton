@@ -23,6 +23,7 @@ import path from "path";
 import { setupAndPushToRepo } from "domain/git";
 import { removeDirectory, existsPath } from "domain/filesystem";
 import BottomDrawer from "@/features/bottomDrawer/bottomDrawer";
+import share from "@/assets/share.svg";
 
 const GithubProgressBar = ({ progress, messages }) => {
   return (
@@ -167,7 +168,7 @@ const LinkGithub = (props) => {
     <React.Fragment>
       {!!isExistsGit ? (
         <Tooltip title="Sync">
-          <Button
+          {/* <Button
             color="inherit"
             aria-label="log"
             size="small"
@@ -176,11 +177,19 @@ const LinkGithub = (props) => {
             <span className="flex items-center justify-center w-[20px] h-[20px] text-[14px]">
               sync
             </span>
-          </Button>
+          </Button> */}
+          <button
+            className={`flex items-center text-gray-700 px-2 py-1 hover:bg-gray-200 active:bg-[#9fd5a2] space-x-1 `}
+            onClick={() => toggleDrawer(true)}
+          >
+            <img src={share} alt="" className="w-4 h-4" />
+            <span>Sync</span>
+          </button>
+
         </Tooltip>
       ) : (
         <Tooltip title="Link a git repository">
-          <Button
+          {/* <Button
             color="inherit"
             aria-label="log"
             size="small"
@@ -189,7 +198,14 @@ const LinkGithub = (props) => {
             <span className="flex items-center justify-center w-[20px] h-[20px] text-[14px]">
               Link
             </span>
-          </Button>
+          </Button> */}
+          <button
+            className={`flex items-center text-gray-700 px-2 py-1 hover:bg-gray-200 active:bg-[#9fd5a2] space-x-1 `}
+            onClick={() => setDialogOpen(true)}
+          >
+            <img src={share} alt="" className="w-4 h-4" />
+            <span>Link</span>
+          </button>
         </Tooltip>
       )}
       <ArDialog

@@ -58,15 +58,6 @@ function RightBefore() {
     getIsExistGit();
   }, [currentProjectRoot]);
 
-  //git control
-  const [isOpen, setIsOpen] = useState(false);
-
-  const toggleDrawer = (open) => {
-    setIsOpen(open);
-  };
-
-  // link
-  const [githubDialogOpen, setGithubDialogOpen] = useState(false);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
 
   const controlShare = async () => {

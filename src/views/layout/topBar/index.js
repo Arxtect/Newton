@@ -7,6 +7,7 @@ import ellipsis from "@/assets/ellipsis.svg";
 import left from "@/assets/left.svg";
 import logoIcon from "@/assets/logo-icon.svg";
 import Share from "../share";
+import LinkGithub from "../linkGithub";
 import PublishDocument from "../publishDocument";
 import { useUserStore, useFileStore } from "@/store";
 import { downloadDirectoryAsZip } from "domain/filesystem";
@@ -59,6 +60,7 @@ const TopBar = (props) => {
 
   const buttonData = [
     { key: "Review", src: review, label: "Review", click: handleClick },
+    { key: "Link", src: review, label: "Review", click: handleClick },
     { key: "History", src: history, label: "History", click: handleClick },
     { key: "Publish", src: "", label: "Publish", click: handleClick },
     { key: "Share", src: "", label: "Share", click: handleClick },
@@ -89,12 +91,14 @@ const TopBar = (props) => {
             if (button.key === "Publish") {
               return <PublishDocument></PublishDocument>;
             }
+            if (button.key === "Link") {
+              return <LinkGithub></LinkGithub>;
+            }
             return (
               <button
                 key={index}
-                className={`flex items-center text-gray-700 px-2 py-1 hover:bg-gray-200 active:bg-[#9fd5a2] ${
-                  index === 0 ? "rounded-l-lg" : ""
-                } ${button.label ? "space-x-1" : ""}`}
+                className={`flex items-center text-gray-700 px-2 py-1 hover:bg-gray-200 active:bg-[#9fd5a2] ${index === 0 ? "rounded-l-lg" : ""
+                  } ${button.label ? "space-x-1" : ""}`}
                 onClick={() => {
                   button.click(button.key);
                 }}
