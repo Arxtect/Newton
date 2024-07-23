@@ -14,19 +14,21 @@ import { ButtonBarContainer } from "@/features/buttonBar/ButtonBarContainer";
 import RightBefore from "./rightBefore";
 import TopBar from "./topBar";
 import ContentTopBar from "./content/topBar";
+import { useLayout } from "store";
 
 const Index = () => {
   useLayoutEffect(() => {
     initializeLatexEngines();
   }, []);
 
+
   return (
     <React.Fragment>
-      <TopBar></TopBar>
+      <TopBar ></TopBar>
       <Layout
         left={<FileSystem />}
         // rightBefore={<RightBefore />}
-        rightBefore={<ContentTopBar />}
+        header={<ContentTopBar />}
         // rightBeforeRight={<ButtonBarContainer />}
         content={<LatexEditorContainer />}
         preview={<PdfPreview />}

@@ -15,6 +15,7 @@ import ContextMenuTrigger from "@mui/material/IconButton";
 import { useFileStore } from "store";
 
 import HoverMenu from "./HoverMenu";
+import fileSvg from "@/assets/layout/file.svg";
 
 const Container = ({ selected, children }) => {
   // Define the base classes for the component
@@ -115,7 +116,8 @@ const FileLine = ({
             minWidth: "unset",
           }}
         >
-          <FileIcon />
+          {/* <FileIcon /> */}
+          <img src={fileSvg} alt="" />
         </ListItemIcon>
         <TextField
           className="tailwind-classes-for-input"
@@ -173,7 +175,7 @@ const FileLine = ({
                 minWidth: "unset",
               }}
             >
-              <FileIcon />
+              <img src={fileSvg} alt="" />
             </ListItemIcon>
             <Pathname ignoreGit={ignoreGit}>{basename}</Pathname>
             {hovered && (

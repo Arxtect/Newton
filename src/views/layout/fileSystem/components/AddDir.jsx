@@ -10,6 +10,8 @@ import { useFileStore } from "store";
 
 import path from "path";
 import { ListItemIcon } from "@mui/material";
+import folderCloseSvg from "@/assets/layout/folderClose.svg";
+
 
 const AddDir = ({ parentDir, depth }) => {
   const { createFile, createDirectory, finishDirCreating, cancelDirCreating } =
@@ -63,7 +65,8 @@ const AddDir = ({ parentDir, depth }) => {
           minWidth: "unset",
         }}
       >
-        <FolderIcon />
+        {/* <FolderIcon /> */}
+        <img src={folderCloseSvg} alt="" />
       </ListItemIcon>
       <TextField
         className="tailwind-classes-for-input"

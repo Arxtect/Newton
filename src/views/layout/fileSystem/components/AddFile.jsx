@@ -1,11 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Box, TextField } from "@mui/material";
 import FileIcon from "@mui/icons-material/InsertDriveFile"; // Assuming you have a FileIcon component
-
 import path from "path";
 import { useFileStore } from "store";
-
 import { ListItemIcon } from "@mui/material";
+import fileSvg from "@/assets/layout/file.svg";
 
 const AddFile = ({ parentDir, depth }) => {
   const {
@@ -64,7 +63,8 @@ const AddFile = ({ parentDir, depth }) => {
           minWidth: "unset",
         }}
       >
-        <FileIcon />
+        {/* <FileIcon /> */}
+        <img src={fileSvg} alt="" />
       </ListItemIcon>
       <TextField
         className="tailwind-classes-for-input"

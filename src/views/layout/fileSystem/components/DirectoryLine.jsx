@@ -21,6 +21,9 @@ import FileIcon from "@mui/icons-material/InsertDriveFile";
 import { Box, TextField } from "@mui/material";
 
 import { readFileStats } from "domain/filesystem";
+import folderOpenSvg from "@/assets/layout/folderOpen.svg";
+import folderCloseSvg from "@/assets/layout/folderClose.svg";
+
 
 const LinkedLines = ({
   dirpath,
@@ -217,9 +220,8 @@ const DirectoryLineContent = ({
             onMouseOver={handleMouseOver}
             onMouseLeave={handleMouseLeave}
             onClick={(e) => handleClick(e, dirpath)}
-            className={`hover:bg-gray-100 transition duration-300 ${
-              hovered || currentSelectDir == dirpath ? "bg-gray-100" : ""
-            }`}
+            className={`hover:bg-gray-100 transition duration-300 ${hovered || currentSelectDir == dirpath ? "bg-gray-100" : ""
+              }`}
             style={{
               padding: "3px 0px 3px 0px",
               paddingLeft: `${depth * 8}px`,
@@ -235,7 +237,8 @@ const DirectoryLineContent = ({
               {opened ? <ExpandMoreIcon /> : <ChevronRightIcon />}
             </ListItemIcon>
             <ListItemIcon style={{ minWidth: "unset" }}>
-              {opened ? <FolderOpenIcon /> : <FolderIcon />}
+              {/* {opened ? <FolderOpenIcon /> : <FolderIcon />} */}
+              {opened ? <img src={folderOpenSvg} alt="" /> : <img src={folderCloseSvg} alt="" />}
             </ListItemIcon>
             {renamingPathname === dirpath ? (
               <TextField

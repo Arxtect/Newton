@@ -46,7 +46,7 @@ const Layout = ({
   // const [resizeOrigin, setResizeOrigin] = useState(null);
   const reactive = useReactive({ resizeOrigin: null });
 
-  useEffect(() => {}, [reactive.resizeOrigin]);
+  useEffect(() => { }, [reactive.resizeOrigin]);
 
   const resizeOutOfRange = (refName, outOfRange) => {
     if (refName === "aside" && outOfRange === "min") {
@@ -223,6 +223,8 @@ const Layout = ({
       terminal: terminalRef,
     }[refName].current;
 
+    console.log(type, reactive.resizeOrigin, refName, min, max)
+
     if (!reactive.resizeOrigin && type) {
       reactive.resizeOrigin = {
         min,
@@ -298,8 +300,12 @@ const Layout = ({
   // Convert Vue's template syntax to JSX
   return (
     <div className={`layout ${presentation ? "presentation" : ""}`}>
-      {showHeader && <div className="header">{header}</div>}
+      {/* {showHeader && <div className="header">{header}</div>} */}
+      <div className="header flex h-[2.2rem]">
+        {header}
+      </div>
       <div className="main">
+
         {showSide && (
           <div className="left" ref={asideRef} id="left">
             {left}
@@ -331,19 +337,6 @@ const Layout = ({
           </div>
         )}
         <div className="ar-right">
-          <div className="right-before flex">
-            {/* <div
-              style={
-                {
-                  // width: rightBeforeWidth,
-                }
-              }
-            >
-              {rightBefore}
-            </div>
-            <div className="right-before-right">{rightBeforeRight}</div> */}
-            {rightBefore}
-          </div>
           <div className="content" ref={contentRef}>
             {showEditor && (
               <div className="editor" ref={editorRef}>
@@ -356,6 +349,7 @@ const Layout = ({
                 id="sash-left"
                 onDoubleClick={() => resetSize("right", "editor")}
                 onMouseDown={(e) => {
+                  e.preventDefault()
                   initEditorResize(e);
                   setWillResizing(true);
                 }}

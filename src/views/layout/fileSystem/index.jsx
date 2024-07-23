@@ -107,7 +107,7 @@ const FileSystem = () => {
 
   return (
     <main className="max-w-[100%] h-full">
-      <div className="right-before flex pl-2 overflow-hidden">
+      {/* <div className="right-before flex pl-2 overflow-hidden">
         <RightBeforeLeft
           createProject={createProject}
           currentProject={currentProjectRoot}
@@ -118,9 +118,9 @@ const FileSystem = () => {
           currentSelectDir={currentSelectDir}
           projectSync={projectSync}
         ></RightBeforeLeft>
-      </div>
+      </div> */}
 
-      <div className="overflow-auto" style={{ height: "calc(100% - 32px)" }}>
+      <div className="overflow-auto h-full mr-[1rem]">
         <RootDirectory
           key={currentProjectRoot}
           root={currentProjectRoot}
