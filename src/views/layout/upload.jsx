@@ -16,6 +16,8 @@ import path from "path";
 import DriveFolderUploadIcon from "@mui/icons-material/DriveFolderUploadRounded";
 import { IconButton, Tooltip } from "@mui/material";
 import { readFile } from "domain/filesystem";
+import uploadFileSvg from "@/assets/layout/uploadFile.svg";
+import uploadFolderSvg from "@/assets/layout/uploadFolder.svg";
 
 const FileUploader = forwardRef(
   (
@@ -60,7 +62,8 @@ const FileUploader = forwardRef(
       <div {...props} className="position-relative">
         <Tooltip title={props.title}>
           <IconButton color="#inherit" aria-label="controls" size="small">
-            <UploadFileIcon className="text-[#000]" fontSize="small" />
+            {/* <UploadFileIcon fontSize="small" /> */}
+            <img src={uploadFileSvg} alt="" className="w-5 h-5" />
           </IconButton>
         </Tooltip>
         <input
@@ -120,7 +123,8 @@ const FolderUploader = forwardRef(
       <div {...props} className="relative">
         <Tooltip title={props.title}>
           <IconButton color="#inherit" aria-label="controls" size="small">
-            <DriveFolderUploadIcon className="text-[#000]" fontSize="small" />
+            {/* <DriveFolderUploadIcon className="text-[#000]" fontSize="small" /> */}
+            <img src={uploadFolderSvg} alt="" className="w-5 h-5" />
           </IconButton>
         </Tooltip>
         <input

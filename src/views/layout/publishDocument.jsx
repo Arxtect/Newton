@@ -6,6 +6,7 @@ import {
   FormControl,
   InputLabel,
   Checkbox,
+  Tooltip,
 } from "@mui/material";
 import { AddCircleOutline } from "@mui/icons-material";
 import { getAllTags, uploadDocument } from "services";
@@ -147,15 +148,17 @@ const ProductDialog = () => {
 
   return (
     <React.Fragment>
-      <button
-        className={`flex items-center text-gray-700 px-2 py-1 hover:bg-gray-200 active:bg-[#9fd5a2] space-x-1 `}
-        onClick={() => {
-          handleOpenPublish();
-        }}
-      >
-        <img src={publish} alt="" className="w-4 h-4" />
-        <span>Publish</span> {/* 使用空格字符 */}
-      </button>
+      <Tooltip title="Share Your Project">
+        <button
+          className={`flex items-center text-gray-700 px-2 py-1 hover:bg-gray-200 active:bg-[#9fd5a2] space-x-1 `}
+          onClick={() => {
+            handleOpenPublish();
+          }}
+        >
+          <img src={publish} alt="" className="w-4 h-4" />
+          <span>Publish</span> {/* 使用空格字符 */}
+        </button>
+      </Tooltip>
       <ArDialog
         title="Publish Product"
         dialogOpen={openPublishDialog}

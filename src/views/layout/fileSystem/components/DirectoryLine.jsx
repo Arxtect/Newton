@@ -23,7 +23,7 @@ import { Box, TextField } from "@mui/material";
 import { readFileStats } from "domain/filesystem";
 import folderOpenSvg from "@/assets/layout/folderOpen.svg";
 import folderCloseSvg from "@/assets/layout/folderClose.svg";
-
+import { useFileStore } from "store";
 
 const LinkedLines = ({
   dirpath,
@@ -93,6 +93,10 @@ const DirectoryLineContent = ({
   changePreRenamingDirpath,
   changeCurrentProjectRoot,
 }) => {
+  const { dirOpen } = useFileStore((state) => ({
+    dirOpen: state.dirOpen,
+  }));
+
   const [opened, setOpened] = useState(
     preRenamingDirpath == dirpath ? true : open
   );
@@ -207,6 +211,12 @@ const DirectoryLineContent = ({
     }
   };
 
+  useEffect(() => {
+    if (!!dirOpen) {
+      setOpened(true);
+    }
+  }, [dirOpen]);
+
   return (
     <List className="p-0">
       <div onMouseOver={handleMouseOver} onMouseLeave={handleMouseLeave}>
@@ -220,8 +230,9 @@ const DirectoryLineContent = ({
             onMouseOver={handleMouseOver}
             onMouseLeave={handleMouseLeave}
             onClick={(e) => handleClick(e, dirpath)}
-            className={`hover:bg-gray-100 transition duration-300 ${hovered || currentSelectDir == dirpath ? "bg-gray-100" : ""
-              }`}
+            className={`hover:bg-gray-100 transition duration-300 ${
+              hovered || currentSelectDir == dirpath ? "bg-gray-100" : ""
+            }`}
             style={{
               padding: "3px 0px 3px 0px",
               paddingLeft: `${depth * 8}px`,
@@ -238,7 +249,11 @@ const DirectoryLineContent = ({
             </ListItemIcon>
             <ListItemIcon style={{ minWidth: "unset" }}>
               {/* {opened ? <FolderOpenIcon /> : <FolderIcon />} */}
-              {opened ? <img src={folderOpenSvg} alt="" /> : <img src={folderCloseSvg} alt="" />}
+              {opened ? (
+                <img src={folderOpenSvg} alt="" />
+              ) : (
+                <img src={folderCloseSvg} alt="" />
+              )}
             </ListItemIcon>
             {renamingPathname === dirpath ? (
               <TextField

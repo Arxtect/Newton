@@ -1,3 +1,8 @@
+/*
+ * @Description:
+ * @Author: Devin
+ * @Date: 2024-05-28 12:37:50
+ */
 import React, { useEffect, useRef, useState } from "react";
 import AceEditor from "react-ace";
 import "ace-builds/src-noconflict/mode-latex";
@@ -12,6 +17,7 @@ const LatexEditor = ({ handleChange, sourceCode, filepath }) => {
   const latexRef = useRef(null);
 
   const { editor, updateEditor } = useEditor((state) => ({
+    editor: state.editor,
     updateEditor: state.updateEditor,
   }));
 

@@ -11,7 +11,7 @@ import React, {
 } from "react";
 
 import ArDialog from "@/components/arDialog";
-import { TextField, Box } from "@mui/material";
+import { TextField, Box, Tooltip } from "@mui/material";
 import { toast } from "react-toastify";
 import { ProjectSync } from "@/convergence";
 import { getProjectInfo } from "domain/filesystem";
@@ -86,15 +86,17 @@ const Share = forwardRef(({ rootPath, user }, ref) => {
 
   return (
     <React.Fragment>
-      <button
-        className={`flex items-center text-gray-700 px-2 py-1 hover:bg-gray-200 active:bg-[#9fd5a2] space-x-1 `}
-        onClick={() => {
-          controlShare();
-        }}
-      >
-        <img src={share} alt="" className="w-4 h-4" />
-        <span>Share</span> {/* 使用空格字符 */}
-      </button>
+      <Tooltip title="Share Your Project">
+        <button
+          className={`flex items-center text-gray-700 px-2 py-1 hover:bg-gray-200 active:bg-[#9fd5a2] space-x-1 `}
+          onClick={() => {
+            controlShare();
+          }}
+        >
+          <img src={share} alt="" className="w-4 h-4" />
+          <span>Share</span> {/* 使用空格字符 */}
+        </button>
+      </Tooltip>
       <ArDialog
         title="Share Project"
         dialogOpen={dialogOpen}

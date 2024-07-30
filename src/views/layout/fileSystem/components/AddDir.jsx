@@ -12,7 +12,6 @@ import path from "path";
 import { ListItemIcon } from "@mui/material";
 import folderCloseSvg from "@/assets/layout/folderClose.svg";
 
-
 const AddDir = ({ parentDir, depth }) => {
   const { createFile, createDirectory, finishDirCreating, cancelDirCreating } =
     useFileStore((state) => ({
@@ -81,6 +80,17 @@ const AddDir = ({ parentDir, depth }) => {
           "& .MuiInputBase-input": {
             height: "24px",
             padding: "0 6px",
+          },
+          "& .MuiOutlinedInput-root": {
+            "& fieldset": {
+              borderColor: "#81C784",
+            },
+            "&:hover fieldset": {
+              borderColor: "#81C784",
+            },
+            "&.Mui-focused fieldset": {
+              borderColor: "#81C784",
+            },
           },
         }}
       />

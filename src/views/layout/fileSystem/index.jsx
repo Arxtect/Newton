@@ -120,7 +120,7 @@ const FileSystem = () => {
         ></RightBeforeLeft>
       </div> */}
 
-      <div className="overflow-auto h-full mr-[1rem]">
+      <div className="overflow-auto h-full mr-3">
         <RootDirectory
           key={currentProjectRoot}
           root={currentProjectRoot}
