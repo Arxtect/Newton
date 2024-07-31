@@ -120,6 +120,8 @@ body {
   animation-name: slideDown;
 }
 
+
+
 @keyframes slideUp {
   from {
     opacity: 0;

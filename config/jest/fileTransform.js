@@ -1,7 +1,12 @@
-'use strict';
+/*
+ * @Description:
+ * @Author: Devin
+ * @Date: 2024-05-28 12:37:50
+ */
+"use strict";
 
-const path = require('path');
-const camelcase = require('camelcase');
+const path = require("path");
+const camelcase = require("camelcase");
 
 // This is a custom Jest transformer turning file imports into filenames.
 // http://facebook.github.io/jest/docs/en/webpack.html

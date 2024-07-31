@@ -1,163 +1,587 @@
-import * as React from "react";
+import React, {
+  useMemo,
+  useRef,
+  useState,
+  useEffect,
+  useLayoutEffect,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
+import { useNavigate } from "react-router-dom";
+import { DataGrid } from "@mui/x-data-grid";
+import { IconButton, Tooltip } from "@mui/material";
+import {
+  findAllProjectInfo,
+  downloadDirectoryAsZip,
+  getProjectInfo,
+} from "domain/filesystem";
+import { toast } from "react-toastify";
+import { useUserStore, useLoginStore, useFileStore } from "@/store";
+import { formatDate } from "@/util";
+import { ProjectSync } from "@/convergence";
+import ArDialog from "@/components/arDialog";
+import NewProject from "../newProject";
+import UploadProject from "../uploadProject";
+import CopyProject from "../copyProject";
+import RenameProject from "../renameProject";
+import Share from "../share";
 
+import copySvg from "@/assets/project/copy.svg";
+import deleteSvg from "@/assets/project/delete.svg";
+import downloadSvg from "@/assets/project/download.svg";
+import renameSvg from "@/assets/project/rename.svg";
+import shareSvg from "@/assets/project/share.svg";
+import downloadPdfSvg from "@/assets/project/downloadPdf.svg";
+import "./index.scss";
 
-const Table = () => {
-    return (
-        <div>
-            <div className="flex gap-5 justify-center w-full border-b-2 py-2 ">
-                <div className="w-3/12 text-center">Project</div>
-                <div className="w-3/12 text-center">Created</div>
-                <div className="flex w-3/12 gap-5 text-center justify-center">
-                    <div>Last modified</div>
-                    <img
-                        loading="lazy"
-                        src="https://cdn.builder.io/api/v1/image/assets/TEMP/f31e28f04577e512fbdc844fc654f0f71d769ff07047dcbeabe2f16a187d208a?apiKey=f537c5c71a7b442c975ebf88445457b6&"
-                    />
-                </div>
-                <div className="w-3/12 text-center">Actions</div>
-            </div>
-            <div className="w-full mt-6">
-                <div className="flex gap-5">
-                    <div className="flex flex-col w-3/12 max-md:ml-0 max-md:w-full">
-                        <div className="flex flex-col self-stretch my-auto text-base leading-4 text-center text-black max-md:mt-10">
-                            <div>File Name</div>
-                            <div className="mt-7">File Name</div>
-                            <div className="mt-7">File Name</div>
-                            <div className="mt-7">File Name</div>
-                        </div>
-                    </div>
-                    <div className="flex flex-col ml-5 w-3/12 max-md:ml-0 max-md:w-full">
-                        <div className="flex flex-col self-stretch my-auto text-base leading-4 text-center text-black whitespace-nowrap max-md:mt-10">
-                            <div>2024-07-11</div>
-                            <div className="mt-7">2024-07-11</div>
-                            <div className="mt-7">2024-07-11</div>
-                            <div className="mt-7">2024-07-11</div>
-                        </div>
-                    </div>
-                    <div className="flex flex-col ml-5 w-3/12 max-md:ml-0 max-md:w-full">
-                        <div className="flex flex-col self-stretch my-auto text-base leading-4 text-center text-black whitespace-nowrap max-md:mt-10">
-                            <div>2024-07-11</div>
-                            <div className="mt-7">2024-07-11</div>
-                            <div className="mt-7">2024-07-11</div>
-                            <div className="mt-7">2024-07-11</div>
-                        </div>
-                    </div>
-                    <div className="flex flex-col ml-5 w-3/12 max-md:ml-0 max-md:w-full">
-                        <div className="flex flex-col grow max-md:mt-10">
-                            <div className="flex gap-2.5">
-                                <img
-                                    loading="lazy"
-                                    src="https://cdn.builder.io/api/v1/image/assets/TEMP/6fd764aa6764c558f86a1da28b5e78d9311ecdbbde38b8fe43dd6e07f2388b64?apiKey=f537c5c71a7b442c975ebf88445457b6&"
-                                    className="shrink-0 aspect-square w-[18px]"
-                                />
-                                <img
-                                    loading="lazy"
-                                    src="https://cdn.builder.io/api/v1/image/assets/TEMP/49377e7aa0b3290118a13daff3885b359c3badc569153cabc0adfd7e62555cff?apiKey=f537c5c71a7b442c975ebf88445457b6&"
-                                    className="shrink-0 self-start aspect-square w-[17px]"
-                                />
-                                <img
-                                    loading="lazy"
-                                    src="https://cdn.builder.io/api/v1/image/assets/TEMP/b549defbcd3c6ca2c6a91b76a9526a978d8bfa74fed3fc7194af2dc4b8540e44?apiKey=f537c5c71a7b442c975ebf88445457b6&"
-                                    className="shrink-0 my-auto aspect-square w-[15px]"
-                                />
-                                <img
-                                    loading="lazy"
-                                    src="https://cdn.builder.io/api/v1/image/assets/TEMP/025eb899c7bc82584486d53b7acb41412be1e0cb544f6ce14829851c2af90a44?apiKey=f537c5c71a7b442c975ebf88445457b6&"
-                                    className="shrink-0 self-start aspect-square w-[17px]"
-                                />
-                                <img
-                                    loading="lazy"
-                                    src="https://cdn.builder.io/api/v1/image/assets/TEMP/8ede9723b68f0b00652bb7ef9bad7bcb610d8ad545675aa1124bdeb637625742?apiKey=f537c5c71a7b442c975ebf88445457b6&"
-                                    className="shrink-0 my-auto aspect-square w-[15px]"
-                                />
-                            </div>
-                            <div className="flex gap-2.5 mt-5">
-                                <img
-                                    loading="lazy"
-                                    src="https://cdn.builder.io/api/v1/image/assets/TEMP/6fd764aa6764c558f86a1da28b5e78d9311ecdbbde38b8fe43dd6e07f2388b64?apiKey=f537c5c71a7b442c975ebf88445457b6&"
-                                    className="shrink-0 aspect-square w-[18px]"
-                                />
-                                <img
-                                    loading="lazy"
-                                    src="https://cdn.builder.io/api/v1/image/assets/TEMP/49377e7aa0b3290118a13daff3885b359c3badc569153cabc0adfd7e62555cff?apiKey=f537c5c71a7b442c975ebf88445457b6&"
-                                    className="shrink-0 self-start aspect-square w-[17px]"
-                                />
-                                <img
-                                    loading="lazy"
-                                    src="https://cdn.builder.io/api/v1/image/assets/TEMP/b549defbcd3c6ca2c6a91b76a9526a978d8bfa74fed3fc7194af2dc4b8540e44?apiKey=f537c5c71a7b442c975ebf88445457b6&"
-                                    className="shrink-0 my-auto aspect-square w-[15px]"
-                                />
-                                <img
-                                    loading="lazy"
-                                    src="https://cdn.builder.io/api/v1/image/assets/TEMP/025eb899c7bc82584486d53b7acb41412be1e0cb544f6ce14829851c2af90a44?apiKey=f537c5c71a7b442c975ebf88445457b6&"
-                                    className="shrink-0 self-start aspect-square w-[17px]"
-                                />
-                                <img
-                                    loading="lazy"
-                                    src="https://cdn.builder.io/api/v1/image/assets/TEMP/8ede9723b68f0b00652bb7ef9bad7bcb610d8ad545675aa1124bdeb637625742?apiKey=f537c5c71a7b442c975ebf88445457b6&"
-                                    className="shrink-0 my-auto aspect-square w-[15px]"
-                                />
-                            </div>
-                            <div className="flex gap-2.5 mt-5">
-                                <img
-                                    loading="lazy"
-                                    src="https://cdn.builder.io/api/v1/image/assets/TEMP/6fd764aa6764c558f86a1da28b5e78d9311ecdbbde38b8fe43dd6e07f2388b64?apiKey=f537c5c71a7b442c975ebf88445457b6&"
-                                    className="shrink-0 aspect-square w-[18px]"
-                                />
-                                <img
-                                    loading="lazy"
-                                    src="https://cdn.builder.io/api/v1/image/assets/TEMP/49377e7aa0b3290118a13daff3885b359c3badc569153cabc0adfd7e62555cff?apiKey=f537c5c71a7b442c975ebf88445457b6&"
-                                    className="shrink-0 self-start aspect-square w-[17px]"
-                                />
-                                <img
-                                    loading="lazy"
-                                    src="https://cdn.builder.io/api/v1/image/assets/TEMP/b549defbcd3c6ca2c6a91b76a9526a978d8bfa74fed3fc7194af2dc4b8540e44?apiKey=f537c5c71a7b442c975ebf88445457b6&"
-                                    className="shrink-0 my-auto aspect-square w-[15px]"
-                                />
-                                <img
-                                    loading="lazy"
-                                    src="https://cdn.builder.io/api/v1/image/assets/TEMP/025eb899c7bc82584486d53b7acb41412be1e0cb544f6ce14829851c2af90a44?apiKey=f537c5c71a7b442c975ebf88445457b6&"
-                                    className="shrink-0 self-start aspect-square w-[17px]"
-                                />
-                                <img
-                                    loading="lazy"
-                                    src="https://cdn.builder.io/api/v1/image/assets/TEMP/8ede9723b68f0b00652bb7ef9bad7bcb610d8ad545675aa1124bdeb637625742?apiKey=f537c5c71a7b442c975ebf88445457b6&"
-                                    className="shrink-0 my-auto aspect-square w-[15px]"
-                                />
-                            </div>
-                            <div className="flex gap-2.5 mt-5">
-                                <img
-                                    loading="lazy"
-                                    src="https://cdn.builder.io/api/v1/image/assets/TEMP/6fd764aa6764c558f86a1da28b5e78d9311ecdbbde38b8fe43dd6e07f2388b64?apiKey=f537c5c71a7b442c975ebf88445457b6&"
-                                    className="shrink-0 aspect-square w-[18px]"
-                                />
-                                <img
-                                    loading="lazy"
-                                    src="https://cdn.builder.io/api/v1/image/assets/TEMP/49377e7aa0b3290118a13daff3885b359c3badc569153cabc0adfd7e62555cff?apiKey=f537c5c71a7b442c975ebf88445457b6&"
-                                    className="shrink-0 self-start aspect-square w-[17px]"
-                                />
-                                <img
-                                    loading="lazy"
-                                    src="https://cdn.builder.io/api/v1/image/assets/TEMP/b549defbcd3c6ca2c6a91b76a9526a978d8bfa74fed3fc7194af2dc4b8540e44?apiKey=f537c5c71a7b442c975ebf88445457b6&"
-                                    className="shrink-0 my-auto aspect-square w-[15px]"
-                                />
-                                <img
-                                    loading="lazy"
-                                    src="https://cdn.builder.io/api/v1/image/assets/TEMP/025eb899c7bc82584486d53b7acb41412be1e0cb544f6ce14829851c2af90a44?apiKey=f537c5c71a7b442c975ebf88445457b6&"
-                                    className="shrink-0 self-start aspect-square w-[17px]"
-                                />
-                                <img
-                                    loading="lazy"
-                                    src="https://cdn.builder.io/api/v1/image/assets/TEMP/8ede9723b68f0b00652bb7ef9bad7bcb610d8ad545675aa1124bdeb637625742?apiKey=f537c5c71a7b442c975ebf88445457b6&"
-                                    className="shrink-0 my-auto aspect-square w-[15px]"
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+const Table = forwardRef(
+  ({ sortSelect, searchInput, selectedRows = [], setSelectedRows }, ref) => {
+    const navigate = useNavigate();
+    const {
+      projectLists,
+      currentProjectRoot,
+      deleteProject,
+      changeCurrentProjectRoot,
+      getCurrentProjectPdf,
+      initFile,
+    } = useFileStore((state) => ({
+      allProject: state.allProject,
+      currentProjectRoot: state.currentProjectRoot,
+      deleteProject: state.deleteProject,
+      changeCurrentProjectRoot: state.changeCurrentProjectRoot,
+      getCurrentProjectPdf: state.getCurrentProjectPdf,
+      initFile: state.initFile,
+    }));
+    const [projectData, setProjectData] = useState([]);
+
+    const { user, accessToken } = useUserStore((state) => ({
+      user: state.user,
+      accessToken: state.accessToken,
+    }));
+
+    const { updateDialogLoginOpen, updateOtherOperation } = useLoginStore(
+      (state) => ({
+        updateDialogLoginOpen: state.updateDialogLoginOpen,
+        updateOtherOperation: state.updateOtherOperation,
+      })
     );
-}
+
+    const getProjectList = async (currentSelectMenu) => {
+      console.log(currentSelectMenu, "currentSelectMenu");
+      const project = await findAllProjectInfo();
+
+      console.log(project, "project");
+      setProjectData(
+        project
+          .map((item, index) => {
+            if (
+              currentSelectMenu == 3 &&
+              (item?.userId == user?.id || !item?.isSync)
+            ) {
+              return null;
+            }
+            if (
+              currentSelectMenu == 2 &&
+              item?.userId &&
+              item?.userId != user?.id
+            ) {
+              return null;
+            }
+            return {
+              id: index + 1,
+              ...item,
+            };
+          })
+          .filter((item) => item !== null)
+      );
+    };
+
+    // 根据父容器宽度计算列宽度
+
+    const handleSelection = (selectedIDs) => {
+      const selectedRowData = projectData.filter((row) =>
+        selectedIDs.includes(row.id)
+      );
+      setSelectedRows(selectedRowData);
+    };
+
+    //new project
+
+    const [newDialogOpen, setNewDialogOpen] = useState(false);
+    const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
+
+    // delete project
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [deleteProjectName, setDeleteProjectName] = useState("");
+
+    const handleDeleteProject = (deleteProjectName) => {
+      if (!deleteProjectName) {
+        toast.error("Please select a project to delete");
+        return;
+      }
+      setDeleteDialogOpen(true);
+      setDeleteProjectName(deleteProjectName);
+    };
+
+    const handleConfirmDelete = async () => {
+      await deleteProject({ dirpath: deleteProjectName });
+      getProjectList();
+      setDeleteDialogOpen(false);
+    };
+    const handleCancelDelete = () => {
+      setDeleteDialogOpen(false);
+    };
+
+    //copy project
+    const [sourceProject, setSourceProject] = useState("");
+    const [copyDialogOpen, setCopyDialogOpen] = useState(false);
+    const handleCopy = (title) => {
+      setSourceProject(title);
+      setCopyDialogOpen(true);
+    };
+
+    // share project
+    const [shareDialogOpen, setShareDialogOpen] = useState(false);
+    const [shareProjectName, setShareProjectName] = useState("");
+
+    const controlShare = (project) => {
+      console.log(user, accessToken, "user");
+      if (!user || JSON.stringify(user) === "{}") {
+        toast.warning("Please login");
+        updateDialogLoginOpen(true);
+        return;
+      }
+      setShareProjectName(project);
+      setShareDialogOpen(true);
+    };
+
+    // download pdf
+    const downloadPdf = async (projectName) => {
+      const blobUrl = await getCurrentProjectPdf(projectName);
+      console.log(blobUrl, "blobUrl");
+
+      if (!blobUrl) {
+        toast.warning("project is not compiled please compile it first");
+        return;
+      }
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = projectName + ".pdf";
+      link.click();
+      setTimeout(() => {
+        URL.revokeObjectURL(blobUrl);
+      }, 30000);
+    };
+
+    const auth = (condition, callback) => {
+      if (condition) {
+        toast.warning("Nonanonymous project，Please login first");
+        updateDialogLoginOpen(true);
+        updateOtherOperation(callback);
+        return true;
+      }
+      return false;
+    };
+
+    //rename project
+    const [renameSourceProject, setRenameSourceProject] = useState("");
+    const [renameDialogOpen, setRenameDialogOpen] = useState(false);
+    const handleRename = (title) => {
+      setRenameSourceProject(title);
+      setRenameDialogOpen(true);
+    };
+
+    // table
+    const columns = [
+      {
+        field: "id",
+        headerName: "ID",
+        width: 0.1,
+        headerAlign: "center",
+        align: "center",
+        sortable: true, // 允许排序
+        renderCell: (params) => (
+          <span className="font-bold">{params.value}</span>
+        ),
+      },
+      {
+        field: "title",
+        headerName: "Title",
+        width: 0.3,
+        headerAlign: "center",
+        align: "center",
+        sortable: false,
+        renderCell: (params) => (
+          <div
+            style={{ cursor: "pointer", color: "inherit" }}
+            onMouseOver={(e) => (e.target.style.textDecoration = "underline")}
+            onMouseOut={(e) => (e.target.style.textDecoration = "none")}
+            onClick={async (e) => {
+              const isAuth = auth(
+                params.row.name != "YOU" &&
+                  (!user || JSON.stringify(user) === "{}"),
+                () => {
+                  e.stopPropagation();
+                  changeCurrentProjectRoot({
+                    projectRoot: params.value,
+                  });
+                  navigate(`/newton`);
+                }
+              );
+              if (isAuth) return;
+              e.stopPropagation();
+              changeCurrentProjectRoot({
+                projectRoot: params.value,
+              });
+              navigate(`/newton`);
+            }}
+          >
+            <span className="text-[#22c55e]">{params.value}</span>
+          </div>
+        ),
+      },
+      {
+        field: "name",
+        headerName: "Owner",
+        width: 0.2,
+        headerAlign: "center",
+        align: "center",
+        sortable: false,
+        renderCell: (params) => (
+          <span className="font-bold">{params.value}</span>
+        ),
+      },
+      {
+        field: "lastModified",
+        headerName: "LastModified",
+        width: 0.15,
+        headerAlign: "center",
+        align: "center",
+        sortable: false, // 允许排序
+        renderCell: (params) => (
+          <div className="font-bold">{formatDate(params.value)}</div>
+        ),
+      },
+      {
+        field: "actions",
+        headerName: "Actions",
+        width: 0.25,
+        headerAlign: "center",
+        align: "center",
+        sortable: false,
+        renderCell: (params) => (
+          <div>
+            <Tooltip title="Download">
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const isAuth = auth(
+                    params.row.name != "YOU" &&
+                      (!user || JSON.stringify(user) === "{}"),
+                    () => {
+                      downloadDirectoryAsZip(params.row.title);
+                    }
+                  );
+                  if (isAuth) return;
+                  downloadDirectoryAsZip(params.row.title);
+                }}
+              >
+                <img src={downloadSvg} alt="" />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Copy">
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const isAuth = auth(
+                    params.row.name != "YOU" &&
+                      (!user || JSON.stringify(user) === "{}"),
+                    () => {
+                      handleCopy(params.row.title);
+                    }
+                  );
+                  if (isAuth) return;
+                  handleCopy(params.row.title);
+                }}
+              >
+                <img src={copySvg} alt="" />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Download PDF">
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const isAuth = auth(
+                    params.row.name != "YOU" &&
+                      (!user || JSON.stringify(user) === "{}"),
+                    () => {
+                      downloadPdf(params.row.title);
+                    }
+                  );
+                  if (isAuth) return;
+                  downloadPdf(params.row.title);
+                }}
+              >
+                <img src={downloadPdfSvg} alt="" />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="SHARE">
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  console.log(params.row.userId, user.id, "params.row");
+                  if (params.row.userId && params.row.userId != user.id) {
+                    toast.warning(
+                      "This project is collaborative and cannot be shared"
+                    );
+                    return;
+                  }
+                  const isAuth = auth(
+                    params.row.name != "YOU" &&
+                      (!user || JSON.stringify(user) === "{}"),
+                    () => {
+                      controlShare(params.row.title);
+                    }
+                  );
+                  if (isAuth) return;
+                  controlShare(params.row.title);
+                }}
+              >
+                <img src={shareSvg} alt="" />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Delete">
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const isAuth = auth(
+                    params.row.name != "YOU" &&
+                      (!user || JSON.stringify(user) === "{}"),
+                    () => {
+                      handleDeleteProject(params.row.title);
+                    }
+                  );
+                  if (isAuth) return;
+                  handleDeleteProject(params.row.title);
+                }}
+              >
+                <img src={deleteSvg} alt="" />
+              </IconButton>
+            </Tooltip>
+          </div>
+        ),
+      },
+    ];
+
+    const [calculatedColumns, setCalculatedColumns] = useState([]);
+
+    useLayoutEffect(() => {
+      const updateColumns = () => {
+        const viewportWidth = window.innerWidth;
+        const totalWidth = columns.reduce(
+          (sum, column) => sum + column.width,
+          0
+        );
+        setCalculatedColumns(
+          columns.map((column) => ({
+            ...column,
+            width: (viewportWidth * 0.7 * column.width) / totalWidth,
+          }))
+        );
+      };
+
+      updateColumns();
+      window.addEventListener("resize", updateColumns);
+
+      return () => window.removeEventListener("resize", updateColumns);
+    }, []);
+
+    // slider menu
+    const [currentSelectMenu, setCurrentSelectMenu] = useState(1);
+    const [currentSelectMenuTitle, setCurrentSelectMenuTitle] = useState("");
+
+    const sliderRef = useRef(null);
+
+    const handleCurrentSelectMenu = (id) => {
+      setCurrentSelectMenu(id);
+      setCurrentSelectMenuTitle(sliderRef.current.getMainMenuTitleViaId(id));
+    };
+    //   useEffect(() => {
+    //     setCurrentSelectMenuTitle(
+    //       sliderRef.current.getMainMenuTitleViaId(currentSelectMenu)
+    //     );
+    //   }, []);
+
+    // sync project
+    const [projectSync, setProjectSync] = useState(null);
+
+    const [syncDialogOpen, setSyncDialogOpen] = useState(false);
+
+    const [syncParams, setSyncParams] = useState({});
+
+    const handleSyncProject = (syncProjectName, roomId) => {
+      setSyncParams({ roomId, project: syncProjectName });
+      setSyncDialogOpen(true);
+    };
+
+    const handleConfirmSync = async () => {
+      const projectSync = new ProjectSync(
+        syncParams.project,
+        user,
+        syncParams.roomId,
+        getProjectList
+      );
+      await projectSync.setObserveHandler();
+
+      setProjectSync(projectSync);
+      setSyncDialogOpen(false);
+    };
+    const handleCancelSync = () => {
+      setSyncDialogOpen(false);
+    };
+
+    const initShareProject = async () => {
+      const hash = window.location.hash;
+      const queryString = hash.includes("?") ? hash.split("?")[1] : "";
+      const searchParams = new URLSearchParams(queryString);
+
+      const project = searchParams.get("project");
+      const roomId = searchParams.get("roomId");
+
+      if (!project || !roomId) return;
+
+      if (!user || JSON.stringify(user) === "{}") {
+        toast.warning("Please login");
+        updateDialogLoginOpen(true);
+        updateOtherOperation(() => handleSyncProject(project, roomId));
+        return;
+      }
+
+      handleSyncProject(project, roomId);
+    };
+
+    useEffect(() => {
+      const init = async () => {
+        await initShareProject(getProjectList);
+      };
+
+      init();
+      getProjectList();
+      return () => {
+        if (projectSync) {
+          projectSync?.leaveCollaboration && projectSync?.leaveCollaboration();
+        }
+      };
+    }, []);
+
+    useEffect(() => {
+      getProjectList(currentSelectMenu);
+    }, [currentSelectMenu]);
+
+    const sortedRows = useMemo(() => {
+      console.log("sortedRows", sortSelect);
+      return [...projectData]
+        .filter((data) => data.title.includes(searchInput))
+        .sort((a, b) => {
+          if (sortSelect === "lastModified") {
+            return b.lastModified - a.lastModified;
+          } else if (sortSelect === "id") {
+            return a.id - b.id;
+          }
+          return 0;
+        });
+    }, [projectData, searchInput, sortSelect]);
+
+    useImperativeHandle(ref, () => ({
+      handleCopy,
+      handleRename,
+      getProjectList,
+      auth,
+      user,
+    }));
+
+    return (
+      <div>
+        <DataGrid
+          rows={sortedRows}
+          columns={calculatedColumns}
+          disableColumnMenu
+          initialState={{
+            pagination: {
+              paginationModel: { page: 0, pageSize: 5 },
+            },
+          }}
+          pageSizeOptions={[5, 10]}
+          pageSize={10}
+          checkboxSelection={true}
+          onRowSelectionModelChange={handleSelection}
+          disableRowSelectionOnClick
+          onCellDoubleClick={(params) => console.log(params)}
+          rowHeight={40}
+          columnHeaderHeight={50}
+        />
+        <NewProject
+          dialogOpen={newDialogOpen}
+          setDialogOpen={setNewDialogOpen}
+        />
+        <UploadProject
+          dialogOpen={uploadDialogOpen}
+          setDialogOpen={setUploadDialogOpen}
+          user={user}
+        />
+        <CopyProject
+          dialogOpen={copyDialogOpen}
+          setDialogOpen={setCopyDialogOpen}
+          sourceProject={sourceProject}
+          setSourceProject={setSourceProject}
+          getProjectList={getProjectList}
+        />
+        <RenameProject
+          dialogOpen={renameDialogOpen}
+          setDialogOpen={setRenameDialogOpen}
+          sourceProject={renameSourceProject}
+          setSourceProject={setRenameSourceProject}
+          getProjectList={getProjectList}
+        />
+        <ArDialog
+          title="Delete Project"
+          dialogOpen={deleteDialogOpen}
+          handleCancel={handleCancelDelete}
+          buttonList={[
+            { title: "Cancel", click: handleCancelDelete },
+            { title: "Delete", click: handleConfirmDelete },
+          ]}
+        >
+          Are you sure you want to delete the project：
+          <span className="text-red-500 mr-1">{deleteProjectName}</span>
+        </ArDialog>
+        <ArDialog
+          title="Sync Project"
+          dialogOpen={syncDialogOpen}
+          handleCancel={handleCancelSync}
+          buttonList={[
+            { title: "Cancel", click: handleCancelSync },
+            { title: "Confirm", click: handleConfirmSync },
+          ]}
+        >
+          Whether to enter the collaboration project:
+          <span className="text-red-500 mr-1">{syncParams.project}</span>
+        </ArDialog>
+        <Share
+          dialogOpen={shareDialogOpen}
+          setDialogOpen={setShareDialogOpen}
+          rootPath={shareProjectName}
+          user={user}
+          getProjectList={getProjectList}
+        ></Share>
+      </div>
+    );
+  }
+);
 
 export default Table;

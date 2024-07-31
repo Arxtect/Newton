@@ -1,0 +1,15 @@
+.MuiDataGrid-columnHeaderTitleContainerContent .MuiDataGrid-columnHeaderTitle {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.MuiDataGrid-columnHeadersInner .MuiDataGrid-columnHeader:focus {
+  outline: solid #1976d2 0px;
+}
+.MuiDataGrid-columnHeadersInner .MuiDataGrid-columnHeader:focus-within {
+  outline: solid #1976d2 0px;
+}
+
+.MuiDataGrid-row .MuiDataGrid-cell:focus {
+  outline: solid #1976d2 0px;
+}/*# sourceMappingURL=index.css.map */

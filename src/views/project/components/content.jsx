@@ -1,49 +1,93 @@
-import * as React from "react";
-import ContentBar from "./contentBar"
-import Grid from "./grid"
+import React, { useState, useRef } from "react";
+import ContentBar from "./contentBar";
+import Grid from "./grid";
+import Table from "./table";
+import tableSvg from "@/assets/project/table.svg";
+import gridSvg from "@/assets/project/grid.svg";
+import expandSvg from "@/assets/project/expand.svg";
 
-import Table from "./table"
+import { Tooltip } from "@mui/material";
 
 const Content = () => {
-    return (
-        <div className="flex flex-col">
-            <ContentBar></ContentBar>
-            <div className="flex justify-between gap-5 mt-5 w-full max-md:flex-wrap">
-                <div className="text-xl font-semibold  text-center text-black">
-                    Projects Dashboard
-                </div>
-                <div className="flex gap-3.5">
-                    <div className="grow my-auto text-base font-medium text-center text-black">
-                        Sort By
-                    </div>
-                    <div className="flex">
-                        <img
-                            loading="lazy"
-                            srcSet="https://cdn.builder.io/api/v1/image/assets/TEMP/a2758d7ad32116641a3bd296aad2b425b0a9d0443b83ec872806161d796888dd?apiKey=f537c5c71a7b442c975ebf88445457b6&width=100 100w, https://cdn.builder.io/api/v1/image/assets/TEMP/a2758d7ad32116641a3bd296aad2b425b0a9d0443b83ec872806161d796888dd?apiKey=f537c5c71a7b442c975ebf88445457b6&width=200 200w, https://cdn.builder.io/api/v1/image/assets/TEMP/a2758d7ad32116641a3bd296aad2b425b0a9d0443b83ec872806161d796888dd?apiKey=f537c5c71a7b442c975ebf88445457b6&width=400 400w, https://cdn.builder.io/api/v1/image/assets/TEMP/a2758d7ad32116641a3bd296aad2b425b0a9d0443b83ec872806161d796888dd?apiKey=f537c5c71a7b442c975ebf88445457b6&width=800 800w, https://cdn.builder.io/api/v1/image/assets/TEMP/a2758d7ad32116641a3bd296aad2b425b0a9d0443b83ec872806161d796888dd?apiKey=f537c5c71a7b442c975ebf88445457b6&width=1200 1200w, https://cdn.builder.io/api/v1/image/assets/TEMP/a2758d7ad32116641a3bd296aad2b425b0a9d0443b83ec872806161d796888dd?apiKey=f537c5c71a7b442c975ebf88445457b6&width=1600 1600w, https://cdn.builder.io/api/v1/image/assets/TEMP/a2758d7ad32116641a3bd296aad2b425b0a9d0443b83ec872806161d796888dd?apiKey=f537c5c71a7b442c975ebf88445457b6&width=2000 2000w, https://cdn.builder.io/api/v1/image/assets/TEMP/a2758d7ad32116641a3bd296aad2b425b0a9d0443b83ec872806161d796888dd?apiKey=f537c5c71a7b442c975ebf88445457b6&"
-                            className="shrink-0 rounded aspect-[1.23] w-[26px]"
-                        />
-                        <img
-                            loading="lazy"
-                            srcSet="https://cdn.builder.io/api/v1/image/assets/TEMP/7c968d46e2f621466876c121a20dcf961534772076b5186c42a9ecd765c7bf39?apiKey=f537c5c71a7b442c975ebf88445457b6&width=100 100w, https://cdn.builder.io/api/v1/image/assets/TEMP/7c968d46e2f621466876c121a20dcf961534772076b5186c42a9ecd765c7bf39?apiKey=f537c5c71a7b442c975ebf88445457b6&width=200 200w, https://cdn.builder.io/api/v1/image/assets/TEMP/7c968d46e2f621466876c121a20dcf961534772076b5186c42a9ecd765c7bf39?apiKey=f537c5c71a7b442c975ebf88445457b6&width=400 400w, https://cdn.builder.io/api/v1/image/assets/TEMP/7c968d46e2f621466876c121a20dcf961534772076b5186c42a9ecd765c7bf39?apiKey=f537c5c71a7b442c975ebf88445457b6&width=800 800w, https://cdn.builder.io/api/v1/image/assets/TEMP/7c968d46e2f621466876c121a20dcf961534772076b5186c42a9ecd765c7bf39?apiKey=f537c5c71a7b442c975ebf88445457b6&width=1200 1200w, https://cdn.builder.io/api/v1/image/assets/TEMP/7c968d46e2f621466876c121a20dcf961534772076b5186c42a9ecd765c7bf39?apiKey=f537c5c71a7b442c975ebf88445457b6&width=1600 1600w, https://cdn.builder.io/api/v1/image/assets/TEMP/7c968d46e2f621466876c121a20dcf961534772076b5186c42a9ecd765c7bf39?apiKey=f537c5c71a7b442c975ebf88445457b6&width=2000 2000w, https://cdn.builder.io/api/v1/image/assets/TEMP/7c968d46e2f621466876c121a20dcf961534772076b5186c42a9ecd765c7bf39?apiKey=f537c5c71a7b442c975ebf88445457b6&"
-                            className="shrink-0 rounded-none aspect-[1.23] w-[26px]"
-                        />
-                    </div>
-                    <div className="flex gap-2 p-1.5 text-xs leading-4 text-center text-black rounded bg-zinc-300">
-                        <div className="grow">last modified</div>
-                        <img
-                            loading="lazy"
-                            src="https://cdn.builder.io/api/v1/image/assets/TEMP/8744c7abfce57fdf1901bd5cffbe12851185e9fb4c9749114d01477bf97db232?apiKey=f537c5c71a7b442c975ebf88445457b6&"
-                            className="shrink-0 w-3 aspect-square"
-                        />
-                    </div>
-                </div>
-            </div>
-            <div className="mt-5">
-                {/* <Grid></Grid> */}
-                <Table></Table>
-            </div>
+  const [sortType, setSortType] = useState("table");
+  const [sortSelect, setSortSelect] = useState("lastModified");
+  // search
+  const [searchInput, setSearchInput] = useState("");
+  const [selectedRows, setSelectedRows] = React.useState([]);
+
+  const tableRef = useRef(null);
+
+  return (
+    <div className="flex flex-col w-full">
+      <ContentBar
+        searchInput={searchInput}
+        setSearchInput={setSearchInput}
+        selectedRows={selectedRows}
+        tableRef={tableRef}
+      ></ContentBar>
+      <div className="flex justify-between gap-5 mt-5 w-full max-md:flex-wrap">
+        <div className="text-xl font-semibold  text-center text-black">
+          Projects Dashboard
         </div>
-    );
-}
+        <div className="flex gap-3.5">
+          <div className="grow my-auto text-base font-medium text-center text-black">
+            Sort By
+          </div>
+          <div className="flex rounded bg-gray-200 overflow-hidden">
+            <Tooltip title="Table">
+              <div
+                className={`flex items-center justify-center w-7 h-7 cursor-pointer ${
+                  sortType === "table" ? "bg-green-400" : ""
+                }`}
+                onClick={() => setSortType("table")}
+              >
+                <img src={tableSvg} alt="Table View" className="w-5 h-5" />
+              </div>
+            </Tooltip>
+            <Tooltip title="Grid">
+              <div
+                className={`flex items-center justify-center w-7 h-7 cursor-pointer ${
+                  sortType === "grid" ? "bg-green-400" : ""
+                }`}
+                onClick={() => setSortType("grid")}
+              >
+                <img src={gridSvg} alt="Grid View" className="w-5 h-5" />
+              </div>
+            </Tooltip>
+          </div>
+          <div className="relative inline-block text-gray-700">
+            <select
+              value={sortSelect}
+              onChange={(event) => setSortSelect(event.target.value)}
+              className="appearance-none bg-gray-200 border border-gray-300 text-gray-700 pl-1 pr-5 rounded focus:outline-none py-[0.05rem]"
+            >
+              <option value="lastModified">last modified</option>
+              <option value="id">Id</option>
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+              <img src={expandSvg} alt="expand" />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="mt-5 ">
+        {sortType == "table" ? (
+          <Table
+            sortSelect={sortSelect}
+            searchInput={searchInput}
+            setSelectedRows={setSelectedRows}
+            ref={tableRef}
+          ></Table>
+        ) : (
+          <Grid
+            sortSelect={sortSelect}
+            searchInput={searchInput}
+            setSelectedRows={setSelectedRows}
+          ></Grid>
+        )}
+      </div>
+    </div>
+  );
+};
 
 export default Content;

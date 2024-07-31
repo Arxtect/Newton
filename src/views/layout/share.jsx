@@ -24,7 +24,10 @@ const Share = forwardRef(({ rootPath, user }, ref) => {
   const controlShare = async () => {
     const info = await getProjectInfo(rootPath);
     if (info.userId && info.userId != user.id) {
-      toast.warning("This project is collaborative and cannot be shared");
+      await navigator.clipboard.writeText(link);
+      toast.warning(
+        "This project is collaborative and cannot be shared, link copied to clipboard"
+      );
       return;
     }
     if (!user || JSON.stringify(user) === "{}") {

@@ -70,6 +70,7 @@ export const useFileStore = create()(
       // Actions
       setAutosave: (autosave) => set({ autosave }),
       loadFile: async ({ filepath }) => {
+        if (!filepath) return;
         const { editor } = useEditor.getState();
         const fileContent = await FS.readFile(filepath);
 
