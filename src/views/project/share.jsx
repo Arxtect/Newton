@@ -9,6 +9,7 @@ import { TextField, Box } from "@mui/material";
 import { toast } from "react-toastify";
 import { ProjectSync } from "@/convergence";
 import { useFileStore } from "store";
+import { getYDocToken } from "services";
 
 const Share = ({
   dialogOpen,
@@ -34,9 +35,14 @@ const Share = ({
   const handleCancelProject = () => {
     setDialogOpen(false);
   };
-
+  const getYDocTokenReq = async () => {
+    const token = await getYDocToken();
+    console.log(token, "token");
+    return token;
+  };
   const createProjectSync = async (rootPath, user) => {
-    const projectSync = await new ProjectSync(rootPath, user, user.id);
+    const token = await getYDocTokenReq();
+    const projectSync = await new ProjectSync(rootPath, user, user.id, token);
     projectSync.syncFolderToYMapRootPath(getProjectList);
   };
 

@@ -17,6 +17,7 @@ import { ProjectSync } from "@/convergence";
 import { getProjectInfo } from "domain/filesystem";
 import { updateDialogLoginOpen, useUserStore, useFileStore } from "@/store";
 import share from "@/assets/share.svg";
+import { getYDocToken } from "services";
 
 const Share = forwardRef(({ rootPath, user }, ref) => {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -60,9 +61,15 @@ const Share = forwardRef(({ rootPath, user }, ref) => {
   const handleCancelProject = () => {
     setDialogOpen(false);
   };
+  const getYDocTokenReq = async () => {
+    const token = await getYDocToken();
+    console.log(token, "token");
+    return token;
+  };
 
   const createProjectSync = async (rootPath, user) => {
-    const projectSync = new ProjectSync(rootPath, user, user.id);
+    const token = await getYDocTokenReq();
+    const projectSync = new ProjectSync(rootPath, user, user.id, token);
     updateProjectSync(projectSync);
     await projectSync.syncFolderToYMapRootPath();
     setTimeout(() => {

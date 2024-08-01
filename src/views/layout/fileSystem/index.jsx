@@ -11,6 +11,7 @@ import { useFileStore, useUserStore } from "store";
 import { ProjectSync } from "@/convergence";
 import RightBeforeLeft from "@/views/layout/rightBeforeLeft";
 import { useAuth } from "@/useHooks";
+import { getYDocToken } from "services";
 
 const FileSystem = () => {
   const {
@@ -88,7 +89,11 @@ const FileSystem = () => {
   const toggleDrawer = (open) => {
     setIsOpen(open);
   };
-
+  const getYDocTokenReq = async () => {
+    const token = await getYDocToken();
+    console.log(token, "token");
+    return token;
+  };
   const initShareProject = async () => {
     const projectInfo = await getProjectInfo(currentProjectRoot);
 
@@ -97,7 +102,8 @@ const FileSystem = () => {
     const isSync = projectInfo?.["isSync"];
 
     if (!isSync || !project || !roomId) return;
-    const projectSync = await new ProjectSync(project, user, roomId);
+    const token = await getYDocTokenReq();
+    const projectSync = await new ProjectSync(project, user, roomId, token);
     updateProjectSync(projectSync);
   };
 

@@ -10,10 +10,11 @@ import { debounce } from "@/util";
 
 const host = window.location.hostname;
 const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-const wsUrl = `wss://arxtect.com/websockets`;
+// const wsUrl = `wss://arxtect.com/websockets`;
+const wsUrl = `ws://10.10.101.126:8013`;
 
 class ProjectSync {
-  constructor(rootPath, user, roomId, otherOperation) {
+  constructor(rootPath, user, roomId, token, otherOperation) {
     this.folderMapName = `${rootPath}_folder_map_list_${roomId}`;
     this.rootPath = rootPath;
     this.roomId = roomId;
@@ -21,7 +22,8 @@ class ProjectSync {
     this.websocketProvider = new WebsocketProvider(
       wsUrl,
       this.rootPath + this.roomId,
-      this.yDoc
+      this.yDoc,
+      { params: { yauth: token } }
     );
     this.user = {
       ...user,
@@ -194,7 +196,6 @@ class ProjectSync {
 
   // 同步整个文件夹到 Yjs Map
   async syncFolderToYMap(folderPath) {
-
     try {
       this.syncFolderInfo(folderPath);
       const files = await FS.readFileStats(folderPath, false);
@@ -216,7 +217,6 @@ class ProjectSync {
       throw err;
     }
   }
-
 
   debouncedRepoChanged = debounce(() => {
     useFileStore.getState().repoChanged();

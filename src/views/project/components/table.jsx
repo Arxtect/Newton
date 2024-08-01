@@ -31,6 +31,7 @@ import renameSvg from "@/assets/project/rename.svg";
 import shareSvg from "@/assets/project/share.svg";
 import downloadPdfSvg from "@/assets/project/downloadPdf.svg";
 import "./index.scss";
+import { getYDocToken } from "services";
 
 const Table = forwardRef(
   ({ setSelectedRows, getProjectList, projectData, sortedRows, auth }, ref) => {
@@ -364,12 +365,18 @@ const Table = forwardRef(
       setSyncParams({ roomId, project: syncProjectName });
       setSyncDialogOpen(true);
     };
-
+    const getYDocTokenReq = async () => {
+      const token = await getYDocToken();
+      console.log(token, "token");
+      return token;
+    };
     const handleConfirmSync = async () => {
+      const token = await getYDocTokenReq();
       const projectSync = new ProjectSync(
         syncParams.project,
         user,
         syncParams.roomId,
+        token,
         getProjectList
       );
       await projectSync.setObserveHandler();

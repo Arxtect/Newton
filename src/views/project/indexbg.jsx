@@ -46,6 +46,7 @@ import { formatDate } from "@/util";
 import { ProjectSync } from "@/convergence";
 import { useUserStore, useLoginStore } from "@/store";
 import Share from "./share";
+import { getYDocToken } from "services";
 
 function Project() {
   const navigate = useNavigate();
@@ -454,11 +455,18 @@ function Project() {
     setSyncDialogOpen(true);
   };
 
+  const getYDocTokenReq = async () => {
+    const token = await getYDocToken();
+    console.log(token, "token");
+    return token;
+  };
   const handleConfirmSync = async () => {
+    const token = await getYDocTokenReq();
     const projectSync = new ProjectSync(
       syncParams.project,
       user,
       syncParams.roomId,
+      token,
       getProjectList
     );
     await projectSync.setObserveHandler();

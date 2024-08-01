@@ -8,7 +8,6 @@ function getApiUrl(endpoint) {
   return `/api/v1${endpoint}`;
 }
 
-
 // 注册用户
 export async function registerUser(userData) {
   const response = await fetch(getApiUrl("/auth/register"), {
@@ -47,6 +46,22 @@ export async function loginUser(credentials) {
     return data;
   } else {
     throw new Error("Login failed");
+  }
+}
+
+export async function getYDocToken() {
+  const response = await fetch(getApiUrl("/auth/token"), {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (response.ok) {
+    const data = await response.json();
+    return data.token;
+  } else {
+    throw new Error("Get share token failed");
   }
 }
 
@@ -168,7 +183,11 @@ export async function forgotPassword(email) {
 }
 
 // 重置密码
-export async function resetPassword({ resetToken, password, password_confirm }) {
+export async function resetPassword({
+  resetToken,
+  password,
+  password_confirm,
+}) {
   const response = await fetch(getApiUrl(`/auth/resetpassword/${resetToken}`), {
     method: "PATCH",
     headers: {
