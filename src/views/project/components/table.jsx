@@ -20,12 +20,10 @@ import { useUserStore, useLoginStore, useFileStore } from "@/store";
 import { formatDate } from "@/util";
 import { ProjectSync } from "@/convergence";
 import ArDialog from "@/components/arDialog";
-import NewProject from "../newProject";
-import UploadProject from "../uploadProject";
+
 import CopyProject from "../copyProject";
 import RenameProject from "../renameProject";
 import Share from "../share";
-
 import copySvg from "@/assets/project/copy.svg";
 import deleteSvg from "@/assets/project/delete.svg";
 import downloadSvg from "@/assets/project/download.svg";
@@ -35,7 +33,7 @@ import downloadPdfSvg from "@/assets/project/downloadPdf.svg";
 import "./index.scss";
 
 const Table = forwardRef(
-  ({ sortSelect, searchInput, selectedRows = [], setSelectedRows }, ref) => {
+  ({ setSelectedRows, getProjectList, projectData, sortedRows, auth }, ref) => {
     const navigate = useNavigate();
     const {
       projectLists,
@@ -52,7 +50,6 @@ const Table = forwardRef(
       getCurrentProjectPdf: state.getCurrentProjectPdf,
       initFile: state.initFile,
     }));
-    const [projectData, setProjectData] = useState([]);
 
     const { user, accessToken } = useUserStore((state) => ({
       user: state.user,
@@ -66,36 +63,6 @@ const Table = forwardRef(
       })
     );
 
-    const getProjectList = async (currentSelectMenu) => {
-      console.log(currentSelectMenu, "currentSelectMenu");
-      const project = await findAllProjectInfo();
-
-      console.log(project, "project");
-      setProjectData(
-        project
-          .map((item, index) => {
-            if (
-              currentSelectMenu == 3 &&
-              (item?.userId == user?.id || !item?.isSync)
-            ) {
-              return null;
-            }
-            if (
-              currentSelectMenu == 2 &&
-              item?.userId &&
-              item?.userId != user?.id
-            ) {
-              return null;
-            }
-            return {
-              id: index + 1,
-              ...item,
-            };
-          })
-          .filter((item) => item !== null)
-      );
-    };
-
     // 根据父容器宽度计算列宽度
 
     const handleSelection = (selectedIDs) => {
@@ -104,11 +71,6 @@ const Table = forwardRef(
       );
       setSelectedRows(selectedRowData);
     };
-
-    //new project
-
-    const [newDialogOpen, setNewDialogOpen] = useState(false);
-    const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
 
     // delete project
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -171,16 +133,6 @@ const Table = forwardRef(
       setTimeout(() => {
         URL.revokeObjectURL(blobUrl);
       }, 30000);
-    };
-
-    const auth = (condition, callback) => {
-      if (condition) {
-        toast.warning("Nonanonymous project，Please login first");
-        updateDialogLoginOpen(true);
-        updateOtherOperation(callback);
-        return true;
-      }
-      return false;
     };
 
     //rename project
@@ -401,22 +353,6 @@ const Table = forwardRef(
       return () => window.removeEventListener("resize", updateColumns);
     }, []);
 
-    // slider menu
-    const [currentSelectMenu, setCurrentSelectMenu] = useState(1);
-    const [currentSelectMenuTitle, setCurrentSelectMenuTitle] = useState("");
-
-    const sliderRef = useRef(null);
-
-    const handleCurrentSelectMenu = (id) => {
-      setCurrentSelectMenu(id);
-      setCurrentSelectMenuTitle(sliderRef.current.getMainMenuTitleViaId(id));
-    };
-    //   useEffect(() => {
-    //     setCurrentSelectMenuTitle(
-    //       sliderRef.current.getMainMenuTitleViaId(currentSelectMenu)
-    //     );
-    //   }, []);
-
     // sync project
     const [projectSync, setProjectSync] = useState(null);
 
@@ -479,30 +415,9 @@ const Table = forwardRef(
       };
     }, []);
 
-    useEffect(() => {
-      getProjectList(currentSelectMenu);
-    }, [currentSelectMenu]);
-
-    const sortedRows = useMemo(() => {
-      console.log("sortedRows", sortSelect);
-      return [...projectData]
-        .filter((data) => data.title.includes(searchInput))
-        .sort((a, b) => {
-          if (sortSelect === "lastModified") {
-            return b.lastModified - a.lastModified;
-          } else if (sortSelect === "id") {
-            return a.id - b.id;
-          }
-          return 0;
-        });
-    }, [projectData, searchInput, sortSelect]);
-
     useImperativeHandle(ref, () => ({
       handleCopy,
       handleRename,
-      getProjectList,
-      auth,
-      user,
     }));
 
     return (
@@ -524,16 +439,16 @@ const Table = forwardRef(
           onCellDoubleClick={(params) => console.log(params)}
           rowHeight={40}
           columnHeaderHeight={50}
+          sx={{
+            "& .MuiDataGrid-footerContainer": {
+              minHeight: 40,
+            },
+            "& .MuiTablePagination-toolbar": {
+              minHeight: 40,
+            },
+          }}
         />
-        <NewProject
-          dialogOpen={newDialogOpen}
-          setDialogOpen={setNewDialogOpen}
-        />
-        <UploadProject
-          dialogOpen={uploadDialogOpen}
-          setDialogOpen={setUploadDialogOpen}
-          user={user}
-        />
+
         <CopyProject
           dialogOpen={copyDialogOpen}
           setDialogOpen={setCopyDialogOpen}
@@ -548,6 +463,13 @@ const Table = forwardRef(
           setSourceProject={setRenameSourceProject}
           getProjectList={getProjectList}
         />
+        <Share
+          dialogOpen={shareDialogOpen}
+          setDialogOpen={setShareDialogOpen}
+          rootPath={shareProjectName}
+          user={user}
+          getProjectList={getProjectList}
+        ></Share>
         <ArDialog
           title="Delete Project"
           dialogOpen={deleteDialogOpen}
@@ -572,13 +494,6 @@ const Table = forwardRef(
           Whether to enter the collaboration project:
           <span className="text-red-500 mr-1">{syncParams.project}</span>
         </ArDialog>
-        <Share
-          dialogOpen={shareDialogOpen}
-          setDialogOpen={setShareDialogOpen}
-          rootPath={shareProjectName}
-          user={user}
-          getProjectList={getProjectList}
-        ></Share>
       </div>
     );
   }

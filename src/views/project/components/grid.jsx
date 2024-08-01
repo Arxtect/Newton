@@ -1,64 +1,46 @@
-import * as React from "react";
-import ContentBar from "./contentBar"
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
-
-const Grid = () => {
-    return (
-        <div>
-            <div className="flex gap-5 items-start text-base leading-4 text-center text-black max-md:flex-wrap max-md:mt-10 max-md:max-w-full">
-                <div className="flex flex-col flex-1 mt-1.5">
-                    <div className="shrink-0 bg-zinc-300 h-[178px]" />
-                    <div className="self-center mt-3">File Name</div>
-                </div>
-                <div className="flex flex-col flex-1 mt-1.5">
-                    <div className="shrink-0 bg-zinc-300 h-[178px]" />
-                    <div className="self-center mt-3">File Name</div>
-                </div>
-                <div className="flex flex-col flex-1 mt-2">
-                    <div className="shrink-0 bg-zinc-300 h-[178px]" />
-                    <div className="self-center mt-3">File Name</div>
-                </div>
-                <div className="flex flex-col flex-1 mt-1.5">
-                    <div className="shrink-0 bg-zinc-300 h-[178px]" />
-                    <div className="self-center mt-3">File Name</div>
-                </div>
-                <div className="flex flex-col flex-1 self-stretch my-auto">
-                    <div className="shrink-0 bg-zinc-300 h-[178px]" />
-                    <div className="self-center mt-3">File Name</div>
-                </div>
-                <div className="flex flex-col flex-1">
-                    <div className="shrink-0 bg-zinc-300 h-[178px]" />
-                    <div className="self-center mt-3">File Name</div>
-                </div>
+const Grid = ({ sortedRows, auth, user, changeCurrentProjectRoot }) => {
+  const navigate = useNavigate();
+  return (
+    <div>
+      <div className="grid grid-cols-6 gap-5 items-start text-base leading-4 text-center text-black max-md:grid-cols-1 max-md:mt-10 max-md:max-w-full">
+        {[...sortedRows].map((item) => {
+          return (
+            <div
+              className="flex flex-col flex-1 mt-1.5 cursor-pointer"
+              key={item.id}
+              onClick={async (e) => {
+                const isAuth = auth(
+                  item.name != "YOU" &&
+                    (!user || JSON.stringify(user) === "{}"),
+                  () => {
+                    e.stopPropagation();
+                    changeCurrentProjectRoot({
+                      projectRoot: item.title,
+                    });
+                    navigate(`/newton`);
+                  }
+                );
+                if (isAuth) return;
+                e.stopPropagation();
+                changeCurrentProjectRoot({
+                  projectRoot: item.title,
+                });
+                navigate(`/newton`);
+              }}
+            >
+              <div className="shrink-0 bg-zinc-300 h-[178px]" />
+              <div className="self-center mt-3 hover:text-[#81c784] hover:underline">
+                {item.title}
+              </div>
             </div>
-            <div className="flex gap-5 items-start mt-5 text-base leading-4 text-center text-black max-md:flex-wrap max-md:mt-10 max-md:max-w-full">
-                <div className="flex flex-col flex-1 mt-1.5">
-                    <div className="shrink-0 bg-zinc-300 h-[178px]" />
-                    <div className="self-center mt-3">File Name</div>
-                </div>
-                <div className="flex flex-col flex-1 mt-1.5">
-                    <div className="shrink-0 bg-zinc-300 h-[178px]" />
-                    <div className="self-center mt-3">File Name</div>
-                </div>
-                <div className="flex flex-col flex-1 mt-2">
-                    <div className="shrink-0 bg-zinc-300 h-[178px]" />
-                    <div className="self-center mt-3">File Name</div>
-                </div>
-                <div className="flex flex-col flex-1 mt-1.5">
-                    <div className="shrink-0 bg-zinc-300 h-[178px]" />
-                    <div className="self-center mt-3">File Name</div>
-                </div>
-                <div className="flex flex-col flex-1 self-stretch my-auto">
-                    <div className="shrink-0 bg-zinc-300 h-[178px]" />
-                    <div className="self-center mt-3">File Name</div>
-                </div>
-                <div className="flex flex-col flex-1">
-                    <div className="shrink-0 bg-zinc-300 h-[178px]" />
-                    <div className="self-center mt-3">File Name</div>
-                </div>
-            </div>
-        </div>
-    );
-}
+          );
+        })}
+      </div>
+    </div>
+  );
+};
 
 export default Grid;
