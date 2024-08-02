@@ -10,6 +10,8 @@ import shareProjectSvg from "@/assets/project/shareProject.svg";
 import categorySvg from "@/assets/project/category.svg";
 import newProjectSvg from "@/assets/project/newProject.svg";
 import trashSvg from "@/assets/project/trash.svg";
+import gitCloudSvg from "@/assets/project/gitCloud.svg";
+
 import ArMenuRadix from "@/components/arMenuRadix";
 
 const menuItems = [
@@ -26,6 +28,7 @@ const menuItems = [
     icon: shareProjectSvg,
   },
   { key: "trash", label: "Trash", icon: trashSvg },
+  { key: "git", label: "Git Cloud", icon: gitCloudSvg },
   { key: "category", label: "Project Category", icon: categorySvg },
 ];
 
@@ -61,7 +64,7 @@ const Slide = ({ contentRef }) => {
               buttonCom={
                 <div
                   key={item.key}
-                  className={`flex gap-5 px-5 py-3 rounded-2xl my-1 h-14 text-[1rem] items-center $ cursor-pointer`}
+                  className={`flex gap-5 px-5 py-3 rounded-2xl h-14 text-[1rem] items-center $ cursor-pointer`}
                 >
                   <img src={item.icon} className="w-6" />
                   <div>{item.label}</div>

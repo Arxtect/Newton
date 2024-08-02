@@ -12,6 +12,7 @@ import { ProjectSync } from "@/convergence";
 import RightBeforeLeft from "@/views/layout/rightBeforeLeft";
 import { useAuth } from "@/useHooks";
 import { getYDocToken } from "services";
+import { gitCloneGitea } from "./gitclone";
 
 const FileSystem = () => {
   const {
@@ -70,7 +71,6 @@ const FileSystem = () => {
     updateProjectSync: state.updateProjectSync,
   }));
 
-
   const getAllProject = async () => {
     let projectLists = await findAllProject(".");
     if (projectLists.length > 0) {
@@ -78,7 +78,7 @@ const FileSystem = () => {
       updateAllProject(projectLists);
     }
   };
-  
+
   const { user } = useUserStore((state) => ({
     user: state.user,
   }));

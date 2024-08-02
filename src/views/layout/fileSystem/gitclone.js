@@ -43,6 +43,27 @@ const gitClone = async () => {
   });
 };
 
+const gitCloneGitea = async () => {
+  const clonePath = "http://localhost:3000/git/devin/test1123.git";
+  const match = clonePath.match(/\/([^\/]+)\/([^\/]+)\.git$/);
+
+  if (!match) {
+    console.error("Invalid repository URL");
+    return;
+  }
+
+  const user = match[1];
+  const repo = match[2];
+  console.log(repo, "repo");
+  const destPath = path.join("/", repo);
+  console.log(destPath, "destPath");
+
+  await cloneRepository(destPath, clonePath, {
+    singleBranch: true,
+    token: "1f6678fb4022f33f98dbd06e45d454b659e220e2",
+  });
+};
+
 const linkRepo = async () => {
   // 使用示例
   const projectRoot = "/arxtect";
@@ -90,4 +111,4 @@ const gitPush = async (projectRoot) => {
   console.log("push success, branch main.");
 };
 
-export { gitClone, linkRepo, commitFile, gitPush };
+export { gitClone, linkRepo, commitFile, gitPush, gitCloneGitea };

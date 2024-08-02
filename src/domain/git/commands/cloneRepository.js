@@ -1,3 +1,8 @@
+/*
+ * @Description:
+ * @Author: Devin
+ * @Date: 2024-05-28 13:48:03
+ */
 import delay from "delay";
 import { EventEmitter } from "events";
 import * as git from "isomorphic-git";
@@ -24,7 +29,7 @@ export async function cloneRepository(projectRoot, cloneDest, options) {
   const clonePromise = git.clone({
     dir: projectRoot,
     url: cloneDest, //https://github.com/devixyz/wasm-git-demo.git
-    // ref: "master",
+    ref: "main",
     emitter,
     ...options,
   });

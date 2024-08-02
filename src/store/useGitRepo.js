@@ -7,6 +7,7 @@ import * as git from "isomorphic-git";
 import * as Git from "domain/git";
 import { useFileStore, startUpdate } from "./useFileStore";
 import { toast } from "react-toastify";
+import fs from "fs";
 
 export const GIT_STORE = "git_store";
 
@@ -121,7 +122,14 @@ export const useGitRepo = create()(
         const history = await Git.getHistory(projectRoot, {
           ref: currentBranch,
         });
-        const statusMatrix = await git.statusMatrix({ dir: projectRoot });
+        console.log(
+          currentBranch,
+          branches,
+          remotes,
+          remoteBranches,
+          "currentBranch"
+        );
+        const statusMatrix = await git.statusMatrix({ fs, dir: projectRoot });
         get().endInitialize({
           history,
           currentBranch,
@@ -152,7 +160,7 @@ export const useGitRepo = create()(
         const state = get();
         await Git.deleteBranch(projectRoot, branch);
         if (state.currentBranch === branch) {
-          await Git.checkoutBranch(projectRoot, "master");
+          await Git.checkoutBranch(projectRoot, "main");
         }
         const { branches, currentBranch } = await Git.getBranchStatus(
           projectRoot
@@ -226,7 +234,7 @@ export const useGitRepo = create()(
       updateStatusMatrixOnSaveFile: async ({ projectRoot }) => {
         try {
           let isExists = await existsPath(path.join(projectRoot, ".git"));
-          console.log(isExists, 'isExists')
+          console.log(isExists, "isExists");
           if (!isExists) {
             return;
           }
@@ -238,7 +246,7 @@ export const useGitRepo = create()(
           );
           set({ statusMatrix: newMat });
         } catch (e) {
-          console.log(e, 'updateStatusMatrixOnSaveFile')
+          console.log(e, "updateStatusMatrixOnSaveFile");
         }
       },
       pushCurrentBranchToOrigin: async () => {

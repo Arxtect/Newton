@@ -126,6 +126,11 @@ module.exports = function (proxy, allowedHost) {
         changeOrigin: true,
         pathRewrite: { "^/minio": "" },
       },
+      "/git": {
+        target: "http://10.10.101.126:3006",
+        changeOrigin: true,
+        pathRewrite: { "^/git": "" },
+      },
     },
     onBeforeSetupMiddleware(devServer) {
       // Keep `evalSourceMapMiddleware`

@@ -86,6 +86,9 @@ const Content = React.forwardRef((props, ref) => {
           if (currentSelectMenu == "category") {
             return null;
           }
+          if (currentSelectMenu == "git") {
+            return null;
+          }
           if (
             currentSelectMenu == "shared" &&
             (item?.userId == user?.id || !item?.isSync)
