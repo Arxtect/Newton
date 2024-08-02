@@ -69,6 +69,8 @@ const FileSystem = () => {
     projectSync: state.projectSync,
     updateProjectSync: state.updateProjectSync,
   }));
+
+
   const getAllProject = async () => {
     let projectLists = await findAllProject(".");
     if (projectLists.length > 0) {
@@ -76,6 +78,7 @@ const FileSystem = () => {
       updateAllProject(projectLists);
     }
   };
+  
   const { user } = useUserStore((state) => ({
     user: state.user,
   }));
@@ -156,4 +159,4 @@ const FileSystem = () => {
   );
 };
 
-export default React.memo(FileSystem);
+export default FileSystem;

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import download from "@/assets/download.svg";
 import down from "@/assets/down.svg";
 import review from "@/assets/review.svg";
@@ -41,7 +41,6 @@ const TopBar = (props) => {
     const colors = ["#4caf4f", "#adaf4c", "#1bbcfe", "#9c5fd9", "#ff9a9e"];
     return colors[i ?? colors.length - 1];
   }
-  const collaborators = ["AA", "cc", "aa", "ss", "aa", "a"];
 
   const handleClick = (type) => {
     switch (type) {
@@ -67,6 +66,10 @@ const TopBar = (props) => {
     { key: "Download", src: download, label: "", click: handleClick },
     { key: "More", src: down, label: "", click: handleClick },
   ];
+
+  useEffect(() => {
+    console.log(projectSync?.userList);
+  }, [projectSync?.userList]);
 
   return (
     <div className="flex items-center justify-between p-2 bg-[#f9fdfd]">
@@ -113,35 +116,39 @@ const TopBar = (props) => {
             );
           })}
         </div>
-        <div className="flex items-center">
-          {collaborators.slice(0, maxDisplayCount).map((name, index) => (
-            <div
-              key={index}
-              className="relative rounded-full w-8 h-8 flex items-center justify-center border-2 border-white"
-              style={{
-                backgroundColor: getRandomColor(index),
-                marginLeft: index === 0 ? "0" : "-0.5rem", // Adjust the overlap
-                zIndex: 100 - index,
-              }}
-              title={name}
-            >
-              <span className="text-white text-xs">
-                {name.charAt(0).toUpperCase()}
-              </span>
-            </div>
-          ))}
-          {collaborators.length > maxDisplayCount && (
-            <div
-              className="rounded-full w-8 h-8 flex items-center justify-center border-2 border-white"
-              style={{
-                backgroundColor: getRandomColor(),
-                marginLeft: "-0.5rem", // Adjust the overlap
-              }}
-            >
-              <img src={ellipsis} alt="" />
-            </div>
-          )}
-        </div>
+        {!!projectSync && (
+          <div className="flex items-center">
+            {projectSync?.userList
+              .slice(0, maxDisplayCount)
+              .map((user, index) => (
+                <div
+                  key={user.id}
+                  className="relative rounded-full w-8 h-8 flex items-center justify-center border-2 border-white"
+                  style={{
+                    backgroundColor: getRandomColor(index),
+                    marginLeft: index === 0 ? "0" : "-0.5rem", // Adjust the overlap
+                    zIndex: 100 - index,
+                  }}
+                  title={user.name}
+                >
+                  <span className="text-white text-xs">
+                    {user.name.charAt(0).toUpperCase()}
+                  </span>
+                </div>
+              ))}
+            {projectSync?.userList?.length > maxDisplayCount && (
+              <div
+                className="rounded-full w-8 h-8 flex items-center justify-center border-2 border-white"
+                style={{
+                  backgroundColor: getRandomColor(),
+                  marginLeft: "-0.5rem", // Adjust the overlap
+                }}
+              >
+                <img src={ellipsis} alt="" />
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

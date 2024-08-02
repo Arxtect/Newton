@@ -26,7 +26,7 @@ import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-import { useFileStore, getInitialState } from "store";
+import { useFileStore } from "store";
 import {
   findAllProjectInfo,
   downloadDirectoryAsZip,

@@ -60,29 +60,10 @@ const ContentTopBar = (props) => {
     startDirCreating: state.startDirCreating,
     currentSelectDir: state.currentSelectDir,
     updateDirOpen: state.updateDirOpen,
-    reload: state.reload,
+    reload: state.repoChanged,
   }));
 
   const compile = () => compileLatex(sourceCode, currentProjectRoot);
-
-  const widthOption = [
-    {
-      value: "100%",
-      name: "100%",
-    },
-    {
-      value: "75%",
-      name: "75%",
-    },
-    {
-      value: "50%",
-      name: "50%",
-    },
-    {
-      value: "25%",
-      name: "25%",
-    },
-  ];
 
   const handleActionClick = (key) => {
     switch (key) {
@@ -213,36 +194,6 @@ const ContentTopBar = (props) => {
           <EngineStatus className="text-[12px]" />
         </button>
         <div className="flex items-center space-x-2">
-          {/* <Select
-            labelId="tag-label"
-            id="demo-simple-select"
-            variant="outlined"
-            value="100%"
-            sx={{
-              height: "24px",
-              minWidth: "70px",
-              padding: "0",
-              textAlign: "center",
-            }}
-            MenuProps={{
-              PaperProps: {
-                style: {
-                  textAlign: "center",
-                },
-              },
-            }}
-          >
-            {widthOption.map((option) => (
-              <MenuItem
-                key={option.name}
-                value={option.name}
-                sx={{ padding: "2px 10px" }}
-              >
-                {option.name}
-              </MenuItem>
-            ))}
-          </Select> */}
-
           <Tooltip title={"Preview"}>
             <IconButton
               color="#inherit"

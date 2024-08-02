@@ -198,8 +198,7 @@ export class AceBinding {
     this.mux = mux;
     this.aceCursors = null;
     this.added = [];
-    this.updated = [];
-    this.removed = [];
+    this.userList = [];
 
     this.awareness = awareness;
     this.handleAwarenessChange = async (ace, notUpdateSelf = true) => {

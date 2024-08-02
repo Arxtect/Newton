@@ -7,6 +7,7 @@ import { AceBinding } from "./ace-binding"; // 导入AceBinding
 import { uploadFile, downloadFile } from "./minio";
 import { assetExtensions } from "@/util";
 import { debounce } from "@/util";
+import { Awareness } from "y-protocols/awareness.js"; // eslint-disable-line
 
 const host = window.location.hostname;
 const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
@@ -45,6 +46,31 @@ class ProjectSync {
 
     // 保存当前的观察者句柄
     this.currentObserver = null;
+    this.awareness.on("change", this.getUserList.bind(this));
+  }
+
+  getUserList({ added, removed, updated }) {
+    const states = /** @type {Awareness} */ (this.awareness).getStates();
+
+    // 初始化一个 Set 来存储唯一的用户
+    let uniqueUsers = [];
+    let currentUsersId = [];
+
+    for (let [id, state] of states) {
+      console.log(state, "state"); // 输出每个 state 对象
+      if (state && state.user) {
+        if (!currentUsersId.includes(state.user.id)) {
+          currentUsersId.push(state.user.id);
+          uniqueUsers.push(state.user); // 使用 JSON 字符串来确保对象的唯一性
+        }
+      }
+    }
+
+    // 将 Set 转换为数组，并解析 JSON 字符串回对象
+    this.userList = uniqueUsers;
+
+    // 输出最终的用户列表
+    console.log("User List:", this.userList);
   }
 
   // set observe handler

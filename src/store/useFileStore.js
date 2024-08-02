@@ -12,7 +12,7 @@ import { ProjectSync } from "@/convergence";
 import { useEditor } from "./useEditor";
 import { isAssetExtension } from "@/util";
 
-export const FILE_STORE = "file_store";
+export const FILE_STORE = "FILE_STORE";
 
 function debounce(func, wait) {
   let timeout;
@@ -124,8 +124,9 @@ export const useFileStore = create()(
         }
       },
       reload: () => {
-        const state = get();
-        set({ reloadCounter: state.reloadCounter + 1 });
+        let reloadCounter = get().reloadCounter;
+        set({ reloadCounter: reloadCounter + 1 });
+        console.log("RootDirectory", reloadCounter);
       },
       unloadFile: () => {
         const initialState = getInitialState();
