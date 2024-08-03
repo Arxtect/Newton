@@ -11,8 +11,8 @@ import { Awareness } from "y-protocols/awareness.js"; // eslint-disable-line
 
 const host = window.location.hostname;
 const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-// const wsUrl = `wss://arxtect.com/websockets`;
-const wsUrl = `ws://10.10.101.126:8013`;
+const wsUrl = `wss://arxtect.com/websockets`;
+// const wsUrl = `ws://10.10.101.126:8013`;
 
 class ProjectSync {
   constructor(rootPath, user, roomId, token, otherOperation) {

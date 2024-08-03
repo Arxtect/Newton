@@ -22,6 +22,7 @@ import NewProject from "../newProject";
 import UploadProject from "../uploadProject";
 import Github from "../github";
 import { toast } from "react-toastify";
+import {getGitRepoList} from "@/services"
 
 const Content = React.forwardRef((props, ref) => {
   const { changeCurrentProjectRoot } = useFileStore((state) => ({
@@ -72,9 +73,38 @@ const Content = React.forwardRef((props, ref) => {
 
   const [projectData, setProjectData] = useState([]);
 
+    useEffect(() => {
+    getRepoList()
+  }, []);
+
+  const getRepoList = async ()=>{
+    const {data} = await getGitRepoList()
+
+    let projectData = data.map(item=>{
+      const {name,updated_at,...res}=item
+      return {
+        ...res,
+        title:name,
+        lastModified:updated_at,
+        name:item.owner?.login,
+        type:"git"
+      }
+    })
+    
+    console.log(projectData,'1111')
+    return projectData
+  }
+
   const getProjectList = async (currentSelectMenu) => {
     console.log(currentSelectMenu, "currentSelectMenu");
-    const project = await findAllProjectInfo();
+    let project = []
+
+    if(currentSelectMenu == "git"){
+ project=await getRepoList()
+    }else{
+     project= await findAllProjectInfo();
+    }
+
 
     console.log(project, "project");
     setProjectData(
@@ -84,9 +114,6 @@ const Content = React.forwardRef((props, ref) => {
             return null;
           }
           if (currentSelectMenu == "category") {
-            return null;
-          }
-          if (currentSelectMenu == "git") {
             return null;
           }
           if (

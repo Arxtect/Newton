@@ -5,12 +5,12 @@ import { updateAccessToken, updateUser } from "store";
 
 // 辅助函数：生成带有统一前缀的URL
 function getApiUrl(endpoint) {
-  return `/api/v1${endpoint}`;
+  return `/api/v1/auth${endpoint}`;
 }
 
 // 注册用户
 export async function registerUser(userData) {
-  const response = await fetch(getApiUrl("/auth/register"), {
+  const response = await fetch(getApiUrl("/register"), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -30,7 +30,7 @@ export async function registerUser(userData) {
 
 // 登录用户
 export async function loginUser(credentials) {
-  const response = await fetch(getApiUrl("/auth/login"), {
+  const response = await fetch(getApiUrl("/login"), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -50,7 +50,7 @@ export async function loginUser(credentials) {
 }
 
 export async function getYDocToken() {
-  const response = await fetch(getApiUrl("/auth/token"), {
+  const response = await fetch(getApiUrl("/token"), {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -68,7 +68,7 @@ export async function getYDocToken() {
 // 刷新 token
 export async function refreshAuth() {
   try {
-    const response = await fetch(getApiUrl("/auth/refresh"), {
+    const response = await fetch(getApiUrl("/refresh"), {
       method: "GET",
       credentials: "include",
     });
@@ -95,7 +95,7 @@ export async function refreshAuth() {
 
 // 登出用户
 export async function logoutUser() {
-  const response = await fetch(getApiUrl("/auth/logout"), {
+  const response = await fetch(getApiUrl("/logout"), {
     method: "GET",
     credentials: "include",
   });
@@ -109,34 +109,10 @@ export async function logoutUser() {
   }
 }
 
-// 获取用户信息
-export async function getMe() {
-  const response = await fetch(getApiUrl("/users/me"), {
-    method: "GET",
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-
-  if (response.ok) {
-    return response.json();
-  } else if (response.status === 401) {
-    // deleteCookie("mojolicious");
-    updateAccessToken("");
-    updateUser({});
-    // toast.error("Login has expired. Please log in again", {
-    //   position: "top-right",
-    // });
-  } else {
-    throw new Error("Failed to fetch user information");
-  }
-}
-
 // 验证邮箱
 export async function verifyEmail(verificationCode) {
   const response = await fetch(
-    getApiUrl(`/auth/verifyemail/${verificationCode}`),
+    getApiUrl(`/verifyemail/${verificationCode}`),
     {
       method: "GET", // 默认为GET，可以省略
       credentials: "include",
@@ -159,7 +135,7 @@ export async function verifyEmail(verificationCode) {
 
 // 忘记密码
 export async function forgotPassword(email) {
-  const response = await fetch(getApiUrl("/auth/forgotpassword"), {
+  const response = await fetch(getApiUrl("/forgotpassword"), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -188,7 +164,7 @@ export async function resetPassword({
   password,
   password_confirm,
 }) {
-  const response = await fetch(getApiUrl(`/auth/resetpassword/${resetToken}`), {
+  const response = await fetch(getApiUrl(`/resetpassword/${resetToken}`), {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",

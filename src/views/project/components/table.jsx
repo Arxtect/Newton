@@ -164,8 +164,11 @@ const Table = forwardRef(
         headerAlign: "center",
         align: "center",
         sortable: false,
-        renderCell: (params) => (
-          <div
+        renderCell: (params) => {
+           if(params.row?.type=="git"){
+            return <span className="font-bold">{params.value}</span>
+          }
+          return <div
             style={{ cursor: "pointer", color: "inherit" }}
             onMouseOver={(e) => (e.target.style.textDecoration = "underline")}
             onMouseOut={(e) => (e.target.style.textDecoration = "none")}
@@ -191,7 +194,7 @@ const Table = forwardRef(
           >
             <span className="text-[#22c55e]">{params.value}</span>
           </div>
-        ),
+        },
       },
       {
         field: "name",
@@ -222,8 +225,29 @@ const Table = forwardRef(
         headerAlign: "center",
         align: "center",
         sortable: false,
-        renderCell: (params) => (
-          <div>
+        renderCell: (params) => {
+           if(params.row?.type=="git"){
+            return  <Tooltip title="Sync">
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const isAuth = auth(
+                    params.row.name != "YOU" &&
+                      (!user || JSON.stringify(user) === "{}"),
+                    () => {
+                      downloadDirectoryAsZip(params.row.title);
+                    }
+                  );
+                  if (isAuth) return;
+                  downloadDirectoryAsZip(params.row.title);
+                }}
+              >
+                <img src={downloadSvg} alt="" />
+              </IconButton>
+            </Tooltip>
+          }
+          return <div>
             <Tooltip title="Download">
               <IconButton
                 size="small"
@@ -327,7 +351,8 @@ const Table = forwardRef(
               </IconButton>
             </Tooltip>
           </div>
-        ),
+        }
+          
       },
     ];
 
