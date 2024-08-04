@@ -73,12 +73,12 @@ const Content = React.forwardRef((props, ref) => {
 
   const [projectData, setProjectData] = useState([]);
 
-    useEffect(() => {
-    getRepoList()
-  }, []);
-
   const getRepoList = async ()=>{
-    const {data} = await getGitRepoList()
+    const res = await getGitRepoList()
+
+    let data = res?.data
+
+    if(!data?.length) return[]
 
     let projectData = data.map(item=>{
       const {name,updated_at,...res}=item

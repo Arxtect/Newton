@@ -55,8 +55,8 @@ export async function getGitRepoList(page=1,limit=100) {
   }
 }
 
-export async function getGitToken() {
-  const response = await fetch(getApiUrl(`/gitea/token`), {
+export async function getGitToken(token="") {
+  const response = await fetch(getApiUrl(`/gitea/token?token=${token}`), {
     method: "GET",
     credentials: "include",
     headers: {

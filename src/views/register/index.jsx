@@ -12,7 +12,7 @@ import passwordSvg from "@/assets/website/password.svg";
 import usernameSvg from "@/assets/website/username.svg";
 
 const registerSchema = object({
-  name: string().min(1, "Full username required").max(100),
+  name: string().min(1, "Full username required").max(100).regex(/^(?!.*[-_.]{2})([a-zA-Z0-9]+[-_.])*[a-zA-Z0-9]+$/, "Username can only contain alphanumeric chars ('0-9','a-z','A-Z'), dash ('-'), underscore ('_') and dot ('.'). It cannot begin or end with non-alphanumeric chars, and consecutive non-alphanumeric chars are also forbidden!"),
   email: string()
     .min(1, "Need to fill in the mailbox")
     .email("Incorrect email address"),

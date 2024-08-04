@@ -22,6 +22,7 @@ import ArTextField from "@/components/arTextField";
 import path from "path";
 import { cloneRepository } from "domain/git";
 import { createProjectInfo } from "domain/filesystem";
+import {getGitToken} from "@/services"
 
 const GithubProgressBar = ({ progress, messages }) => {
   return (
@@ -55,29 +56,35 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList }) => {
   const [projectName, setProjectName] = useState("");
   const [messages, setMessages] = useState("");
   const [progress, setProgress] = useState(0);
-  const { copyProject } = useFileStore((state) => ({
-    copyProject: state.copyProject,
-  }));
-
   const {
-    committerName,
-    committerEmail,
     githubApiToken,
     changeConfig,
-    corsProxy,
   } = useGitRepo((state) => ({
-    committerName: state.committerName,
-    committerEmail: state.committerEmail,
     githubApiToken: state.githubApiToken,
     changeConfig: state.changeConfig,
-    corsProxy: state.corsProxy,
   }));
 
   const [gitConfig, setGitConfig] = useState({
-    committerName: committerName,
-    committerEmail: committerEmail,
     githubApiToken: githubApiToken,
   });
+
+  const getGiteaToekn=async (token) =>{
+   try{
+    let res= await getGitToken(token)
+    console.log(res.data,'123123123')
+    changeConfig({
+      githubApiToken:res?.data
+    })
+     return res.data
+   }catch(err){
+     changeConfig({githubApiToken:""})
+   }
+  }
+
+  useEffect(()=>{
+    if(!dialogOpen) return
+    getGiteaToekn(githubApiToken)
+  },[dialogOpen])
 
   const handleCancelProject = () => {
     setDialogOpen(false);
@@ -90,13 +97,9 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList }) => {
       return;
     }
     if (
-      gitConfig.committerName &&
-      gitConfig.committerEmail &&
       gitConfig.githubApiToken
     ) {
       changeConfig({
-        committerName: gitConfig.committerName,
-        committerEmail: gitConfig.committerEmail,
         githubApiToken: gitConfig.githubApiToken,
       });
     } else {
@@ -152,7 +155,6 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList }) => {
     return new Promise(async (resolve, reject) => {
       await cloneRepository(destPath, clonePath, {
         singleBranch: false,
-        corsProxy: corsProxy,
         token: gitConfig.githubApiToken,
         onProgress,
         onMessage,
@@ -191,45 +193,7 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList }) => {
             <GithubProgressBar progress={progress} messages={messages} />
           )}
         </div>
-        {!committerName && (
-          <div className="w-[100%]">
-            <ArTextField
-              label="Git: Committer Name"
-              placeholder="Your committer name"
-              defaultValue={committerName}
-              onChange={(event) => {
-                setGitConfig({
-                  ...gitConfig,
-                  committerName: event.target.value,
-                });
-              }}
-              sx={{ width: "100%" }}
-              className="my-3"
-              inputSize="middle"
-            />
-          </div>
-        )}
-        {!committerEmail && (
-          <div className="w-[100%]">
-            <ArTextField
-              label="Git: Committer Email"
-              variant="outlined"
-              placeholder="Your email"
-              defaultValue={committerEmail}
-              onChange={(event) =>
-                setGitConfig({
-                  ...gitConfig,
-                  committerEmail: event.target.value,
-                })
-              }
-              sx={{ width: "100%" }}
-              className="my-3"
-              inputSize="middle"
-            />
-          </div>
-        )}
-
-        {!githubApiToken && (
+        {/* {!githubApiToken && (
           <div className="w-[100%]">
             <ArTextField
               label="GitHub: Private Access Token"
@@ -246,7 +210,7 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList }) => {
               inputSize="middle"
             />
           </div>
-        )}
+        )} */}
       </Box>
     </ArDialog>
   );
