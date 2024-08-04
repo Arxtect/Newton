@@ -11,22 +11,21 @@ import { logoutUser } from "services";
 import { useUserStore } from "store";
 import { toast } from "react-toastify";
 import { HashLink } from "react-router-hash-link";
-import { useAuth } from "@/useHooks"
 
 const UserMenu = () => {
   const [userInfo, setUserInfo] = useState({});
-  const { updateUser,accessToken, updateAccessToken } = useUserStore((state) => ({
+  const { user,updateUser,accessToken, updateAccessToken } = useUserStore((state) => ({
+    user:state.user,
     updateUser:state.updateUser,
     accessToken: state.accessToken,
     updateAccessToken: state.updateAccessToken
   }));
 
-  const { user, auth } = useAuth()
 
 
   useEffect(() => {
     setUserInfo(user);
-  }, [auth]);
+  }, [user]);
 
   const onLogout = () => {
     logoutUser()
@@ -46,7 +45,7 @@ const UserMenu = () => {
 
   return (
     <div>
-      {auth ? (
+      {user?.id ? (
         <>
           <div className="lg:ml-8 px-4">
             <ArMenuRadix

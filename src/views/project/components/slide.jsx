@@ -80,7 +80,7 @@ const Slide = ({ contentRef }) => {
                   onSelect: () => contentRef.current.setUploadDialogOpen(true),
                 },
                 {
-                  label: "Import From GitHub",
+                  label: "Import From Cloud",
                   onSelect: () => contentRef.current.setGithubDialogOpen(true),
                 },
                 // {

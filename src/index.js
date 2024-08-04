@@ -24,7 +24,6 @@ import AppRouter from "@/router";
 import DialogLogin from "@/views/login/dialog-login.js";
 // import "@blueprintjs/core/lib/css/blueprint.css";
 // import "@blueprintjs/icons/lib/css/blueprint-icons.css";
-import { AuthProvider, useAuth } from "@/useHooks";
 
 async function loadBrowserFS() {
   return new Promise((resolve) => {
@@ -51,9 +50,7 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.Fragment>
     <ToastContainer />
-    <AuthProvider>
       <AppRouter />
-    </AuthProvider>
     <DialogLogin></DialogLogin>
   </React.Fragment>
 );

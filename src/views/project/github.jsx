@@ -19,10 +19,13 @@ import {
 import { useFileStore, useGitRepo, useUserStore } from "store";
 import { toast } from "react-toastify";
 import ArTextField from "@/components/arTextField";
+import ArSelect from "@/components/arSelect";
+
 import path from "path";
 import { cloneRepository } from "domain/git";
 import { createProjectInfo } from "domain/filesystem";
 import {getGitToken} from "@/services"
+import {getGitRepoList} from "@/services"
 
 const GithubProgressBar = ({ progress, messages }) => {
   return (
@@ -52,7 +55,7 @@ const GithubProgressBar = ({ progress, messages }) => {
   );
 };
 
-const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList }) => {
+const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList,user }) => {
   const [projectName, setProjectName] = useState("");
   const [messages, setMessages] = useState("");
   const [progress, setProgress] = useState(0);
@@ -71,7 +74,7 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList }) => {
   const getGiteaToekn=async (token) =>{
    try{
     let res= await getGitToken(token)
-    console.log(res.data,'123123123')
+    console.log(res.data,'123123123',user)
     changeConfig({
       githubApiToken:res?.data
     })
@@ -81,11 +84,6 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList }) => {
    }
   }
 
-  useEffect(()=>{
-    if(!dialogOpen) return
-    getGiteaToekn(githubApiToken)
-  },[dialogOpen])
-
   const handleCancelProject = () => {
     setDialogOpen(false);
   };
@@ -94,17 +92,6 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList }) => {
     if (!projectName) {
       setLoading(false);
       toast.warning("Please enter project name");
-      return;
-    }
-    if (
-      gitConfig.githubApiToken
-    ) {
-      changeConfig({
-        githubApiToken: gitConfig.githubApiToken,
-      });
-    } else {
-      setLoading(false);
-      toast.warning("Please enter git config");
       return;
     }
     gitClone(projectName)
@@ -120,7 +107,7 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList }) => {
         });
         setLoading(false);
         setDialogOpen(false);
-        toast.success("Import success from github");
+        toast.success("Import success from cloud");
       })
       .catch((error) => {
         setLoading(false);
@@ -140,33 +127,53 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList }) => {
     setMessages(message);
     console.log(message, "message");
   };
-  const gitClone = async (clonePath) => {
-    const match = clonePath.match(/github\.com\/(.+?)\/(.+?)\.git$/);
-    if (!match) {
-      toast.warning("Invalid repository URL");
-      return;
-    }
+  const gitClone = async (projectName) => {
+    console.log(projectName,'clonePath')
+    let userName = user?.name
 
-    const user = match[1];
-    const repo = match[2];
-    const destPath = path.join("/", repo);
-    console.log(destPath, "destPath");
+    let url =window.origin +"/git/"+userName+"/"+projectName+".git"
+       console.log(projectName,'clonePath',url)
 
     return new Promise(async (resolve, reject) => {
-      await cloneRepository(destPath, clonePath, {
+      await cloneRepository(projectName, url, {
         singleBranch: false,
         token: gitConfig.githubApiToken,
         onProgress,
         onMessage,
       });
-      resolve(destPath);
+      resolve(projectName);
     });
   };
   const [loading, setLoading] = useState(false);
+    const [options, setOptions] = useState([]);
 
+    const getRepoList = async ()=>{
+    const res = await getGitRepoList()
+
+    let data = res?.data
+
+    if(!data?.length) return[]
+
+    let projectData = data.map(item=>{
+      return {
+        ...item,
+        key:item.name,
+        value:item.name,
+        label:item.name,
+      }
+    })
+    setOptions(projectData)
+  }
+
+   useEffect(()=>{
+    if(!dialogOpen) return
+    getRepoList()
+    getGiteaToekn(githubApiToken)
+
+  },[dialogOpen])
   return (
     <ArDialog
-      title="Import From Github"
+      title="Import From Cloud"
       dialogOpen={dialogOpen}
       handleCancel={handleCancelProject}
       buttonList={[
@@ -177,7 +184,17 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList }) => {
     >
       <Box component="form" noValidate autoComplete="off">
         <div className="w-[100%]">
-          <ArTextField
+          <ArSelect
+      label="Cloud Repository Url"
+      value={projectName}
+      onChange={(event) => {
+              setProjectName(event.target.value);
+            }}
+      options={options}
+            fullWidth
+            className="my-3"
+    />
+          {/* <ArTextField
             label="Github Repository Url"
             placeholder="please input github repository url"
             defaultValue={projectName}
@@ -188,7 +205,7 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList }) => {
             fullWidth
             className="my-3"
             inputSize="middle"
-          />
+          /> */}
           {progress > 0 && (
             <GithubProgressBar progress={progress} messages={messages} />
           )}

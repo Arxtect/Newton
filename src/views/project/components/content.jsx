@@ -226,7 +226,7 @@ const Content = React.forwardRef((props, ref) => {
             projectData={projectData}
             getProjectList={getProjectList}
             sortedRows={sortedRows}
-            handleCurrentSelectMenu={handleCurrentSelectMenu}
+            currentSelectMenu={currentSelectMenu}
             ref={tableRef}
             auth={auth}
           ></Table>
@@ -238,7 +238,6 @@ const Content = React.forwardRef((props, ref) => {
             projectData={projectData}
             getProjectList={getProjectList}
             sortedRows={sortedRows}
-            changeCurrentProjectRoot={changeCurrentProjectRoot}
             auth={auth}
             user={user}
           ></Grid>
@@ -254,6 +253,7 @@ const Content = React.forwardRef((props, ref) => {
         dialogOpen={githubDialogOpen}
         setDialogOpen={setGithubDialogOpen}
         getProjectList={getProjectList}
+              user={user}
       ></Github>
     </div>
   );

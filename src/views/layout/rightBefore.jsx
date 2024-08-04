@@ -8,7 +8,6 @@ import { findAllProject, getProjectInfo, existsPath } from "domain/filesystem";
 import path from "path";
 import LinkGithub from "./linkGithub";
 import Share from "./share";
-import { useAuth } from "@/useHooks";
 import { toast } from "react-toastify";
 import {
   updateDialogLoginOpen,

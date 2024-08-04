@@ -27,6 +27,7 @@ import Share from "../share";
 import copySvg from "@/assets/project/copy.svg";
 import deleteSvg from "@/assets/project/delete.svg";
 import downloadSvg from "@/assets/project/download.svg";
+import gitCloudSvg from "@/assets/project/gitCloud.svg";
 import renameSvg from "@/assets/project/rename.svg";
 import shareSvg from "@/assets/project/share.svg";
 import downloadPdfSvg from "@/assets/project/downloadPdf.svg";
@@ -34,7 +35,7 @@ import "./index.scss";
 import { getYDocToken } from "services";
 
 const Table = forwardRef(
-  ({ setSelectedRows, getProjectList, projectData, sortedRows, auth }, ref) => {
+  ({ setSelectedRows, getProjectList, projectData, sortedRows, auth,currentSelectMenu }, ref) => {
     const navigate = useNavigate();
     const {
       projectLists,
@@ -227,7 +228,7 @@ const Table = forwardRef(
         sortable: false,
         renderCell: (params) => {
            if(params.row?.type=="git"){
-            return  <Tooltip title="Sync">
+            return  <Tooltip title="Import">
               <IconButton
                 size="small"
                 onClick={(e) => {
@@ -243,7 +244,8 @@ const Table = forwardRef(
                   downloadDirectoryAsZip(params.row.title);
                 }}
               >
-                <img src={downloadSvg} alt="" />
+
+                <img src={gitCloudSvg} className="w-4" alt="" />
               </IconButton>
             </Tooltip>
           }
@@ -465,7 +467,7 @@ const Table = forwardRef(
           }}
           pageSizeOptions={[5, 10]}
           pageSize={10}
-          checkboxSelection={true}
+          checkboxSelection={currentSelectMenu!="git"?true:false}
           onRowSelectionModelChange={handleSelection}
           disableRowSelectionOnClick
           onCellDoubleClick={(params) => console.log(params)}
