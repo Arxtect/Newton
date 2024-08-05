@@ -37,12 +37,10 @@ const subCategories = [
   { key: "sub_category_2", label: "Sub Category 2" },
 ];
 
-const Slide = ({ contentRef }) => {
-  const [selectedKey, setSelectedKey] = useState("all");
+const Slide = ({ contentRef,currentSelectMenu, setCurrentSelectMenu }) => {
 
   const handleClick = (key) => {
-    contentRef.current.handleCurrentSelectMenu(key);
-    setSelectedKey(key);
+    setCurrentSelectMenu(key)
   };
 
   const getButtonClass = (open) => {
@@ -105,7 +103,7 @@ const Slide = ({ contentRef }) => {
           <div
             key={item.key}
             className={`flex gap-5 px-5 py-3 rounded-2xl my-1 h-14 text-[1rem] items-center ${
-              selectedKey === item.key ? "bg-[#81c784]" : ""
+              currentSelectMenu === item.key ? "bg-[#81c784]" : ""
             } cursor-pointer`}
             onClick={() => handleClick(item.key)}
           >

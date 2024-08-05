@@ -3,6 +3,7 @@ import * as git from "isomorphic-git";
 import uniq from "lodash/uniq";
 // tslint:disable-next-line
 import { getRefOids } from "./getRefOids";
+import fs from "fs";
 
 export async function detectConflict(dir, refA, refB, refC) {
   const aOids = await getRefOids(dir, refA);
@@ -28,6 +29,7 @@ export async function detectConflict(dir, refA, refB, refC) {
 
     if (aOid) {
       const { object } = await git.readObject({
+        fs,
         dir,
         oid: aOid.oid,
       });
@@ -36,6 +38,7 @@ export async function detectConflict(dir, refA, refB, refC) {
 
     if (bOid) {
       const { object } = await git.readObject({
+        fs,
         dir,
         oid: bOid.oid,
       });
@@ -43,6 +46,7 @@ export async function detectConflict(dir, refA, refB, refC) {
     }
     if (cOid) {
       const { object } = await git.readObject({
+        fs,
         dir,
         oid: cOid.oid,
       });

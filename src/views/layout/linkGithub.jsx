@@ -16,7 +16,7 @@ import {
   CircularProgress,
   LinearProgress,
 } from "@mui/material";
-import { useFileStore, useGitRepo } from "store";
+import { useFileStore, useGitRepo,useUserStore } from "store";
 import { toast } from "react-toastify";
 import ArTextField from "@/components/arTextField";
 import path from "path";
@@ -24,6 +24,8 @@ import { setupAndPushToRepo } from "domain/git";
 import { removeDirectory, existsPath } from "domain/filesystem";
 import BottomDrawer from "@/features/bottomDrawer/bottomDrawer";
 import share from "@/assets/share.svg";
+import {getGitToken,createGitRepo} from "@/services"
+
 
 const GithubProgressBar = ({ progress, messages }) => {
   return (
@@ -80,72 +82,73 @@ const LinkGithub = (props) => {
   }, [currentProjectRoot]);
 
   const {
-    committerName,
-    committerEmail,
     githubApiToken,
     changeConfig,
     corsProxy,
   } = useGitRepo((state) => ({
-    committerName: state.committerName,
-    committerEmail: state.committerEmail,
     githubApiToken: state.githubApiToken,
     changeConfig: state.changeConfig,
     corsProxy: state.corsProxy,
   }));
 
+    const { user } = useUserStore((state) => ({
+    user: state.user,
+  }));
+
   const [gitConfig, setGitConfig] = useState({
-    committerName: committerName,
-    committerEmail: committerEmail,
     githubApiToken: githubApiToken,
   });
 
   const handleCancelProject = () => {
     setDialogOpen(false);
   };
-  const handleSaveProject = () => {
+const handleSaveProject = async () => {
+  try {
     setLoading(true);
+
+    if (!user?.id) {
+      toast.warning("Please log in first");
+      setLoading(false);
+      return;
+    }
+
     if (!projectName) {
       setLoading(false);
-      toast.warning("Please enter remote repository url");
+      toast.warning("Please enter the remote repository URL");
       return;
     }
-    if (
-      gitConfig.committerName &&
-      gitConfig.committerEmail &&
-      gitConfig.githubApiToken
-    ) {
-      changeConfig({
-        committerName: gitConfig.committerName,
-        committerEmail: gitConfig.committerEmail,
-        githubApiToken: gitConfig.githubApiToken,
-      });
-    } else {
-      setLoading(false);
-      toast.warning("Please enter git config");
-      return;
+
+    const res = await createGitRepo(projectName, projectName);
+    console.log(res, 'res'); // Debug information
+
+    if (!res || res.error) {
+      console.log(res.error, 'res.error'); // Debug information
+      throw new Error(res.error || "Failed to create Git repository");
     }
-    setupAndPushToRepo(currentProjectRoot, projectName, {
+
+    let userName = user?.name;
+    let remoteUrl = window.origin + "/git/" + userName + "/" + projectName + ".git";
+    console.log(remoteUrl);
+
+    await setupAndPushToRepo(currentProjectRoot, projectName, {
       singleBranch: false,
-      corsProxy: corsProxy,
       token: gitConfig.githubApiToken,
-      committerName: gitConfig.committerName,
-      committerEmail: gitConfig.committerEmail,
       onProgress,
       onMessage,
-    })
-      .then((res) => {
-        setDialogOpen(false);
-        toast.success("Link repository success from github");
-        setIsExistsGit(true);
-        initializeGitStatus({ projectRoot: currentProjectRoot });
-        setLoading(false);
-      })
-      .catch((error) => {
-        toast.warning(error.message);
-        setLoading(false);
-        removeDirectory(path.join(currentProjectRoot, ".git"));
-      });
-  };
+    });
+
+    setDialogOpen(false);
+    toast.success("Successfully linked repository from GitHub");
+    setIsExistsGit(true);
+    initializeGitStatus({ projectRoot: currentProjectRoot });
+    setLoading(false);
+
+  } catch (err) {
+    console.error(err); // Debug information
+    toast.warning(err.message || err);
+    setLoading(false);
+  }
+};
 
   const onProgress = (progress) => {
     const rate = progress.loaded / progress.total;
@@ -164,20 +167,36 @@ const LinkGithub = (props) => {
     setIsOpen(open);
   };
 
+   const getGiteaToekn=async (token) =>{
+   try{
+    let res= await getGitToken(token)
+    changeConfig({
+      githubApiToken:res?.data
+    })
+     return res.data
+   }catch(err){
+     changeConfig({githubApiToken:""})
+   }
+  }
+     useEffect(()=>{
+    if(!dialogOpen) {
+      setMessages("")
+      setProgress(0)
+      return
+    }
+    if(!user?.id){
+        toast.warning("Plaese login first");
+    }
+    console.log(currentProjectRoot,'currentProjectRoot')
+    setProjectName(currentProjectRoot)
+    getGiteaToekn(githubApiToken)
+
+  },[dialogOpen])
+
   return (
     <React.Fragment>
       {!!isExistsGit ? (
         <Tooltip title="Sync">
-          {/* <Button
-            color="inherit"
-            aria-label="log"
-            size="small"
-            onClick={() => toggleDrawer(true)}
-          >
-            <span className="flex items-center justify-center w-[20px] h-[20px] text-[14px]">
-              sync
-            </span>
-          </Button> */}
           <button
             className={`flex items-center text-gray-700 px-2 py-1 hover:bg-gray-200 active:bg-[#9fd5a2] space-x-1 `}
             onClick={() => toggleDrawer(true)}
@@ -189,16 +208,6 @@ const LinkGithub = (props) => {
         </Tooltip>
       ) : (
         <Tooltip title="Link a git repository">
-          {/* <Button
-            color="inherit"
-            aria-label="log"
-            size="small"
-            onClick={() => setDialogOpen(true)}
-          >
-            <span className="flex items-center justify-center w-[20px] h-[20px] text-[14px]">
-              Link
-            </span>
-          </Button> */}
           <button
             className={`flex items-center text-gray-700 px-2 py-1 hover:bg-gray-200 active:bg-[#9fd5a2] space-x-1 `}
             onClick={() => setDialogOpen(true)}
@@ -209,12 +218,12 @@ const LinkGithub = (props) => {
         </Tooltip>
       )}
       <ArDialog
-        title="Link Remote Github Repository"
+        title="Link Remote Cloud Repository"
         dialogOpen={dialogOpen}
         handleCancel={handleCancelProject}
-        tooltipText={
-          "Ensure that the remote repository is empty when you link it"
-        }
+        // tooltipText={
+        //   "Ensure that the remote repository is empty when you link it"
+        // }
         buttonList={[
           { title: "Cancel", click: handleCancelProject },
           { title: "Save", click: handleSaveProject, loading: loading },
@@ -224,12 +233,15 @@ const LinkGithub = (props) => {
         <Box component="form" noValidate autoComplete="off">
           <div className="w-[100%]">
             <ArTextField
-              label="Remote Repository Url"
-              placeholder="please input remote repository url"
-              defaultValue={""}
+              label="Remote Repository Name"
+              placeholder="please input remote repository name"
+              value={projectName}
               onChange={(event) => {
                 setProjectName(event.target.value);
               }}
+               InputProps={{
+            readOnly: true,
+          }}
               margin="normal"
               fullWidth
               className="my-3"
@@ -239,62 +251,6 @@ const LinkGithub = (props) => {
               <GithubProgressBar progress={progress} messages={messages} />
             )}
           </div>
-          {!committerName && (
-            <div className="w-[100%]">
-              <ArTextField
-                label="Git: Committer Name"
-                placeholder="Your committer name"
-                defaultValue={committerName}
-                onChange={(event) => {
-                  setGitConfig({
-                    ...gitConfig,
-                    committerName: event.target.value,
-                  });
-                }}
-                sx={{ width: "100%" }}
-                className="my-3"
-                inputSize="middle"
-              />
-            </div>
-          )}
-          {!committerEmail && (
-            <div className="w-[100%]">
-              <ArTextField
-                label="Git: Committer Email"
-                variant="outlined"
-                placeholder="Your email"
-                defaultValue={committerEmail}
-                onChange={(event) =>
-                  setGitConfig({
-                    ...gitConfig,
-                    committerEmail: event.target.value,
-                  })
-                }
-                sx={{ width: "100%" }}
-                className="my-3"
-                inputSize="middle"
-              />
-            </div>
-          )}
-
-          {!githubApiToken && (
-            <div className="w-[100%]">
-              <ArTextField
-                label="GitHub: Private Access Token"
-                variant="outlined"
-                defaultValue={githubApiToken}
-                onChange={(event) =>
-                  setGitConfig({
-                    ...gitConfig,
-                    githubApiToken: event.target.value,
-                  })
-                }
-                className="my-3"
-                sx={{ width: "100%" }}
-                inputSize="middle"
-              />
-            </div>
-          )}
         </Box>
       </ArDialog>
       <BottomDrawer isOpen={isOpen} toggleDrawer={toggleDrawer} />

@@ -35,7 +35,7 @@ import "./index.scss";
 import { getYDocToken } from "services";
 
 const Table = forwardRef(
-  ({ setSelectedRows, getProjectList, projectData, sortedRows, auth,currentSelectMenu }, ref) => {
+  ({ setSelectedRows, getProjectList, projectData, sortedRows, auth,currentSelectMenu,handleGithub }, ref) => {
     const navigate = useNavigate();
     const {
       projectLists,
@@ -233,15 +233,7 @@ const Table = forwardRef(
                 size="small"
                 onClick={(e) => {
                   e.stopPropagation();
-                  const isAuth = auth(
-                    params.row.name != "YOU" &&
-                      (!user || JSON.stringify(user) === "{}"),
-                    () => {
-                      downloadDirectoryAsZip(params.row.title);
-                    }
-                  );
-                  if (isAuth) return;
-                  downloadDirectoryAsZip(params.row.title);
+                  handleGithub(true,params.row.title)
                 }}
               >
 

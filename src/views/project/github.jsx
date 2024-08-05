@@ -24,8 +24,8 @@ import ArSelect from "@/components/arSelect";
 import path from "path";
 import { cloneRepository } from "domain/git";
 import { createProjectInfo } from "domain/filesystem";
-import {getGitToken} from "@/services"
-import {getGitRepoList} from "@/services"
+import {getGitToken,getGitRepoList} from "@/services"
+
 
 const GithubProgressBar = ({ progress, messages }) => {
   return (
@@ -55,8 +55,8 @@ const GithubProgressBar = ({ progress, messages }) => {
   );
 };
 
-const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList,user }) => {
-  const [projectName, setProjectName] = useState("");
+const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList,user,projectName, setProjectName }) => {
+
   const [messages, setMessages] = useState("");
   const [progress, setProgress] = useState(0);
   const {
@@ -89,6 +89,12 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList,user }) => {
   };
   const handleSaveProject = () => {
     setLoading(true);
+    console.log(user,'Github')
+    if(!user?.id){
+      toast.warning("Plaese login first");
+      setLoading(false);
+      return 
+    }
     if (!projectName) {
       setLoading(false);
       toast.warning("Please enter project name");
@@ -97,7 +103,6 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList,user }) => {
     gitClone(projectName)
       .then((res) => {
         console.log(res);
-        const user = useUserStore.getState().user;
         console.log(user, res, "user");
         createProjectInfo(res, {
           name: "YOU",
@@ -148,6 +153,10 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList,user }) => {
     const [options, setOptions] = useState([]);
 
     const getRepoList = async ()=>{
+      if(!user?.id){
+        toast.warning("Please login first")
+        return 
+      }
     const res = await getGitRepoList()
 
     let data = res?.data
@@ -166,7 +175,11 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList,user }) => {
   }
 
    useEffect(()=>{
-    if(!dialogOpen) return
+    if(!dialogOpen) {
+      setMessages("")
+      setProgress(0)
+      return
+    }
     getRepoList()
     getGiteaToekn(githubApiToken)
 
@@ -185,7 +198,7 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList,user }) => {
       <Box component="form" noValidate autoComplete="off">
         <div className="w-[100%]">
           <ArSelect
-      label="Cloud Repository Url"
+      label="Cloud Repository Name"
       value={projectName}
       onChange={(event) => {
               setProjectName(event.target.value);
@@ -194,40 +207,10 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList,user }) => {
             fullWidth
             className="my-3"
     />
-          {/* <ArTextField
-            label="Github Repository Url"
-            placeholder="please input github repository url"
-            defaultValue={projectName}
-            onChange={(event) => {
-              setProjectName(event.target.value);
-            }}
-            margin="normal"
-            fullWidth
-            className="my-3"
-            inputSize="middle"
-          /> */}
           {progress > 0 && (
             <GithubProgressBar progress={progress} messages={messages} />
           )}
         </div>
-        {/* {!githubApiToken && (
-          <div className="w-[100%]">
-            <ArTextField
-              label="GitHub: Private Access Token"
-              variant="outlined"
-              defaultValue={githubApiToken}
-              onChange={(event) =>
-                setGitConfig({
-                  ...gitConfig,
-                  githubApiToken: event.target.value,
-                })
-              }
-              className="my-3"
-              sx={{ width: "100%" }}
-              inputSize="middle"
-            />
-          </div>
-        )} */}
       </Box>
     </ArDialog>
   );

@@ -11,7 +11,6 @@ const fsPify = {
   stat: pify(fs.stat),
 };
 
-// 将 fs 的方法转换为返回 Promise 的方法
 const writeFile = pify(fs.writeFile);
 
 export async function addAllFilesToGit(dir) {
@@ -19,7 +18,6 @@ export async function addAllFilesToGit(dir) {
     const entries = await fsPify.readdir(currentPath);
 
     for (const entry of entries) {
-      // Skip the .git directory
       if (entry === ".git") {
         continue;
       }
@@ -28,12 +26,11 @@ export async function addAllFilesToGit(dir) {
       const stat = await fsPify.stat(entryPath);
 
       if (stat.isFile()) {
-        // Assuming `dir` is the root of your project and also the root where the git repo is initialized
         const gitPath = path.relative(dir, entryPath);
         await git.add({ fs, dir, filepath: gitPath });
         console.log(`Added ${gitPath}`);
       } else if (stat.isDirectory()) {
-        await addFilesFromDirectory(entryPath); // Recurse into subdirectories
+        await addFilesFromDirectory(entryPath);
       }
     }
   }
@@ -42,10 +39,8 @@ export async function addAllFilesToGit(dir) {
 }
 
 export async function setupAndPushToRepo(projectRoot, remoteUrl, options) {
-
-
   try {
-    await git.init({ fs, dir: projectRoot });
+    await git.init({ fs, dir: projectRoot, defaultBranch: 'main' });
     await git.addRemote({
       fs,
       dir: projectRoot,
@@ -53,25 +48,17 @@ export async function setupAndPushToRepo(projectRoot, remoteUrl, options) {
       url: remoteUrl,
     });
 
-    // 为了简单起见，直接使用文件系统操作来创建一个文件
-    // await writeFile(`${projectRoot}/main.tex`, "\\documentclass{article}\n");
-
-    // 将文件添加到Git跟踪
     await addAllFilesToGit(projectRoot);
 
-    // 进行首次提交
     await git.commit({
       fs,
       dir: projectRoot,
-      author: {
-        name: options.committerName,
-        email: options.committerEmail,
-      },
       message: "arxtect initial commit",
     });
 
     await createBranch(projectRoot, "main");
     await checkoutBranch(projectRoot, "main");
+
     await git.push({
       fs,
       dir: projectRoot,

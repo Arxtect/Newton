@@ -6,7 +6,7 @@
 import delay from "delay";
 import { EventEmitter } from "events";
 import * as git from "isomorphic-git";
-
+import fs from "fs";
 //  options = {
 //    corsProxy,
 //    onProgress,
@@ -27,6 +27,7 @@ export async function cloneRepository(projectRoot, cloneDest, options) {
 
   // not async for test
   const clonePromise = git.clone({
+    fs,
     dir: projectRoot,
     url: cloneDest, //https://github.com/devixyz/wasm-git-demo.git
     ref: "main",
@@ -37,8 +38,8 @@ export async function cloneRepository(projectRoot, cloneDest, options) {
   while (true) {
     await delay(1000);
     try {
-      const list = await git.listFiles({ dir: projectRoot });
-      const e = await git.status({ dir: projectRoot, filepath: list[0] });
+      const list = await git.listFiles({fs, dir: projectRoot });
+      const e = await git.status({fs, dir: projectRoot, filepath: list[0] });
       console.log("status correct with", e);
       break;
     } catch (e) {

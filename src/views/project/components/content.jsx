@@ -24,7 +24,7 @@ import Github from "../github";
 import { toast } from "react-toastify";
 import {getGitRepoList} from "@/services"
 
-const Content = React.forwardRef((props, ref) => {
+const Content = React.forwardRef(({currentSelectMenu, setCurrentSelectMenu}, ref) => {
   const { changeCurrentProjectRoot } = useFileStore((state) => ({
     changeCurrentProjectRoot: state.changeCurrentProjectRoot,
   }));
@@ -47,8 +47,6 @@ const Content = React.forwardRef((props, ref) => {
 
   const [sortType, setSortType] = useState("table");
   const [sortSelect, setSortSelect] = useState("lastModified");
-  // slider menu
-  const [currentSelectMenu, setCurrentSelectMenu] = useState("all");
   // search
   const [searchInput, setSearchInput] = useState("");
   const [selectedRows, setSelectedRows] = React.useState([]);
@@ -61,10 +59,8 @@ const Content = React.forwardRef((props, ref) => {
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   //github
   const [githubDialogOpen, setGithubDialogOpen] = useState(false);
+  const [projectName, setProjectName] = useState("");
 
-  const handleCurrentSelectMenu = (id) => {
-    setCurrentSelectMenu(id);
-  };
 
   useEffect(() => {
     if (sortType === "table") return;
@@ -74,7 +70,8 @@ const Content = React.forwardRef((props, ref) => {
   const [projectData, setProjectData] = useState([]);
 
   const getRepoList = async ()=>{
-    const res = await getGitRepoList()
+   try{
+     const res = await getGitRepoList()
 
     let data = res?.data
 
@@ -93,18 +90,21 @@ const Content = React.forwardRef((props, ref) => {
     
     console.log(projectData,'1111')
     return projectData
+   }catch(err){
+    toast.warning(err)
+   }
   }
 
-  const getProjectList = async (currentSelectMenu) => {
+  const getProjectList = async () => {
     console.log(currentSelectMenu, "currentSelectMenu");
     let project = []
 
     if(currentSelectMenu == "git"){
- project=await getRepoList()
+      project=await getRepoList()
     }else{
      project= await findAllProjectInfo();
     }
-
+    if(!project?.length) return
 
     console.log(project, "project");
     setProjectData(
@@ -138,7 +138,7 @@ const Content = React.forwardRef((props, ref) => {
     );
   };
   useEffect(() => {
-    getProjectList(currentSelectMenu);
+    getProjectList();
   }, [currentSelectMenu]);
 
   const sortedRows = useMemo(() => {
@@ -156,13 +156,18 @@ const Content = React.forwardRef((props, ref) => {
   }, [projectData, searchInput, sortSelect]);
 
   useImperativeHandle(ref, () => ({
-    handleCurrentSelectMenu,
     setNewDialogOpen,
     setUploadDialogOpen,
     setGithubDialogOpen,
   }));
 
   const tableRef = useRef(null);
+
+
+  const handleGithub =(open,proejctName)=>{
+    setGithubDialogOpen(open)
+    setProjectName(proejctName)
+  }
 
   return (
     <div className="flex flex-col w-full">
@@ -192,15 +197,16 @@ const Content = React.forwardRef((props, ref) => {
               </div>
             </Tooltip>
             <Tooltip title="Grid">
-              <div
-                className={`flex items-center justify-center w-7 h-7 cursor-pointer ${
-                  sortType === "grid" ? "bg-green-400" : ""
-                }`}
-                onClick={() => setSortType("grid")}
-              >
-                <img src={gridSvg} alt="Grid View" className="w-5 h-5" />
-              </div>
-            </Tooltip>
+  <div
+    className={`flex items-center justify-center w-7 h-7 cursor-pointer ${
+      sortType === "grid" ? "bg-green-400" : "bg-gray-200"
+    } ${currentSelectMenu === "git" ? "opacity-50 cursor-not-allowed" : ""}`}
+    onClick={currentSelectMenu !== "git" ? () => setSortType("grid") : null}
+  >
+    <img src={gridSvg} alt="Grid View" className="w-5 h-5" />
+  </div>
+</Tooltip>
+
           </div>
           <div className="relative inline-block text-gray-700">
             <select
@@ -229,6 +235,7 @@ const Content = React.forwardRef((props, ref) => {
             currentSelectMenu={currentSelectMenu}
             ref={tableRef}
             auth={auth}
+            handleGithub={handleGithub}
           ></Table>
         ) : (
           <Grid
@@ -240,6 +247,7 @@ const Content = React.forwardRef((props, ref) => {
             sortedRows={sortedRows}
             auth={auth}
             user={user}
+            setGithubDialogOpen={setGithubDialogOpen}
           ></Grid>
         )}
       </div>
@@ -253,7 +261,10 @@ const Content = React.forwardRef((props, ref) => {
         dialogOpen={githubDialogOpen}
         setDialogOpen={setGithubDialogOpen}
         getProjectList={getProjectList}
-              user={user}
+        user={user}
+        projectName={projectName}
+        setProjectName={setProjectName}
+        currentSelectMenu={currentSelectMenu}
       ></Github>
     </div>
   );

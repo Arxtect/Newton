@@ -6,7 +6,7 @@
 import { TextField, Box } from "@mui/material";
 import { useMemo } from "react";
 
-export default function ArTextField({ inputSize, sx, ...props }) {
+export default function ArTextField({ inputSize, sx,inputProps,defaultValue, ...props }) {
   const getHeight = () => {
     switch (inputSize) {
       case "small":
@@ -45,14 +45,11 @@ export default function ArTextField({ inputSize, sx, ...props }) {
       fullWidth
       size="small"
       variant="outlined"
-      InputLabelProps={
-        getHeight() == "32px" && {
-          style: { lineHeight: "1" },
-        }
-      }
       inputProps={{
         style: { height: getHeight() },
+        ...inputProps,
       }}
+      defaultValue={defaultValue}
       sx={
         getHeight() == "32px"
           ? {

@@ -1,7 +1,6 @@
-import * as git from "isomorphic-git"
-export async function checkoutBranch(
-  projectRoot,
-  branchName
-) {
-  return git.checkout({ dir: projectRoot, ref: branchName })
+import * as git from "isomorphic-git";
+import fs from "fs";
+
+export async function checkoutBranch(projectRoot, branchName) {
+  return git.checkout({ fs, dir: projectRoot, ref: branchName });
 }

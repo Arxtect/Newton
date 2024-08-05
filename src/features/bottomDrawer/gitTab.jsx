@@ -45,10 +45,10 @@ const GitTab = () => {
             },
           }}
         >
-          <Tab label="Git" value="git" />
+          <Tab label="Sync" value="git" />
           <Tab label="History" value="history" />
           {/* <Tab label="Help" value="help" /> */}
-          <Tab label="Config" value="config" />
+          {/* <Tab label="Config" value="config" /> */}
         </Tabs>
       </Box>
       {/* 为内容区设置固定的高度并允许滚动 */}

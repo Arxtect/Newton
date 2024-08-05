@@ -1,7 +1,8 @@
 import * as git from "isomorphic-git";
+import fs from "fs";
 export async function isFastForward(dir, refA, refB) {
-  const logA = await git.log({ dir, ref: refA });
-  const logB = await git.log({ dir, ref: refB });
+  const logA = await git.log({ fs,dir, ref: refA });
+  const logB = await git.log({ fs,dir, ref: refB });
   const fastForward = isFastForwardByCommits(logA, logB);
   if (fastForward) {
     const oid = logA[logA.length - 1].oid;

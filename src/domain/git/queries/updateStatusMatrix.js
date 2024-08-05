@@ -1,14 +1,15 @@
 import * as git from "isomorphic-git";
-
+import fs from "fs";
 export async function updateStatusMatrix(projectRoot, matrix, patterns) {
   // return getStagingStatus(projectRoot)
   if (patterns.length === 0) {
-    return git.statusMatrix({ dir: projectRoot });
+    return git.statusMatrix({ fs,dir: projectRoot });
   }
 
   const buffer = [...matrix];
   for (const pattern of patterns) {
     const newMat = await git.statusMatrix({
+      fs,
       dir: projectRoot,
       pattern,
     });

@@ -28,7 +28,6 @@ import DialogLogin from "@/views/login/dialog-login.js";
 async function loadBrowserFS() {
   return new Promise((resolve) => {
     const BrowserFS = require("browserfs");
-    git.plugins.set("fs", fs);
     BrowserFS.install(window);
     BrowserFS.configure({ fs: "IndexedDB", options: {} }, (err) => {
       if (err) {

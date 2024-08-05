@@ -38,6 +38,7 @@ export async function pushBranch({
   //   return false;
   // }
   const ret = await git.push({
+    fs,
     dir: projectRoot,
     remote,
     ref,

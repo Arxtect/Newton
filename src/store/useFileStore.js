@@ -126,6 +126,7 @@ export const useFileStore = create()(
       reload: () => {
         let reloadCounter = get().reloadCounter;
         set({ reloadCounter: reloadCounter + 1 });
+        get().repoChanged()
         console.log("RootDirectory", reloadCounter);
       },
       unloadFile: () => {

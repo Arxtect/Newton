@@ -118,7 +118,7 @@ const GitEasy = () => {
                 variant="outlined"
                 value={commitMessage}
                 onChange={(e) => setCommitMessage(e.target.value)}
-                placeholder="Commit message"
+                placeholder="Sync message"
               />
               <ArLoadingButton
                 variant="contained"
@@ -128,7 +128,7 @@ const GitEasy = () => {
                 data-testid="commit-all-button"
                 loading={loading}
               >
-                Commit All
+                Sync All
               </ArLoadingButton>
               {/* <Button
                 variant="contained"

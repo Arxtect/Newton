@@ -142,6 +142,7 @@ export const useGitRepo = create()(
 
       mergeBranches: async ({ projectRoot, ref1, ref2 }) => {
         await git.merge({
+          fs,
           dir: projectRoot,
           ours: ref1,
           theirs: ref2,
