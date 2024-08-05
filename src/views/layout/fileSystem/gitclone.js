@@ -6,6 +6,8 @@
 import fs from "fs";
 import path from "path";
 import pify from "pify";
+import http from "isomorphic-git/http/web";
+
 import {
   cloneRepository,
   setupAndPushToRepo,

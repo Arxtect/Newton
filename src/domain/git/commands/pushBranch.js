@@ -7,6 +7,7 @@ import * as git from "isomorphic-git";
 import { EventEmitter } from "events";
 import fs from "fs";
 import { isCanPush } from "domain/git";
+import http from "isomorphic-git/http/web";
 
 export async function pushBranch({
   projectRoot,
@@ -42,6 +43,7 @@ export async function pushBranch({
     dir: projectRoot,
     remote,
     ref,
+    http,
     corsProxy,
     token,
     emitter,

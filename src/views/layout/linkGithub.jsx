@@ -25,6 +25,7 @@ import { removeDirectory, existsPath } from "domain/filesystem";
 import BottomDrawer from "@/features/bottomDrawer/bottomDrawer";
 import share from "@/assets/share.svg";
 import {getGitToken,createGitRepo} from "@/services"
+import {lookupSavedPassword} from "isomorphic-git";
 
 
 const GithubProgressBar = ({ progress, messages }) => {
@@ -118,24 +119,25 @@ const handleSaveProject = async () => {
       return;
     }
 
-    const res = await createGitRepo(projectName, projectName);
-    console.log(res, 'res'); // Debug information
+    // const res = await createGitRepo(projectName, projectName);
+    // console.log(res, 'res'); // Debug information
 
-    if (!res || res.error) {
-      console.log(res.error, 'res.error'); // Debug information
-      throw new Error(res.error || "Failed to create Git repository");
-    }
+    // if (!res || res.error) {
+    //   console.log(res.error, 'res.error'); // Debug information
+    //   throw new Error(res.error || "Failed to create Git repository");
+    // }
 
     let userName = user?.name;
     let remoteUrl = window.origin + "/git/" + userName + "/" + projectName + ".git";
     console.log(remoteUrl);
 
-    await setupAndPushToRepo(currentProjectRoot, projectName, {
+   await setupAndPushToRepo(currentProjectRoot, remoteUrl, {
       singleBranch: false,
-      token: gitConfig.githubApiToken,
+      onAuth: () => ({ password: gitConfig.githubApiToken}),
       onProgress,
       onMessage,
     });
+
 
     setDialogOpen(false);
     toast.success("Successfully linked repository from GitHub");

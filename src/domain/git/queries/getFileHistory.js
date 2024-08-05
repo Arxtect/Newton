@@ -1,6 +1,7 @@
 import * as Diff from "diff";
 import * as git from "isomorphic-git";
 import fs from "fs";
+
 export async function getFileHistory(dir, ref, filepath) {
   const commits = await git.log({ fs,dir, ref });
   const rawChanges = await Promise.all(
