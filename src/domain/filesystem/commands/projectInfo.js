@@ -72,3 +72,7 @@ export const removeProjectInfo = async (projectRoot) => {
     console.log("Error removing project info file: " + err);
   }
 };
+
+export const getInfoProjectName = () => {
+  return `project-${has}.json`;
+}

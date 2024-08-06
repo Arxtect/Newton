@@ -5,7 +5,8 @@ import path from "path";
 import { createBranch } from "./createBranch";
 import { checkoutBranch } from "./checkoutBranch";
 import http from "isomorphic-git/http/web";
-import {gitAuth} from "./gitAuth"
+import { gitAuth, getAuthor } from "./gitAuth";
+import {getInfoProjectName} from "domain/filesystem"
 
 const fsPify = {
   mkdir: pify(fs.mkdir),
@@ -13,14 +14,14 @@ const fsPify = {
   stat: pify(fs.stat),
 };
 
-const writeFile = pify(fs.writeFile);
 
 export async function addAllFilesToGit(dir) {
   async function addFilesFromDirectory(currentPath) {
     const entries = await fsPify.readdir(currentPath);
 
     for (const entry of entries) {
-      if (entry === ".git") {
+      console.log(entries, "entries");
+      if (entry === ".git" || getInfoProjectName() === entry) {
         continue;
       }
 
@@ -59,12 +60,12 @@ export async function setupAndPushToRepo(projectRoot, remoteUrl, options) {
     // 提交文件
     await git.commit({
       fs,
-       author: {
-        name: options?.committerName || "arxtect",
-        email: options?.committerEmail || "arxtect@gmail.com",
-      },
+      ...getAuthor({
+        name: options?.committerName,
+        email: options?.committerEmail 
+      }),
       dir: projectRoot,
-      message: 'arxtect initial commit'
+      message: "arxtect initial commit",
     });
 
   

@@ -78,9 +78,9 @@ export async function getDocumentById(documentId) {
 export async function getPreviewPdfUrl(storageKey) {
   try{
   await refreshAuth();
-   const response = await apiFetch(getApiUrl("/pre/download"), "POST",JSON.stringify({
+   const response = await apiFetch(getApiUrl("/pre/download"), "POST",{
       file_storage_id: storageKey,
-    }));
+    });
   return response}
   catch (error) {
     toast.error(` ${error}`);

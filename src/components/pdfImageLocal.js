@@ -62,7 +62,13 @@ const PdfImageLocal = ({ url, height = 250, ...res }) => {
   return (
     <React.Fragment>
       {pageImage ? (
-        <img src={pageImage} alt="PDF thumbnail" className="w-full" {...res} />
+        <img
+          src={pageImage}
+          alt="PDF thumbnail"
+          className="w-full"
+          style={{height: height}}
+          {...res}
+        />
       ) : (
         <Skeleton variant="rectangular" width="100%" height={height} />
       )}

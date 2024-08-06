@@ -50,21 +50,7 @@ export async function loginUser(credentials) {
   }
 }
 
-export async function getYDocToken() {
-  const response = await fetch(getApiUrl("/token"), {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
 
-  if (response.ok) {
-    const data = await response.json();
-    return data.token;
-  } else {
-    throw new Error("Get share token failed");
-  }
-}
 
 // 刷新 token
 export async function refreshAuth() {

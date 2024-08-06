@@ -63,8 +63,12 @@ const ProductDialog = () => {
   };
 
   const getAllTagsList = async () => {
-    const list = await getAllTags();
-    setCustomTags(list.data.tags);
+       try {
+         const list = await getAllTags();
+         setCustomTags(list.data.tags);
+       } catch (error) {
+         console.error(error);
+       }
   };
 
   useEffect(() => {

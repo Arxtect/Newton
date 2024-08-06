@@ -48,8 +48,6 @@ export async function getFileHistoryWithDiff(dir, ref, filepath) {
     const prevRaw = prev == null ? "" : Buffer.from(prev.blob).toString('utf8'); // 确保正确解码
     const diff = diffLines(prevRaw, currentRaw);
 
-    console.log(diff, prevRaw, currentRaw, prev, 'diff');
-
     return {
       ...current,
       diff,

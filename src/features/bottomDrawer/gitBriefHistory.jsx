@@ -1,3 +1,8 @@
+/*
+ * @Description: 
+ * @Author: Devin
+ * @Date: 2024-05-28 13:48:03
+ */
 import React, { useState } from "react";
 import Button from "@mui/material/Button";
 import Accordion from "@mui/material/Accordion";
@@ -58,10 +63,15 @@ const GitBriefHistory = () => {
             }}
           >
             {history.map((description) => {
-              const name = description.committer?.name || "<anonymous>";
-              const message = description.error?.message || description.message;
-              const formatted = description.author
-                ? format(description.author.timestamp * 1000, "MM/dd HH:mm")
+              console.log(description, "description");
+              const name = description.commit?.author?.name || "<anonymous>";
+              const message =
+                description.commit?.message || description.message;
+              const formatted = description?.commit?.author
+                ? format(
+                    description.commit?.author?.timestamp * 1000,
+                    "MM/dd HH:mm"
+                  )
                 : "<none>";
               return (
                 <div key={description.oid}>

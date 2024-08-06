@@ -1,3 +1,8 @@
+/*
+ * @Description: 
+ * @Author: Devin
+ * @Date: 2024-08-05 09:47:36
+ */
 // 假设你有这些辅助函数
 import { toast } from "react-toastify"; // 假设你已经安装了react-toastify
 import { updateAccessToken, updateUser } from "store";
@@ -53,7 +58,7 @@ export async function getGitTokenValidate(token) {
 export async function createGitRepo(name, description, isPrivate = true) {
   try {
       await refreshAuth();
-   const response = await apiFetch(getApiUrl("/gitea/repo"), "POST",  JSON.stringify({ name, description, private: isPrivate }))
+   const response = await apiFetch(getApiUrl("/gitea/repo"), "POST",  { name, description, private: isPrivate })
     return response;
   } catch (error) {
     throw error;

@@ -16,3 +16,16 @@ function generateBasicAuthHeader(password) {
   const base64Encoded = btoa(authString);
   return `Basic ${base64Encoded}`;
 }
+
+export function getAuthor(user) {
+  return {
+    committer: {
+      name: user.name || "arxtect",
+      email: user.email || "arxtect@gmail.com",
+    },
+    author: {
+      name: user.name || "arxtect",
+      email: user.email || "arxtect@gmail.com",
+    },
+  };
+}

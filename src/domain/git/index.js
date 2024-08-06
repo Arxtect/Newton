@@ -13,6 +13,8 @@ export * from "./commands/createProject";
 export * from "./commands/deleteBranch";
 export * from "./commands/pushBranch";
 export * from "./commands/removeFromGit";
+export * from "./commands/statusMatrix";
+export * from "./commands/merge";
 export * from "./queries/getBranchStatus";
 export * from "./queries/getFileStatus";
 export * from "./queries/getHistory";

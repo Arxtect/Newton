@@ -3,11 +3,12 @@ import create from "zustand";
 import { persist } from "zustand/middleware";
 import { existsPath } from "domain/filesystem";
 import path from "path";
-import * as git from "isomorphic-git";
 import * as Git from "domain/git";
 import { useFileStore, startUpdate } from "./useFileStore";
+import { useUserStore } from "./user";
 import { toast } from "react-toastify";
 import fs from "fs";
+
 
 export const GIT_STORE = "git_store";
 
@@ -129,7 +130,7 @@ export const useGitRepo = create()(
           remoteBranches,
           "currentBranch"
         );
-        const statusMatrix = await git.statusMatrix({ fs, dir: projectRoot });
+        const statusMatrix = await Git.statusMatrix({ fs, dir: projectRoot });
         get().endInitialize({
           history,
           currentBranch,
@@ -141,7 +142,7 @@ export const useGitRepo = create()(
       },
 
       mergeBranches: async ({ projectRoot, ref1, ref2 }) => {
-        await git.merge({
+        await Git.merge({
           fs,
           dir: projectRoot,
           ours: ref1,
@@ -205,14 +206,16 @@ export const useGitRepo = create()(
       },
 
       commitAll: async ({ message }) => {
+        let user = useUserStore.getState().user;
+        console.log(user, "user");
         const state = get();
-        const { committerName, committerEmail, statusMatrix, currentBranch } =
+        const { statusMatrix, currentBranch } =
           get();
         const { currentProjectRoot: projectRoot } = useFileStore.getState();
         if (statusMatrix) {
           const author = {
-            name: committerName || "<none>",
-            email: committerEmail || "<none>",
+            name: user?.name,
+            email: user?.email,
           };
           await Git.commitAll(projectRoot, message, author);
           const newMat = await Git.updateStatusMatrix(
@@ -252,7 +255,6 @@ export const useGitRepo = create()(
       pushCurrentBranchToOrigin: async () => {
         const state = get();
         const githubToken = state.githubApiToken;
-        const corsProxy = state.corsProxy;
         const { currentProjectRoot: projectRoot } = useFileStore.getState();
         const { currentBranch } = await Git.getBranchStatus(projectRoot);
 
