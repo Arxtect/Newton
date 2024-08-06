@@ -264,3 +264,8 @@ export function debounce(func, wait) {
 export function isNullOrUndefined(value) {
   return value === undefined || value === null;
 }
+
+export function getGiteaFullUrl(userName,repoName){
+ let remoteUrl = window.origin + "/git/" + userName + "/" + repoName + ".git";
+ return remoteUrl
+}

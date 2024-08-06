@@ -7,6 +7,8 @@ import { toast } from "react-toastify"; // 假设你已经安装了react-toastif
 import { refreshAuth } from "./auth";
 import { setCookie, deleteCookie, pdfToImageFirst } from "@/util";
 import { updateAccessToken } from "store";
+import {apiFetch} from "./apiFetch.js"
+
 // 辅助函数：生成带有统一前缀的URL
 function getApiUrl(endpoint) {
   return `/api/v1/documents${endpoint}`;
@@ -14,18 +16,18 @@ function getApiUrl(endpoint) {
 
 export async function getAllTags() {
   await refreshAuth();
-  const response = await fetch(getApiUrl("/tags/list"), {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-
-  return response.json();
+  try {
+    const response = await apiFetch(getApiUrl("/tags/list"), "GET");
+    return response;
+  } catch (error) {
+    throw error;
+  }
 }
 
+
 export async function documentSearch(search) {
-  await refreshAuth();
+   await refreshAuth();
+  try {
   // Initialize the query parameters as an array of strings
   let queryParams = [];
 
@@ -47,18 +49,12 @@ export async function documentSearch(search) {
   const url = `${getApiUrl("/list/search")}?${queryParams.join("&")}`;
 
   // Perform the GET request using the constructed URL
-  const response = await fetch(url, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-
-  if (response.ok) {
-    return response.json();
-  } else {
-    throw new Error("get document list failed");
+   const response = await apiFetch(url, "GET");
+return response
+  } catch (error) {
+    throw error;
   }
+
 }
 
 export async function getDocumentById(documentId) {
@@ -72,47 +68,22 @@ export async function getDocumentById(documentId) {
     const url = `${getApiUrl("/drafts")}/${documentId}`;
 
     // Perform the GET request using the constructed URL
-    const response = await fetch(url, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    // Check if the response is ok (status in the range 200-299)
-    if (response.ok) {
-      return response.json();
-    } else if (response.status === 401) {
-      // deleteCookie("mojolicious");
-      updateAccessToken("");
-      toast.error("Login has expired. Please log in again", {
-        position: "top-right",
-      });
-    } else {
-      // If the response is not ok, throw an error with the status text
-      throw new Error(`${response.statusText}`);
-    }
+    const response = await apiFetch(url, "GET");
+   return response
   } catch (error) {
     toast.error(` ${error}`);
   }
 }
 
 export async function getPreviewPdfUrl(storageKey) {
+  try{
   await refreshAuth();
-  const response = await fetch(getApiUrl("/pre/download"), {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
+   const response = await apiFetch(getApiUrl("/pre/download"), "POST",JSON.stringify({
       file_storage_id: storageKey,
-    }),
-  });
-
-  if (response.ok) {
-    return response.json();
-  } else {
-    throw new Error("get preview pdf url failed");
+    }));
+  return response}
+  catch (error) {
+    toast.error(` ${error}`);
   }
 }
 

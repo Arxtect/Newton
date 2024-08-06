@@ -29,12 +29,12 @@ const menuItems = [
   },
   { key: "trash", label: "Trash", icon: trashSvg },
   { key: "git", label: "Git Cloud", icon: gitCloudSvg },
-  { key: "category", label: "Project Category", icon: categorySvg },
+  // { key: "category", label: "Project Category", icon: categorySvg },
 ];
 
 const subCategories = [
-  { key: "sub_category_1", label: "Sub Category 1" },
-  { key: "sub_category_2", label: "Sub Category 2" },
+  // { key: "sub_category_1", label: "Sub Category 1" },
+  // { key: "sub_category_2", label: "Sub Category 2" },
 ];
 
 const Slide = ({ contentRef,currentSelectMenu, setCurrentSelectMenu }) => {

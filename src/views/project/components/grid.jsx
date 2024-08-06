@@ -1,12 +1,37 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import PdfImageLocal from "@/components/pdfImageLocal"
+import {useFileStore} from "store"
 
 const Grid = ({ sortedRows, auth, user, changeCurrentProjectRoot }) => {
+   const {
+      getCurrentProjectPdf,
+    } = useFileStore((state) => ({
+      getCurrentProjectPdf: state.getCurrentProjectPdf,
+    }));
   const navigate = useNavigate();
+
+   const [pdfUrls, setPdfUrls] = useState({});
+
+  useEffect(() => {
+    const fetchPdfUrls = async () => {
+      const urls = {};
+      for (const item of sortedRows) {
+        const url = await getCurrentProjectPdf(item.title);
+        urls[item.id] = url;
+      }
+      setPdfUrls(urls);
+      console.log(urls,'urls')
+    };
+
+    fetchPdfUrls();
+  }, [sortedRows]);
+
   return (
     <div>
       <div className="grid grid-cols-6 gap-5 items-start text-base leading-4 text-center text-black max-md:grid-cols-1 max-md:mt-10 max-md:max-w-full">
         {[...sortedRows].map((item) => {
+          const pdfUrl = pdfUrls[item.id];
           return (
             <div
               className="flex flex-col flex-1 mt-1.5 cursor-pointer"
@@ -31,7 +56,7 @@ const Grid = ({ sortedRows, auth, user, changeCurrentProjectRoot }) => {
                 navigate(`/newton`);
               }}
             >
-              <div className="shrink-0 bg-zinc-300 h-[178px]" />
+                 <PdfImageLocal url={pdfUrl} height={178} />
               <div className="self-center mt-3 hover:text-[#81c784] hover:underline">
                 {item.title}
               </div>

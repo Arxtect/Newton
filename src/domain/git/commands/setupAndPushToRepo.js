@@ -5,6 +5,7 @@ import path from "path";
 import { createBranch } from "./createBranch";
 import { checkoutBranch } from "./checkoutBranch";
 import http from "isomorphic-git/http/web";
+import {gitAuth} from "./gitAuth"
 
 const fsPify = {
   mkdir: pify(fs.mkdir),
@@ -79,6 +80,7 @@ export async function setupAndPushToRepo(projectRoot, remoteUrl, options) {
       ref: "main",
       http,
       ...options,
+      ...gitAuth( options.token)
     });
 
     console.log('Repository setup complete and pushed to remote.');

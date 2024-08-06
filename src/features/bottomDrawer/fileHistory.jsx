@@ -36,24 +36,24 @@ const FileHistory = () => {
         relpath
       );
 
-      const formattedHistory = changeHistory
-        .map((c) => ({
-          message: c.commit.message,
-          commitId: c.commit.oid,
-          timestamp: c.commit.committer.timestamp,
-          content: c.blob.object.toString(),
-          diffText: c.diff
-            .filter((d) => d.added || d.removed)
-            .map((d) =>
-              d.added
-                ? `+ : ${d.value}`
-                : d.removed
-                ? `- : ${d.value}`
-                : d.value
-            )
-            .join("\n"),
-        }))
-        .reverse();
+       const formattedHistory = changeHistory
+      .map((c) => ({
+        message: c.commit.message,
+        commitId: c.commit.oid,
+        timestamp: c.commit.committer?.timestamp,
+        content: Buffer.from(c.blob).toString('utf8'), // 确保正确解码
+        diffText: c.diff
+          .filter((d) => d.added || d.removed)
+          .map((d) =>
+            d.added
+              ? `+ : ${d.value}`
+              : d.removed
+              ? `- : ${d.value}`
+              : d.value
+          )
+          .join("\n"),
+      }))
+      .reverse();
 
       setCurrentHistory(formattedHistory);
     };

@@ -227,7 +227,6 @@ export const useGitRepo = create()(
             ref: currentBranch,
             remote: "origin",
             token: state.githubApiToken,
-            corsProxy: state.corsProxy,
           });
           set({ isCanPush });
         }
@@ -271,7 +270,6 @@ export const useGitRepo = create()(
               remote: "origin",
               ref: currentBranch,
               token: githubToken,
-              corsProxy,
               onProgress,
               onMessage,
             });

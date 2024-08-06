@@ -1,12 +1,13 @@
 // 假设你有这些辅助函数
-import { setCookie, deleteCookie } from "@/util";
 import { toast } from "react-toastify"; // 假设你已经安装了react-toastify
 import { updateAccessToken, updateUser } from "store";
+import {apiFetch} from "./apiFetch.js"
 
 // 辅助函数：生成带有统一前缀的URL
 function getApiUrl(endpoint) {
   return `/api/v1/auth${endpoint}`;
 }
+
 
 // 注册用户
 export async function registerUser(userData) {

@@ -7,6 +7,8 @@ import delay from "delay";
 import { EventEmitter } from "events";
 import * as git from "isomorphic-git";
 import fs from "fs";
+import http from "isomorphic-git/http/web";
+import {gitAuth} from "./gitAuth"
 //  options = {
 //    corsProxy,
 //    onProgress,
@@ -31,8 +33,10 @@ export async function cloneRepository(projectRoot, cloneDest, options) {
     dir: projectRoot,
     url: cloneDest, //https://github.com/devixyz/wasm-git-demo.git
     ref: "main",
+    http,
     emitter,
     ...options,
+    ...gitAuth(options.token)
   });
 
   while (true) {

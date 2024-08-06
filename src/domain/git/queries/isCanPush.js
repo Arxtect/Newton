@@ -1,5 +1,7 @@
 import * as git from "isomorphic-git";
 import fs from "fs";
+import http from "isomorphic-git/http/web";
+import {gitAuth} from "../commands/gitAuth"
 
 export async function fetchLatestRemoteInfo({ dir, remote, corsProxy, token }) {
   await git.fetch({
@@ -8,7 +10,9 @@ export async function fetchLatestRemoteInfo({ dir, remote, corsProxy, token }) {
     remote,
     corsProxy,
     singleBranch: false,
-    token,
+    http,
+...gitAuth(
+    token)
   });
 }
 export async function hasLocalCommits({

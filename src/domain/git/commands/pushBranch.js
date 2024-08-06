@@ -8,6 +8,7 @@ import { EventEmitter } from "events";
 import fs from "fs";
 import { isCanPush } from "domain/git";
 import http from "isomorphic-git/http/web";
+import {gitAuth} from "./gitAuth"
 
 export async function pushBranch({
   projectRoot,
@@ -48,6 +49,8 @@ export async function pushBranch({
     token,
     emitter,
     ...options,
+   ...gitAuth(
+    token)
   });
 
   if (ret.errors && ret.errors.length > 0) {

@@ -4,7 +4,7 @@ import { gitCommandSuccess, gitCommandError } from "@/util";
 import fs from "fs";
 
 export async function commitAll(root, message, author) {
-  const mat = await git.statusMatrix({ dir: root });
+  const mat = await git.statusMatrix({ fs,dir: root });
   const modified = Parser.getModifiedFilenames(mat);
   const removable = Parser.getRemovableFilenames(mat);
 

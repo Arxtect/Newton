@@ -61,6 +61,10 @@ const GitEasy = () => {
   }
 
   const commitAndPush = async (commitMessage) => {
+    if(!commitMessage){
+     toast.error("Please enter message");
+     return
+    }
     setLoading(true)
     commitAll({ message: commitMessage })
       .then(async () => {

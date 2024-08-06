@@ -11,16 +11,13 @@ import { getPreViewUrl } from "@/util";
 // 设置 pdf.js 的 worker，这是必须的步骤
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
-const PdfImage = ({ storageKey, height = 250, ...res }) => {
+const PdfImageLocal = ({ url, height = 250, ...res }) => {
   const [pageImage, setPageImage] = useState("");
 
   const getImage = async () => {
-    if (!storageKey) return;
-    // const response = await getPreviewPdfUrl(storageKey);
-    // const fileUrl = response.data.preview;
-    const fileUrl = getPreViewUrl(storageKey);
+    if (!url) return;
     const loadingTask = pdfjs.getDocument({
-      url: fileUrl,
+      url: url,
       disableAutoFetch: true,
       disableStream: true,
       rangeChunkSize: 1,
@@ -60,7 +57,7 @@ const PdfImage = ({ storageKey, height = 250, ...res }) => {
 
   useEffect(() => {
     getImage();
-  }, [storageKey]);
+  }, [url]);
 
   return (
     <React.Fragment>
@@ -73,4 +70,4 @@ const PdfImage = ({ storageKey, height = 250, ...res }) => {
   );
 };
 
-export default PdfImage;
+export default PdfImageLocal;
