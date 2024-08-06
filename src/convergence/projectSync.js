@@ -8,11 +8,13 @@ import { uploadFile, downloadFile } from "./minio";
 import { assetExtensions } from "@/util";
 import { debounce } from "@/util";
 import { Awareness } from "y-protocols/awareness.js"; // eslint-disable-line
+import {getColors} from "@/util";
 
 const host = window.location.hostname;
 const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
 const wsUrl = `wss://arxtect.com/websockets`;
 // const wsUrl = `ws://10.10.101.126:8013`;
+
 
 class ProjectSync {
   constructor(rootPath, user, roomId, token, otherOperation) {
@@ -28,7 +30,7 @@ class ProjectSync {
     );
     this.user = {
       ...user,
-      color: "#" + Math.floor(Math.random() * 16777215).toString(16),
+      color: getColors(),
     };
     this.userList = [];
     this.awareness = this.websocketProvider.awareness;
@@ -419,7 +421,6 @@ class ProjectSync {
   leaveCollaboration() {
     // 清理 Yjs 观察者
     this.cleanup();
-
     // 断开 WebSocket 连接
     if (this.websocketProvider) {
       this.websocketProvider.disconnect();

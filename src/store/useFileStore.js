@@ -52,6 +52,12 @@ export const useFileStore = create()(
         await (projectSync && projectSync.setObserveHandler());
         set({ projectSync });
       },
+      leaveProjectSyncRoom: () => {
+        let projectSync = get().projectSync;
+        console.log(projectSync,"leaveProjectSyncRoom");
+        projectSync?.leaveCollaboration && projectSync?.leaveCollaboration();
+        get().updateProjectSync(null);
+      },
       updateProject: async (pdfBlob) => {
         const projectRoot = get().currentProjectRoot;
         // 保存PDF到IndexedDB

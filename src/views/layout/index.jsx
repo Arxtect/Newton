@@ -14,12 +14,23 @@ import { ButtonBarContainer } from "@/features/buttonBar/ButtonBarContainer";
 import RightBefore from "./rightBefore";
 import TopBar from "./topBar";
 import ContentTopBar from "./content/topBar";
-import { useLayout } from "store";
+import { useFileStore } from "store";
 
 const Index = () => {
   useLayoutEffect(() => {
     initializeLatexEngines();
   }, []);
+  const { leaveProjectSyncRoom } =
+    useFileStore((state) => ({
+      leaveProjectSyncRoom: state.leaveProjectSyncRoom,
+     
+    }));
+
+  useEffect(() => {
+    return ()=>{
+      leaveProjectSyncRoom();
+    }
+  }, [])
 
 
   return (

@@ -6,11 +6,12 @@ import { isNullOrUndefined } from "@/util";
 const Range = Ace.require("ace/range").Range;
 
 class AceCursors {
-  constructor(ace) {
+  constructor(ace, localUser) {
     this.marker = {};
     this.markerID = {};
     this.marker.cursors = [];
     this.aceID = null; // Ace container ID will be set dynamically
+    this.localUser = localUser;
 
     // Bind the marker update function to this context
     this.marker.update = (html, markerLayer, session, config) => {
@@ -36,6 +37,8 @@ class AceCursors {
     console.log(cursors, "cursors");
 
     for (let i = 0; i < cursors.length; i++) {
+      console.log(cursors[i],this.localUser, "cursors[i]");
+      if(this.localUser?.id == cursors[i].userId) continue
       let pos = cursors[i];
       if (
         pos.row < start ||
@@ -81,6 +84,10 @@ class AceCursors {
             cursorLabel.style.whiteSpace = "nowrap";
             cursorLabel.textContent = pos.name;
             cursorLabel.style.display = "inline-block";
+            cursorLabel.style.transform = `translateY(-${config.lineHeight +4}px)`;
+            cursorLabel.style.borderRadius = "5px"; // 添加圆角
+            cursorLabel.style.padding = "2px 4px"; // 添加内边距以提高可读性
+            cursorLabel.style.boxShadow = "0 1px 3px rgba(0,0,0,0.2)"; // 添加阴影以提高可见性
             el.appendChild(cursorLabel);
           });
           el.addEventListener("mouseleave", function () {
@@ -299,7 +306,8 @@ export class AceBinding {
   }
 
   init(ace, currentFilePath) {
-    this.aceCursors = new AceCursors(ace);
+    console.log(this.awareness.getLocalState(), "cursors");
+    this.aceCursors = new AceCursors(ace,this.awareness.getLocalState().user);
     this.aceCursors.init(ace, currentFilePath);
     ace.session.getUndoManager().reset();
     this.currentFilePath = currentFilePath;

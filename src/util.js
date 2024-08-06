@@ -269,3 +269,26 @@ export function getGiteaFullUrl(userName,repoName){
  let remoteUrl = window.origin + "/git/" + userName + "/" + repoName + ".git";
  return remoteUrl
 }
+
+export function getColors(i) {
+  const colors = [
+    "#FF5733",
+    "#33FF57",
+    "#3357FF",
+    "#babdfb", // 修正了这里的多余 '#'
+    "#A133FF",
+    "#33FFA1",
+    "#FF5733",
+    "#FFC300",
+    "#FF5733",
+    "#DAF7A6",
+  ];
+
+  if (typeof i === "number" && i >= 0) {
+    return colors[i];
+  } else if(i > colors.length){
+    return colors[colors.length - 1];
+  }else{
+    return colors[Math.floor(Math.random() * colors.length)];
+  }
+}

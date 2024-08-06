@@ -25,21 +25,23 @@ function RightBefore() {
     pdfUrl: state.pdfUrl,
     toggleCompilerLog: state.toggleCompilerLog,
   }));
-  const { projectSync, sourceCode, currentProjectRoot, filepath, loadFile } =
-    useFileStore((state) => ({
-      projectSync: state.projectSync,
-      sourceCode: state.value,
-      currentProjectRoot: state.currentProjectRoot,
-      filepath: state.filepath,
-      loadFile: state.loadFile,
-    }));
+  const {
+    leaveProjectSyncRoom,
+    sourceCode,
+    currentProjectRoot,
+    projectSync,
+  } = useFileStore((state) => ({
+    leaveProjectSyncRoom: state.leaveProjectSyncRoom,
+    sourceCode: state.value,
+    currentProjectRoot: state.currentProjectRoot,
+    projectSync: state.projectSync,
+  }));
 
   useEffect(() => {
     return () => {
-      console.log(projectSync, "projectSync");
-      projectSync?.leaveCollaboration && projectSync?.leaveCollaboration();
+     leaveProjectSyncRoom()
     };
-  }, [projectSync]);
+  }, []);
 
   const compile = () => compileLatex(sourceCode, currentProjectRoot);
 

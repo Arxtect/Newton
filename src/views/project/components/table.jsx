@@ -436,6 +436,7 @@ const Table = forwardRef(
       getProjectList();
       return () => {
         if (projectSync) {
+          
           projectSync?.leaveCollaboration && projectSync?.leaveCollaboration();
         }
       };

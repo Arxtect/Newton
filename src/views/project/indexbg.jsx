@@ -506,6 +506,7 @@ function Project() {
     init();
     getProjectList();
     return () => {
+      console.log(projectSync, "leaveCollaboration");
       if (projectSync) {
         projectSync?.leaveCollaboration && projectSync?.leaveCollaboration();
       }

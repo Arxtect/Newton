@@ -13,6 +13,7 @@ import { useUserStore, useFileStore } from "@/store";
 import { downloadDirectoryAsZip } from "domain/filesystem";
 import { useNavigate } from "react-router-dom";
 import { Tooltip } from "@mui/material";
+import {getColors} from "@/util";
 const maxDisplayCount = 3; // 最大显示的名字数量
 
 const TopBar = (props) => {
@@ -29,18 +30,6 @@ const TopBar = (props) => {
       loadFile: state.loadFile,
     }));
 
-  //   const getRandomColor = () => {
-  //     const letters = "0123456789ABCDEF";
-  //     let color = "#";
-  //     for (let i = 0; i < 6; i++) {
-  //       color += letters[Math.floor(Math.random() * 16)];
-  //     }
-  //     return color;
-  //   };
-  function getRandomColor(i) {
-    const colors = ["#4caf4f", "#adaf4c", "#1bbcfe", "#9c5fd9", "#ff9a9e"];
-    return colors[i ?? colors.length - 1];
-  }
 
   const handleClick = (type) => {
     switch (type) {
@@ -52,6 +41,8 @@ const TopBar = (props) => {
         downloadDirectoryAsZip(currentProjectRoot);
         break;
       case "Down":
+        break;
+      default:
         break;
     }
     console.log("handleClick", type);
@@ -125,7 +116,7 @@ const TopBar = (props) => {
                   key={user.id}
                   className="relative rounded-full w-8 h-8 flex items-center justify-center border-2 border-white"
                   style={{
-                    backgroundColor: getRandomColor(index),
+                    backgroundColor: getColors(index),
                     marginLeft: index === 0 ? "0" : "-0.5rem", // Adjust the overlap
                     zIndex: 100 - index,
                   }}
@@ -140,7 +131,7 @@ const TopBar = (props) => {
               <div
                 className="rounded-full w-8 h-8 flex items-center justify-center border-2 border-white"
                 style={{
-                  backgroundColor: getRandomColor(),
+                  backgroundColor: getColors(12),
                   marginLeft: "-0.5rem", // Adjust the overlap
                 }}
               >
