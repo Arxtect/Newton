@@ -121,8 +121,8 @@ module.exports = function (proxy, allowedHost) {
         // pathRewrite: { "^/api/v1": "" }
       },
       "/minio": {
-        // target: "http://network.jancsitech.net:9000",
-        target: "https://arxtect.com/",
+        target: "http://network.jancsitech.net:9000",
+        // target: "https://arxtect.com/",
         changeOrigin: true,
         pathRewrite: { "^/minio": "" },
       },
