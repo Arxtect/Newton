@@ -76,38 +76,8 @@ const TopBar = (props) => {
         <img src={logoIcon} alt="icon" className="mx-2" />
         <span className="ml-2 text-black font-bold">Project</span>
       </div>
-      <div className="flex items-center space-x-10 mr-4">
-        <div className="flex items-center bg-white rounded-lg shadow">
-          {buttonData.map((button, index) => {
-            if (button.key === "Share") {
-              return <Share rootPath={currentProjectRoot} user={user}></Share>;
-            }
-            if (button.key === "Publish") {
-              return <PublishDocument></PublishDocument>;
-            }
-            if (button.key === "Link") {
-              return <LinkGithub></LinkGithub>;
-            }
-            return (
-              <Tooltip title={button.key}>
-                <button
-                  key={index}
-                  className={`flex items-center text-gray-700 px-2 py-1 hover:bg-gray-200 active:bg-[#9fd5a2] ${
-                    index === 0 ? "rounded-l-lg" : ""
-                  } ${button.label ? "space-x-1" : ""}`}
-                  onClick={() => {
-                    button.click(button.key);
-                  }}
-                >
-                  {!button.label && <span>{"\u00A0"}</span>}
-                  <img src={button.src} alt="" className="w-4 h-4" />
-                  <span>{button.label || "\u00A0"}</span> {/* 使用空格字符 */}
-                </button>
-              </Tooltip>
-            );
-          })}
-        </div>
-        {!!projectSync && (
+      <div className="flex items-center space-x-20 mr-4">
+         {!!projectSync && (
           <div className="flex items-center">
             {projectSync?.userList
               .slice(0, maxDisplayCount)
@@ -140,6 +110,37 @@ const TopBar = (props) => {
             )}
           </div>
         )}
+        <div className="flex items-center bg-white rounded-lg shadow">
+          {buttonData.map((button, index) => {
+            if (button.key === "Share") {
+              return <Share rootPath={currentProjectRoot} user={user}></Share>;
+            }
+            if (button.key === "Publish") {
+              return <PublishDocument></PublishDocument>;
+            }
+            if (button.key === "Link") {
+              return <LinkGithub></LinkGithub>;
+            }
+            return (
+              <Tooltip title={button.key}>
+                <button
+                  key={index}
+                  className={`flex items-center text-gray-700 px-2 py-1 hover:bg-gray-200 active:bg-[#9fd5a2] ${
+                    index === 0 ? "rounded-l-lg" : ""
+                  } ${button.label ? "space-x-1" : ""}`}
+                  onClick={() => {
+                    button.click(button.key);
+                  }}
+                >
+                  {!button.label && <span>{"\u00A0"}</span>}
+                  <img src={button.src} alt="" className="w-4 h-4" />
+                  <span>{button.label || "\u00A0"}</span> {/* 使用空格字符 */}
+                </button>
+              </Tooltip>
+            );
+          })}
+        </div>
+       
       </div>
     </div>
   );

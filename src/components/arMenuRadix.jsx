@@ -36,11 +36,16 @@ const ArMenuRadix = forwardRef(
         <React.Fragment key={index}>
           {!item.subMenu ? (
             <DropdownMenu.Item
-              className={`px-4 py-2 hover:bg-gray-100 cursor-pointer outline-none ${
+              className={`flex items-center gap-4 px-4 py-2 hover:bg-gray-100 cursor-pointer outline-none ${
                 align === "center" ? "text-center" : "text-left"
               }`}
               onSelect={item.onSelect}
             >
+              {item.icon&& <img
+            src={item.icon}
+            alt=""
+            className="w-6 h-6 cursor-pointer"
+          />}
               {item.label}
             </DropdownMenu.Item>
           ) : (

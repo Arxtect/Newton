@@ -1,7 +1,9 @@
 
 
 export const gitAuth =(token)=>{
-    if(!token) return {}
+    if(!token) {
+      token ="arxtect"
+    }
 return {
       //  onAuth: () => ({
       //   password: token // 你的 GitHub API 令牌

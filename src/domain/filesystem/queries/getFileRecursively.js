@@ -8,7 +8,7 @@ export async function getFilesRecursively(rootPath) {
   return nodeToFileList(node);
 }
 
-const IGNORE_PATTERNS = [".git"];
+export const IGNORE_PATTERNS = [".git"];
 
 export async function readRecursiveFileNode(pathname) {
   const stat = await pify(fs.stat)(pathname);

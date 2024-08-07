@@ -66,23 +66,31 @@ function DraggableItem(props) {
 }
 
 
+const DraggableDropTargetItem = React.memo(
+  DropTarget(DND_GROUP, fileTarget, (connect) => ({
+    connectDropTarget: connect.dropTarget(),
+  }))(
+    DragSource(DND_GROUP, fileSource, (connect, monitor) => ({
+      connectDragSource: connect.dragSource(),
+      isDragging: monitor.isDragging(),
+    }))(DraggableItem)
+  )
+);
+
 const DraggableAndDroppable = ({ isEnabled = true, children, ...props }) => {
-  let Component = DraggableItem;
-
   if (isEnabled) {
-    Component = DropTarget(DND_GROUP, fileTarget, (connect) => ({
-      connectDropTarget: connect.dropTarget(),
-    }))(
-      DragSource(DND_GROUP, fileSource, (connect, monitor) => ({
-        connectDragSource: connect.dragSource(),
-        isDragging: monitor.isDragging(),
-      }))(DraggableItem)
-    );
-  }else{
-    Component = ()=> <div>{children}</div>
+    return <DraggableDropTargetItem {...props}>{children}</DraggableDropTargetItem>;
+  } else {
+    return <div {...props}>{children}</div>;
   }
-
-  return <Component {...props}>{children}</Component>;
 };
 
 export default DraggableAndDroppable;
+// export default DropTarget(DND_GROUP, fileTarget, (connect) => ({
+//       connectDropTarget: connect.dropTarget(),
+//     }))(
+//       DragSource(DND_GROUP, fileSource, (connect, monitor) => ({
+//         connectDragSource: connect.dragSource(),
+//         isDragging: monitor.isDragging(),
+//       }))(DraggableItem)
+//     );

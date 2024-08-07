@@ -32,17 +32,10 @@ import WebAssetIcon from "@mui/icons-material/WebAsset";
 import { Box, Tooltip } from "@mui/material";
 import { useLayout } from "store";
 import layoutSvg from "@/assets/layout/layout.svg";
-
-const WebAssetIconRotate = (props) => {
-  return (
-    <WebAssetIcon
-      sx={{
-        transform: "rotate(-90deg)", // This rotates the whole icon
-      }}
-      {...props}
-    />
-  );
-};
+import ArMenuRadix from "@/components/arMenuRadix";
+import editorPdfSvg from "@/assets/layout/editorPdf.svg";
+import onlyPdfSvg from "@/assets/layout/onlyPdf.svg";
+import onlyCodeSvg from "@/assets/layout/onlyCode.svg";
 
 const CustomDropdownMenu = forwardRef((props, ref) => {
   const {
@@ -59,6 +52,8 @@ const CustomDropdownMenu = forwardRef((props, ref) => {
     toggleView,
     emitResize,
     showFooter,
+    changeShowView,
+    changeShowEditor,
   } = useLayout();
 
   const [anchorEl, setAnchorEl] = useState(null);
@@ -77,35 +72,21 @@ const CustomDropdownMenu = forwardRef((props, ref) => {
   const open = Boolean(anchorEl);
   const id = open ? "simple-popover" : undefined;
 
-  const actionList = [
-    {
-      icon: <WebAssetIconRotate />,
-      isSelected: showSide,
-      onClick: toggleSide,
-      title: "sidebar",
-    },
-    {
-      icon: <BorderColorTwoToneIcon />,
-      isSelected: showEditor,
-      onClick: toggleEditor,
-      title: "editor",
-    },
-    {
-      icon: <VisibilityIcon />,
-      isSelected: showView,
-      onClick: toggleView,
-      title: "preview",
-    },
-    { icon: <ViewColumnIcon />, isSelected: false },
-    { icon: <HelpOutlineIcon />, isSelected: false },
-    { icon: <TextFieldsIcon />, isSelected: false },
-    { icon: <GridViewIcon />, isSelected: false },
-    { icon: <SearchIcon />, isSelected: false },
-  ];
+  //   const getButtonClass = (open) => {
+  //   console.log(open, "open");
+  //   if (open) {
+  //     return "bg-[#81c784]";
+  //   }
+  // };
 
   return (
-    <React.Fragment>
-      <Tooltip title={"Layout"}>
+    <div className="font-bold leading-3 text-center text-[0.9rem] text-black border-0 border-black border-solid ">
+      <ArMenuRadix
+              align="left"
+              title={"New Project"}
+              // getButtonClass={getButtonClass}
+              buttonCom={
+                   <Tooltip title={"Layout"}>
         <IconButton
           color="#inherit"
           aria-label="controls"
@@ -119,54 +100,33 @@ const CustomDropdownMenu = forwardRef((props, ref) => {
           />
         </IconButton>
       </Tooltip>
-
-      <Popover
-        id={id}
-        open={open}
-        anchorEl={anchorEl}
-        onClose={handleClose}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "left",
-        }}
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "left",
-        }}
-        sx={{
-          ".MuiPaper-root": {
-            bgcolor: "#f1f1f2",
-            width: "200px",
-          },
-        }}
-      >
-        <Grid container className="p-1 py-2" spacing={1}>
-          {actionList.map((item, index) => (
-            <Grid item xs={3} key={index}>
-              <Tooltip title={item.title} key={index}>
-                <IconButton
-                  className={`p-2`}
-                  onClick={() => {
-                    item.onClick && item.onClick();
-                  }}
-                  sx={{
-                    borderRadius: "20%",
-                    ...(item.isSelected && {
-                      bgcolor: "#cfcfd2",
-                      "&:hover": {
-                        bgcolor: "#cfcfd2", // 选中状态下悬停颜色不变
+              }
+              items={[
+                {
+                  label: "Editor & PDF",
+                  icon:editorPdfSvg,
+                      onSelect: () => {
+                         changeShowEditor(true)
+    changeShowView(true)
                       },
-                    }),
-                  }}
-                >
-                  {React.cloneElement(item.icon, { className: "text-[#000]" })}
-                </IconButton>
-              </Tooltip>
-            </Grid>
-          ))}
-        </Grid>
-      </Popover>
-    </React.Fragment>
+                },
+                {
+                  label: "Editor Only",  icon:onlyCodeSvg,
+                  onSelect: () => {
+                     changeShowEditor(true)
+    changeShowView(false)
+                  },
+                },
+                {
+                  label: "PDF Only",  icon:onlyPdfSvg,
+                  onSelect: () => {
+                      changeShowEditor(false)
+    changeShowView(true)
+                  },
+                },
+              ]}
+            ></ArMenuRadix>
+    </div>
   );
 });
 

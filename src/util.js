@@ -272,10 +272,10 @@ export function getGiteaFullUrl(userName,repoName){
 
 export function getColors(i) {
   const colors = [
-    "#FF5733",
-    "#33FF57",
-    "#3357FF",
-    "#babdfb", // 修正了这里的多余 '#'
+    "#42c0b0",
+    "#4caf4f",
+    "#acae4c",
+    "#babdfb",
     "#A133FF",
     "#33FFA1",
     "#FF5733",

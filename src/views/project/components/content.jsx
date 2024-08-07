@@ -148,9 +148,11 @@ const Content = React.forwardRef(({currentSelectMenu, setCurrentSelectMenu}, ref
       .sort((a, b) => {
         if (sortSelect === "lastModified") {
           return b.lastModified - a.lastModified;
-        } else if (sortSelect === "id") {
-          return a.id - b.id;
-        }
+        } else if (sortSelect === "lastCreated") {
+          return b.created_at - a.created_at;
+        } else if (sortSelect === "alphabetical") {
+    return a.title.localeCompare(b.title);
+}
         return 0;
       });
   }, [projectData, searchInput, sortSelect]);
@@ -219,8 +221,9 @@ const Content = React.forwardRef(({currentSelectMenu, setCurrentSelectMenu}, ref
               onChange={(event) => setSortSelect(event.target.value)}
               className="appearance-none bg-gray-200 border border-gray-300 text-gray-700 pl-1 pr-5 rounded focus:outline-none py-[0.05rem]"
             >
-              <option value="lastModified">last modified</option>
-              <option value="id">Id</option>
+              <option value="lastModified">Last modified</option>
+              <option value="lastCreated">Last created</option>
+              <option value="alphabetical">Alphabetical</option>
             </select>
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
               <img src={expandSvg} alt="expand" />

@@ -74,7 +74,6 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList,user,projectNa
   const getGiteaToekn=async (token) =>{
    try{
     let res= await getGitToken(token)
-    console.log(res.data,'123123123',user)
     changeConfig({
       githubApiToken:res?.data
     })
@@ -87,8 +86,8 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList,user,projectNa
   const handleCancelProject = () => {
     setDialogOpen(false);
   };
+  
   const handleSaveProject = () => {
-    setLoading(true);
     console.log(user,'Github')
     if(!user?.id){
       toast.warning("Plaese login first");

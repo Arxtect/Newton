@@ -164,6 +164,7 @@ class ProjectSync {
       this.yMap.set(filePath, { _delete: true, ...otherInfo });
     });
   }
+
   // 删除文件夹
   async deleteFolder(folderPath) {
     try {
@@ -175,7 +176,7 @@ class ProjectSync {
         const filePath = path.join(folderPath, file.name); // 使用 path.join 进行路径拼接
 
         if (file.type == "file") {
-          await this.deleteFile(filePath, { dir: folderPath }); // 删除文件
+          await this.deleteFile(filePath); // 删除文件
         } else if (file.type == "dir") {
           await this.deleteFolder(filePath); // 递归删除子文件夹
         }
@@ -189,6 +190,7 @@ class ProjectSync {
 
   // 同步单个文件到 Yjs Map
   async syncFileToYMap(filePath, content) {
+    if(filePath.includes(".git")) return
     try {
       await this.syncToYMap(filePath, content);
       const folderPath = path.dirname(filePath);
@@ -202,6 +204,7 @@ class ProjectSync {
 
   // 同步文件夹列表
   syncFolderInfo(folderPath) {
+    if(folderPath.includes(".git")) return
     console.log(folderPath, "folderPath");
     this.yDoc.transact(() => {
       let folderMap = this.yMap.get(this.folderMapName) || [];
@@ -213,6 +216,7 @@ class ProjectSync {
 
   // 从 Yjs Map 中删除文件夹
   removeFolderInfo(folderPath) {
+    if(folderPath.includes(".git")) return
     this.yDoc.transact(() => {
       let folderMap = this.yMap.get(this.folderMapName) || [];
       if (folderMap.includes(folderPath)) {
@@ -224,6 +228,7 @@ class ProjectSync {
 
   // 同步整个文件夹到 Yjs Map
   async syncFolderToYMap(folderPath) {
+    if(folderPath.includes(".git")) return;
     try {
       this.syncFolderInfo(folderPath);
       const files = await FS.readFileStats(folderPath, false);
@@ -258,6 +263,7 @@ class ProjectSync {
   }
 
   async handleFolderInfo(folderPath, key, content) {
+    if(folderPath.includes(".git")) return;
     const files = await FS.readFileStats(folderPath, false);
     const fileNames = new Set(files.map((f) => f.name));
     const contentNames = new Set(content);
@@ -265,6 +271,7 @@ class ProjectSync {
     // 删除 files 中有但 content 中没有的文件夹
     for (const file of files) {
       const filePath = path.join(folderPath, file.name);
+      if(file.name.includes(".git")) continue;
       if (file.type == "dir" && !contentNames.has(filePath)) {
         await this.deleteFolder(filePath);
         console.log(`Deleted folder ${filePath}`);
@@ -307,17 +314,9 @@ class ProjectSync {
               resolve();
               return;
             }
-            if (content?._delete || content == undefined) {
+            if (content?._delete) {
               // 如果内容为空，则删除文件
               await useFileStore.getState().deleteFile({ filename: key });
-              if (!!content?.dir) {
-                const files = await FS.readFileStats(content?.dir, false);
-                if (files.length == 0) {
-                  useFileStore
-                    .getState()
-                    .deleteDirectory({ dirpath: content.dir });
-                }
-              }
               console.log(`File ${key} deleted successfully.`);
               resolve();
               return;

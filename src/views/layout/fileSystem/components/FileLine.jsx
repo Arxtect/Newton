@@ -130,12 +130,23 @@ const FileLine = ({
           onBlur={handleBlur}
           onKeyDown={handleKeyDown}
           inputRef={inputRef}
-          sx={{
-            "& .MuiInputBase-input": {
-              height: "24px",
-              padding: "0 6px",
+       sx={{
+          "& .MuiInputBase-input": {
+            height: "24px",
+            padding: "0 6px",
+          },
+          "& .MuiOutlinedInput-root": {
+            "& fieldset": {
+              borderColor: "#81C784",
             },
-          }}
+            "&:hover fieldset": {
+              borderColor: "#81C784",
+            },
+            "&.Mui-focused fieldset": {
+              borderColor: "#81C784",
+            },
+          },
+        }}
         />
       </Box>
     );

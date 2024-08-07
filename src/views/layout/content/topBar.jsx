@@ -140,7 +140,7 @@ const ContentTopBar = (props) => {
 
   return (
     <div className="flex items-center justify-between bg-[#e8f9ef] w-full">
-      <div className="flex items-center pl-2 w-1/2">
+      <div className="flex items-center pl-2 w-1/2 ">
         {actionList.map((icon) => {
           if (icon.key == "uploadFile") {
             return (

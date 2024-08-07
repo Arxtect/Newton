@@ -41,6 +41,8 @@ import path from "path";
 import pify from "pify";
 import orderBy from "lodash/orderBy";
 import { projectInfoExists } from "../commands/projectInfo";
+import { IGNORE_PATTERNS } from "./getFileRecursively"
+
 
 export async function readFileStats(dirpath, isNotSync = true) {
   const readdir = pify(fs.readdir);
@@ -53,6 +55,9 @@ export async function readFileStats(dirpath, isNotSync = true) {
     filenames.map(async (name) => {
       if (!!projectInfoExists(name) && isNotSync) return null; // TODO: remove
       const childPath = path.join(dirpath, name);
+      if(IGNORE_PATTERNS.includes(childPath)){
+       return null
+      }
       const stats = await stat(childPath);
 
       return {

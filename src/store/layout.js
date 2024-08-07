@@ -29,6 +29,14 @@ export const useLayout = create((set) => ({
       }
       return { showEditor: !state.showEditor };
     }),
+      changeShowEditor: (show) =>
+    set((state) => {
+      return { showEditor: show };
+    }),
+     changeShowView: (show) =>
+    set((state) => {
+      return { showView: show };
+    }),
   toggleView: () =>
     set((state) => {
       if (!state.showEditor && state.showView) {
