@@ -47,6 +47,8 @@ export const useFileStore = create()(
       preRenamingDirpath: "",
       allProject: [],
       dirOpen: false,
+      isDropFileSystem:true,
+      updateIsDropFileSystem:(isDropFileSystem) => set({ isDropFileSystem }),
       updateDirOpen: (dirOpen) => set({ dirOpen }),
       updateProjectSync: async (projectSync) => {
         await (projectSync && projectSync.setObserveHandler());

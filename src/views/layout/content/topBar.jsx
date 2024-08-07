@@ -16,10 +16,11 @@ import uploadFileSvg from "@/assets/layout/uploadFile.svg";
 import successSvg from "@/assets/layout/success.svg";
 import { Select, MenuItem, IconButton, Tooltip } from "@mui/material";
 import Controls from "./controls";
-import { useLayout, useFileStore, redo, undo, search } from "store";
+import { useLayout, useFileStore, redo, undo, search,useUserStore } from "store";
 import { compileLatex } from "@/features/latexCompilation/latexCompilation";
 import { EngineStatus } from "@/features/engineStatus/EngineStatus";
 import { FileUploader, FolderUploader } from "../upload.jsx";
+import UploadFiles from "./uploadFiles"
 
 const ContentTopBar = (props) => {
   const {
@@ -61,6 +62,10 @@ const ContentTopBar = (props) => {
     currentSelectDir: state.currentSelectDir,
     updateDirOpen: state.updateDirOpen,
     reload: state.repoChanged,
+  }));
+
+    const { user } = useUserStore((state) => ({
+    user: state.user,
   }));
 
   const compile = () => compileLatex(sourceCode, currentProjectRoot);
@@ -140,7 +145,17 @@ const ContentTopBar = (props) => {
           if (icon.key == "uploadFile") {
             return (
               <React.Fragment>
-                <FileUploader
+                <UploadFiles  
+                reload={reload}
+                  filepath={filepath}
+                  currentSelectDir={currentSelectDir}
+                  currentProject={currentProjectRoot}
+                  title={"Upload File"}
+                  projectSync={projectSync}
+                  user={user}
+                  />
+                  
+                {/* <FileUploader
                   onClick={() => fileUploaderRef.current.click()}
                   reload={reload}
                   filepath={filepath}
@@ -161,7 +176,7 @@ const ContentTopBar = (props) => {
                   currentProject={currentProjectRoot}
                   projectSync={projectSync}
                   title="Upload Folder"
-                ></FolderUploader>
+                ></FolderUploader> */}
               </React.Fragment>
             );
           }

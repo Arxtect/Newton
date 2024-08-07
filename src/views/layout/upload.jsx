@@ -10,12 +10,11 @@ import React, {
   forwardRef,
   useImperativeHandle,
 } from "react";
-import { uploadFile, uploadFolder } from "@/domain/filesystem";
+import { uploadFile, uploadFolder,readFile} from "@/domain/filesystem";
 import UploadFileIcon from "@mui/icons-material/UploadFileRounded";
 import path from "path";
 import DriveFolderUploadIcon from "@mui/icons-material/DriveFolderUploadRounded";
 import { IconButton, Tooltip } from "@mui/material";
-import { readFile } from "domain/filesystem";
 import uploadFileSvg from "@/assets/layout/uploadFile.svg";
 import uploadFolderSvg from "@/assets/layout/uploadFolder.svg";
 

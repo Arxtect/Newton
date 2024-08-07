@@ -12,7 +12,7 @@ import { ensureDir } from "./ensureDir";
 const writeFile = pify(fs.writeFile);
 
 // 处理二进制文件上传
-export const writeInBrowser = async (file, dirpath, reload) => {
+export const writeInBrowser = async (file, dirpath, reload,webkitRelativePath) => {
   try {
     // 使用 FileReader 读取文件的二进制内容
     const data = await new Promise((resolve, reject) => {
@@ -22,7 +22,7 @@ export const writeInBrowser = async (file, dirpath, reload) => {
       reader.readAsArrayBuffer(file);
     });
 
-    const filename = file.webkitRelativePath || file.name;
+    const filename = webkitRelativePath ||file.webkitRelativePath || file.name;
     const browserPath = path.join(dirpath, filename);
 
     // 确保目录存在

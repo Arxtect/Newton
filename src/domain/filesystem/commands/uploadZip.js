@@ -60,7 +60,7 @@ const uploadZip = async (
 
       if (zipEntry.dir) {
         // 如果是文件夹，则创建文件夹
-        await ensureDir(targetPath);
+        // await ensureDir(targetPath);
       } else {
         // 如果是文件，则读取并写入文件
         const content = await zipEntry.async("nodebuffer");

@@ -47,6 +47,7 @@ const FileLine = ({
     editingFilepath,
     currentSelectDir,
     renamingPathname,
+    isDropFileSystem
   } = useFileStore((state) => ({
     editorValue: state.value,
     saveFile: state.saveFile,
@@ -54,6 +55,7 @@ const FileLine = ({
     currentSelectDir: state.currentSelectDir,
     deleteFile: state.deleteFile,
     renamingPathname: state.renamingPathname,
+        isDropFileSystem:state.isDropFileSystem
   }));
   const basename = path.basename(filepath);
 
@@ -148,6 +150,7 @@ const FileLine = ({
             fileMoved(result);
           }
         }}
+        isEnabled={isDropFileSystem}
         onDropByOther={() => {
           // Do nothing yet
         }}

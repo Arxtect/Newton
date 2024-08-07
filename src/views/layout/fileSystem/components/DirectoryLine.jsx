@@ -3,7 +3,6 @@ import fs from "fs";
 import path from "path";
 import pify from "pify";
 import range from "lodash/range";
-
 import AddDir from "./AddDir";
 import AddFile from "./AddFile";
 import Draggable from "./Draggable";
@@ -93,8 +92,9 @@ const DirectoryLineContent = ({
   changePreRenamingDirpath,
   changeCurrentProjectRoot,
 }) => {
-  const { dirOpen } = useFileStore((state) => ({
+  const { dirOpen,isDropFileSystem } = useFileStore((state) => ({
     dirOpen: state.dirOpen,
+    isDropFileSystem:state.isDropFileSystem
   }));
 
   const [opened, setOpened] = useState(
@@ -144,6 +144,7 @@ const DirectoryLineContent = ({
   };
 
   const handleFileMove = (result) => {
+    console.log(result)
     if (result) {
       fileMoved(result);
     }
@@ -218,6 +219,7 @@ const DirectoryLineContent = ({
   }, [dirOpen]);
 
   return (
+
     <List className="p-0">
       <div onMouseOver={handleMouseOver} onMouseLeave={handleMouseLeave}>
         <Draggable
@@ -225,6 +227,7 @@ const DirectoryLineContent = ({
           type="dir"
           onDrop={handleFileMove}
           onDropByOther={() => setOpened(true)}
+          isEnabled={isDropFileSystem}
         >
           <ListItem
             onMouseOver={handleMouseOver}
