@@ -1,0 +1,6 @@
+.custom-select option {
+  background-color: #ffffff; /* White background for the options */
+  color: #000000; /* Black text for the options */
+  padding: 12px;
+  line-height: 1rem;
+}

@@ -44,7 +44,7 @@ const ArMenuRadix = forwardRef(
               {item.icon&& <img
             src={item.icon}
             alt=""
-            className="w-6 h-6 cursor-pointer"
+            className="w-5 h-5 cursor-pointer"
           />}
               {item.label}
             </DropdownMenu.Item>

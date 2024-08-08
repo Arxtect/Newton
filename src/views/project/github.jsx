@@ -67,10 +67,6 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList,user,projectNa
     changeConfig: state.changeConfig,
   }));
 
-  const [gitConfig, setGitConfig] = useState({
-    githubApiToken: githubApiToken,
-  });
-
   const getGiteaToekn=async (token) =>{
    try{
     let res= await getGitToken(token)
@@ -101,8 +97,6 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList,user,projectNa
     }
     gitClone(projectName)
       .then((res) => {
-        console.log(res);
-        console.log(user, res, "user");
         createProjectInfo(res, {
           name: "YOU",
           ...user,
@@ -132,21 +126,25 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList,user,projectNa
     console.log(message, "message");
   };
   const gitClone = async (projectName) => {
-    console.log(projectName,'clonePath')
-    let userName = user?.name
+    try {
+      console.log(projectName, 'clonePath')
+      let userName = user?.name
 
-    let url =window.origin +"/git/"+userName+"/"+projectName+".git"
-       console.log(projectName,'clonePath',url)
+      let url = window.origin + "/git/" + userName + "/" + projectName + ".git"
+      console.log(projectName, 'clonePath', url)
 
-    return new Promise(async (resolve, reject) => {
-      await cloneRepository(projectName, url, {
-        singleBranch: false,
-        token: gitConfig.githubApiToken,
-        onProgress,
-        onMessage,
+      return new Promise(async (resolve, reject) => {
+        await cloneRepository(projectName, url, {
+          singleBranch: false,
+          token: githubApiToken,
+          onProgress,
+          onMessage,
+        });
+        resolve(projectName);
       });
-      resolve(projectName);
-    });
+    } catch (err) {
+      toast.warning(err.message);
+    }
   };
   const [loading, setLoading] = useState(false);
     const [options, setOptions] = useState([]);

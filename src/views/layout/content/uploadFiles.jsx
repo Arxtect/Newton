@@ -19,8 +19,8 @@ const UploadFiles = ({ user,title,reload,
       filepath,
       currentSelectDir,
       currentProject,
-      projectSync, }) => {
-  const navigate = useNavigate();
+  projectSync, }) => {
+  
   const { repoChanged,updateIsDropFileSystem} = useFileStore((state) => ({
     repoChanged: state.repoChanged,
     updateIsDropFileSystem:state.updateIsDropFileSystem
@@ -88,7 +88,9 @@ const handleUpload = async (files) => {
     ? currentSelectDir
     : !!filepath
     ? path.dirname(filepath)
-    : currentProject;
+      : currentProject;
+  
+  console.log(currentPath,currentSelectDir, "currentPath");
   const fileList = files;
   const filesArray = Array.from(fileList);
   const filePaths = await uploadFile(filesArray, currentPath, reload);
