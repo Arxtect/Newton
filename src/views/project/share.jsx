@@ -10,6 +10,10 @@ import { toast } from "react-toastify";
 import { ProjectSync } from "@/convergence";
 import { useFileStore } from "store";
 import { getYDocToken } from "services";
+import linkSvg from "@/assets/link.svg";
+import ShareProject from "@/features/share";
+import { inviteUser } from "@/services";
+
 
 const Share = ({
   dialogOpen,
@@ -20,11 +24,6 @@ const Share = ({
 }) => {
   const [loading, setLoading] = useState(false);
   const [link, setLink] = useState("");
-
-  const { projectSync, updateProjectSync } = useFileStore((state) => ({
-    projectSync: state.projectSync,
-    updateProjectSync: state.updateProjectSync,
-  }));
 
   useEffect(() => {
     if (!rootPath || !user || JSON.stringify(user) === "{}") return;
@@ -46,16 +45,14 @@ const Share = ({
     projectSync.syncFolderToYMapRootPath(getProjectList);
   };
 
+
   const handleSaveProject = async () => {
     setLoading(true);
     try {
       // 创建 ProjectSync 实例
       await createProjectSync(rootPath, user);
-
-      await navigator.clipboard.writeText(link);
-      toast.success("Link copied to clipboard!");
       setLoading(false);
-      handleCancelProject();
+      // handleCancelProject();
     } catch (error) {
       toast.error("Share failed!");
     } finally {
@@ -63,31 +60,101 @@ const Share = ({
     }
   };
 
+
+    const copyLink = async (link) => {
+      await navigator.clipboard.writeText(link);
+      toast.success("Link copied to clipboard!");
+    };
+  
+   const handleInvite = async (searchInput, access) => {
+     console.log(searchInput, access, "searchInput");
+     let status = await inviteUser({
+       email: searchInput,
+       share_link: link,
+       project_name: rootPath + user.id,
+       access: access,
+     });
+     if (status == "success") {
+       toast.success(`Invite ${searchInput} success`);
+       handleSaveProject();
+     }
+     return status;
+   };
+
+   const handleUpdateUser = async (searchInput, access) => {
+     let status = await inviteUser({
+       email: searchInput,
+       share_link: link,
+       project_name: rootPath + user.id,
+       access: access,
+     });
+     if (status == "success") {
+       toast.success(`Change user acess success`);
+     }
+     return status;
+   };
+
+  const [roomInfo, setRoomInfo] = useState({});
+  
+  const getRoomInfo = () => {
+    //rootPath+user.id
+    let roomName = rootPath + user.id;
+    const roomInfo = {
+      name: roomName,
+      create_by: user.id,
+      access: "rw",
+      share_link: link,
+      accessList: [
+        {
+          ...user,
+          access: "rw",
+        },
+        {
+          id: "123",
+          name: "ad",
+          email: "2473023641@qq.com",
+          access: "rw",
+        },
+      ],
+    };
+    setRoomInfo(roomInfo);
+  };
+
+    useEffect(() => {
+      getRoomInfo();
+    }, []);
+
   return (
     <ArDialog
-      title="Share Project"
+      title={
+        <div className="flex justify-between mr-8">
+          {"Share Project"}
+          <div
+            className="flex items-center gap-2.5 text-sm  cursor-pointer"
+            onClick={() => copyLink(link)}
+          >
+            <img
+              loading="lazy"
+              src={linkSvg}
+              className="object-contain shrink-0 w-6 aspect-square"
+              alt=""
+            />
+            <span className="text-[#81C684]">Copy Link</span>
+          </div>
+        </div>
+      }
       dialogOpen={dialogOpen}
       handleCancel={handleCancelProject}
-      buttonList={[
-        { title: "Cancel", click: handleCancelProject },
-        { title: "SHARE", click: handleSaveProject, loading: loading },
-      ]}
+      buttonList={[{ title: "Cancel", click: handleCancelProject }]}
       width={"50vw"}
     >
-      <Box component="form" noValidate autoComplete="off">
-        <div className="w-[100%]">
-          <TextField
-            fullWidth
-            label="Shareable Link"
-            value={link}
-            InputProps={{
-              readOnly: true,
-            }}
-            variant="outlined"
-            margin="normal"
-          />
-        </div>
-      </Box>
+      <ShareProject
+        handleInvite={handleInvite}
+        handleUpdateUser={handleUpdateUser}
+        roomInfo={roomInfo}
+        getRoomInfo={getRoomInfo}
+        user={user}
+      ></ShareProject>
     </ArDialog>
   );
 };

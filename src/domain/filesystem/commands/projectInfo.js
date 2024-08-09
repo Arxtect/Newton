@@ -56,6 +56,7 @@ export const getProjectInfo = async (projectRoot) => {
   }
 };
 
+
 // 检查项目信息文件是否存在的函数
 export const projectInfoExists = (filename) => {
   const projectInfoPath = `project-${has}.json`;

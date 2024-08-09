@@ -58,6 +58,8 @@ class ProjectSync {
     let uniqueUsers = [];
     let currentUsersId = [];
 
+    console.log(states, "states");
+
     for (let [id, state] of states) {
       console.log(state, "state"); // 输出每个 state 对象
       if (state && state.user) {
@@ -70,6 +72,8 @@ class ProjectSync {
 
     // 将 Set 转换为数组，并解析 JSON 字符串回对象
     this.userList = uniqueUsers;
+
+    useFileStore.getState().updateShareUserList(this.userList);
 
     // 输出最终的用户列表
     console.log("User List:", this.userList);
@@ -93,6 +97,7 @@ class ProjectSync {
       rootPath: this.rootPath,
       userId: this.roomId,
       isSync: true,
+      isClose: false,
       ...otherInfo,
     });
   }

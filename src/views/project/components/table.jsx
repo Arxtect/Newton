@@ -32,7 +32,7 @@ import renameSvg from "@/assets/project/rename.svg";
 import shareSvg from "@/assets/project/share.svg";
 import downloadPdfSvg from "@/assets/project/downloadPdf.svg";
 import "./index.scss";
-import { getYDocToken } from "services";
+import { getYDocToken, deleteGitRepo } from "services";
 
 const Table = forwardRef(
   ({ setSelectedRows, getProjectList, projectData, sortedRows, auth,currentSelectMenu,handleGithub }, ref) => {
@@ -77,6 +77,7 @@ const Table = forwardRef(
     // delete project
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [deleteProjectName, setDeleteProjectName] = useState("");
+    const [isGitDelete, setIsGitDelete] = useState(false)
 
     const handleDeleteProject = (deleteProjectName) => {
       if (!deleteProjectName) {
@@ -143,6 +144,16 @@ const Table = forwardRef(
     const handleRename = (title) => {
       setRenameSourceProject(title);
       setRenameDialogOpen(true);
+    };
+
+    const handleDeleteGitRepo = async () => {
+      let res =await deleteGitRepo(deleteProjectName);
+      if (res?.status == 'success') {
+        getProjectList();
+          setDeleteDialogOpen(false);
+      toast.success("Delete success");
+      }
+      
     };
 
     // table
@@ -228,18 +239,33 @@ const Table = forwardRef(
         sortable: false,
         renderCell: (params) => {
            if(params.row?.type=="git"){
-            return  <Tooltip title="Import">
-              <IconButton
-                size="small"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleGithub(true,params.row.title)
-                }}
-              >
-
-                <img src={gitCloudSvg} className="w-4" alt="" />
-              </IconButton>
-            </Tooltip>
+             return (
+               <React.Fragment>
+                 <Tooltip title="Import">
+                   <IconButton
+                     size="small"
+                     onClick={(e) => {
+                       e.stopPropagation();
+                       handleGithub(true, params.row.title);
+                     }}
+                   >
+                     <img src={gitCloudSvg} className="w-4" alt="" />
+                   </IconButton>
+                 </Tooltip>
+                 <Tooltip title="Delete">
+                   <IconButton
+                     size="small"
+                     onClick={(e) => {
+                       e.stopPropagation();
+                       handleDeleteProject(params.row.title);
+                       setIsGitDelete(true);
+                     }}
+                   >
+                     <img src={deleteSvg} alt="" />
+                   </IconButton>
+                 </Tooltip>
+               </React.Fragment>
+             );
           }
           return <div>
             <Tooltip title="Download">
@@ -307,7 +333,7 @@ const Table = forwardRef(
                   console.log(params.row.userId, user.id, "params.row");
                   if (params.row.userId && params.row.userId != user.id) {
                     toast.warning(
-                      "This project is collaborative and cannot be shared"
+                      "this project is shared, You didn't have permission to share"
                     );
                     return;
                   }
@@ -330,6 +356,7 @@ const Table = forwardRef(
                 size="small"
                 onClick={(e) => {
                   e.stopPropagation();
+                   setIsGitDelete(false);
                   const isAuth = auth(
                     params.row.name != "YOU" &&
                       (!user || JSON.stringify(user) === "{}"),
@@ -371,7 +398,7 @@ const Table = forwardRef(
       window.addEventListener("resize", updateColumns);
 
       return () => window.removeEventListener("resize", updateColumns);
-    }, []);
+    }, [user]);
 
     // sync project
     const [projectSync, setProjectSync] = useState(null);
@@ -460,7 +487,7 @@ const Table = forwardRef(
           }}
           pageSizeOptions={[5, 10]}
           pageSize={10}
-          checkboxSelection={currentSelectMenu!="git"?true:false}
+          checkboxSelection={currentSelectMenu != "git" ? true : false}
           onRowSelectionModelChange={handleSelection}
           disableRowSelectionOnClick
           onCellDoubleClick={(params) => console.log(params)}
@@ -503,7 +530,10 @@ const Table = forwardRef(
           handleCancel={handleCancelDelete}
           buttonList={[
             { title: "Cancel", click: handleCancelDelete },
-            { title: "Delete", click: handleConfirmDelete },
+            {
+              title: "Delete",
+              click: isGitDelete ? handleDeleteGitRepo : handleConfirmDelete,
+            },
           ]}
         >
           Are you sure you want to delete the project：

@@ -12,7 +12,7 @@ function getApiUrl(endpoint) {
 
 export async function getYDocToken() {
   const response = await apiFetch(getApiUrl("/auth/token"), "GET");
-  return response.token;
+  return response?.token;
 }
 
 export async function inviteUser({email, share_link, project_name, access}) {

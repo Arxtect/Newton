@@ -158,4 +158,4 @@ const FileSystem = () => {
   );
 };
 
-export default FileSystem;
+export default React.memo(FileSystem);

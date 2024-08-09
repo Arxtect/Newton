@@ -31,7 +31,7 @@ const Share = forwardRef(({ rootPath, user }, ref) => {
     if (info.userId && info.userId != user.id) {
       await navigator.clipboard.writeText(link);
       toast.warning(
-        "This project is collaborative and cannot be shared, link copied to clipboard"
+        "You didn't have permission to share, link copied to clipboard"
       );
       return;
     }

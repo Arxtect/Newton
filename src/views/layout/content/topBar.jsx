@@ -76,6 +76,7 @@ const ContentTopBar = (props) => {
         toggleSide();
         break;
       case "newFile":
+        console.log(currentSelectDir, "currentSelectDir");
         updateDirOpen(true);
         startFileCreating(currentSelectDir);
         break;
@@ -136,7 +137,7 @@ const ContentTopBar = (props) => {
         click: handleActionClick,
       },
     ].filter(Boolean);
-  }, [showSide]);
+  }, [showSide, currentSelectDir]);
 
   return (
     <div className="flex items-center justify-between bg-[#e8f9ef] w-full">

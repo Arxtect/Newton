@@ -65,3 +65,16 @@ export async function createGitRepo(name, description, isPrivate = true) {
   }
 
 }
+
+export async function deleteGitRepo(name) {
+  try {
+    await refreshAuth();
+    const response = await apiFetch(
+      getApiUrl(`/gitea/repo/${name}`),
+      "DELETE"
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}

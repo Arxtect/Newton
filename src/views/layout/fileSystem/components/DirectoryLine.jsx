@@ -214,12 +214,11 @@ const DirectoryLineContent = ({
 
   useEffect(() => {
     if (!!dirOpen) {
-      setOpened(true);
+      setOpened(currentSelectDir == dirpath ? true : false);
     }
   }, [dirOpen]);
 
   return (
-
     <List className="p-0">
       <div onMouseOver={handleMouseOver} onMouseLeave={handleMouseLeave}>
         <Draggable
@@ -273,6 +272,17 @@ const DirectoryLineContent = ({
                   "& .MuiInputBase-input": {
                     height: "24px",
                     padding: "0 6px",
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": {
+                      borderColor: "#81C784",
+                    },
+                    "&:hover fieldset": {
+                      borderColor: "#81C784",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "#81C784",
+                    },
                   },
                 }}
               />

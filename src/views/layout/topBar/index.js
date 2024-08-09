@@ -21,8 +21,9 @@ const TopBar = (props) => {
     user: state.user,
   }));
   const navigate = useNavigate();
-  const { projectSync, sourceCode, currentProjectRoot, filepath, loadFile } =
+  const {shareUserList, projectSync, sourceCode, currentProjectRoot, filepath, loadFile } =
     useFileStore((state) => ({
+      shareUserList:state.shareUserList,
       projectSync: state.projectSync,
       sourceCode: state.value,
       currentProjectRoot: state.currentProjectRoot,
@@ -59,8 +60,8 @@ const TopBar = (props) => {
   ];
 
   useEffect(() => {
-    console.log(projectSync?.userList);
-  }, [projectSync?.userList]);
+    console.log(shareUserList, "projectSync");
+  }, [shareUserList]);
 
   return (
     <div className="flex items-center justify-between p-2 bg-[#f9fdfd]">
@@ -77,27 +78,25 @@ const TopBar = (props) => {
         <span className="ml-2 text-black font-bold">Project</span>
       </div>
       <div className="flex items-center space-x-20 mr-4">
-         {!!projectSync && (
+        {!!projectSync && (
           <div className="flex items-center">
-            {projectSync?.userList
-              .slice(0, maxDisplayCount)
-              .map((user, index) => (
-                <div
-                  key={user.id}
-                  className="relative rounded-full w-8 h-8 flex items-center justify-center border-2 border-white"
-                  style={{
-                    backgroundColor: getColors(index),
-                    marginLeft: index === 0 ? "0" : "-0.5rem", // Adjust the overlap
-                    zIndex: 100 - index,
-                  }}
-                  title={user.name}
-                >
-                  <span className="text-white text-xs">
-                    {user.name.charAt(0).toUpperCase()}
-                  </span>
-                </div>
-              ))}
-            {projectSync?.userList?.length > maxDisplayCount && (
+            {shareUserList.slice(0, maxDisplayCount).map((user, index) => (
+              <div
+                key={user.id}
+                className="relative rounded-full w-8 h-8 flex items-center justify-center border-2 border-white"
+                style={{
+                  backgroundColor: getColors(index),
+                  marginLeft: index === 0 ? "0" : "-0.5rem", // Adjust the overlap
+                  zIndex: 100 - index,
+                }}
+                title={user.name}
+              >
+                <span className="text-white text-xs">
+                  {user.name.charAt(0).toUpperCase()}
+                </span>
+              </div>
+            ))}
+            {shareUserList?.length > maxDisplayCount && (
               <div
                 className="rounded-full w-8 h-8 flex items-center justify-center border-2 border-white"
                 style={{
@@ -140,7 +139,6 @@ const TopBar = (props) => {
             );
           })}
         </div>
-       
       </div>
     </div>
   );

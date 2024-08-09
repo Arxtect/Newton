@@ -47,8 +47,10 @@ export const useFileStore = create()(
       preRenamingDirpath: "",
       allProject: [],
       dirOpen: false,
-      isDropFileSystem:true,
-      updateIsDropFileSystem:(isDropFileSystem) => set({ isDropFileSystem }),
+      shareUserList: [],
+      isDropFileSystem: true,
+      updateShareUserList: (shareUserList) => set({ shareUserList }),
+      updateIsDropFileSystem: (isDropFileSystem) => set({ isDropFileSystem }),
       updateDirOpen: (dirOpen) => set({ dirOpen }),
       updateProjectSync: async (projectSync) => {
         await (projectSync && projectSync.setObserveHandler());
@@ -56,9 +58,10 @@ export const useFileStore = create()(
       },
       leaveProjectSyncRoom: () => {
         let projectSync = get().projectSync;
-        console.log(projectSync,"leaveProjectSyncRoom");
+        console.log(projectSync, "leaveProjectSyncRoom");
         projectSync?.leaveCollaboration && projectSync?.leaveCollaboration();
         get().updateProjectSync(null);
+        get().updateShareUserList([]);
       },
       updateProject: async (pdfBlob) => {
         const projectRoot = get().currentProjectRoot;
@@ -134,7 +137,7 @@ export const useFileStore = create()(
       reload: () => {
         let reloadCounter = get().reloadCounter;
         set({ reloadCounter: reloadCounter + 1 });
-        get().repoChanged()
+        get().repoChanged();
         console.log("RootDirectory", reloadCounter);
       },
       unloadFile: () => {
