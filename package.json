@@ -48,7 +48,9 @@
     "camelcase": "^6.2.1",
     "caniuse-lite": "^1.0.30001621",
     "case-sensitive-paths-webpack-plugin": "^2.4.0",
+    "compression-webpack-plugin": "^11.1.0",
     "constants-browserify": "^1.0.0",
+    "cross-env": "^7.0.3",
     "crypto-js": "^4.2.0",
     "css-loader": "^6.5.1",
     "css-minimizer-webpack-plugin": "^3.2.0",
@@ -133,7 +135,7 @@
   },
   "scripts": {
     "start": "node scripts/start.js",
-    "build": "node scripts/build.js",
+    "build": "cross-env GENERATE_SOURCEMAP=false node scripts/build.js",
     "test": "node scripts/test.js"
   },
   "eslintConfig": {

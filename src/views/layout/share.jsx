@@ -21,16 +21,18 @@ import { getYDocToken } from "services";
 import ShareProject from "@/features/share";
 
 import linkSvg from "@/assets/link.svg";
-import {inviteUser} from "@/services"
+import { inviteUser } from "@/services"
+import { useCopyToClipboard } from "@/useHooks";
 
 const Share = forwardRef(({ rootPath, user }, ref) => {
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [copyToClipboard] = useCopyToClipboard();
 
   const controlShare = async () => {
     const info = await getProjectInfo(rootPath);
     if (info.userId && info.userId != user.id) {
-      await navigator.clipboard.writeText(link);
-      toast.warning(
+      await copyToClipboard(
+        link,
         "You didn't have permission to share, link copied to clipboard"
       );
       return;
@@ -83,8 +85,7 @@ const Share = forwardRef(({ rootPath, user }, ref) => {
 
 
   const copyLink = async (link) => {
-    await navigator.clipboard.writeText(link);
-     toast.success("Link copied to clipboard!");
+      await copyToClipboard(link, "Link copied to clipboard!");
   };
 
   const handleSaveProject = async () => {

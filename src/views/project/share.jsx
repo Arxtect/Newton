@@ -13,7 +13,7 @@ import { getYDocToken } from "services";
 import linkSvg from "@/assets/link.svg";
 import ShareProject from "@/features/share";
 import { inviteUser } from "@/services";
-
+import { useCopyToClipboard } from "@/useHooks";
 
 const Share = ({
   dialogOpen,
@@ -24,6 +24,8 @@ const Share = ({
 }) => {
   const [loading, setLoading] = useState(false);
   const [link, setLink] = useState("");
+  const [copyToClipboard] = useCopyToClipboard();
+
 
   useEffect(() => {
     if (!rootPath || !user || JSON.stringify(user) === "{}") return;
@@ -61,9 +63,8 @@ const Share = ({
   };
 
 
-    const copyLink = async (link) => {
-      await navigator.clipboard.writeText(link);
-      toast.success("Link copied to clipboard!");
+  const copyLink = async (link) => {
+      await copyToClipboard(link, "Link copied to clipboard!");
     };
   
    const handleInvite = async (searchInput, access) => {

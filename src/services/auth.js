@@ -46,7 +46,8 @@ export async function loginUser(credentials) {
     updateAccessToken(data.access_token);
     return data;
   } else {
-    throw new Error("Login failed");
+    const data = await response.json();
+    throw new Error(data?.message);
   }
 }
 

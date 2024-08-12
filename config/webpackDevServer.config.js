@@ -114,7 +114,8 @@ module.exports = function (proxy, allowedHost) {
         pathRewrite: { "^/latex": "" },
       },
       "/api/v1": {
-        target: "http://172.17.15.200:8012",
+        target: "http://3.227.9.181:8012",
+        // target: "http://172.17.15.200:8012",
         // target: "http://127.0.0.1:8012",
         // target: "http://206.190.239.91:8012",
         changeOrigin: true,
@@ -127,7 +128,7 @@ module.exports = function (proxy, allowedHost) {
         pathRewrite: { "^/minio": "" },
       },
       "/git": {
-        target: "http://10.10.101.126:3006",
+        target: "http://3.227.9.181:3006",
         changeOrigin: true,
         pathRewrite: { "^/git": "" },
       },

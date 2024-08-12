@@ -104,7 +104,7 @@ const Content = React.forwardRef(({currentSelectMenu, setCurrentSelectMenu}, ref
     }else{
      project= await findAllProjectInfo();
     }
-    if(!project?.length) return
+    if(!project) return
 
     console.log(project, "project");
     setProjectData(

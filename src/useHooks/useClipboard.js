@@ -1,26 +1,43 @@
-/*
- * @Description:
- * @Author: Devin
- * @Date: 2024-06-26 14:37:08
- */
-/*
- * @Description:
- * @Author: Devin
- * @Date: 2024-06-26 14:37:08
- */
 import { useEffect, useState } from "react";
 
 const useClipboard = () => {
   const [projectName, setProjectName] = useState("");
   const [roomId, setRoomId] = useState("");
 
+  const readClipboardFallback = () => {
+    return new Promise((resolve, reject) => {
+      const textarea = document.createElement("textarea");
+      document.body.appendChild(textarea);
+      textarea.focus();
+      document.execCommand("paste");
+      const clipboardText = textarea.value;
+      document.body.removeChild(textarea);
+      if (clipboardText) {
+        resolve(clipboardText);
+      } else {
+        reject("Failed to read clipboard contents using fallback method.");
+      }
+    });
+  };
+
   const readClipboard = async () => {
-    try {
-      const text = await navigator.clipboard.readText();
-      return text;
-    } catch (err) {
-      console.error("Failed to read clipboard contents: ", err);
-      return null;
+    if (navigator.clipboard) {
+      try {
+        const text = await navigator.clipboard.readText();
+        return text;
+      } catch (err) {
+        console.error("Failed to read clipboard contents: ", err);
+        return null;
+      }
+    } else {
+      console.warn("Clipboard API not available, using fallback method.");
+      try {
+        const text = await readClipboardFallback();
+        return text;
+      } catch (err) {
+        console.error(err);
+        return null;
+      }
     }
   };
 
