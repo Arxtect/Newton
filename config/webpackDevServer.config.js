@@ -109,26 +109,27 @@ module.exports = function (proxy, allowedHost) {
         pathRewrite: { "^/websockets": "" },
       },
       "/latex": {
-        target: "http://206.190.239.91:5000",
+        target: "http://3.227.9.181:5000",
         changeOrigin: true,
         pathRewrite: { "^/latex": "" },
       },
       "/api/v1": {
-        target: "http://3.227.9.181:8012",
+        // target: "http://3.227.9.181:8012",
         // target: "http://172.17.15.200:8012",
-        // target: "http://127.0.0.1:8012",
+        target: "http://127.0.0.1:8012",
         // target: "http://206.190.239.91:8012",
         changeOrigin: true,
         // pathRewrite: { "^/api/v1": "" }
       },
       "/minio": {
         target: "http://network.jancsitech.net:9000",
-        // target: "https://arxtect.com/",
+        // target: "http://arxtect.s3.dualstack.us-east-1.amazonaws.com/",
         changeOrigin: true,
         pathRewrite: { "^/minio": "" },
       },
       "/git": {
-        target: "http://3.227.9.181:3006",
+        // target: "http://3.227.9.181:3006",
+        target: "http://10.10.101.126:3006",
         changeOrigin: true,
         pathRewrite: { "^/git": "" },
       },
