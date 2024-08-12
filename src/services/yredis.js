@@ -43,8 +43,17 @@ export async function deleteRoom({
 }
 
 export async function getRoomInfo({ project_name }) {
-  const response = await apiFetch(getApiUrl("/room/share"), "GET", {
+  const response = await apiFetch(getApiUrl("/room/share"), "POST", {
     project_name, //(project+userid)
   });
   return response;
 }
+
+export async function getRoomPermission({ project_name,email }) {
+  const response = await apiFetch(getApiUrl("/room/share"), "POST", {
+    project_name, //(project+userid)
+    email,
+  });
+  return response;
+}
+

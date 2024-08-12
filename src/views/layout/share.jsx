@@ -103,8 +103,6 @@ const Share = forwardRef(({ rootPath, user }, ref) => {
   };
 
   const handleInvite = async (searchInput, access) => {
-    handleSaveProject()
-    return 
     console.log(searchInput,access, "searchInput");
    let status =await  inviteUser({
       email: searchInput,
