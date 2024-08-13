@@ -8,6 +8,7 @@ self.memlog = "";
 self.mainfile = "main.tex";
 // self.texlive_endpoint = "/latex/";
 self.texlive_endpoint = "https://arxtect.com/latex/";
+// self.texlive_endpoint = "https://206.190.239.91:5000/latex/"
 // self.texlive_endpoint = "https://texlive2.swiftlatex.com/";
 // self.texlive_endpoint = "https://mirror.bjtu.edu.cn/CTAN/macros/";
 Module["print"] = function (a) {

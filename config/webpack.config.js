@@ -298,59 +298,59 @@ module.exports = function (webpackEnv) {
         new CssMinimizerPlugin(),
       ],
       // TODO: build splitChunks.
-      splitChunks: {
-        chunks: "all",
-        minSize: 60000, // 增加最小块大小到 50KB
-        maxSize: 200000, // 设置最大块大小为 200KB
-        minChunks: 3,
-        cacheGroups: {
-          reactAndFriends: {
-            test: /[\\/]node_modules[\\/](react|react-dom|react-router-dom|react-toastify|react-tooltip|react-icons)[\\/]/,
-            name: "chunk-react-and-friends",
-            chunks: "all",
-            priority: 30,
-            reuseExistingChunk: true,
-            enforce: true,
-          },
-          mui: {
-            test: /[\\/]node_modules[\\/](@mui|@emotion|@atlaskit)[\\/]/,
-            name: "chunk-mui",
-            chunks: "all",
-            priority: 20,
-            reuseExistingChunk: true,
-            enforce: true,
-          },
-          fontsAndIcons: {
-            test: /[\\/]node_modules[\\/](@fortawesome|@react-pdf-viewer|@blueprintjs|@hookform|react-hook-form)[\\/]/,
-            name: "chunk-fonts-and-icons",
-            chunks: "all",
-            priority: 20,
-            reuseExistingChunk: true,
-            enforce: true,
-          },
-          pdfTools: {
-            test: /[\\/]node_modules[\\/](@react-pdf|pdfjs-dist|lodash)[\\/]/,
-            name: "chunk-pdf-tools",
-            chunks: "all",
-            priority: 20,
-            reuseExistingChunk: true,
-            enforce: true,
-          },
-          vendors: {
-            test: /[\\/]node_modules[\\/]/,
-            priority: 1,
-            name: "vendors",
-            chunks: "initial",
-            reuseExistingChunk: true,
-            enforce: true,
-          },
-          default: {
-            minChunks: 2,
-            priority: -20,
-            reuseExistingChunk: true,
-          },
-        },
-      },
+      // splitChunks: {
+      //   chunks: "all",
+      //   minSize: 60000, // 增加最小块大小到 50KB
+      //   maxSize: 200000, // 设置最大块大小为 200KB
+      //   minChunks: 3,
+      //   cacheGroups: {
+      //     reactAndFriends: {
+      //       test: /[\\/]node_modules[\\/](react|react-dom|react-router-dom|react-toastify|react-tooltip|react-icons)[\\/]/,
+      //       name: "chunk-react-and-friends",
+      //       chunks: "all",
+      //       priority: 30,
+      //       reuseExistingChunk: true,
+      //       enforce: true,
+      //     },
+      //     mui: {
+      //       test: /[\\/]node_modules[\\/](@mui|@emotion|@atlaskit)[\\/]/,
+      //       name: "chunk-mui",
+      //       chunks: "all",
+      //       priority: 20,
+      //       reuseExistingChunk: true,
+      //       enforce: true,
+      //     },
+      //     fontsAndIcons: {
+      //       test: /[\\/]node_modules[\\/](@fortawesome|@react-pdf-viewer|@blueprintjs|@hookform|react-hook-form)[\\/]/,
+      //       name: "chunk-fonts-and-icons",
+      //       chunks: "all",
+      //       priority: 20,
+      //       reuseExistingChunk: true,
+      //       enforce: true,
+      //     },
+      //     pdfTools: {
+      //       test: /[\\/]node_modules[\\/](@react-pdf|pdfjs-dist|lodash)[\\/]/,
+      //       name: "chunk-pdf-tools",
+      //       chunks: "all",
+      //       priority: 20,
+      //       reuseExistingChunk: true,
+      //       enforce: true,
+      //     },
+      //     vendors: {
+      //       test: /[\\/]node_modules[\\/]/,
+      //       priority: 1,
+      //       name: "vendors",
+      //       chunks: "initial",
+      //       reuseExistingChunk: true,
+      //       enforce: true,
+      //     },
+      //     default: {
+      //       minChunks: 2,
+      //       priority: -20,
+      //       reuseExistingChunk: true,
+      //     },
+      //   },
+      // },
     },
     resolve: {
       // This allows you to set a fallback for where webpack should look for modules.
