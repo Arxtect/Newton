@@ -297,6 +297,7 @@ module.exports = function (webpackEnv) {
         // This is only used in production mode
         new CssMinimizerPlugin(),
       ],
+      // TODO: build splitChunks.
       // splitChunks: {
       //   chunks: "all",
       //   minSize: 60000, // 增加最小块大小到 50KB
@@ -646,19 +647,19 @@ module.exports = function (webpackEnv) {
         Buffer: "bufferGlobal",
       }),
       // performance optimization
-      // new CompresssionPlugin({
-      //   test: /\.(css|js|jpg|png|ttf)$/, //匹配文件
-      //   threshold: 500, //设置文件从多发开始压缩
-      //   minRatio: 0.7, //至少的压缩比例
-      //   algorithm: "gzip", //采用的压缩算法
-      // }),
-      // new CompresssionPlugin({
-      //   test: /\.(mp4|woff(2))$/, //匹配文件
-      //   threshold: 10240, //设置文件从多发开始压缩
-      //   minRatio: 0.8, //至少的压缩比例
-      //   algorithm: "gzip", //采用的压缩算法
-      //   deleteOriginalAssets: false,
-      // }),
+      new CompresssionPlugin({
+        test: /\.(css|js|jpg|png|ttf|wasm)$/, //匹配文件
+        threshold: 500, //设置文件从多发开始压缩
+        minRatio: 0.7, //至少的压缩比例
+        algorithm: "gzip", //采用的压缩算法
+      }),
+      new CompresssionPlugin({
+        test: /\.(mp4|woff(2))$/, //匹配文件
+        threshold: 10240, //设置文件从多发开始压缩
+        minRatio: 0.8, //至少的压缩比例
+        algorithm: "gzip", //采用的压缩算法
+        deleteOriginalAssets: false,
+      }),
 
       // Generates an `index.html` file with the <script> injected.
       new CopyWebpackPlugin({

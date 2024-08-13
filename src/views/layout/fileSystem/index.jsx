@@ -12,8 +12,13 @@ import { ProjectSync } from "@/convergence";
 import RightBeforeLeft from "@/views/layout/rightBeforeLeft";
 import { getYDocToken } from "services";
 import { gitCloneGitea } from "./gitclone";
+import {getRoomUserAccess} from "@/services"
+import { toast } from "react-toastify";
+
+import { useNavigate } from "react-router-dom";
 
 const FileSystem = () => {
+        const navigate = useNavigate();
   const {
     filepath,
     currentProjectRoot,
@@ -41,6 +46,7 @@ const FileSystem = () => {
     updateAllProject,
     projectSync,
     updateProjectSync,
+    updateShareIsRead,
   } = useFileStore((state) => ({
     filepath: state.filepath,
     currentProjectRoot: state.currentProjectRoot,
@@ -68,6 +74,7 @@ const FileSystem = () => {
     updateAllProject: state.updateAllProject,
     projectSync: state.projectSync,
     updateProjectSync: state.updateProjectSync,
+    updateShareIsRead: state.updateShareIsRead,
   }));
 
   const getAllProject = async () => {
@@ -103,7 +110,32 @@ const FileSystem = () => {
     const roomId = projectInfo?.["userId"];
     const isSync = projectInfo?.["isSync"];
 
+    console.log(projectInfo, "projectInfo");
+
     if (!isSync || !project || !roomId) return;
+    const res = await getRoomUserAccess({
+      project_name: project+roomId,
+    });
+    if (res?.status != "success") {
+      toast.error("Get room user access failed.");
+      return;
+    }
+
+    if (res?.access == "r") {
+      updateShareIsRead(true);
+      toast.info(
+        "The project is read-only for you, please contact your project manager to modify it."
+      );
+    }
+
+    if (res?.access == "no") {
+      toast.info(
+        "The project is not shared for you, please contact your project manager to modify it."
+      );
+      navigate("/project");
+      return
+    }
+
     const token = await getYDocTokenReq();
     const projectSync = await new ProjectSync(project, user, roomId, token);
     updateProjectSync(projectSync);

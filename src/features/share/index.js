@@ -13,6 +13,10 @@ function ShareProject({
   getRoomInfo,
   user,
   handleUpdateUser,
+  updateInviteUserAccess,
+  handleRemoveUser,
+  handleCloseRoom,
+  handleReopenRoom,
 }) {
   return (
     <main className="flex flex-col px-4 mt-4">
@@ -27,7 +31,17 @@ function ShareProject({
         getRoomInfo={getRoomInfo}
         user={user}
         handleUpdateUser={handleUpdateUser}
+        updateInviteUserAccess={updateInviteUserAccess}
+        handleRemoveUser={handleRemoveUser}
       />
+      <div>
+        <button
+          className="py-1.5 bg-[#81c684] rounded-lg w-1/3 self-center float-right"
+          onClick={roomInfo?.is_closed ? handleReopenRoom : handleCloseRoom}
+        >
+          {roomInfo?.is_closed ? "Reopen Share Project" : "Close Share Project"}
+        </button>
+      </div>
     </main>
   );
 }

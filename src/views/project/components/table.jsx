@@ -32,7 +32,8 @@ import renameSvg from "@/assets/project/rename.svg";
 import shareSvg from "@/assets/project/share.svg";
 import downloadPdfSvg from "@/assets/project/downloadPdf.svg";
 import "./index.scss";
-import { getYDocToken, deleteGitRepo } from "services";
+import { getYDocToken, deleteGitRepo, getRoomUserAccess } from "services";
+
 
 const Table = forwardRef(
   ({ setSelectedRows, getProjectList, projectData, sortedRows, auth,currentSelectMenu,handleGithub }, ref) => {
@@ -448,6 +449,28 @@ const Table = forwardRef(
         toast.warning("Please login");
         updateDialogLoginOpen(true);
         updateOtherOperation(() => handleSyncProject(project, roomId));
+        return;
+      }
+
+      const res = await getRoomUserAccess({
+        project_name: project + roomId,
+      });
+      if (res?.status != "success") {
+        toast.error("Get room user access failed.");
+        return;
+      }
+
+      if (res?.access == "r") {
+        toast.info(
+          "The project is read-only for you, please contact your project manager to modify it."
+        );
+      }
+
+      if (res?.access == "no") {
+        toast.info(
+          "The project is not shared for you, please contact your project manager to modify it."
+        );
+        navigate("/project");
         return;
       }
 

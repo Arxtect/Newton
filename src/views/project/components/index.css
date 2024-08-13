@@ -4,16 +4,16 @@
 }
 
 .MuiDataGrid-columnHeadersInner .MuiDataGrid-columnHeader:focus {
-  outline: solid #1976d2 0px;
+  outline: solid #1976d2 0px !important;
 }
 .MuiDataGrid-columnHeadersInner .MuiDataGrid-columnHeader:focus-within {
-  outline: solid #1976d2 0px;
+  outline: solid #1976d2 0px !important;
 }
 
 .MuiDataGrid-row .MuiDataGrid-cell:focus {
-  outline: solid #1976d2 0px;
+  outline: solid #1976d2 0px !important;
 }
 
 .MuiDataGrid-root .MuiDataGrid-cell:focus-within {
-  outline: solid #1976d2 0px;
+  outline: solid #1976d2 0px !important;
 }/*# sourceMappingURL=index.css.map */

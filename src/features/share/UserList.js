@@ -59,9 +59,15 @@ function UserItem({
   );
 }
 
-function UserList({ roomInfo, getRoomInfo, user, handleUpdateUser }) {
-  const onRemove = (email) => {
-    console.log("remove", email);
+function UserList({
+  roomInfo,
+  getRoomInfo,
+  user,
+  handleUpdateUser,
+  handleRemoveUser,
+}) {
+  const onRemove = async (email) => {
+    await handleRemoveUser(email);
   };
 
   const getIsRemove = (item, user) => {
@@ -77,10 +83,10 @@ function UserList({ roomInfo, getRoomInfo, user, handleUpdateUser }) {
   };
 
   const users = useMemo(() => {
-    return roomInfo?.accessList?.map((item, index) => {
+    return roomInfo?.users?.map((item, index) => {
       return {
         ...item,
-        ...getIsRemove(item, user),
+        ...getIsRemove(item, user, roomInfo),
       };
     });
   }, [roomInfo]);
@@ -96,6 +102,7 @@ function UserList({ roomInfo, getRoomInfo, user, handleUpdateUser }) {
                 index={index}
                 user={user}
                 handleUpdateUser={handleUpdateUser}
+                handleRemoveUser={handleRemoveUser}
                 {...item}
               />
             ))}

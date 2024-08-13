@@ -307,22 +307,32 @@ export class AceBinding {
 
   init(ace, currentFilePath) {
     console.log(this.awareness.getLocalState(), "cursors");
-    this.aceCursors = new AceCursors(ace,this.awareness.getLocalState().user);
+    this.aceCursors = new AceCursors(ace, this.awareness.getLocalState().user);
     this.aceCursors.init(ace, currentFilePath);
     ace.session.getUndoManager().reset();
     this.currentFilePath = currentFilePath;
 
-    ace.getSession().selection.on("changeCursor", () => {
+    this.cursorChangeHandler = () => {
       this.mux(() => this._cursorObserver(ace));
-    });
+    };
+
+    ace.getSession().selection.on("changeCursor", this.cursorChangeHandler);
+
     this.offChangeCursor = () => {
-      ace.getSession().selection.off("changeCursor", () => {
-        this.mux(() => this._cursorObserver(ace));
-      });
+      console.log("destroy cursor");
+      ace.getSession().selection.off("changeCursor", this.cursorChangeHandler);
+    };
+
+    this.awarenessChangeHandler = (e) => {
+      this._awarenessChange(e, ace);
+    };
+
+    this.offAwarenessChange = () => {
+      this.awareness.off("change", this.awarenessChangeHandler);
     };
 
     if (this.awareness) {
-      this.awareness.on("change", (e) => this._awarenessChange(e, ace));
+      this.awareness.on("change", this.awarenessChangeHandler);
     }
   }
 
@@ -335,9 +345,10 @@ export class AceBinding {
     }, 200);
   }
 
-  destroy(ace) {
+  destroy() {
+      this.offAwarenessChange();
+      this.offChangeCursor();
     if (this.awareness) {
-      this.awareness.off("change", (e) => this._awarenessChange(e, ace));
       this.awareness.setLocalStateField("cursor", null);
     }
   }

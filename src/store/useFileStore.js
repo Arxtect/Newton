@@ -49,6 +49,8 @@ export const useFileStore = create()(
       dirOpen: false,
       shareUserList: [],
       isDropFileSystem: true,
+      shareIsRead: false,
+      updateShareIsRead: (isRead) => set({ shareIsRead: isRead }),
       updateShareUserList: (shareUserList) => set({ shareUserList }),
       updateIsDropFileSystem: (isDropFileSystem) => set({ isDropFileSystem }),
       updateDirOpen: (dirOpen) => set({ dirOpen }),
@@ -98,9 +100,11 @@ export const useFileStore = create()(
           return;
         }
         const projectSync = get().projectSync;
+        
+          console.log(projectSync, "projectSync");
         if (projectSync && editor != null && filepath) {
           editor.blur && editor.blur();
-          projectSync.updateEditorAndCurrentFilePath(filepath, editor);
+          projectSync?.updateEditorAndCurrentFilePath(filepath, editor);
         }
         set({
           filepath,
@@ -171,6 +175,7 @@ export const useFileStore = create()(
         withReload = false
       ) => {
         const state = get();
+        if(!!state.shareIsRead) return
         await state.saveFile(filepath, value, withReload);
         if (!isSync) return;
         const projectSync = get().projectSync;

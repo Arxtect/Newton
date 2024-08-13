@@ -92,7 +92,7 @@ const TopBar = (props) => {
                 title={user.name}
               >
                 <span className="text-white text-xs">
-                  {user.name.charAt(0).toUpperCase()}
+                  {user.name?.charAt(0)?.toUpperCase()}
                 </span>
               </div>
             ))}

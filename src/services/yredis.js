@@ -15,6 +15,7 @@ export async function getYDocToken() {
   return response?.token;
 }
 
+//UpdateUserAccess
 export async function inviteUser({email, share_link, project_name, access}) {
   const response = await apiFetch(getApiUrl("/room/share/user"), "PUT", {
     email,
@@ -22,7 +23,7 @@ export async function inviteUser({email, share_link, project_name, access}) {
     project_name, //(project+userid)
     access, //权限（值：r、rw）
   });
-  return response?.status;
+  return response;
 }
 
 export async function deleteInviteUser({ email, project_name }) {
@@ -30,30 +31,38 @@ export async function deleteInviteUser({ email, project_name }) {
     email,
     project_name, //(project+userid)
   });
-  return response?.status;
+  return response;
 }
 
-export async function deleteRoom({
+export async function closeRoom({
   project_name,
 }) {
   const response = await apiFetch(getApiUrl("/room/share"), "DELETE", {
     project_name, //(project+userid)
   });
-  return response?.status;
+  return response;
 }
 
-export async function getRoomInfo({ project_name }) {
-  const response = await apiFetch(getApiUrl("/room/share"), "POST", {
+
+export async function getRoomInfoList({ project_name }) {
+  const response = await apiFetch(
+    getApiUrl(`/room/share/${project_name}`),
+    "GET"
+  );
+  return response;
+}
+
+export async function getRoomUserAccess({ project_name }) {
+  const response = await apiFetch(
+    getApiUrl(`/room/share/user/${project_name}`),
+    "GET",
+  );
+  return response;
+}
+
+export async function reopenRoom({ project_name }) {
+  const response = await apiFetch(getApiUrl("/room/share/reopen"), "POST", {
     project_name, //(project+userid)
   });
   return response;
 }
-
-export async function getRoomPermission({ project_name,email }) {
-  const response = await apiFetch(getApiUrl("/room/share"), "POST", {
-    project_name, //(project+userid)
-    email,
-  });
-  return response;
-}
-
