@@ -103,7 +103,7 @@ module.exports = function (proxy, allowedHost) {
     // `proxy` is run between `before` and `after` `webpack-dev-server` hooks
     proxy: {
       "/websockets": {
-        target: "http://206.190.239.91:9008",
+        target: "http://arxtect.com:8013",
         changeOrigin: true,
         ws: true,
         pathRewrite: { "^/websockets": "" },

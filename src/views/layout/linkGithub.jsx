@@ -4,14 +4,10 @@
  * @Date: 2024-03-06 21:26:51
  */
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { IconButton, Button, Menu, MenuItem, Tooltip } from "@mui/material";
+import { Tooltip } from "@mui/material";
 import ArDialog from "@/components/arDialog";
 import {
-  Card,
-  CardContent,
   Typography,
-  TextField,
   Box,
   CircularProgress,
   LinearProgress,
@@ -21,11 +17,10 @@ import { toast } from "react-toastify";
 import ArTextField from "@/components/arTextField";
 import path from "path";
 import { setupAndPushToRepo } from "domain/git";
-import { removeDirectory, existsPath } from "domain/filesystem";
+import {existsPath } from "domain/filesystem";
 import BottomDrawer from "@/features/bottomDrawer/bottomDrawer";
-import share from "@/assets/share.svg";
+import syncSvg from "@/assets/project/gitCloud.svg";
 import {getGitToken,createGitRepo} from "@/services"
-import {lookupSavedPassword} from "isomorphic-git";
 import {getGiteaFullUrl} from "@/util"
 
 const GithubProgressBar = ({ progress, messages }) => {
@@ -205,10 +200,9 @@ const handleSaveProject = async () => {
             className={`flex items-center text-gray-700 px-2 py-1 hover:bg-gray-200 active:bg-[#9fd5a2] space-x-1 `}
             onClick={() => toggleDrawer(true)}
           >
-            <img src={share} alt="" className="w-4 h-4" />
+            <img src={syncSvg} alt="" className="w-4 h-4" />
             <span>Sync</span>
           </button>
-
         </Tooltip>
       ) : (
         <Tooltip title="Link a git repository">
@@ -216,13 +210,13 @@ const handleSaveProject = async () => {
             className={`flex items-center text-gray-700 px-2 py-1 hover:bg-gray-200 active:bg-[#9fd5a2] space-x-1 `}
             onClick={() => setDialogOpen(true)}
           >
-            <img src={share} alt="" className="w-4 h-4" />
-            <span>Link</span>
+            <img src={syncSvg} alt="" className="w-4 h-4" />
+            <span>Sync</span>
           </button>
         </Tooltip>
       )}
       <ArDialog
-        title="Link Remote Cloud Repository"
+        title="Sync Remote Cloud Repository"
         dialogOpen={dialogOpen}
         handleCancel={handleCancelProject}
         // tooltipText={
@@ -243,9 +237,9 @@ const handleSaveProject = async () => {
               onChange={(event) => {
                 setProjectName(event.target.value);
               }}
-               InputProps={{
-            readOnly: true,
-          }}
+              InputProps={{
+                readOnly: true,
+              }}
               margin="normal"
               fullWidth
               className="my-3"

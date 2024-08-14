@@ -134,9 +134,9 @@
     "zustand": "^4.5.0"
   },
   "scripts": {
-    "start": "node scripts/start.js",
-    "build": "cross-env GENERATE_SOURCEMAP=false node scripts/build.js",
-    "test": "node scripts/test.js"
+    "start": "cross-env NODE_ENV=development node scripts/start.js",
+    "build": "cross-env NODE_ENV=production GENERATE_SOURCEMAP=false node scripts/build.js",
+    "test": "cross-env NODE_ENV=test node scripts/test.js"
   },
   "eslintConfig": {
     "extends": [

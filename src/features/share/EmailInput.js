@@ -1,3 +1,8 @@
+/*
+ * @Description: 
+ * @Author: Devin
+ * @Date: 2024-08-08 11:34:15
+ */
 import React, { useState } from "react";
 import { Box, InputBase } from "@mui/material";
 import { styled } from "@mui/system";
@@ -57,7 +62,7 @@ function EmailInput({ handleInvite }) {
   };
 
   return (
-    <form className="flex justify-between text-xs gap-20">
+    <form className="flex justify-between text-xs gap-5">
       <div className="flex flex-auto gap-10 py-1 pr-2  rounded-lg">
         <SearchBox>
           <SearchInput
@@ -71,7 +76,7 @@ function EmailInput({ handleInvite }) {
       <button
         type="submit"
         onClick={handleInviteSubmit}
-        className="px-4 my-1 text-center text-black whitespace-nowrap bg-[#81c684] rounded-md"
+        className="w-24 text-[1rem] px-4 my-1 text-center text-black whitespace-nowrap bg-[#81c684] rounded-md"
       >
         Invite
       </button>

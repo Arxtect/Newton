@@ -1,3 +1,8 @@
+/*
+ * @Description: 
+ * @Author: Devin
+ * @Date: 2024-05-28 12:37:50
+ */
 import React, { useState, useEffect } from "react";
 import { NavLinksSm, NavLinksLg } from "./NavLinks";
 import { HashLink } from "react-router-hash-link";
@@ -20,13 +25,14 @@ export const Header = () => {
 
   return (
     <nav
-      className={`top-0 w-full z-30 transition duration-300 ease-in-out  bg-white ${!top && "bg-white shadow-lg"
-        }`}
+      className={`top-0 w-full z-30 transition duration-300 ease-in-out  bg-white ${
+        !top && "bg-white shadow-lg"
+      }`}
     >
       <div className="flex flex-row justify-between items-center py-3">
         <div className="flex flex-row justify-center md:px-12 md:mx-12 items-center text-center font-semibold">
           <HashLink smooth to="/#home">
-            <img src={logo} alt="" />
+            <img src={logo} alt="" className="h-[2.2rem]" />
           </HashLink>
         </div>
         <div className="group flex flex-col items-center">
@@ -59,8 +65,9 @@ export const Header = () => {
           </div>
 
           <div
-            className={`fixed transition-transform duration-300 ease-in-out transit flex justify-center left-0 w-full h-auto rounded-md p-4 bg-white lg:hidden shadow-xl top-14 z-999 pb-8 ${isOpen ? "block" : "hidden"
-              } `}
+            className={`fixed transition-transform duration-300 ease-in-out transit flex justify-center left-0 w-full h-auto rounded-md p-4 bg-white lg:hidden shadow-xl top-14 z-999 pb-8 ${
+              isOpen ? "block" : "hidden"
+            } `}
           >
             <div className="flex flex-col space-y-6">
               <NavLinksSm />

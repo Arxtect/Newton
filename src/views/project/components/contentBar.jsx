@@ -1,3 +1,8 @@
+/*
+ * @Description: 
+ * @Author: Devin
+ * @Date: 2024-07-30 15:02:25
+ */
 import * as React from "react";
 import SearchBar from "./searchBar";
 import ActionBar from "../actionBar";
@@ -30,7 +35,7 @@ const ContentBar = ({
             <div className="grow my-auto text-black">
               You’re on the free plan
             </div>
-            <div className="my-1 px-3 flex items-center text-white whitespace-nowrap bg-green-500 rounded-xl">
+            <div className="my-1 px-3 flex items-center text-white whitespace-nowrap bg-arxTheme rounded-xl">
               Upgrade
             </div>
           </React.Fragment>

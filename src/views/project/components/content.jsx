@@ -191,7 +191,7 @@ const Content = React.forwardRef(({currentSelectMenu, setCurrentSelectMenu}, ref
             <Tooltip title="Table">
               <div
                 className={`flex items-center justify-center w-7 h-7 cursor-pointer ${
-                  sortType === "table" ? "bg-green-400" : ""
+                  sortType === "table" ? "bg-arxTheme" : ""
                 }`}
                 onClick={() => setSortType("table")}
               >
@@ -201,7 +201,7 @@ const Content = React.forwardRef(({currentSelectMenu, setCurrentSelectMenu}, ref
             <Tooltip title="Grid">
               <div
                 className={`flex items-center justify-center w-7 h-7 cursor-pointer ${
-                  sortType === "grid" ? "bg-green-400" : "bg-gray-200"
+                  sortType === "grid" ? "bg-arxTheme" : "bg-gray-200"
                 } ${
                   currentSelectMenu === "git"
                     ? "opacity-50 cursor-not-allowed"

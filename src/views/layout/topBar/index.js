@@ -51,12 +51,12 @@ const TopBar = (props) => {
 
   const buttonData = [
     // { key: "Review", src: review, label: "Review", click: handleClick },
-    { key: "Link", src: review, label: "Review", click: handleClick },
+    { key: "Sync", src: "", label: "Sync", click: handleClick },
     // { key: "History", src: history, label: "History", click: handleClick },
     { key: "Publish", src: "", label: "Publish", click: handleClick },
     { key: "Share", src: "", label: "Share", click: handleClick },
     { key: "Download", src: download, label: "", click: handleClick },
-    { key: "More", src: down, label: "", click: handleClick },
+    // { key: "More", src: down, label: "", click: handleClick },
   ];
 
   useEffect(() => {
@@ -117,7 +117,7 @@ const TopBar = (props) => {
             if (button.key === "Publish") {
               return <PublishDocument></PublishDocument>;
             }
-            if (button.key === "Link") {
+            if (button.key === "Sync") {
               return <LinkGithub></LinkGithub>;
             }
             return (
