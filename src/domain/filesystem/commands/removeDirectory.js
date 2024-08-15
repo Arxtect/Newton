@@ -8,6 +8,9 @@ import path from "path";
 import pify from "pify";
 import { unlink } from "./unlink";
 import { existsPath } from "../queries/existsPath";
+import { createProjectInfo, getProjectInfo } from "./projectInfo";
+
+const EXPIRE_DAYS = 30;
 
 export async function removeDirectory(dirpath) {
   const node = await readRecursiveFileNodeWithGit(dirpath);
@@ -52,3 +55,34 @@ export async function removeDir(dirpath) {
   if (!(await existsPath(dirpath))) return;
   await pify(fs.rmdir)(dirpath);
 }
+
+export async function archiveRemoveProject(dirpath) {
+  if (!(await existsPath(dirpath))) return;
+  let now = new Date();
+  await createProjectInfo(dirpath, {
+    isClosed: true,
+    close_at: now,
+  });
+}
+
+export async function deleteExpiredProject(dirpath) {
+  if (!(await existsPath(dirpath))) return;
+
+  let projectInfo = await getProjectInfo(dirpath);
+
+  if (projectInfo?.close_at) {
+    
+    let closeDate = new Date(projectInfo.close_at); // 将关闭日期转换为 Date 对象
+    let now = new Date();
+
+    // 计算当前日期和关闭日期之间的天数差
+    let timeDiff = Math.abs(now - closeDate);
+    let diffDays = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+    if (diffDays > EXPIRE_DAYS) {
+      await removeDirectory(dirpath);
+      return true;
+    }
+  }
+  return false
+}
+

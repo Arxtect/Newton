@@ -100,8 +100,8 @@ export const useFileStore = create()(
           return;
         }
         const projectSync = get().projectSync;
-        
-          console.log(projectSync, "projectSync");
+
+        console.log(projectSync, "projectSync");
         if (projectSync && editor != null && filepath) {
           editor.blur && editor.blur();
           projectSync?.updateEditorAndCurrentFilePath(filepath, editor);
@@ -175,7 +175,7 @@ export const useFileStore = create()(
         withReload = false
       ) => {
         const state = get();
-        if(!!state.shareIsRead) return
+        if (!!state.shareIsRead) return;
         await state.saveFile(filepath, value, withReload);
         if (!isSync) return;
         const projectSync = get().projectSync;
@@ -228,6 +228,10 @@ export const useFileStore = create()(
         });
         // 假设 ProjectActions.loadProjectList 已适配 Zustand
         // get().loadProjectList();
+      },
+
+      archivedDeleteProject: async ({ dirpath }) => {
+        await FS.archiveRemoveProject(dirpath);
       },
 
       finishFileCreating: async ({ filepath }) => {

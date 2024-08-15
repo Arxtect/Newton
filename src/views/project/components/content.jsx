@@ -110,7 +110,8 @@ const Content = React.forwardRef(({currentSelectMenu, setCurrentSelectMenu}, ref
     setProjectData(
       project
         .map((item, index) => {
-          if (currentSelectMenu == "trash") {
+          if (currentSelectMenu == "trash"&&!item.isClosed) {
+            console.log(item, "item.is_closed");
             return null;
           }
           if (currentSelectMenu == "category") {
@@ -129,10 +130,11 @@ const Content = React.forwardRef(({currentSelectMenu, setCurrentSelectMenu}, ref
           ) {
             return null;
           }
-          return {
-            id: index + 1,
-            ...item,
-          };
+          if (currentSelectMenu != "trash" && item.isClosed) return null;
+            return {
+              id: index + 1,
+              ...item,
+            };
         })
         .filter((item) => item !== null)
     );

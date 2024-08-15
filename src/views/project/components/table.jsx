@@ -14,6 +14,7 @@ import {
   findAllProjectInfo,
   downloadDirectoryAsZip,
   getProjectInfo,
+  createProjectInfo,
 } from "domain/filesystem";
 import { toast } from "react-toastify";
 import { useUserStore, useLoginStore, useFileStore } from "@/store";
@@ -28,6 +29,7 @@ import copySvg from "@/assets/project/copy.svg";
 import deleteSvg from "@/assets/project/delete.svg";
 import downloadSvg from "@/assets/project/download.svg";
 import gitCloudSvg from "@/assets/project/gitCloud.svg";
+import restoreSvg from "@/assets/project/restore.svg";
 import renameSvg from "@/assets/project/rename.svg";
 import shareSvg from "@/assets/project/share.svg";
 import downloadPdfSvg from "@/assets/project/downloadPdf.svg";
@@ -45,6 +47,7 @@ const Table = forwardRef(
       changeCurrentProjectRoot,
       getCurrentProjectPdf,
       initFile,
+      archivedDeleteProject,
     } = useFileStore((state) => ({
       allProject: state.allProject,
       currentProjectRoot: state.currentProjectRoot,
@@ -52,6 +55,7 @@ const Table = forwardRef(
       changeCurrentProjectRoot: state.changeCurrentProjectRoot,
       getCurrentProjectPdf: state.getCurrentProjectPdf,
       initFile: state.initFile,
+      archivedDeleteProject: state.archivedDeleteProject,
     }));
 
     const { user, accessToken } = useUserStore((state) => ({
@@ -79,6 +83,7 @@ const Table = forwardRef(
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [deleteProjectName, setDeleteProjectName] = useState("");
     const [isGitDelete, setIsGitDelete] = useState(false)
+        const [isTrashDelete, setIsTrashDelete] = useState(false);
 
     const handleDeleteProject = (deleteProjectName) => {
       if (!deleteProjectName) {
@@ -90,10 +95,18 @@ const Table = forwardRef(
     };
 
     const handleConfirmDelete = async () => {
-      await deleteProject({ dirpath: deleteProjectName });
+      await archivedDeleteProject({ dirpath: deleteProjectName });
+      toast.success("trash project success");
       getProjectList();
       setDeleteDialogOpen(false);
     };
+    const handlTrashDelete = async () => {
+      await deleteProject({ dirpath: deleteProjectName });
+      toast.success("delete project success");
+      getProjectList();
+      setDeleteDialogOpen(false);
+    };
+
     const handleCancelDelete = () => {
       setDeleteDialogOpen(false);
     };
@@ -151,10 +164,18 @@ const Table = forwardRef(
       let res =await deleteGitRepo(deleteProjectName);
       if (res?.status == 'success') {
         getProjectList();
-          setDeleteDialogOpen(false);
+        setDeleteDialogOpen(false);
       toast.success("Delete success");
       }
       
+    };
+
+    const restoreProject = async (rootName) => {
+      await createProjectInfo(rootName, {
+        isClosed: false,
+      });
+      
+      getProjectList();
     };
 
     // table
@@ -167,7 +188,7 @@ const Table = forwardRef(
         align: "center",
         sortable: true, // 允许排序
         renderCell: (params) => (
-          <span className="font-bold">{params.value}</span>
+          <span className="font-[500]">{params.value}</span>
         ),
       },
       {
@@ -178,8 +199,8 @@ const Table = forwardRef(
         align: "center",
         sortable: false,
         renderCell: (params) => {
-           if(params.row?.type=="git"){
-            return <span className="font-bold">{params.value}</span>
+           if(params.row?.type=="git" || params.row?.isClosed){
+            return <span className="font-[500]">{params.value}</span>
           }
           return <div
             style={{ cursor: "pointer", color: "inherit" }}
@@ -217,18 +238,18 @@ const Table = forwardRef(
         align: "center",
         sortable: false,
         renderCell: (params) => (
-          <span className="font-bold">{params.value}</span>
+          <span className="font-[500]">{params.value}</span>
         ),
       },
       {
         field: "lastModified",
-        headerName: "LastModified",
+        headerName: "Last Modified",
         width: 0.15,
         headerAlign: "center",
         align: "center",
         sortable: false, // 允许排序
         renderCell: (params) => (
-          <div className="font-bold">{formatDate(params.value)}</div>
+          <div className="font-[500]">{formatDate(params.value)}</div>
         ),
       },
       {
@@ -260,6 +281,7 @@ const Table = forwardRef(
                        e.stopPropagation();
                        handleDeleteProject(params.row.title);
                        setIsGitDelete(true);
+                        setIsTrashDelete(false);
                      }}
                    >
                      <img src={deleteSvg} alt="" />
@@ -267,7 +289,37 @@ const Table = forwardRef(
                  </Tooltip>
                </React.Fragment>
              );
-          }
+           }
+            if (params.row?.isClosed) {
+              return (
+                <React.Fragment>
+                  <Tooltip title="Restore">
+                    <IconButton
+                      size="small"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        restoreProject(params.row.title);
+                      }}
+                    >
+                      <img src={restoreSvg} className="w-4" alt="" />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Delete">
+                    <IconButton
+                      size="small"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteProject(params.row.title);
+                        setIsTrashDelete(true);
+                        setIsGitDelete(false);
+                      }}
+                    >
+                      <img src={deleteSvg} alt="" />
+                    </IconButton>
+                  </Tooltip>
+                </React.Fragment>
+              );
+            }
           return <div>
             <Tooltip title="Download">
               <IconButton
@@ -352,12 +404,13 @@ const Table = forwardRef(
                 <img src={shareSvg} alt="" />
               </IconButton>
             </Tooltip>
-            <Tooltip title="Delete">
+            <Tooltip title="Trash">
               <IconButton
                 size="small"
                 onClick={(e) => {
                   e.stopPropagation();
-                   setIsGitDelete(false);
+                  setIsGitDelete(false);
+                  setIsTrashDelete(false);
                   const isAuth = auth(
                     params.row.name != "YOU" &&
                       (!user || JSON.stringify(user) === "{}"),
@@ -548,18 +601,22 @@ const Table = forwardRef(
           getProjectList={getProjectList}
         ></Share>
         <ArDialog
-          title="Delete Project"
+          title={isTrashDelete || isGitDelete ? "Delete Project" : "Trash Project"}
           dialogOpen={deleteDialogOpen}
           handleCancel={handleCancelDelete}
           buttonList={[
             { title: "Cancel", click: handleCancelDelete },
             {
               title: "Delete",
-              click: isGitDelete ? handleDeleteGitRepo : handleConfirmDelete,
+              click: isGitDelete
+                ? handleDeleteGitRepo
+                : isTrashDelete
+                ? handlTrashDelete
+                : handleConfirmDelete,
             },
           ]}
         >
-          Are you sure you want to delete the project：
+         {`Are you sure you want to ${isTrashDelete || isGitDelete ? 'delete' : 'trash'} the project：`}
           <span className="text-red-500 mr-1">{deleteProjectName}</span>
         </ArDialog>
         <ArDialog

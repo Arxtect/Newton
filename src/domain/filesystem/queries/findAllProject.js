@@ -7,6 +7,7 @@ import fs from "fs";
 import path from "path";
 import pify from "pify";
 import { getProjectInfo, createProjectInfo } from "../commands/projectInfo";
+import {deleteExpiredProject} from "../commands/removeDirectory";
 
 export async function findAllProject(currentDir = ".") {
   try {
@@ -50,12 +51,17 @@ export async function findAllProjectInfo(currentDir = ".") {
       if (!stat.isDirectory()) {
         return null;
       }
+      let title = stat.isDirectory() ? entry : null;
+      let isExpired = await deleteExpiredProject(title);
+      if (isExpired) {
+        return null
+      }
       const lastModified = await getLastModified(entryPath);
       return {
         ...stat,
-        title: stat.isDirectory() ? entry : null,
+        title: title,
         name: "YOU",
-        lastModified: lastModified||stat?.mtime,
+        lastModified: lastModified || stat?.mtime,
         ...projectInfo,
       };
     });
