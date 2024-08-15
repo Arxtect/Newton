@@ -41,6 +41,8 @@ export const useFileStore = create()(
       dirCreatingDir: null,
       renamingPathname: null,
       currentProjectRoot: "",
+      currentProjectFileList: [],
+      currentProjectBibFilepathList: [],
       projectSync: null,
       touchCounter: 0,
       currentSelectDir: "",
@@ -50,6 +52,29 @@ export const useFileStore = create()(
       shareUserList: [],
       isDropFileSystem: true,
       shareIsRead: false,
+      updateCurrentProjectFileList: async (currentProjectRoot) => {
+        const files = await FS.getFilesRecursively(currentProjectRoot);
+        const relativePathPrefix = `${currentProjectRoot}/`;
+        const modifiedFiles = files.map((file) => {
+          // 使用正则表达式匹配第一个 sync-demo/ 并替换为相对路径
+          if (
+            file.includes(".git") ||
+            file.includes("project-hasOwnProperty-arxtect-projectInfo.json")
+          ) {
+            return null;
+          }
+          return file.replace(new RegExp(`^${relativePathPrefix}`), "");
+        });
+
+        let fileList = modifiedFiles.filter((i) => !!i);
+
+        set({ currentProjectFileList: fileList });
+      },
+      updateCurrentProjectBibFilepathList: async (currentProjectRoot) => {
+        const files = await FS.getFilesRecursively(currentProjectRoot);
+        let list = files.filter((item) => item.includes(".bib"));
+        set({ currentProjectBibFilepathList: list });
+      },
       updateShareIsRead: (isRead) => set({ shareIsRead: isRead }),
       updateShareUserList: (shareUserList) => set({ shareUserList }),
       updateIsDropFileSystem: (isDropFileSystem) => set({ isDropFileSystem }),
@@ -310,6 +335,8 @@ export const useFileStore = create()(
         get().initFile();
         set({ currentProjectRoot: projectRoot, currentSelectDir: projectRoot });
         initializeGitStatus({ projectRoot });
+        get().updateCurrentProjectBibFilepathList(projectRoot);
+        get().updateCurrentProjectFileList(projectRoot);
       },
       createProject: async (newProjectRoot) => {
         let isExists = await FS.existsPath(newProjectRoot);

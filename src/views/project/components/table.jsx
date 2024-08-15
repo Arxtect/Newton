@@ -452,7 +452,7 @@ const Table = forwardRef(
       window.addEventListener("resize", updateColumns);
 
       return () => window.removeEventListener("resize", updateColumns);
-    }, [user]);
+    }, [user,currentSelectMenu]);
 
     // sync project
     const [projectSync, setProjectSync] = useState(null);

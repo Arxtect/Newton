@@ -1,9 +1,4 @@
-/*
- * @Description:
- * @Author: Devin
- * @Date: 2024-05-28 12:37:50
- */
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import AceEditor from "react-ace";
 import "ace-builds/src-noconflict/mode-latex";
 // import "ace-builds/src-noconflict/theme-github";
@@ -12,8 +7,16 @@ import "ace-builds/src-min-noconflict/ext-language_tools";
 import "ace-builds/src-min-noconflict/ext-searchbox";
 import AiTools from "./aiTools";
 import { useEditor, useFileStore } from "@/store";
+import {setupCustomCompleter } from "./customCompletion"; // 导入自定义补全器
 
-const LatexEditor = ({ handleChange, sourceCode, filepath }) => {
+
+const LatexEditor = ({
+  handleChange,
+  sourceCode,
+  filepath,
+  fileList,
+  bibFilepathList,
+}) => {
   const latexRef = useRef(null);
 
   const { editor, updateEditor } = useEditor((state) => ({
@@ -41,6 +44,12 @@ const LatexEditor = ({ handleChange, sourceCode, filepath }) => {
     if (!editor && !filepath) return;
     loadFile({ filepath: filepath });
   }, [editor]);
+
+  useEffect(() => {
+    if (latexRef.current && latexRef.current.editor && fileList?.length > 0) {
+      setupCustomCompleter(latexRef.current.editor, fileList, bibFilepathList);
+    }
+  }, [fileList, bibFilepathList]);
 
   return (
     <div className="h-full relative" id="editor">
