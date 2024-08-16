@@ -115,7 +115,7 @@ export const useFileStore = create()(
         if (isAssetExtension(filepath)) {
           set({
             assetsFilePath: filepath,
-            assetValue: fileContent,
+            // assetValue: fileContent,
             value: "",
             filepath: "",
             lastSavedValue: "",

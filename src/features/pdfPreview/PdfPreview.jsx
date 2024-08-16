@@ -7,7 +7,7 @@
 import { useEffect, useState } from "react";
 import { usePdfPreviewStore, useFileStore, useLayout } from "store";
 import AssetPreview from "../assetPreview/assetPreview";
-import Viewer from "./viewer";
+import { readFile } from "domain/filesystem";
 
 export const PdfPreview = () => {
   const { pdfUrl, compilerLog, showCompilerLog, setCompiledPdfUrl } =
@@ -46,14 +46,32 @@ export const PdfPreview = () => {
     console.log(willResizing, "willResizing");
   }, [willResizing]);
 
+  const [fileContent, setFileContent] = useState("")
+
+  useEffect(() => {
+    if (!assetsFilePath && assetsFilePath == "") return
+    console.log(
+      assetsFilePath,
+      "assetsFilePath"
+    );
+      (async () => {
+      const content = await readFile(assetsFilePath);
+      setFileContent(content);
+    })();
+  
+  }, [assetsFilePath])
+
   return (
     <div
       className={`h-full relative ${willResizing ? "z-10" : ""}`}
       style={{ overflow: "auto" }} // 添加这一行以允许滚动
     >
-      {!!assetValue && !!assetsFilePath ? (
-        <AssetPreview filename={assetsFilePath} content={assetValue} />
-      ) : showCompilerLog ? formattedCompilerLog:pdfUrl !== "" &&(
+      {!!assetsFilePath && !!fileContent ? (
+        <AssetPreview filename={assetsFilePath} content={fileContent} />
+      ) : showCompilerLog ? (
+        formattedCompilerLog
+      ) : (
+        pdfUrl !== "" &&
         pdfEmbed
         // <Viewer url={pdfU/rl}></Viewer>
       )}

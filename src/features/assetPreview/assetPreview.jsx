@@ -1,8 +1,16 @@
+/*
+ * @Description: 
+ * @Author: Devin
+ * @Date: 2024-07-02 09:45:55
+ */
 import React from "react";
 import path from "path";
-import Viewer from "../pdfPreview/viewer";
+import AutoPreview from "./autoPreview";
 
 const AssetPreview = React.memo(({ filename, content }) => {
+
+  // return <AutoPreview filename={filename} content={content}></AutoPreview>
+
   const fileExtension = path.extname(filename).slice(1).toLowerCase();
 
   if (!filename || (!content && !content.data)) {

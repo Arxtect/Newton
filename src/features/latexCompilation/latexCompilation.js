@@ -13,7 +13,6 @@ import {
   setErrorEngineStatus,
 } from "store";
 import { setCompiledPdfUrl, setCompilerLog, setShowCompilerLog } from "store";
-import { loadFileNames, initDB, getFileContent } from "@/util";
 
 import { getAllFileNames } from "@/domain/filesystem";
 import path from "path";
@@ -44,7 +43,24 @@ const LATEX_FILE_EXTENSIONS = [
   ".xdy",
   ".bst",
   ".eps",
+  ".pdf",
+  ".png",
+  ".jpg",
+  ".jpeg",
+  ".gif",
+  ".bmp",
+  ".svg",
+  ".py",
+  ".txt",
+  ".sh",
 ];
+
+const IgnoreFile = [
+  ".DS_Store",
+  ".gitignore",
+  ".git"
+]
+
 
 const fsPify = {
   readdir: pify(fs.readdir),
@@ -70,6 +86,72 @@ export const initializeLatexEngines = async () => {
   }
 };
 
+export const ensureFolderExists = async (list, currentProject) => {
+  let directories = new Set();
+
+  list.forEach((filePath) => {
+    let filepath = path.relative(currentProject, filePath);
+    console.log(`Relative path: ${filepath}`);
+    // 提取文件夹路径
+    let directory = filepath.substring(0, filepath.lastIndexOf("/"));
+    console.log(`Extracted directory: ${directory}`);
+    // 检查是否包含忽略文件夹
+    let shouldIgnore = IgnoreFile.some((ignoreItem) =>
+      directory.includes(ignoreItem)
+    );
+
+    if (!shouldIgnore && directory) {
+      directories.add(directory);
+    }
+  });
+
+  let allDirectories = new Set();
+
+  directories.forEach((directory) => {
+    let parts = directory.split("/");
+    let currentPath = "";
+    parts.forEach((part) => {
+      currentPath = currentPath ? `${currentPath}/${part}` : part;
+      allDirectories.add(currentPath);
+    });
+  });
+
+  let sortedDirectories = Array.from(allDirectories).sort(
+    (a, b) => a.length - b.length
+  );
+
+  console.log("All directories to be created:", sortedDirectories);
+
+  sortedDirectories.forEach((directory) => {
+    console.log(`Creating directory: ${directory}`);
+    if (directory !== "" && directory !== "/" && directory !== ".") {
+      xetexEngine.makeMemFSFolder(directory);
+      dviEngine.makeMemFSFolder(directory);
+    }
+  });
+};
+
+export const ensureFileExists = async (list, currentProject) => {
+  for (let i = 0; i < list.length; i++) {
+    let fullFilename = list[i];
+    let shouldIgnore = IgnoreFile.some((ignoreItem) =>
+      fullFilename.includes(ignoreItem)
+    );
+
+    if (shouldIgnore) continue;
+
+    let fileBlob = await fsPify.readFile(fullFilename);
+    let filepath = path.relative(currentProject, fullFilename);
+    let ext = path.extname(filepath);
+
+    // if (LATEX_FILE_EXTENSIONS.includes(ext)) {
+      console.log(filepath, "filepath");
+      dviEngine.writeMemFSFile(filepath, fileBlob);
+      xetexEngine.writeMemFSFile(filepath, fileBlob);
+    // }
+  }
+};
+
 export const compileLatex = async (latexCode, currentProject) => {
   // Make sure both engines are ready for compilation
   if (!xetexEngine.isReady() || !dviEngine.isReady()) {
@@ -83,52 +165,10 @@ export const compileLatex = async (latexCode, currentProject) => {
   // Create a temporary main.tex file
   xetexEngine.writeMemFSFile("main.tex", latexCode);
 
-  // const lists = [
-  // "eg.eps",
-  // "fancyplot.eps",
-  // "exp.eps",
-  // "expfig.eps",
-  // "fsim.eps",
-  // "nsim.eps",
-  // "SREP-19-29377-T.dvi",
-  // "SREP-19-29377-T.ps",
-  //   "lmmono9-regular.otf",
-  // ];
-
-  // for (let i = 0; i < lists.length; i++) {
-  //   let downloadReq = await fetch(`/assets/${lists[i]}`);
-  //   let imageBlob = await downloadReq.arrayBuffer();
-
-  //   xetexEngine.writeMemFSFile(`${lists[i]}`, new Uint8Array(imageBlob));
-  // }
   let list = await getAllFileNames(currentProject);
-  console.log(list, "list");
-  for (let i = 0; i < list.length; i++) {
-    // 去掉文件名的后缀
-    let filename = path.basename(list[i]);
-    let fileNameWithoutExtension = filename.split(".")[0];
-
-    // 检查latexCode是否包含文件名（无后缀）或者文件名的前缀
-    if (latexCode.includes(fileNameWithoutExtension)) {
-      console.log(list[i], "list");
-      let imageBlob = await fsPify.readFile(list[i]);
-
-      xetexEngine.writeMemFSFile(`${filename}`, imageBlob);
-      if (LATEX_FILE_EXTENSIONS.some((ext) => filename.endsWith(ext))) {
-        let fileContent = await imageBlob.toString();
-        for (let j = 0; j < list.length; j++) {
-          let newFilename = path.basename(list[j]);
-          let fileNameWithoutExtensions = newFilename.split(".")[0];
-          // 检查latexCode是否包含文件名（无后缀）或者文件名的前缀
-          if (i !== j && fileContent.includes(fileNameWithoutExtensions)) {
-            let nestedImageBlob = await fsPify.readFile(list[j]);
-            xetexEngine.writeMemFSFile(newFilename, nestedImageBlob);
-          }
-        }
-      }
-    }
-  }
-
+  await ensureFolderExists(list,currentProject);
+  await ensureFileExists(list, currentProject);
+  
   // Associate the XeTeX engine with this main.tex file
   xetexEngine.setEngineMainFile("main.tex");
   // Compile the main.tex file
@@ -142,32 +182,6 @@ export const compileLatex = async (latexCode, currentProject) => {
 
     // Create a temporary main.xdv file from the XeTeX compilation result
     dviEngine.writeMemFSFile("main.xdv", xetexCompilation.pdf);
-
-    for (let i = 0; i < list.length; i++) {
-      // 去掉文件名的后缀
-      let filename = path.basename(list[i]);
-      let fileNameWithoutExtension = filename.split(".")[0];
-
-      // 检查latexCode是否包含文件名（无后缀）或者文件名的前缀
-      if (latexCode.includes(fileNameWithoutExtension)) {
-        console.log(list[i], "list[i]");
-        let imageBlob = await fsPify.readFile(list[i]);
-
-        dviEngine.writeMemFSFile(`${filename}`, imageBlob);
-        if (LATEX_FILE_EXTENSIONS.some((ext) => filename.endsWith(ext))) {
-          let fileContent = await imageBlob.toString();
-          for (let j = 0; j < list.length; j++) {
-            let newFilename = path.basename(list[j]);
-            let fileNameWithoutExtensions = newFilename.split(".")[0];
-            // 检查latexCode是否包含文件名（无后缀）或者文件名的前缀
-            if (i !== j && fileContent.includes(fileNameWithoutExtensions)) {
-              let nestedImageBlob = await fsPify.readFile(list[j]);
-              dviEngine.writeMemFSFile(newFilename, nestedImageBlob);
-            }
-          }
-        }
-      }
-    }
 
     let dviCompilation = await dviEngine.compilePDF();
     console.log(dviCompilation, "dviCompilation");
