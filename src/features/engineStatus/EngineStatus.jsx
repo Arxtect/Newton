@@ -1,3 +1,8 @@
+/*
+ * @Description: 
+ * @Author: Devin
+ * @Date: 2024-05-28 12:37:50
+ */
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ReactTooltip from "react-tooltip";
@@ -19,11 +24,11 @@ export const EngineStatus = ({ className }) => {
     })
   );
 
-  useEffect(() => {
-    if (engineStatus === 4) {
-      setShowCompilerLog(true);
-    }
-  }, [engineStatus]);
+  // useEffect(() => {
+  //   if (engineStatus === 4) {
+  //     setShowCompilerLog(true);
+  //   }
+  // }, [engineStatus]);
 
   const handleClick = () => {
     if (engineStatus === 2) {
@@ -43,7 +48,7 @@ export const EngineStatus = ({ className }) => {
             size={20}
             engineStatus={engineStatus}
             className={`text-center ${color} hover:cursor-pointer text-arxTheme h-4 w-4 flex justify-center items-center`}
-            onClick={handleClick}
+            // onClick={handleClick}
           />
         ) : (
           <img
@@ -52,7 +57,7 @@ export const EngineStatus = ({ className }) => {
             }
             engineStatus={engineStatus}
             className={`text-center ${color} hover:cursor-pointer h-4 w-4`}
-            onClick={handleClick}
+            // onClick={handleClick}
           />
         )}
       </a>

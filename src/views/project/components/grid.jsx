@@ -1,17 +1,20 @@
+/*
+ * @Description: 
+ * @Author: Devin
+ * @Date: 2024-07-30 15:02:25
+ */
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import PdfImageLocal from "@/components/pdfImageLocal"
-import {useFileStore} from "store"
+import PdfImageLocal from "@/components/pdfImageLocal";
+import { useFileStore } from "store";
 
 const Grid = ({ sortedRows, auth, user, changeCurrentProjectRoot }) => {
-   const {
-      getCurrentProjectPdf,
-    } = useFileStore((state) => ({
-      getCurrentProjectPdf: state.getCurrentProjectPdf,
-    }));
+  const { getCurrentProjectPdf } = useFileStore((state) => ({
+    getCurrentProjectPdf: state.getCurrentProjectPdf,
+  }));
   const navigate = useNavigate();
 
-   const [pdfUrls, setPdfUrls] = useState({});
+  const [pdfUrls, setPdfUrls] = useState({});
 
   useEffect(() => {
     const fetchPdfUrls = async () => {
@@ -21,7 +24,7 @@ const Grid = ({ sortedRows, auth, user, changeCurrentProjectRoot }) => {
         urls[item.id] = url;
       }
       setPdfUrls(urls);
-      console.log(urls,'urls')
+      console.log(urls, "urls");
     };
 
     fetchPdfUrls();
@@ -38,7 +41,7 @@ const Grid = ({ sortedRows, auth, user, changeCurrentProjectRoot }) => {
               key={item.id}
               onClick={async (e) => {
                 const isAuth = auth(
-                  item.name != "YOU" &&
+                  item.name !== "YOU" &&
                     (!user || JSON.stringify(user) === "{}"),
                   () => {
                     e.stopPropagation();
@@ -56,7 +59,10 @@ const Grid = ({ sortedRows, auth, user, changeCurrentProjectRoot }) => {
                 navigate(`/newton`);
               }}
             >
-                 <PdfImageLocal url={pdfUrl} height={178} />
+              <div className="relative">
+                <PdfImageLocal url={pdfUrl} height={178} />
+                <div className="absolute inset-0 bg-gradient-to-b from-[#afccb7] to-[#7da97fd1] opacity-50"></div>
+              </div>
               <div className="self-center mt-3 hover:text-[#81c784] hover:underline">
                 {item.title}
               </div>

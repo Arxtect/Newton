@@ -120,7 +120,7 @@ const Content = React.forwardRef(
             }
             if (
               currentSelectMenu == "shared" &&
-              (item?.userId == user?.id || !item?.isSync)
+              (!item?.userId||item?.userId == user?.id || !item?.isSync)
             ) {
               return null;
             }
@@ -184,13 +184,15 @@ const Content = React.forwardRef(
         <div className="flex justify-between gap-5 mt-5 w-full max-md:flex-wrap">
           <div className="flex justify-between items-center text-xl font-semibold  text-center text-black">
             Projects Dashboard
-           {currentSelectMenu == "trash" && <Tooltip
-              title="Trash project are automatically deleted after 30 days"
-              arrow={true}
-              placement={"top"}
-            >
-              <img src={tipSvg} alt="" className="w-4 ml-2 cursor-pointer" />
-            </Tooltip>}
+            {currentSelectMenu == "trash" && (
+              <Tooltip
+                title="Trash project are automatically deleted after 30 days"
+                arrow={true}
+                placement={"top"}
+              >
+                <img src={tipSvg} alt="" className="w-4 ml-2 cursor-pointer" />
+              </Tooltip>
+            )}
           </div>
           <div className="flex gap-3.5">
             <div className="grow my-auto text-base font-medium text-center text-black">
@@ -212,12 +214,12 @@ const Content = React.forwardRef(
                   className={`flex items-center justify-center w-7 h-7 cursor-pointer ${
                     sortType === "grid" ? "bg-arxTheme" : "bg-gray-200"
                   } ${
-                    currentSelectMenu === "git"
-                      ? "opacity-50 cursor-not-allowed"
-                      : ""
+                    currentSelectMenu !== "git" && currentSelectMenu !== "trash"
+                      ? ""
+                      : "opacity-50 cursor-not-allowed"
                   }`}
                   onClick={
-                    currentSelectMenu !== "git"
+                    currentSelectMenu !== "git" && currentSelectMenu !== "trash"
                       ? () => setSortType("grid")
                       : null
                   }

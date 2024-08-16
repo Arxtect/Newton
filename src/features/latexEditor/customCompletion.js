@@ -2,23 +2,24 @@
 import ace from "ace-builds/src-noconflict/ace";
 import { readFile } from "domain/filesystem";
 
+const CHUNK_SIZE = 1000; // 每次处理1000行
+
 // 解析 .bib 文件并提取引用键
 const parseBibFile = async (bibFilePathList) => {
-  // 如果没有提供文件路径列表，返回空数组
-  if (!bibFilePathList || bibFilePathList.length === 0) {
-    return [];
-  }
-
   const regex = /@.*?\{(.*?),/g;
   const citations = [];
 
-  // 逐个读取并解析每个 .bib 文件
   for (const filepath of bibFilePathList) {
     try {
-      const content = await readFile(filepath, 'utf-8');
-      let match;
-      while ((match = regex.exec(content)) !== null) {
-        citations.push(match[1]);
+      const content = await readFile(filepath, "utf-8");
+      if(!content) return []
+      const lines = content?.toString()?.split("\n");
+      for (let i = 0; i < lines.length; i += CHUNK_SIZE) {
+        const chunk = lines.slice(i, i + CHUNK_SIZE).join("\n");
+        let match;
+        while ((match = regex.exec(chunk)) !== null) {
+          citations.push(match[1]);
+        }
       }
     } catch (err) {
       console.error(`Error reading file ${filepath}:`, err);
@@ -90,14 +91,6 @@ const setupCustomCompleter = async (editor, files, bibFilePathList) => {
     const insideCiteBraces =
       /\\cite\{[^}]*$/.test(beforeCursor) && /^[^}]*\}/.test(afterCursor);
 
-    console.log(
-      "asd",
-      inputMatch,
-      citeMatch,
-      insideInputBraces,
-      insideCiteBraces
-    );
-
     if (inputMatch && insideInputBraces) {
       // 使用 \input 补全器
       editor.completers = [inputCustomCompleter];
@@ -124,9 +117,13 @@ const setupCustomCompleter = async (editor, files, bibFilePathList) => {
   });
 
   // 光标移动时触发补全
-  editor.selection.on("changeCursor", function () {
-    triggerAutocomplete();
-  });
+  editor.selection.on("changeCursor", triggerAutocomplete);
+
+  return () => {
+    editor.commands.off("afterExec", triggerAutocomplete);
+    editor.selection.off("changeCursor", triggerAutocomplete);
+  }
 };
+
 
 export { createInputCustomCompleter, setupCustomCompleter };

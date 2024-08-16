@@ -24,7 +24,7 @@ export const useEngineStatusStore = create((set) => ({
         return {
           color: "text-green-500",
           tooltip:
-            "LaTeX Engine Ready for Use! <br /> Click to see compiler log.",
+            "LaTeX Engine Ready for Use! ",
         };
       case 3:
         return {

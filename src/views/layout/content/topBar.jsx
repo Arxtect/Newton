@@ -12,11 +12,20 @@ import previewSvg from "@/assets/layout/preview.svg";
 import redoSvg from "@/assets/layout/redo.svg";
 import searchSvg from "@/assets/layout/search.svg";
 import undoSvg from "@/assets/layout/undo.svg";
+import logSvg from "@/assets/layout/log.svg";
 import uploadFileSvg from "@/assets/layout/uploadFile.svg";
 import successSvg from "@/assets/layout/success.svg";
 import { Select, MenuItem, IconButton, Tooltip } from "@mui/material";
 import Controls from "./controls";
-import { useLayout, useFileStore, redo, undo, search,useUserStore } from "store";
+import {
+  useLayout,
+  useFileStore,
+  redo,
+  undo,
+  search,
+  useUserStore,
+  usePdfPreviewStore,
+} from "store";
 import { compileLatex } from "@/features/latexCompilation/latexCompilation";
 import { EngineStatus } from "@/features/engineStatus/EngineStatus";
 import { FileUploader, FolderUploader } from "../upload.jsx";
@@ -63,6 +72,14 @@ const ContentTopBar = (props) => {
     updateDirOpen: state.updateDirOpen,
     reload: state.repoChanged,
   }));
+
+    const { showCompilerLog,toggleCompilerLog, setShowCompilerLog } = usePdfPreviewStore(
+      (state) => ({
+        showCompilerLog:state.showCompilerLog,
+        toggleCompilerLog: state.toggleCompilerLog,
+        setShowCompilerLog: state.setShowCompilerLog,
+      })
+    );
 
     const { user } = useUserStore((state) => ({
     user: state.user,
@@ -146,16 +163,16 @@ const ContentTopBar = (props) => {
           if (icon.key == "uploadFile") {
             return (
               <React.Fragment>
-                <UploadFiles  
-                reload={reload}
+                <UploadFiles
+                  reload={reload}
                   filepath={filepath}
                   currentSelectDir={currentSelectDir}
                   currentProject={currentProjectRoot}
                   title={"Upload File"}
                   projectSync={projectSync}
                   user={user}
-                  />
-                  
+                />
+
                 {/* <FileUploader
                   onClick={() => fileUploaderRef.current.click()}
                   reload={reload}
@@ -203,12 +220,31 @@ const ContentTopBar = (props) => {
         className={`flex items-center  justify-between space-x-10 mr-4 w-1/2 `}
         style={{ marginLeft: showSide ? sideWidth + 32 : 32 + "px" }}
       >
-        <button
-          className={`bg-[#81C784] text-black px-2 rounded-md flex items-center space-x-4 `}
-        >
-          <span onClick={compile}>Compile</span>
-          <EngineStatus className="text-[12px]" />
-        </button>
+        <div className="flex items-center space-x-2">
+          <button
+            className={`bg-[#81C784] text-black px-2 py-[2px] rounded-md flex items-center space-x-4`}
+          >
+            <span onClick={compile}>Compile</span>
+            <EngineStatus className="text-[12px]" />
+          </button>
+          <Tooltip title={"Compile Log"}>
+            <IconButton
+              color="#inherit"
+              aria-label="toggleView"
+              size="small"
+              className={`flex items-center ${
+                showCompilerLog ? "bg-[#81C784]" : ""
+              } `}
+              onClick={toggleCompilerLog}
+            >
+              <img
+                src={logSvg}
+                alt=""
+                className="w-5 h-5 cursor-pointer hover:opacity-75"
+              />
+            </IconButton>
+          </Tooltip>
+        </div>
         <div className="flex items-center space-x-2">
           <Tooltip title={"Preview"}>
             <IconButton

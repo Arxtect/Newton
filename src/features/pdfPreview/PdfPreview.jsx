@@ -53,9 +53,7 @@ export const PdfPreview = () => {
     >
       {!!assetValue && !!assetsFilePath ? (
         <AssetPreview filename={assetsFilePath} content={assetValue} />
-      ) : pdfUrl === "" || showCompilerLog ? (
-        formattedCompilerLog
-      ) : (
+      ) : showCompilerLog ? formattedCompilerLog:pdfUrl !== "" &&(
         pdfEmbed
         // <Viewer url={pdfU/rl}></Viewer>
       )}

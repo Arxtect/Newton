@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import AceEditor from "react-ace";
 import "ace-builds/src-noconflict/mode-latex";
 // import "ace-builds/src-noconflict/theme-github";
@@ -44,12 +44,35 @@ const LatexEditor = ({
     if (!editor && !filepath) return;
     loadFile({ filepath: filepath });
   }, [editor]);
+  
+  const [isSetupCompleter, setisSetupCompleter] = useState(false)
 
   useEffect(() => {
-    if (latexRef.current && latexRef.current.editor && fileList?.length > 0) {
-      setupCustomCompleter(latexRef.current.editor, fileList, bibFilepathList);
+    let offListener = null;
+    if (
+      latexRef.current &&
+      latexRef.current.editor &&
+      fileList?.length > 0 &&
+      !!filepath &&
+      !isSetupCompleter
+    ) {
+      setisSetupCompleter(true);
+     (async () => {
+       offListener = await setupCustomCompleter(
+          latexRef.current.editor,
+          fileList,
+          bibFilepathList
+        );
+     })()
     }
-  }, [fileList, bibFilepathList]);
+    return () => {
+      // offListener is a function
+      if (offListener && typeof offListener === "function") {
+        console.log(offListener, "offListener");
+        offListener();
+      };
+    }
+  }, [fileList, bibFilepathList, filepath]);
 
   return (
     <div className="h-full relative" id="editor">

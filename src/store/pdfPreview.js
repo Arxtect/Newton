@@ -1,10 +1,15 @@
+/*
+ * @Description: 
+ * @Author: Devin
+ * @Date: 2024-05-28 13:48:03
+ */
 import { create } from "zustand";
 import { useFileStore } from "./useFileStore";
 
 export const usePdfPreviewStore = create((set, get) => ({
   pdfUrl: "",
   compilerLog: "",
-  showCompilerLog: true,
+  showCompilerLog: false,
   setCompiledPdfUrl:async (pdfUrl) => {
     get().revokeCompiledPdfUrl(get().pdfUrl);
     set(() => ({ pdfUrl }));

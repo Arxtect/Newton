@@ -66,12 +66,12 @@ export const useFileStore = create()(
           return file.replace(new RegExp(`^${relativePathPrefix}`), "");
         });
 
-        let fileList = modifiedFiles.filter((i) => !!i);
+        await get().updateCurrentProjectBibFilepathList(files)
 
+        let fileList = modifiedFiles.filter((i) => !!i);
         set({ currentProjectFileList: fileList });
       },
-      updateCurrentProjectBibFilepathList: async (currentProjectRoot) => {
-        const files = await FS.getFilesRecursively(currentProjectRoot);
+      updateCurrentProjectBibFilepathList: async (files) => {
         let list = files.filter((item) => item.includes(".bib"));
         set({ currentProjectBibFilepathList: list });
       },
@@ -335,7 +335,6 @@ export const useFileStore = create()(
         get().initFile();
         set({ currentProjectRoot: projectRoot, currentSelectDir: projectRoot });
         initializeGitStatus({ projectRoot });
-        get().updateCurrentProjectBibFilepathList(projectRoot);
         get().updateCurrentProjectFileList(projectRoot);
       },
       createProject: async (newProjectRoot) => {
