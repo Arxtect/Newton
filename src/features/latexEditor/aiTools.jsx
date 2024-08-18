@@ -20,7 +20,7 @@ const DropdownMenu = ({ options, onSelect, activeIndex }) => {
     );
 };
 
-const AiTools = ({ editorRef }) => {
+const AiTools = ({ editor }) => {
     const [toolbarPosition, setToolbarPosition] = useState({ top: 0, left: 0 });
     const [showDropdown, setShowDropdown] = useState(false);
     const [activeIndex, setActiveIndex] = useState(0);
@@ -31,7 +31,6 @@ const AiTools = ({ editorRef }) => {
     } = useLayout();
 
     const handleCommand = (command) => {
-        const editor = editorRef.current.editor;
         const cursorPosition = editor.getCursorPosition();
         const session = editor.getSession();
         const line = session.getLine(cursorPosition.row);
@@ -65,7 +64,6 @@ const AiTools = ({ editorRef }) => {
     }, [sideWidth])
 
     const handleCursorChange = (selection) => {
-        const editor = editorRef.current.editor;
         const cursorPosition = editor.getCursorPosition();
         const screenCoordinates = editor.renderer.textToScreenCoordinates(cursorPosition.row, cursorPosition.column);
 
@@ -87,7 +85,6 @@ const AiTools = ({ editorRef }) => {
     };
 
     const handleKeyDown = (event) => {
-        const editor = editorRef.current.editor;
         if (showDropdown) {
             event.preventDefault();
             event.stopPropagation();
@@ -108,7 +105,7 @@ const AiTools = ({ editorRef }) => {
     };
 
     useEffect(() => {
-        const editor = editorRef.current.editor;
+        if(!editor) return 
         editor.session.selection.on('changeCursor', handleCursorChange);
         editor.container.addEventListener('keyup', handleKeyDown);
 
@@ -116,10 +113,10 @@ const AiTools = ({ editorRef }) => {
             editor.session.selection.off('changeCursor', handleCursorChange);
             editor.container.removeEventListener('keyup', handleKeyDown);
         };
-    }, [showDropdown, activeIndex]);
+    }, [showDropdown, activeIndex,editor]);
 
     useEffect(() => {
-        const editor = editorRef.current.editor;
+        if(!editor) return 
         if (showDropdown) {
             setOriginalKeyHandler(editor.keyBinding.getKeyboardHandler());
             editor.keyBinding.addKeyboardHandler({
@@ -137,7 +134,7 @@ const AiTools = ({ editorRef }) => {
                 setOriginalKeyHandler(null);
             }
         }
-    }, [showDropdown]);
+    }, [showDropdown,editor]);
 
     const options = [
         { icon: <AiOutlineEdit />, label: 'AI 续写', value: 'section' },
