@@ -233,8 +233,8 @@ const DirectoryLineContent = ({
             onMouseOver={handleMouseOver}
             onMouseLeave={handleMouseLeave}
             onClick={(e) => handleClick(e, dirpath)}
-            className={`hover:bg-gray-100 transition duration-300 ${
-              hovered || currentSelectDir == dirpath ? "bg-gray-100" : ""
+            className={`hover:bg-[#bae6bc5c] transition duration-300 ${
+              hovered || currentSelectDir == dirpath ? "bg-[#81c784]" : ""
             }`}
             style={{
               padding: "3px 0px 3px 0px",

@@ -84,6 +84,11 @@ async function getLastModified(dir) {
   const filePromises = entries.map(async (entry) => {
     const entryPath = path.join(dir, entry);
     const stat = await pify(fs.stat)(entryPath);
+    
+    if (stat.mtime > lastModified) {
+      lastModified = stat.mtime;
+    }
+
 
     if (stat.isDirectory()) {
       const subDirLastModified = await getLastModified(entryPath);

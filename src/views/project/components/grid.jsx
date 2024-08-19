@@ -1,5 +1,5 @@
 /*
- * @Description: 
+ * @Description:
  * @Author: Devin
  * @Date: 2024-07-30 15:02:25
  */
@@ -7,8 +7,16 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import PdfImageLocal from "@/components/pdfImageLocal";
 import { useFileStore } from "store";
+import Action from "./action";
 
-const Grid = ({ sortedRows, auth, user, changeCurrentProjectRoot }) => {
+const Grid = ({
+  sortedRows,
+  auth,
+  user,
+  changeCurrentProjectRoot,
+  getProjectList,
+  handleGithub,
+}) => {
   const { getCurrentProjectPdf } = useFileStore((state) => ({
     getCurrentProjectPdf: state.getCurrentProjectPdf,
   }));
@@ -37,8 +45,6 @@ const Grid = ({ sortedRows, auth, user, changeCurrentProjectRoot }) => {
           const pdfUrl = pdfUrls[item.id];
           return (
             <div
-              className="flex flex-col flex-1 mt-1.5 cursor-pointer"
-              key={item.id}
               onClick={async (e) => {
                 const isAuth = auth(
                   item.name !== "YOU" &&
@@ -48,7 +54,7 @@ const Grid = ({ sortedRows, auth, user, changeCurrentProjectRoot }) => {
                     changeCurrentProjectRoot({
                       projectRoot: item.title,
                     });
-                    navigate(`/newton`);
+                    navigate("/newton");
                   }
                 );
                 if (isAuth) return;
@@ -56,7 +62,17 @@ const Grid = ({ sortedRows, auth, user, changeCurrentProjectRoot }) => {
                 changeCurrentProjectRoot({
                   projectRoot: item.title,
                 });
-                navigate(`/newton`);
+                navigate("/newton");
+              }}
+              className="flex flex-col flex-1 mt-1.5 cursor-pointer relative"
+              key={item.id}
+              onMouseEnter={(e) => {
+                e.currentTarget.querySelector(".action").style.visibility =
+                  "visible";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.querySelector(".action").style.visibility =
+                  "hidden";
               }}
             >
               <div className="relative">
@@ -65,6 +81,14 @@ const Grid = ({ sortedRows, auth, user, changeCurrentProjectRoot }) => {
               </div>
               <div className="self-center mt-3 hover:text-[#81c784] hover:underline">
                 {item.title}
+              </div>
+              <div className="action absolute top-[50%] transform -translate-y-[50%]">
+                <Action
+                  item={item}
+                  auth={auth}
+                  getProjectList={getProjectList}
+                  handleGithub={handleGithub}
+                ></Action>
               </div>
             </div>
           );

@@ -22,7 +22,7 @@ const Container = ({ selected, children }) => {
   const baseClasses = "cursor-pointer";
 
   // Define the dynamic classes based on the `selected` prop
-  const hoverClasses = selected ? "bg-gray-100" : "hover:bg-gray-100";
+  const hoverClasses = selected ? "bg-[#81c784]" : "hover:bg-[#bae6bc5c]";
 
   return <div className={`${baseClasses} ${hoverClasses}`}>{children}</div>;
 };
@@ -63,6 +63,7 @@ const FileLine = ({
     const dirname = path.dirname(filepath);
     const destPath = path.join(dirname, value);
     await pify(fs.rename)(filepath, destPath);
+
     endRenaming();
     fileMoved({ fromPath: filepath, destPath });
   };

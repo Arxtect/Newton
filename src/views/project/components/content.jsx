@@ -23,7 +23,10 @@ import NewProject from "../newProject";
 import UploadProject from "../uploadProject";
 import Github from "../github";
 import { toast } from "react-toastify";
-import { getGitRepoList } from "@/services";
+import ArDialog from "@/components/arDialog";
+import { getYDocToken, deleteGitRepo,getGitRepoList, getRoomUserAccess } from "services";
+import { useNavigate } from "react-router-dom";
+import { ProjectSync } from "@/convergence";
 
 const Content = React.forwardRef(
   ({ currentSelectMenu, setCurrentSelectMenu }, ref) => {
@@ -46,6 +49,8 @@ const Content = React.forwardRef(
       }
       return false;
     };
+        const navigate = useNavigate();
+
 
     const [sortType, setSortType] = useState("table");
     const [sortSelect, setSortSelect] = useState("lastModified");
@@ -120,7 +125,7 @@ const Content = React.forwardRef(
             }
             if (
               currentSelectMenu == "shared" &&
-              (!item?.userId||item?.userId == user?.id || !item?.isSync)
+              (!item?.userId || item?.userId == user?.id || !item?.isSync)
             ) {
               return null;
             }
@@ -172,6 +177,96 @@ const Content = React.forwardRef(
       setGithubDialogOpen(open);
       setProjectName(proejctName);
     };
+
+    // sync project
+    const [projectSync, setProjectSync] = useState(null);
+
+    const [syncDialogOpen, setSyncDialogOpen] = useState(false);
+
+    const [syncParams, setSyncParams] = useState({});
+
+    const handleSyncProject = (syncProjectName, roomId) => {
+      setSyncParams({ roomId, project: syncProjectName });
+      setSyncDialogOpen(true);
+    };
+    const getYDocTokenReq = async () => {
+      const token = await getYDocToken();
+      console.log(token, "token");
+      return token;
+    };
+    const handleConfirmSync = async () => {
+      const token = await getYDocTokenReq();
+      const projectSync = new ProjectSync(
+        syncParams.project,
+        user,
+        syncParams.roomId,
+        token,
+        getProjectList
+      );
+      await projectSync.setObserveHandler();
+
+      setProjectSync(projectSync);
+      setSyncDialogOpen(false);
+    };
+    const handleCancelSync = () => {
+      setSyncDialogOpen(false);
+    };
+
+    const initShareProject = async () => {
+      const hash = window.location.hash;
+      const queryString = hash.includes("?") ? hash.split("?")[1] : "";
+      const searchParams = new URLSearchParams(queryString);
+
+      const project = searchParams.get("project");
+      const roomId = searchParams.get("roomId");
+
+      if (!project || !roomId) return;
+
+      if (!user || JSON.stringify(user) === "{}") {
+        toast.warning("Please login");
+        updateDialogLoginOpen(true);
+        updateOtherOperation(() => handleSyncProject(project, roomId));
+        return;
+      }
+
+      const res = await getRoomUserAccess({
+        project_name: project + roomId,
+      });
+      if (res?.status != "success") {
+        toast.error("Get room user access failed.");
+        return;
+      }
+
+      if (res?.access == "r") {
+        toast.info(
+          "The project is read-only for you, please contact your project manager to modify it."
+        );
+      }
+
+      if (res?.access == "no") {
+        toast.info(
+          "The project is not shared for you, please contact your project manager to modify it."
+        );
+        navigate("/project");
+        return;
+      }
+
+      handleSyncProject(project, roomId);
+    };
+
+    useEffect(() => {
+      const init = async () => {
+        await initShareProject(getProjectList);
+      };
+
+      init();
+      getProjectList();
+      return () => {
+        if (projectSync) {
+          projectSync?.leaveCollaboration && projectSync?.leaveCollaboration();
+        }
+      };
+    }, []);
 
     return (
       <div className="flex flex-col w-full">
@@ -270,6 +365,7 @@ const Content = React.forwardRef(
               user={user}
               setGithubDialogOpen={setGithubDialogOpen}
               changeCurrentProjectRoot={changeCurrentProjectRoot}
+              handleGithub={handleGithub}
             ></Grid>
           )}
         </div>
@@ -291,6 +387,18 @@ const Content = React.forwardRef(
           setProjectName={setProjectName}
           currentSelectMenu={currentSelectMenu}
         ></Github>
+        <ArDialog
+          title="Sync Project"
+          dialogOpen={syncDialogOpen}
+          handleCancel={handleCancelSync}
+          buttonList={[
+            { title: "Cancel", click: handleCancelSync },
+            { title: "Confirm", click: handleConfirmSync },
+          ]}
+        >
+          Whether to enter the collaboration project:
+          <span className="text-red-500 mr-1">{syncParams.project}</span>
+        </ArDialog>
       </div>
     );
   }

@@ -13,6 +13,7 @@ import { toast } from "react-toastify";
 import pify from "pify";
 import path from "path"
 import fs from "fs"
+import { getProjectInfo, createProjectInfo } from "domain/filesystem";
 
 const RenameProject = ({
   dialogOpen,
@@ -44,12 +45,16 @@ const RenameProject = ({
     try {
       // Rename the directory
       await pify(fs.rename)(sourceProject, newDirPath);
-
-      fileMoved({ fromPath: sourceProject, destPath: newDirPath });
-      getProjectList()
+      await fileMoved({ fromPath: sourceProject, destPath: newDirPath });
       setDialogOpen(false);
       setSourceProject("");
       toast.success("Project renamed successfully");
+
+    
+        await createProjectInfo(newDirPath, {
+        });
+       getProjectList()
+
     } catch (error) {
       console.error("Error renaming directory:", error);
     }

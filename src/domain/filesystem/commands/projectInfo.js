@@ -18,7 +18,7 @@ export const createProjectInfo = async (projectRoot, additionalInfo = {}) => {
 
   try {
     // 尝试读取现有的项目信息文件
-    const fileContent = await readFile(projectRoot);
+    const fileContent = await readFile(projectInfoPath);
     existingInfo = JSON.parse(fileContent);
   } catch (err) {
     // 如果文件不存在或解析失败，忽略错误
