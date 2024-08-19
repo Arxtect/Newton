@@ -7,7 +7,7 @@ import "ace-builds/src-min-noconflict/ext-language_tools";
 import "ace-builds/src-min-noconflict/ext-searchbox";
 import AiTools from "./aiTools";
 import { useEditor, useFileStore } from "@/store";
-import AutoCompleteManager from "@/features/autoComplete/AutoCompleteManager2"; // 导入自定义补全器
+import AutoCompleteManager from "@/features/autoComplete/AutoCompleteManager"; // 导入自定义补全器
 
 
 const LatexEditor = ({
@@ -66,7 +66,6 @@ const LatexEditor = ({
 
   useEffect(() => {
     return () => {
-      console.log("====")
       completer&&completer.offAddEventListener&&completer.offAddEventListener()
     }
   },[])
@@ -87,9 +86,9 @@ const LatexEditor = ({
         showPrintMargin={false}
         lineHeight={24}
         setOptions={{
-          enableBasicAutocompletion: true,
-          enableLiveAutocompletion: true,
-          enableSnippets: true,
+          // enableBasicAutocompletion: true,
+          // enableLiveAutocompletion: true,
+          // enableSnippets: true,
           showLineNumbers: true,
           tabSize: 2,
           readOnly: filepath === "",

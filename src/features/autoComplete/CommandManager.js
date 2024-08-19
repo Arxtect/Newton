@@ -16,7 +16,7 @@ import _ from 'lodash'
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 import topHundred from './snippets/TopHundredSnippets'
-let CommandManager
+
 class Parser {
   static initClass() {
     // Ignore single letter commands since auto complete is moot then.
@@ -139,9 +139,10 @@ class Parser {
 }
 Parser.initClass()
 
-export default CommandManager = class CommandManager {
-  constructor(metadataManager) {
-    this.metadataManager = metadataManager
+class CommandManager {
+  constructor() {
+    // this.metadataManager = metadataManager
+    console.log('1231')
   }
 
   getCompletions(editor, session, pos, prefix, callback) {
@@ -150,15 +151,15 @@ export default CommandManager = class CommandManager {
       commandNames[snippet.caption.match(/\w+/)[0]] = true
     }
 
-    const packages = this.metadataManager.getAllPackages()
-    const packageCommands = []
-    for (const pkg in packages) {
-      const snippets = packages[pkg]
-      for (snippet of Array.from(snippets)) {
-        packageCommands.push(snippet)
-        commandNames[snippet.caption.match(/\w+/)[0]] = true
-      }
-    }
+    // const packages = this.metadataManager.getAllPackages()
+    // const packageCommands = []
+    // for (const pkg in packages) {
+    //   const snippets = packages[pkg]
+    //   for (snippet of Array.from(snippets)) {
+    //     packageCommands.push(snippet)
+    //     commandNames[snippet.caption.match(/\w+/)[0]] = true
+    //   }
+    // }
 
     const doc = session.getValue()
     const parser = new Parser(doc, prefix)
@@ -188,7 +189,9 @@ export default CommandManager = class CommandManager {
         })
       }
     }
-    completions = completions.concat(topHundred, packageCommands)
+    // completions = completions.concat(topHundred, packageCommands)
+    completions = completions.concat(topHundred, []);
+    console.log(completions, "completions");
 
     return callback(null, completions)
   }
@@ -239,3 +242,4 @@ function __guard__(value, transform) {
     ? transform(value)
     : undefined
 }
+export default CommandManager 
