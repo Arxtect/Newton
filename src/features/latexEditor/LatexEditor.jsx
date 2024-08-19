@@ -7,7 +7,7 @@ import "ace-builds/src-min-noconflict/ext-language_tools";
 import "ace-builds/src-min-noconflict/ext-searchbox";
 import AiTools from "./aiTools";
 import { useEditor, useFileStore } from "@/store";
-import {setupCustomCompleter } from "./customCompletion"; // 导入自定义补全器
+import AutoCompleteManager from "@/features/autoComplete/AutoCompleteManager"; // 导入自定义补全器
 
 
 const LatexEditor = ({
@@ -47,32 +47,28 @@ const LatexEditor = ({
   
   const [isSetupCompleter, setisSetupCompleter] = useState(false)
 
+  const [completer, setCompleter] = useState(null)
+
   useEffect(() => {
-    let offListener = null;
     if (
       latexRef.current &&
       latexRef.current.editor &&
       fileList?.length > 0 &&
-      !!filepath &&
-      !isSetupCompleter
+      !!filepath
     ) {
+      completer&&completer.changeCurrentFilePath(filepath);
       setisSetupCompleter(true);
-     (async () => {
-       offListener = await setupCustomCompleter(
-          latexRef.current.editor,
-          fileList,
-          bibFilepathList
-        );
-     })()
-    }
-    return () => {
-      // offListener is a function
-      if (offListener && typeof offListener === "function") {
-        console.log(offListener, "offListener");
-        offListener();
-      };
+      if(isSetupCompleter) return
+      let newCompleter = new AutoCompleteManager(latexRef.current.editor,fileList, bibFilepathList,filepath);
+      setCompleter(newCompleter);
     }
   }, [fileList, bibFilepathList, filepath]);
+
+  useEffect(() => {
+    return () => {
+      completer&&completer.offAddEventListener&&completer.offAddEventListener()
+    }
+  },[])
 
   return (
     <div className="h-full relative" id="editor">
@@ -90,9 +86,9 @@ const LatexEditor = ({
         showPrintMargin={false}
         lineHeight={24}
         setOptions={{
-          enableBasicAutocompletion: true,
-          enableLiveAutocompletion: true,
-          enableSnippets: true,
+          // enableBasicAutocompletion: true,
+          // enableLiveAutocompletion: true,
+          // enableSnippets: true,
           showLineNumbers: true,
           tabSize: 2,
           readOnly: filepath === "",
