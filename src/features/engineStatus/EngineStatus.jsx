@@ -11,6 +11,8 @@ import { usePdfPreviewStore, useEngineStatusStore } from "store";
 import { CircularProgress } from "@mui/material";
 import ErrorSvg from "@/assets/website/error.svg";
 import SuccessSvg from "@/assets/layout/success.svg";
+import * as constant from "@/constant";
+import RotatingIcon from "./RotatingIconButton";
 
 export const EngineStatus = ({ className }) => {
   const { engineStatus, selectFormattedEngineStatus } = useEngineStatusStore();
@@ -24,14 +26,8 @@ export const EngineStatus = ({ className }) => {
     })
   );
 
-  // useEffect(() => {
-  //   if (engineStatus === 4) {
-  //     setShowCompilerLog(true);
-  //   }
-  // }, [engineStatus]);
-
   const handleClick = () => {
-    if (engineStatus === 2) {
+    if (engineStatus === constant.readyEngineStatus) {
       toggleCompilerLog();
     }
   };
@@ -40,21 +36,26 @@ export const EngineStatus = ({ className }) => {
     ReactTooltip.rebuild();
   }, []);
 
+
+
   return (
     <div className={`flex justify-center items-center ${className}`}>
       <a data-tip={tooltip} data-for="engineStatus">
-        {engineStatus == 1 || engineStatus == 3 ? (
-          <CircularProgress
-            size={20}
-            engineStatus={engineStatus}
-            className={`text-center ${color} hover:cursor-pointer text-arxTheme h-4 w-4 flex justify-center items-center`}
-            // onClick={handleClick}
-          />
+        {[
+          constant.notReadyEngineStatus,
+          constant.busyEngineStatus,
+        ].includes(engineStatus) ? (
+            <RotatingIcon isRotating={true} />
         ) : (
           <img
             src={
-              engineStatus == 2 ? SuccessSvg : engineStatus == 4 ? ErrorSvg : ""
+              engineStatus == constant.readyEngineStatus
+                ? SuccessSvg
+                : engineStatus == constant.errorEngineStatus
+                ? ErrorSvg
+                : ""
             }
+            alt="engineStatus"
             engineStatus={engineStatus}
             className={`text-center ${color} hover:cursor-pointer h-4 w-4`}
             // onClick={handleClick}

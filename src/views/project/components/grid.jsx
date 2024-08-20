@@ -38,6 +38,25 @@ const Grid = ({
     fetchPdfUrls();
   }, [sortedRows]);
 
+  const handleItemClick = (item, e) => {
+          e.stopPropagation();
+      const isAuth = auth(
+        item.name !== "YOU" && (!user || JSON.stringify(user) === "{}"),
+        () => {
+          changeCurrentProjectRoot({
+            projectRoot: item.title,
+          });
+          navigate("/newton");
+        }
+      );
+      if (isAuth) return;
+      e.stopPropagation();
+      changeCurrentProjectRoot({
+        projectRoot: item.title,
+      });
+      navigate("/newton");
+    };
+
   return (
     <div>
       <div className="grid grid-cols-6 gap-5 items-start text-base leading-4 text-center text-black max-md:grid-cols-1 max-md:mt-10 max-md:max-w-full">
@@ -45,27 +64,8 @@ const Grid = ({
           const pdfUrl = pdfUrls[item.id];
           return (
             <div
-              onClick={async (e) => {
-                const isAuth = auth(
-                  item.name !== "YOU" &&
-                    (!user || JSON.stringify(user) === "{}"),
-                  () => {
-                    e.stopPropagation();
-                    changeCurrentProjectRoot({
-                      projectRoot: item.title,
-                    });
-                    navigate("/newton");
-                  }
-                );
-                if (isAuth) return;
-                e.stopPropagation();
-                changeCurrentProjectRoot({
-                  projectRoot: item.title,
-                });
-                navigate("/newton");
-              }}
-              className="flex flex-col flex-1 mt-1.5 cursor-pointer relative"
               key={item.id}
+              className="flex flex-col flex-1 mt-1.5 cursor-pointer relative"
               onMouseEnter={(e) => {
                 e.currentTarget.querySelector(".action").style.visibility =
                   "visible";
@@ -79,7 +79,10 @@ const Grid = ({
                 <PdfImageLocal url={pdfUrl} height={178} />
                 <div className="absolute inset-0 bg-gradient-to-b from-[#afccb7] to-[#7da97fd1] opacity-50"></div>
               </div>
-              <div className="self-center mt-3 hover:text-[#81c784] hover:underline">
+              <div
+                className="self-center mt-3 hover:text-[#81c784] hover:underline"
+                onClick={(e) => handleItemClick(item, e)}
+              >
                 {item.title}
               </div>
               <div className="action absolute top-[50%] transform -translate-y-[50%]">

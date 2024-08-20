@@ -4,7 +4,7 @@ module.exports = {
   theme: {
     extend: {
       borderWidth: {
-        '1': '1px',
+        1: "1px",
       },
       fontFamily: {
         sans: ["Lato", "sans-serif"],
@@ -29,6 +29,9 @@ module.exports = {
       },
       width: {
         "1/9": "calc(100% / 9)",
+      },
+      animation: {
+        "spin-slow": "spin 2s linear infinite", // 修改这里的3s为你想要的速度
       },
     },
   },

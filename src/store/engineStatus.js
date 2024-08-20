@@ -4,14 +4,18 @@
  * @Date: 2024-02-03 14:40:10
  */
 import create from "zustand";
+import * as constant from "@/constant";
 
 export const useEngineStatusStore = create((set) => ({
   engineStatus: 1,
   setCustomEngineStatus: (engineStatus) => set(() => ({ engineStatus })),
-  setNotReadyEngineStatus: () => set(() => ({ engineStatus: 1 })),
-  setReadyEngineStatus: () => set(() => ({ engineStatus: 2 })),
-  setBusyEngineStatus: () => set(() => ({ engineStatus: 3 })),
-  setErrorEngineStatus: () => set(() => ({ engineStatus: 4 })),
+  setNotReadyEngineStatus: () =>
+    set(() => ({ engineStatus: constant.notReadyEngineStatus })),
+  setReadyEngineStatus: () =>
+    set(() => ({ engineStatus: constant.readyEngineStatus })),
+  setBusyEngineStatus: () =>
+    set(() => ({ engineStatus: constant.busyEngineStatus })),
+  setErrorEngineStatus: () => set(() => ({ engineStatus: constant.errorEngineStatus })),
   selectFormattedEngineStatus: () => {
     const { engineStatus } = useEngineStatusStore.getState();
     switch (engineStatus) {
@@ -23,8 +27,7 @@ export const useEngineStatusStore = create((set) => ({
       case 2:
         return {
           color: "text-green-500",
-          tooltip:
-            "LaTeX Engine Ready for Use! ",
+          tooltip: "LaTeX Engine Ready for Use! ",
         };
       case 3:
         return {
@@ -33,7 +36,6 @@ export const useEngineStatusStore = create((set) => ({
         };
       case 4:
         return {
-
           color: "text-red-500",
           tooltip: "Error with LaTeX Engine!",
         };

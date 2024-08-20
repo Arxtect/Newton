@@ -69,7 +69,10 @@ export const useFileStore = create()(
         await get().updateCurrentProjectBibFilepathList(files)
 
         let fileList = modifiedFiles.filter((i) => !!i);
+        
+        let mainFile = await FS.findMainFile(files);
         set({ currentProjectFileList: fileList });
+        get().loadFile({ filepath: mainFile });
       },
       updateCurrentProjectBibFilepathList: async (files) => {
         let list = files.filter((item) => item.includes(".bib"));

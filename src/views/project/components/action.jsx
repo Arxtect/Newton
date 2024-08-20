@@ -232,6 +232,7 @@ const HoverAction = forwardRef(
                 size="small"
                 onClick={(e) => {
                   e.stopPropagation();
+                  e.preventDefault();
                   const isAuth = auth(
                     item.name != "YOU" &&
                       (!user || JSON.stringify(user) === "{}"),
@@ -251,6 +252,7 @@ const HoverAction = forwardRef(
                 size="small"
                 onClick={(e) => {
                   e.stopPropagation();
+                  e.preventDefault();
                   const isAuth = auth(
                     item.name != "YOU" &&
                       (!user || JSON.stringify(user) === "{}"),

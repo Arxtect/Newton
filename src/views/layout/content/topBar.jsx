@@ -3,7 +3,7 @@
  * @Author: Devin
  * @Date: 2024-07-18 10:06:45
  */
-import React, { useRef } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import pickUpSvg from "@/assets/layout/pickup.svg";
 import newFileSvg from "@/assets/layout/newFile.svg";
 import newFolderSvg from "@/assets/layout/newFolder.svg";
@@ -25,11 +25,13 @@ import {
   search,
   useUserStore,
   usePdfPreviewStore,
+  useEngineStatusStore,
 } from "store";
 import { compileLatex } from "@/features/latexCompilation/latexCompilation";
 import { EngineStatus } from "@/features/engineStatus/EngineStatus";
 import { FileUploader, FolderUploader } from "../upload.jsx";
 import UploadFiles from "./uploadFiles"
+import * as constant from "@/constant";
 
 const ContentTopBar = (props) => {
   const {
@@ -48,6 +50,10 @@ const ContentTopBar = (props) => {
     showFooter,
     sideWidth,
   } = useLayout();
+
+    const { engineStatus, selectFormattedEngineStatus } =
+      useEngineStatusStore();
+
 
   const {
     projectSync,
@@ -86,6 +92,24 @@ const ContentTopBar = (props) => {
   }));
 
   const compile = () => compileLatex(sourceCode, currentProjectRoot);
+
+  const [isAutoCompile, setIsAutoCompile] = useState(false)
+
+    const autoCompileFirst = (compileCallback) => {
+      if (
+        engineStatus === constant.readyEngineStatus &&
+        !isAutoCompile &&
+        sourceCode &&
+        currentProjectRoot
+      ) {
+        setIsAutoCompile(true);
+        compileCallback && compileCallback();
+      }
+    };
+  
+  useEffect(() => {
+    autoCompileFirst(compile);
+  }, [sourceCode, engineStatus, currentProjectRoot]);
 
   const handleActionClick = (key) => {
     switch (key) {

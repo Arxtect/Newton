@@ -13,6 +13,8 @@ export * from "./queries/readFile";
 export * from "./queries/readFileStats";
 
 export * from "./commands/getAllFiles";
+export * from "./commands/findMainFile";
+
 export * from "./queries/findAllProject";
 export * from "./queries/extToFileType";
 

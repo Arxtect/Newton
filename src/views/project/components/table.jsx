@@ -18,7 +18,7 @@ const Table = forwardRef(
   ({ setSelectedRows, getProjectList, projectData, sortedRows, auth,currentSelectMenu,handleGithub }, ref) => {
     const navigate = useNavigate();
     const { changeCurrentProjectRoot } = useFileStore((state) => ({
-      currentProjectRoot: state.currentProjectRoot,
+      changeCurrentProjectRoot: state.changeCurrentProjectRoot,
     }));
 
     const { user, accessToken } = useUserStore((state) => ({
