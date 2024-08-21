@@ -22,6 +22,9 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import AppRouter from "@/router";
 import DialogLogin from "@/views/login/dialog-login.js";
+import { writeFile } from "domain/filesystem";
+import path from "path";
+import latexCodeWelcome from "@/features/latexEditor/welcome";
 // import "@blueprintjs/core/lib/css/blueprint.css";
 // import "@blueprintjs/icons/lib/css/blueprint-icons.css";
 
@@ -42,7 +45,10 @@ async function loadBrowserFS() {
 await loadBrowserFS();
 let projectLists = await findAllProject(".");
 if (projectLists.length == 0) {
-  useFileStore.getState().createProject("arxtect");
+  let rootPath = "arxtect";
+  let filepath = path.join(rootPath, "main.tex");
+  await useFileStore.getState().createProject(rootPath);
+  await writeFile(filepath, latexCodeWelcome);
 }
 
 const root = ReactDOM.createRoot(document.getElementById("root"));

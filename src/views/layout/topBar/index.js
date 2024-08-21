@@ -85,7 +85,7 @@ const TopBar = (props) => {
                 key={user.id}
                 className="relative rounded-full w-8 h-8 flex items-center justify-center border-2 border-white"
                 style={{
-                  backgroundColor: getColors(index),
+                  backgroundColor: user?.color||getColors(index),
                   marginLeft: index === 0 ? "0" : "-0.5rem", // Adjust the overlap
                   zIndex: 100 - index,
                 }}
