@@ -65,10 +65,15 @@ class CustomCompleter {
     this.setupTrigger();
     this.isInit = true;
   }
+  
+  async changeCitationCompleter(bibFilePathList) {
+    this.bibFilePathList = bibFilePathList;
+    const citations = await this.parseBibFile(this.bibFilePathList);
+    this.citeCustomCompleter = this.createCiteCompleter(citations);
+  }
 
   changeCurrentFilePath(filepath) {
     this.currentFilePath = filepath;
-    console.log(this.currentFilePath);
     this.inputCustomCompleter = this.createInputCustomCompleter(
       this.fileList,
       filepath

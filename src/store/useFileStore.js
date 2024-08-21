@@ -72,8 +72,30 @@ export const useFileStore = create()(
         set({ currentProjectFileList: fileList });
       },
       updateCurrentProjectBibFilepathList: async (files) => {
-        let list = files.filter((item) => item.includes(".bib"));
+        let list = files.filter((item) => {  
+          let fileExt = path.extname(item);
+          return fileExt === ".bib";
+        });
         set({ currentProjectBibFilepathList: list });
+      },
+      changeSingleBibFilepath: (bibFilepath, isAdd = true) => {
+        let fileExt = path.extname(bibFilepath);
+        if (fileExt !== ".bib") return;
+      
+        let bibFilepathList = get().currentProjectBibFilepathList;
+      
+        if (isAdd) {
+          // Create a Set to ensure uniqueness
+          let bibFilepathSet = new Set(bibFilepathList);
+          bibFilepathSet.add(bibFilepath);
+          set({
+            currentProjectBibFilepathList: Array.from(bibFilepathSet),
+          });
+        } else {
+          set({
+            currentProjectBibFilepathList: bibFilepathList.filter((item) => item !== bibFilepath),
+          });
+        }
       },
       updateShareIsRead: (isRead) => set({ shareIsRead: isRead }),
       updateShareUserList: (shareUserList) => set({ shareUserList }),
@@ -200,6 +222,7 @@ export const useFileStore = create()(
         withReload = false
       ) => {
         const state = get();
+       state.changeSingleBibFilepath(filepath);
         if (!!state.shareIsRead) return;
         await state.saveFile(filepath, value, withReload);
         if (!isSync) return;
@@ -265,6 +288,7 @@ export const useFileStore = create()(
         get().startUpdate({ changedPath: filepath });
         // 假设 loadFile 已适配 Zustand
         get().loadFile({ filepath });
+        get().changeSingleBibFilepath(filepath);
       },
       cancelFileCreating: () => {
         set({ fileCreatingDir: null });
@@ -283,6 +307,7 @@ export const useFileStore = create()(
         await FS.writeFile(filepath, content);
         get().loadFile({ filepath }); // 假设 loadFile 已适配 Zustand
         get().startUpdate({ changedPath: filepath });
+        get().changeSingleBibFilepath(filepath);
       },
       changeFolderPath: ({}) => {},
 
@@ -299,6 +324,7 @@ export const useFileStore = create()(
         if (projectSync && filename) {
           projectSync.deleteFile(filename);
         }
+        get().changeSingleBibFilepath(filename,false);
         get().startUpdate({ changedPath: filename });
       },
       deleteDirectory: async ({ dirpath }) => {
@@ -306,6 +332,11 @@ export const useFileStore = create()(
           set({ filepath: "", value: "", currentSelectDir: "" });
           const files = await FS.getFilesRecursively(dirpath);
           const projectSync = get().projectSync;
+          files.map(item=>{
+            if(path.extname(item) === ".bib"){
+              get().changeSingleBibFilepath(item,false);
+            }
+          })
           if (projectSync && dirpath) {
             projectSync.deleteFolder(dirpath);
           }

@@ -56,9 +56,12 @@ const LatexEditor = ({
       fileList?.length > 0 &&
       !!filepath
     ) {
-      completer&&completer.changeCurrentFilePath(filepath);
       setisSetupCompleter(true);
-      if(isSetupCompleter) return
+      if(isSetupCompleter) {
+        completer&&completer.changeCurrentFilePath(filepath);
+        completer&&completer.changeCitationCompleter(bibFilepathList);
+        return
+      }
       let newCompleter = new AutoCompleteManager(latexRef.current.editor,fileList, bibFilepathList,filepath);
       setCompleter(newCompleter);
     }
