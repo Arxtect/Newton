@@ -183,7 +183,7 @@ const Table = forwardRef(
           }}
           pageSizeOptions={[5, 10]}
           pageSize={10}
-          checkboxSelection={currentSelectMenu != "git"|| currentSelectMenu !="trash" ? true : false}
+          checkboxSelection={currentSelectMenu != "git"&& currentSelectMenu !="trash" ? true : false}
           onRowSelectionModelChange={handleSelection}
           disableRowSelectionOnClick
           onCellDoubleClick={(params) => console.log(params)}
