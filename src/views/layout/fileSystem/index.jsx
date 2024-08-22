@@ -9,7 +9,6 @@ import RootDirectory from "./components/RootDirectory";
 import { findAllProject, getProjectInfo } from "domain/filesystem";
 import { useFileStore, useUserStore } from "store";
 import { ProjectSync } from "@/convergence";
-import RightBeforeLeft from "@/views/layout/rightBeforeLeft";
 import { getYDocToken } from "services";
 import { gitCloneGitea } from "./gitclone";
 import {getRoomUserAccess} from "@/services"
@@ -147,18 +146,6 @@ const FileSystem = () => {
 
   return (
     <main className="max-w-[100%] h-full">
-      {/* <div className="right-before flex pl-2 overflow-hidden">
-        <RightBeforeLeft
-          createProject={createProject}
-          currentProject={currentProjectRoot}
-          deleteProject={() => deleteProject()}
-          projectLists={allProject}
-          reload={repoChanged}
-          filepath={filepath}
-          currentSelectDir={currentSelectDir}
-          projectSync={projectSync}
-        ></RightBeforeLeft>
-      </div> */}
 
       <div className="overflow-auto h-full mr-3">
         <RootDirectory

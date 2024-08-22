@@ -68,6 +68,7 @@ export async function refreshAuth() {
     const data = await response.json();
     // setCookie("mojolicious", data.access_token, 30000);
     updateAccessToken(data.access_token);
+    return true
   } catch (error) {
     // toast.error("Login has expired. Please log in again", {
     //   position: "top-right",

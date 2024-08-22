@@ -219,6 +219,7 @@ const DirectoryLineContent = ({
     }
   }, [dirOpen]);
 
+
   return (
     <List className="p-0">
       <div onMouseOver={handleMouseOver} onMouseLeave={handleMouseLeave}>
@@ -228,13 +229,14 @@ const DirectoryLineContent = ({
           onDrop={handleFileMove}
           onDropByOther={() => setOpened(true)}
           isEnabled={isDropFileSystem}
+          setHover={()=>{console.log('setHover')}}
         >
           <ListItem
             onMouseOver={handleMouseOver}
             onMouseLeave={handleMouseLeave}
             onClick={(e) => handleClick(e, dirpath)}
             className={`hover:bg-[#bae6bc5c] transition duration-300 ${
-              hovered || currentSelectDir == dirpath ? "bg-[#81c784]" : ""
+              currentSelectDir == dirpath ? "bg-[#81c784]" : ""
             }`}
             style={{
               padding: "3px 0px 3px 0px",

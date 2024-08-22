@@ -11,7 +11,6 @@ import { initializeLatexEngines } from "@/features/latexCompilation/latexCompila
 
 import { PdfPreview } from "@/features/pdfPreview/PdfPreview";
 import { ButtonBarContainer } from "@/features/buttonBar/ButtonBarContainer";
-import RightBefore from "./rightBefore";
 import TopBar from "./topBar";
 import ContentTopBar from "./content/topBar";
 import { useFileStore } from "store";

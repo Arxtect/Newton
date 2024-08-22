@@ -14,7 +14,6 @@ const Project = () => {
   // slider menu
   const [currentSelectMenu, setCurrentSelectMenu] = useState("all");
 
-  
 
   return (
     <div className="w-full flex  bg-white h-full overflow-hidden">

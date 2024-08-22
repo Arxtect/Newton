@@ -16,7 +16,10 @@ function getApiUrl(endpoint) {
 
 export async function getMe() {
   try {
-    await refreshAuth();
+    let isSuccess = await refreshAuth();
+    if (!isSuccess) {
+      return;
+    }
     const response = await apiFetch(getApiUrl("/me"), "GET");
     return response;
   } catch (error) {

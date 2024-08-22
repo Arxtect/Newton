@@ -248,7 +248,13 @@ const ContentTopBar = (props) => {
           <button
             className={`bg-[#81C784] text-black px-2 py-[2px] rounded-md flex items-center space-x-4`}
           >
-            <span onClick={compile}>Compile</span>
+            <span onClick={compile}>
+              {engineStatus == constant.notReadyEngineStatus ||
+              engineStatus == constant.busyEngineStatus
+                ? "Compiling"
+                : "Compile"}
+              {/* : "Compile\u2009\u2009\u2009\u2009"} */}
+            </span>
             <EngineStatus className="text-[12px]" />
           </button>
           <Tooltip title={"Compile Log"}>

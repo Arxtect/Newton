@@ -55,7 +55,7 @@ const FileLine = ({
     currentSelectDir: state.currentSelectDir,
     deleteFile: state.deleteFile,
     renamingPathname: state.renamingPathname,
-        isDropFileSystem:state.isDropFileSystem
+    isDropFileSystem:state.isDropFileSystem
   }));
   const basename = path.basename(filepath);
 

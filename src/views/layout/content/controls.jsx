@@ -8,7 +8,7 @@ import React, {
   forwardRef,
   useImperativeHandle,
   useEffect,
-  useCallback
+  useCallback,
 } from "react";
 import IconButton from "@mui/material/IconButton";
 import { Box, Tooltip } from "@mui/material";
@@ -51,22 +51,19 @@ const CustomDropdownMenu = forwardRef((props, ref) => {
     handleClick,
   }));
 
-  const getButtonClass =useCallback(
-      (open) => {
-        console.log(open, "open");
-        if (open) {
-          return "bg-[#81c784]";
-        }
-      },
-      []
-    );
+  const getButtonClass = (open) => {
+    console.log(open, "open");
+    if (open) {
+      return "bg-[#81c784]";
+    }
+  };
 
   return (
     <div className="font-bold leading-3 text-center text-[0.9rem] text-black border-0 border-black border-solid ">
       <ArMenuRadix
         align="left"
         title={"New Project"}
-        getButtonClass={getButtonClass}
+        getButtonClass={(open) => getButtonClass(open)}
         buttonCom={
           <Tooltip title={"Layout"}>
             <IconButton
@@ -114,4 +111,4 @@ const CustomDropdownMenu = forwardRef((props, ref) => {
   );
 });
 
-export default CustomDropdownMenu;
+export default React.memo(CustomDropdownMenu);

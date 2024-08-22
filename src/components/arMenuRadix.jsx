@@ -142,4 +142,4 @@ const ArMenuRadix = forwardRef(
   }
 );
 
-export default ArMenuRadix;
+export default React.memo(ArMenuRadix);
