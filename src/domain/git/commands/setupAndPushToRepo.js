@@ -90,5 +90,6 @@ export async function setupAndPushToRepo(projectRoot, remoteUrl, options) {
     if (e.message.includes('force: true')) {
       throw new Error('Repository is not empty, please try clone.');
     }
+    throw new Error(e.message);
   }
 }
