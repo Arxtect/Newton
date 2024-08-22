@@ -8,7 +8,7 @@ import { EventEmitter } from "events";
 import * as git from "isomorphic-git";
 import fs from "fs";
 import http from "isomorphic-git/http/web";
-import {gitAuth} from "./gitAuth"
+import { gitAuth } from "./gitAuth";
 //  options = {
 //    corsProxy,
 //    onProgress,
@@ -36,18 +36,31 @@ export async function cloneRepository(projectRoot, cloneDest, options) {
     http,
     emitter,
     ...options,
-    ...gitAuth(options.token)
+    ...gitAuth(options.token),
   });
 
-  while (true) {
-    await delay(1000);
-    try {
-      const list = await git.listFiles({fs, dir: projectRoot });
-      const e = await git.status({fs, dir: projectRoot, filepath: list[0] });
-      console.log("status correct with", e);
-      break;
-    } catch (e) {
-      console.log("wait...", e.message);
+  try {
+    while (true) {
+      await delay(1000);
+      try {
+        const list = await git.listFiles({ fs, dir: projectRoot });
+        if (list.length === 0) {
+          console.log("The repository is empty.");
+          break;
+        }
+        const e = await git.status({ fs, dir: projectRoot, filepath: list[0] });
+        console.log("status correct with", e);
+        break;
+      } catch (e) {
+        console.log("wait...", e.message);
+        break;
+      }
+    }
+  } catch (error) {
+    if (error.message.includes("no such file or directory")) {
+      console.log("The repository is empty or it could not be cloned.");
+    } else {
+      throw error;
     }
   }
 
