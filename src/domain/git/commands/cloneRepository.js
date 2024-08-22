@@ -42,20 +42,15 @@ export async function cloneRepository(projectRoot, cloneDest, options) {
   try {
     while (true) {
       await delay(1000);
-      try {
         const list = await git.listFiles({ fs, dir: projectRoot });
         if (list.length === 0) {
           console.log("The repository is empty.");
-          break;
+          throw new Error("The repository is empty.");
         }
         const e = await git.status({ fs, dir: projectRoot, filepath: list[0] });
         console.log("status correct with", e);
         break;
-      } catch (e) {
-        console.log("wait...", e.message);
-        break;
-      }
-    }
+      } 
   } catch (error) {
     if (error.message.includes("no such file or directory")) {
       console.log("The repository is empty or it could not be cloned.");

@@ -125,6 +125,7 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList,user,projectNa
     setMessages(message);
     console.log(message, "message");
   };
+
   const gitClone = async (projectName) => {
     try {
       console.log(projectName, 'clonePath')
@@ -134,18 +135,23 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList,user,projectNa
       console.log(projectName, 'clonePath', url)
 
       return new Promise(async (resolve, reject) => {
-        await cloneRepository(projectName, url, {
-          singleBranch: false,
-          token: githubApiToken,
-          onProgress,
-          onMessage,
-        });
+        try {
+          await cloneRepository(projectName, url, {
+            singleBranch: false,
+            token: githubApiToken,
+            onProgress,
+            onMessage,
+          });
+        }catch (err) {
+          reject(err);
+        }
         resolve(projectName);
       });
     } catch (err) {
       toast.warning(err.message);
     }
   };
+
   const [loading, setLoading] = useState(false);
     const [options, setOptions] = useState([]);
 
