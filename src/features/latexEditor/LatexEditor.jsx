@@ -1,14 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
 import AceEditor from "react-ace";
 import "ace-builds/src-noconflict/mode-latex";
-// import "ace-builds/src-noconflict/theme-github";
-// import "ace-builds/src-noconflict/theme-monokai";
 import "ace-builds/src-min-noconflict/ext-language_tools";
 import "ace-builds/src-min-noconflict/ext-searchbox";
 import AiTools from "./aiTools";
 import { useEditor, useFileStore } from "@/store";
-import AutoCompleteManager from "@/features/autoComplete/AutoCompleteManager"; // 导入自定义补全器
+import AutoCompleteManager from "@/features/autoComplete/AutoCompleteManager";
 
+const SCROLL_POSITION_KEY = "scrollPosition";
 
 const LatexEditor = ({
   handleChange,
@@ -44,10 +43,9 @@ const LatexEditor = ({
     if (!editor && !filepath) return;
     loadFile({ filepath: filepath });
   }, [editor]);
-  
-  const [isSetupCompleter, setisSetupCompleter] = useState(false)
 
-  const [completer, setCompleter] = useState(null)
+  const [isSetupCompleter, setIsSetupCompleter] = useState(false);
+  const [completer, setCompleter] = useState(null);
 
   useEffect(() => {
     if (
@@ -56,28 +54,72 @@ const LatexEditor = ({
       fileList?.length > 0 &&
       !!filepath
     ) {
-      setisSetupCompleter(true);
-      if(isSetupCompleter) {
-        completer&&completer.changeCurrentFilePath(filepath);
-        completer&&completer.changeCitationCompleter(bibFilepathList);
-        return
+      setIsSetupCompleter(true);
+      if (isSetupCompleter) {
+        completer && completer.changeCurrentFilePath(filepath);
+        completer && completer.changeCitationCompleter(bibFilepathList);
+        return;
       }
-      let newCompleter = new AutoCompleteManager(latexRef.current.editor,fileList, bibFilepathList,filepath);
+      let newCompleter = new AutoCompleteManager(
+        latexRef.current.editor,
+        fileList,
+        bibFilepathList,
+        filepath
+      );
       setCompleter(newCompleter);
     }
   }, [fileList, bibFilepathList, filepath]);
 
   useEffect(() => {
     return () => {
-      completer&&completer.offAddEventListener&&completer.offAddEventListener()
+      completer &&
+        completer.offAddEventListener &&
+        completer.offAddEventListener();
+    };
+  }, []);
+
+  // New state for scroll position
+  const [scrollPosition, setScrollPosition] = useState({});
+
+  // Load scroll position on file load
+  useEffect(() => {
+    const savedScrollPosition =
+      JSON.parse(sessionStorage.getItem(SCROLL_POSITION_KEY)) || {};
+    if (savedScrollPosition[filepath]) {
+      setScrollPosition(savedScrollPosition[filepath]);
     }
-  },[])
+  }, [filepath]);
+
+  // Apply scroll position to editor
+  useEffect(() => {
+    if (latexRef.current && latexRef.current.editor) {
+      const session = latexRef.current.editor.getSession();
+      const scrollTop = scrollPosition.scrollTop || 0;
+      session.setScrollTop(scrollTop);
+    }
+  }, [scrollPosition]);
+
+  // Handle scroll event and save position
+  const handleScroll = () => {
+    if (latexRef.current) {
+      const session = latexRef.current.editor.getSession();
+      const scrollTop = session.getScrollTop();
+      const newScrollPosition = { ...scrollPosition, scrollTop };
+      setScrollPosition(newScrollPosition);
+      sessionStorage.setItem(
+        SCROLL_POSITION_KEY,
+        JSON.stringify({
+          ...JSON.parse(sessionStorage.getItem(SCROLL_POSITION_KEY) || "{}"),
+          [filepath]: newScrollPosition,
+        })
+      );
+    }
+  };
 
   return (
     <div className="h-full relative" id="editor">
       <AceEditor
         mode="latex"
-        // theme="theme-github" //monokai
         name="aceEditor"
         height="100%"
         width="100%"
@@ -89,18 +131,15 @@ const LatexEditor = ({
         showPrintMargin={false}
         lineHeight={24}
         setOptions={{
-          // enableBasicAutocompletion: true,
-          // enableLiveAutocompletion: true,
-          // enableSnippets: true,
           showLineNumbers: true,
           tabSize: 2,
           readOnly: filepath === "",
         }}
         ref={latexRef}
         className={filepath === "" ? "disabled-editor" : "ace_editor ace-tm"}
+        onScroll={handleScroll} // Add scroll handler here
       ></AceEditor>
       <AiTools editorRef={latexRef} />
-      {/* <div className="input overlay">{fragments}</div> */}
       <div id="users"></div>
     </div>
   );
