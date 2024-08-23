@@ -23,8 +23,8 @@ import ArSelect from "@/components/arSelect";
 
 import path from "path";
 import { cloneRepository } from "domain/git";
-import { createProjectInfo } from "domain/filesystem";
-import {getGitToken,getGitRepoList} from "@/services"
+import { createProjectInfo, existsPath,removeDirectory } from "domain/filesystem";
+import { getGitToken, getGitRepoList } from "@/services";
 
 
 const GithubProgressBar = ({ progress, messages }) => {
@@ -128,7 +128,11 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList,user,projectNa
 
   const gitClone = async (projectName) => {
     try {
-      console.log(projectName, 'clonePath')
+      if (await existsPath(projectName)) {
+        return new Promise( (resolve, reject) => {
+          reject(new Error("Project already exists, please enter project to sync"));
+         });
+      }
       let userName = user?.name
 
       let url = window.origin + "/git/" + userName + "/" + projectName + ".git"
@@ -142,7 +146,8 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList,user,projectNa
             onProgress,
             onMessage,
           });
-        }catch (err) {
+        } catch (err) {
+          removeDirectory(projectName);
           reject(err);
         }
         resolve(projectName);
