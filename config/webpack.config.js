@@ -298,7 +298,8 @@ module.exports = function (webpackEnv) {
         new CssMinimizerPlugin(),
       ],
       // TODO: build splitChunks.
-      splitChunks: isEnvProduction ? {
+      splitChunks: isEnvProduction
+        ? {
             chunks: "all",
             minSize: 60000, // 增加最小块大小到 50KB
             maxSize: 200000, // 设置最大块大小为 200KB
@@ -683,6 +684,14 @@ module.exports = function (webpackEnv) {
         patterns: [
           {
             from: "src/features/latexCompilation/swiftlatex/swiftlatexdvipdfm.wasm",
+            to: "static/media",
+          },
+        ],
+      }),
+      new CopyWebpackPlugin({
+        patterns: [
+          {
+            from: "src/features/latexCompilation/swiftlatex/swiftlatexpdftex.wasm",
             to: "static/media",
           },
         ],

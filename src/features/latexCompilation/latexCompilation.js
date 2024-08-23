@@ -1,23 +1,14 @@
-/*
- * @Description:
- * @Author: Devin
- * @Date: 2023-06-26 09:57:49
- */
-// SwiftLaTeX engines
-import { DvipdfmxEngine } from "./swiftlatex/DvipdfmxEngine";
-import { XeTeXEngine } from "./swiftlatex/XeTeXEngine";
-
+// Import necessary modules for dynamic imports
+import path from "path";
+import fs from "fs";
+import pify from "pify";
 import {
   setReadyEngineStatus,
   setBusyEngineStatus,
   setErrorEngineStatus,
 } from "store";
 import { setCompiledPdfUrl, setCompilerLog, setShowCompilerLog } from "store";
-
 import { getAllFileNames } from "@/domain/filesystem";
-import path from "path";
-import fs from "fs";
-import pify from "pify";
 
 const LATEX_FILE_EXTENSIONS = [
   ".tex",
@@ -55,12 +46,7 @@ const LATEX_FILE_EXTENSIONS = [
   ".sh",
 ];
 
-const IgnoreFile = [
-  ".DS_Store",
-  ".gitignore",
-  ".git"
-]
-
+const IgnoreFile = [".DS_Store", ".gitignore", ".git"];
 
 const fsPify = {
   readdir: pify(fs.readdir),
@@ -68,25 +54,31 @@ const fsPify = {
   readFile: pify(fs.readFile),
 };
 
-// Global LaTeX engine objects
-const xetexEngine = new XeTeXEngine(),
+let pdftexEngine, xetexEngine, dviEngine;
+
+const loadEngines = async () => {
+  const { PdfTeXEngine } = await import("./swiftlatex/PdfTeXEngine");
+
+  const { XeTeXEngine } = await import("./swiftlatex/XeTeXEngine");
+  const { DvipdfmxEngine } = await import("./swiftlatex/DvipdfmxEngine");
+  xetexEngine = new XeTeXEngine();
   dviEngine = new DvipdfmxEngine();
+  pdftexEngine = new PdfTeXEngine();
+  await pdftexEngine.loadEngine();
+  await xetexEngine.loadEngine();
+  await dviEngine.loadEngine();
+  setReadyEngineStatus();
+};
 
 export const initializeLatexEngines = async () => {
-  //* Wrapped in try ... catch to ignore multiple engine error message
   try {
-    // Initialize the XeTeX engine
-    await xetexEngine.loadEngine();
-    // Initialize the DviPdfMx engine
-    await dviEngine.loadEngine();
-    // Set the engine status to be ready
-    setReadyEngineStatus();
+    await loadEngines();
   } catch (e) {
     console.log(e);
   }
 };
 
-export const ensureFolderExists = async (list, currentProject) => {
+export const ensureFolderExists = async (list, currentProject, usePdfTeX) => {
   let directories = new Set();
 
   list.forEach((filePath) => {
@@ -125,13 +117,17 @@ export const ensureFolderExists = async (list, currentProject) => {
   sortedDirectories.forEach((directory) => {
     console.log(`Creating directory: ${directory}`);
     if (directory !== "" && directory !== "/" && directory !== ".") {
-      xetexEngine.makeMemFSFolder(directory);
-      dviEngine.makeMemFSFolder(directory);
+      if (usePdfTeX) {
+        pdftexEngine.makeMemFSFolder(directory);
+      } else {
+        xetexEngine.makeMemFSFolder(directory);
+        dviEngine.makeMemFSFolder(directory);
+      }
     }
   });
 };
 
-export const ensureFileExists = async (list, currentProject) => {
+export const ensureFileExists = async (list, currentProject, usePdfTeX) => {
   for (let i = 0; i < list.length; i++) {
     let fullFilename = list[i];
     let shouldIgnore = IgnoreFile.some((ignoreItem) =>
@@ -145,58 +141,85 @@ export const ensureFileExists = async (list, currentProject) => {
     let ext = path.extname(filepath);
 
     // if (LATEX_FILE_EXTENSIONS.includes(ext)) {
-      console.log(filepath, "filepath");
+    console.log(filepath, "filepath");
+    if (usePdfTeX) {
+      pdftexEngine.writeMemFSFile(filepath, fileBlob);
+    } else {
       dviEngine.writeMemFSFile(filepath, fileBlob);
       xetexEngine.writeMemFSFile(filepath, fileBlob);
+    }
     // }
   }
 };
 
-export const compileLatex = async (latexCode, currentProject) => {
-  // Make sure both engines are ready for compilation
-  if (!xetexEngine.isReady() || !dviEngine.isReady()) {
-    console.log("Engine not ready yet!");
-    return;
+export const compileLatex = async (latexCode, currentProject, usePdfTeX=false) => {
+  // Make sure the engines are ready for compilation
+  if (usePdfTeX) {
+    if (!pdftexEngine.isReady()) {
+      console.log("PDFTeX Engine not ready yet!");
+      return;
+    }
+  } else {
+    if (!xetexEngine.isReady() || !dviEngine.isReady()) {
+      console.log("XeTeX or DVI Engine not ready yet!");
+      return;
+    }
   }
 
   // Set the engine status to be busy
   setBusyEngineStatus();
 
   // Create a temporary main.tex file
-  xetexEngine.writeMemFSFile("main.tex", latexCode);
+  if (usePdfTeX) {
+    pdftexEngine.writeMemFSFile("main.tex", latexCode);
+  } else {
+    xetexEngine.writeMemFSFile("main.tex", latexCode);
+  }
 
   let list = await getAllFileNames(currentProject);
-  await ensureFolderExists(list,currentProject);
-  await ensureFileExists(list, currentProject);
-  
-  // Associate the XeTeX engine with this main.tex file
-  xetexEngine.setEngineMainFile("main.tex");
-  // Compile the main.tex file
-  let xetexCompilation = await xetexEngine.compileLaTeX();
-  // Print the compilation log
-  setCompilerLog(xetexCompilation.log);
+  await ensureFolderExists(list, currentProject, usePdfTeX);
+  await ensureFileExists(list, currentProject, usePdfTeX);
 
-  // On successfull first compilation continue with the second one
-  if (xetexCompilation.status === 0) {
-    // Download the frog image and add it to the virtual file system
+  if (usePdfTeX) {
+    // Associate the PDFTeX engine with this main.tex file
+    pdftexEngine.setEngineMainFile("main.tex");
+    // Compile the main.tex file
+    let pdftexCompilation = await pdftexEngine.compileLaTeX();
+    // Print the compilation log
+    setCompilerLog(pdftexCompilation.log);
 
-    // Create a temporary main.xdv file from the XeTeX compilation result
-    dviEngine.writeMemFSFile("main.xdv", xetexCompilation.pdf);
+    // On successful compilation
+    if (pdftexCompilation.status === 0) {
+      const pdfBlob = new Blob([pdftexCompilation.pdf], {
+        type: "application/pdf",
+      });
 
-    let dviCompilation = await dviEngine.compilePDF();
-    console.log(dviCompilation, "dviCompilation");
-    // Create a blob out of the resulting PDF
-    const pdfBlob = new Blob([dviCompilation.pdf], {
-      type: "application/pdf",
-    });
-
-    // Create a temporary URL to this PDF blob
-    await setCompiledPdfUrl(URL.createObjectURL(pdfBlob));
-    setShowCompilerLog(false);
-    // After compilation, the engine is ready again
-    setReadyEngineStatus();
+      await setCompiledPdfUrl(URL.createObjectURL(pdfBlob));
+      setShowCompilerLog(false);
+      setReadyEngineStatus();
+    } else {
+      setErrorEngineStatus();
+    }
   } else {
-    // If the compilation failed, reflect it with an error
-    setErrorEngineStatus();
+    // Associate the XeTeX engine with this main.tex file
+    xetexEngine.setEngineMainFile("main.tex");
+    // Compile the main.tex file
+    let xetexCompilation = await xetexEngine.compileLaTeX();
+    // Print the compilation log
+    setCompilerLog(xetexCompilation.log);
+
+    if (xetexCompilation.status === 0) {
+      dviEngine.writeMemFSFile("main.xdv", xetexCompilation.pdf);
+      let dviCompilation = await dviEngine.compilePDF();
+      const pdfBlob = new Blob([dviCompilation.pdf], {
+        type: "application/pdf",
+      });
+
+      await setCompiledPdfUrl(URL.createObjectURL(pdfBlob));
+      setShowCompilerLog(false);
+      setReadyEngineStatus();
+    } else {
+      setErrorEngineStatus();
+    }
   }
 };

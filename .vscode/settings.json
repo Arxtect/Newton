@@ -1,3 +1,4 @@
 {
-    "solidity.telemetry": false
+    "solidity.telemetry": false,
+    "commentTranslate.multiLineMerge": true
 }
