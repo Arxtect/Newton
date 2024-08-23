@@ -93,9 +93,10 @@ const DirectoryLineContent = ({
   changePreRenamingDirpath,
   changeCurrentProjectRoot,
 }) => {
-  const { dirOpen,isDropFileSystem } = useFileStore((state) => ({
+  const { dirOpen,isDropFileSystem,filepath } = useFileStore((state) => ({
     dirOpen: state.dirOpen,
-    isDropFileSystem:state.isDropFileSystem
+    isDropFileSystem: state.isDropFileSystem,
+    filepath: state.filepath
   }));
 
   const [opened, setOpened] = useState(
@@ -213,9 +214,15 @@ const DirectoryLineContent = ({
     }
   };
 
+  //新增 打开文件夹
   useEffect(() => {
     if (!!dirOpen) {
-      setOpened(currentSelectDir == dirpath ? true : false);
+      if (!currentSelectDir) {
+        let dir = path.dirname(filepath);
+        setOpened(dir == dirpath ? true : false);
+        return 
+      }
+        setOpened(currentSelectDir == dirpath ? true : false);
     }
   }, [dirOpen]);
 

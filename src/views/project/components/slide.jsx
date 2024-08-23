@@ -56,6 +56,7 @@ const Slide = ({ contentRef,currentSelectMenu, setCurrentSelectMenu }) => {
         if (item.key === "new") {
           return (
             <ArMenuRadix
+              key={item.key}
               align="left"
               title={"New Project"}
               getButtonClass={getButtonClass}

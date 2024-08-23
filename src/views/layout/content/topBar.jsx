@@ -32,6 +32,7 @@ import { EngineStatus } from "@/features/engineStatus/EngineStatus";
 import { FileUploader, FolderUploader } from "../upload.jsx";
 import UploadFiles from "./uploadFiles"
 import * as constant from "@/constant";
+import path from "path";
 
 const ContentTopBar = (props) => {
   const {
@@ -119,10 +120,20 @@ const ContentTopBar = (props) => {
       case "newFile":
         console.log(currentSelectDir, "currentSelectDir");
         updateDirOpen(true);
+        if (!currentSelectDir) {
+          let dir = path.dirname(filepath);
+          startFileCreating(dir);
+          break
+        }
         startFileCreating(currentSelectDir);
         break;
       case "newFolder":
         updateDirOpen(true);
+        if (!currentSelectDir) {
+          let dir = path.dirname(filepath);
+          startFileCreating(dir);
+          break
+        }
         startDirCreating(currentSelectDir);
         break;
       case "uploadFile":

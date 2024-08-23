@@ -72,7 +72,7 @@ export const useFileStore = create()(
         
         let mainFile = await FS.findMainFile(files);
         set({ currentProjectFileList: fileList });
-        get().loadFile({ filepath: mainFile });
+        await get().loadFile({ filepath: mainFile });
       },
       updateCurrentProjectBibFilepathList: async (files) => {
         let list = files.filter((item) => {  
@@ -292,11 +292,14 @@ export const useFileStore = create()(
         // 假设 loadFile 已适配 Zustand
         get().loadFile({ filepath });
         get().changeSingleBibFilepath(filepath);
+        get().updateDirOpen(false)
       },
       cancelFileCreating: () => {
+         get().updateDirOpen(false);
         set({ fileCreatingDir: null });
       },
       cancelDirCreating: () => {
+         get().updateDirOpen(false);
         set({ dirCreatingDir: null });
       },
       finishDirCreating: async ({ dirpath }) => {
@@ -304,6 +307,7 @@ export const useFileStore = create()(
         await FS.mkdir(dirpath);
         get().endDirCreating({ dirpath });
         get().startUpdate({ changedPath: dirpath, isDir: true });
+        get().updateDirOpen(false);
       },
 
       createFile: async ({ filepath, content = "" }) => {

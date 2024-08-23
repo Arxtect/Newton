@@ -13,7 +13,8 @@ import { useUserStore } from "store";
 
 const Layout = ({ children, withHeader, withFooter }) => {
   const refresh = async () => {
-    const { data: userData } = await getMe();
+    const res = await getMe();
+    let userData = res?.data||{};
     updateUser(userData.user);
   };
   const { updateUser } = useUserStore((state) => ({
