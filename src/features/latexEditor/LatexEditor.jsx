@@ -6,8 +6,8 @@ import "ace-builds/src-min-noconflict/ext-searchbox";
 import AiTools from "./aiTools";
 import { useEditor, useFileStore } from "@/store";
 import AutoCompleteManager from "@/features/autoComplete/AutoCompleteManager";
+import EditorStateManager from "./EditorStateManager"; // Import the class
 
-const SCROLL_POSITION_KEY = "scrollPosition";
 
 const LatexEditor = ({
   handleChange,
@@ -47,6 +47,7 @@ const LatexEditor = ({
   const [isSetupCompleter, setIsSetupCompleter] = useState(false);
   const [completer, setCompleter] = useState(null);
 
+  // auto completer
   useEffect(() => {
     if (
       latexRef.current &&
@@ -78,44 +79,27 @@ const LatexEditor = ({
     };
   }, []);
 
-  // New state for scroll position
-  const [scrollPosition, setScrollPosition] = useState({});
+  const [editorStateManager, setEditorStateManager] = useState(null);
 
-  // Load scroll position on file load
   useEffect(() => {
-    const savedScrollPosition =
-      JSON.parse(sessionStorage.getItem(SCROLL_POSITION_KEY)) || {};
-    if (savedScrollPosition[filepath]) {
-      setScrollPosition(savedScrollPosition[filepath]);
+    if(editorStateManager) {
+      editorStateManager.destroy();
     }
-  }, [filepath]);
-
-  // Apply scroll position to editor
-  useEffect(() => {
     if (latexRef.current && latexRef.current.editor) {
-      const session = latexRef.current.editor.getSession();
-      const scrollTop = scrollPosition.scrollTop || 0;
-      session.setScrollTop(scrollTop);
+      updateEditor(latexRef.current.editor);
+      const manager = new EditorStateManager(latexRef.current.editor, filepath);
+      setEditorStateManager(manager);
+      manager.applyState();
     }
-  }, [scrollPosition]);
-
-  // Handle scroll event and save position
-  const handleScroll = () => {
-    if (latexRef.current) {
-      const session = latexRef.current.editor.getSession();
-      const scrollTop = session.getScrollTop();
-      const newScrollPosition = { ...scrollPosition, scrollTop };
-      setScrollPosition(newScrollPosition);
-      sessionStorage.setItem(
-        SCROLL_POSITION_KEY,
-        JSON.stringify({
-          ...JSON.parse(sessionStorage.getItem(SCROLL_POSITION_KEY) || "{}"),
-          [filepath]: newScrollPosition,
-        })
-      );
-    }
-  };
-
+    return () => {
+      if (editorStateManager) {
+        console.log("Cleaning up editor state manager");
+        editorStateManager.destroy();
+      }
+      updateEditor(null);
+    };
+  }, [latexRef, filepath]);
+ 
   return (
     <div className="h-full relative" id="editor">
       <AceEditor
@@ -137,7 +121,6 @@ const LatexEditor = ({
         }}
         ref={latexRef}
         className={filepath === "" ? "disabled-editor" : "ace_editor ace-tm"}
-        onScroll={handleScroll} // Add scroll handler here
       ></AceEditor>
       <AiTools editorRef={latexRef} />
       <div id="users"></div>
