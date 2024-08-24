@@ -8,6 +8,8 @@ import { useEffect, useState } from "react";
 import { usePdfPreviewStore, useFileStore, useLayout } from "store";
 import AssetPreview from "../assetPreview/assetPreview";
 import { readFile } from "domain/filesystem";
+import Aitools from "../aiTools/aiTools";
+import { ace } from 'ace-builds';
 
 export const PdfPreview = () => {
   const { pdfUrl, compilerLog, showCompilerLog, setCompiledPdfUrl } =
@@ -66,7 +68,8 @@ export const PdfPreview = () => {
       className={`h-full relative ${willResizing ? "z-10" : ""}`}
       style={{ overflow: "auto" }} // 添加这一行以允许滚动
     >
-      {!!assetsFilePath && !!fileContent ? (
+      <Aitools></Aitools>
+      {/* {!!assetsFilePath && !!fileContent ? (
         <AssetPreview filename={assetsFilePath} content={fileContent} />
       ) : showCompilerLog ? (
         formattedCompilerLog
@@ -74,7 +77,7 @@ export const PdfPreview = () => {
         pdfUrl !== "" &&
         pdfEmbed
         // <Viewer url={pdfU/rl}></Viewer>
-      )}
+      )} */}
 
       {willResizing && (
         <div className="absolute top-0 left-0 w-full h-full z-20"></div>
