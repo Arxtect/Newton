@@ -1,31 +1,29 @@
 import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
-import { debounce } from 'lodash-es';
+// import { debounce } from 'lodash-es';
 import Question from './question';
-import Answer from './answer';
+// import Answer from './answer';
 import ChatInput from './chat-input';
-import Button from '@/app/components/base/button';
-import { StopCircle } from '@/app/components/base/icons/src/vender/solid/mediaAndDevices';
-
+import Button from './button';
+// import { StopCircle } from '@/app/components/base/icons/src/vender/solid/mediaAndDevices';
+import chatListDemo from './chatListdemo'
 const Chat = ({
   onSend,
-  chatList,
   isResponding,
   noStopResponding,
   onStopResponding,
-  noChatInput,
-  chatContainerClassName,
   chatContainerInnerClassName,
   chatFooterClassName,
   chatFooterInnerClassName,
-  showPromptLog,
-  questionIcon,
-  answerIcon,
-  allToolIcons,
+  // showPromptLog,
+  // questionIcon,
+  // answerIcon,
+  // allToolIcons,
   chatNode,
-  chatAnswerContainerInner,
-  hideProcessDetail,
+  // chatAnswerContainerInner,
+  // hideProcessDetail,
   themeBuilder,
 }) => {
+  const chatList = chatListDemo
   const [width, setWidth] = useState(0);
   const chatContainerRef = useRef(null);
   const chatContainerInnerRef = useRef(null);
@@ -63,10 +61,10 @@ const Chat = ({
     }
   });
 
-  useEffect(() => {
-    window.addEventListener('resize', debounce(handleWindowResize));
-    return () => window.removeEventListener('resize', handleWindowResize);
-  }, [handleWindowResize]);
+  // useEffect(() => {
+  //   window.addEventListener('resize', debounce(handleWindowResize));
+  //   return () => window.removeEventListener('resize', handleWindowResize);
+  // }, [handleWindowResize]);
 
   useEffect(() => {
     if (chatFooterRef.current && chatContainerRef.current) {
@@ -101,7 +99,7 @@ const Chat = ({
 
 
   return (
-      <div className='relative h-full'>
+      <div className='relative h-full w-full'>
         <div
           ref={chatContainerRef}
           className={'relative h-full overflow-y-auto'}
@@ -113,29 +111,27 @@ const Chat = ({
           >
             {
               chatList.map((item, index) => {
-                if (item.isAnswer) {
-                  const isLast = item.id === chatList[chatList.length - 1]?.id;
-                  return (
-                    <Answer
-                      key={item.id}
-                      item={item}
-                      question={chatList[index - 1]?.content}
-                      index={index}
-                      answerIcon={answerIcon}
-                      responding={isLast && isResponding}
-                      allToolIcons={allToolIcons}
-                      showPromptLog={showPromptLog}
-                      chatAnswerContainerInner={chatAnswerContainerInner}
-                      hideProcessDetail={hideProcessDetail}
-                    />
-                  );
-                }
+                // if (item.isAnswer) {
+                //   const isLast = item.id === chatList[chatList.length - 1]?.id;
+                //   return (
+                //     <Answer
+                //       key={item.id}
+                //       item={item}
+                //       question={chatList[index - 1]?.content}
+                //       index={index}
+                //       answerIcon={answerIcon}
+                //       responding={isLast && isResponding}
+                //       allToolIcons={allToolIcons}
+                //       showPromptLog={showPromptLog}
+                //       chatAnswerContainerInner={chatAnswerContainerInner}
+                //       hideProcessDetail={hideProcessDetail}
+                //     />
+                //   );
+                // }
                 return (
                   <Question
                     key={item.id}
                     item={item}
-                    questionIcon={questionIcon}
-                    theme={themeBuilder?.theme}
                   />
                 );
               })
@@ -143,7 +139,7 @@ const Chat = ({
           </div>
         </div>
         <div
-          className={`absolute bottom-0 ${(!noChatInput || !noStopResponding) && chatFooterClassName}`}
+          className={`absolute bottom-0 ${(!noStopResponding) && chatFooterClassName}`}
           ref={chatFooterRef}
           style={{
             background: 'linear-gradient(0deg, #F9FAFB 40%, rgba(255, 255, 255, 0.00) 100%)',
@@ -157,23 +153,19 @@ const Chat = ({
               !noStopResponding && isResponding && (
                 <div className='flex justify-center mb-2'>
                   <Button onClick={onStopResponding}>
-                    <StopCircle className='mr-[5px] w-3.5 h-3.5 text-gray-500' />
+                    {/* <StopCircle className='mr-[5px] w-3.5 h-3.5 text-gray-500' /> */}
                     <span className='text-xs text-gray-500 font-normal'>{'appDebug.operation.stopResponding'}</span>
                   </Button>
                 </div>
               )
             }
            
-            {
-              !noChatInput && (
-                <ChatInput
+           <ChatInput
                   // visionConfig={config?.file_upload?.image}
                   // speechToTextConfig={config?.speech_to_text}
                   onSend={onSend}
-                  theme={themeBuilder?.theme}
+                  // theme={themeBuilder?.theme}
                 />
-              )
-            }
           </div>
         </div>
        

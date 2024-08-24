@@ -9,7 +9,7 @@ import { usePdfPreviewStore, useFileStore, useLayout } from "store";
 import AssetPreview from "../assetPreview/assetPreview";
 import { readFile } from "domain/filesystem";
 import Aitools from "../aiTools/aiTools";
-import { ace } from 'ace-builds';
+import Chat from "../aiTools/chat";
 
 export const PdfPreview = () => {
   const { pdfUrl, compilerLog, showCompilerLog, setCompiledPdfUrl } =
@@ -65,10 +65,11 @@ export const PdfPreview = () => {
 
   return (
     <div
-      className={`h-full relative ${willResizing ? "z-10" : ""}`}
+      className={`h-full relative  ${willResizing ? "z-10" : ""}`}
       style={{ overflow: "auto" }} // 添加这一行以允许滚动
     >
-      <Aitools></Aitools>
+      <Chat></Chat>
+      {/* <Aitools></Aitools> */}
       {/* {!!assetsFilePath && !!fileContent ? (
         <AssetPreview filename={assetsFilePath} content={fileContent} />
       ) : showCompilerLog ? (

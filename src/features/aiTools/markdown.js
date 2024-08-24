@@ -7,10 +7,9 @@ import RemarkGfm from 'remark-gfm'
 import SyntaxHighlighter from 'react-syntax-highlighter'
 import { atelierHeathLight } from 'react-syntax-highlighter/dist/esm/styles/hljs'
 import { memo, useEffect, useMemo, useRef, useState } from 'react'
-import cn from '@/utils/classnames'
-import CopyBtn from '@/app/components/base/copy-btn'
-import SVGBtn from '@/app/components/base/svg'
-import Flowchart from '@/app/components/base/mermaid'
+// import CopyBtn from '@/app/components/base/copy-btn'
+// import SVGBtn from '@/app/components/base/svg'
+// import Flowchart from '@/app/components/base/mermaid'
 
 const capitalizationLanguageNameMap = {
   sql: 'SQL',
@@ -98,20 +97,17 @@ const CodeBlock = memo(({ inline, className, children, ...props }) => {
           >
             <div className='text-[13px] text-gray-500 font-normal'>{languageShowName}</div>
             <div style={{ display: 'flex' }}>
-              {language === 'mermaid' && (
+              {/* {language === 'mermaid' && (
                 <SVGBtn isSVG={isSVG} setIsSVG={setIsSVG} />
-              )}
-              <CopyBtn
+              )} */}
+              {/* <CopyBtn
                 className='mr-1'
                 value={String(children).replace(/\n$/, '')}
                 isPlain
-              />
+              /> */}
             </div>
           </div>
-          {(language === 'mermaid' && isSVG)
-            ? (<Flowchart PrimitiveCode={String(children).replace(/\n$/, '')} />)
-            : (
-              <SyntaxHighlighter
+          <SyntaxHighlighter
                 {...props}
                 style={atelierHeathLight}
                 customStyle={{ paddingLeft: 12, backgroundColor: '#fff' }}
@@ -121,7 +117,6 @@ const CodeBlock = memo(({ inline, className, children, ...props }) => {
               >
                 {String(children).replace(/\n$/, '')}
               </SyntaxHighlighter>
-            )}
         </div>
       )
       : (
@@ -137,7 +132,7 @@ CodeBlock.displayName = 'CodeBlock'
 export function Markdown(props) {
   const latexContent = preprocessLaTeX(props.content)
   return (
-    <div className={cn(props.className, 'markdown-body')}>
+    <div className={`markdown-body ${props.className}`}>
       <ReactMarkdown
         remarkPlugins={[[RemarkMath, { singleDollarTextMath: false }], RemarkGfm, RemarkBreaks]}
         rehypePlugins={[RehypeKatex]}
