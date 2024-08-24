@@ -1,13 +1,14 @@
 import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
 // import { debounce } from 'lodash-es';
 import Question from './question';
-// import Answer from './answer';
+import Answer from './answer';
 import ChatInput from './chat-input';
 import Button from './button';
 // import { StopCircle } from '@/app/components/base/icons/src/vender/solid/mediaAndDevices';
 import chatListDemo from './chatListdemo'
+// import "./markdown.scss"
+
 const Chat = ({
-  onSend,
   isResponding,
   noStopResponding,
   onStopResponding,
@@ -22,6 +23,9 @@ const Chat = ({
   // chatAnswerContainerInner,
   // hideProcessDetail,
   themeBuilder,
+  inputsForms,
+  newConversationInputs,
+  handleSend
 }) => {
   const chatList = chatListDemo
   const [width, setWidth] = useState(0);
@@ -30,6 +34,11 @@ const Chat = ({
   const chatFooterRef = useRef(null);
   const chatFooterInnerRef = useRef(null);
   const userScrolledRef = useRef(false);
+  const [newConversationId, setNewConversationId] = useState('')
+
+  const handleNewConversationCompleted = useCallback((newConversationId) => {
+    setNewConversationId(newConversationId)
+  }, [])
 
   const handleScrolltoBottom = useCallback(() => {
     if (chatContainerRef.current && !userScrolledRef.current)
@@ -97,6 +106,34 @@ const Chat = ({
     }
   }, []);
 
+  const onSend = useCallback((message, files) => {
+    const data = {
+      query: message,
+      inputs:  newConversationInputs,
+      conversation_id: newConversationId,
+      response_mode: "streaming"
+    };
+
+    if (files?.length)
+      data.files = files;
+
+    handleSend(
+      data,
+      {
+        onConversationComplete: newConversationId ? undefined : handleNewConversationCompleted,
+      }
+    );
+  }, [
+    newConversationId,
+    newConversationInputs,
+    handleNewConversationCompleted,
+  ]);
+
+
+
+
+
+
 
   return (
       <div className='relative h-full w-full'>
@@ -111,23 +148,23 @@ const Chat = ({
           >
             {
               chatList.map((item, index) => {
-                // if (item.isAnswer) {
-                //   const isLast = item.id === chatList[chatList.length - 1]?.id;
-                //   return (
-                //     <Answer
-                //       key={item.id}
-                //       item={item}
-                //       question={chatList[index - 1]?.content}
-                //       index={index}
-                //       answerIcon={answerIcon}
-                //       responding={isLast && isResponding}
-                //       allToolIcons={allToolIcons}
-                //       showPromptLog={showPromptLog}
-                //       chatAnswerContainerInner={chatAnswerContainerInner}
-                //       hideProcessDetail={hideProcessDetail}
-                //     />
-                //   );
-                // }
+                if (item.answer) {
+                  const isLast = item.id === chatList[chatList.length - 1]?.id;
+                  return (
+                    <Answer
+                      key={item.id}
+                      item={item}
+                      question={chatList[index - 1]?.content}
+                      index={index}
+                      // answerIcon={answerIcon}
+                      // responding={isLast && isResponding}
+                      // allToolIcons={allToolIcons}
+                      // showPromptLog={showPromptLog}
+                      // chatAnswerContainerInner={chatAnswerContainerInner}
+                      // hideProcessDetail={hideProcessDetail}
+                    />
+                  );
+                }
                 return (
                   <Question
                     key={item.id}
