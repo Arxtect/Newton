@@ -51,8 +51,10 @@ const handleStream = (
       }
       buffer += decoder.decode(result.value, { stream: true });
       const lines = buffer.split("\n");
+      console.log(lines,'lines')
       try {
         lines.forEach((message) => {
+          console.log(message, "message");
           if (message.startsWith("data: ")) {
             // check if it starts with data:
             try {
@@ -184,5 +186,12 @@ export const ssePost = (
       onError?.(e);
     });
 };
+
+
+
+// 辅助函数：生成带有统一前缀的URL
+export function getChatApiUrl() {
+  return `/api/v1/chat/chat-messages`;
+}
 
 export default ssePost;

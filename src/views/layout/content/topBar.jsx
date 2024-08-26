@@ -108,9 +108,9 @@ const ContentTopBar = (props) => {
       }
     };
   
-  useEffect(() => {
-    autoCompileFirst(compile);
-  }, [sourceCode, engineStatus, currentProjectRoot]);
+  // useEffect(() => {
+  //   autoCompileFirst(compile);
+  // }, [sourceCode, engineStatus, currentProjectRoot]);
 
   const handleActionClick = (key) => {
     switch (key) {

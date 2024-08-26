@@ -10,15 +10,14 @@ const Question = ({
   theme,
 }) => {
   const {
-    // query: content,
-    answer: content,
+    content,
     message_files,
   } = item
 
   const imgSrcs = message_files?.length ? message_files.map(item => item.url) : []
   return (
     <div className='flex justify-end mb-2 last:mb-0 pl-10'>
-      <div className='group relative mr-4 w-[90%]'>
+      <div className='group relative mr-4 w-max-[90%]'>
         {/* <QuestionTriangle
           className='absolute -right-2 top-0 w-2 h-3 text-[#D1E9FF]/50'
         /> */}

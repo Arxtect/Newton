@@ -4,11 +4,12 @@ import Question from './question';
 import Answer from './answer';
 import ChatInput from './chat-input';
 import Button from './button';
+import {getChatApiUrl} from "./ssePost"
 // import { StopCircle } from '@/app/components/base/icons/src/vender/solid/mediaAndDevices';
-import chatListDemo from './chatListdemo'
 // import "./markdown.scss"
 
 const Chat = ({
+  chatList,
   isResponding,
   noStopResponding,
   onStopResponding,
@@ -22,12 +23,10 @@ const Chat = ({
   chatNode,
   // chatAnswerContainerInner,
   // hideProcessDetail,
-  themeBuilder,
   inputsForms,
   newConversationInputs,
   handleSend
 }) => {
-  const chatList = chatListDemo
   const [width, setWidth] = useState(0);
   const chatContainerRef = useRef(null);
   const chatContainerInnerRef = useRef(null);
@@ -109,7 +108,7 @@ const Chat = ({
   const onSend = useCallback((message, files) => {
     const data = {
       query: message,
-      inputs:  newConversationInputs,
+      inputs:  newConversationInputs||{},
       conversation_id: newConversationId,
       response_mode: "streaming"
     };
@@ -118,6 +117,7 @@ const Chat = ({
       data.files = files;
 
     handleSend(
+      getChatApiUrl(),
       data,
       {
         onConversationComplete: newConversationId ? undefined : handleNewConversationCompleted,
@@ -128,10 +128,6 @@ const Chat = ({
     newConversationInputs,
     handleNewConversationCompleted,
   ]);
-
-
-
-
 
 
 
@@ -148,7 +144,7 @@ const Chat = ({
           >
             {
               chatList.map((item, index) => {
-                if (item.answer) {
+                if (item.isAnswer) {
                   const isLast = item.id === chatList[chatList.length - 1]?.id;
                   return (
                     <Answer
@@ -201,7 +197,6 @@ const Chat = ({
                   // visionConfig={config?.file_upload?.image}
                   // speechToTextConfig={config?.speech_to_text}
                   onSend={onSend}
-                  // theme={themeBuilder?.theme}
                 />
           </div>
         </div>

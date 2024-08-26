@@ -1,9 +1,80 @@
-import React from 'react';
+import React, { useMemo, useState,useEffect } from "react";
+import Chat from "./chat";
+import { useChat } from "./hook";
+import chatListDemo from './chatListdemo'
 
 const AITools = () => {
+  const stopChat = (taskId) => {
+    console.log(`Stop chat with taskId: ${taskId}`);
+  };
+
+  const [currentConversationId, setCurrentConversationId] = useState("123");
+  const [appChatListData, setAppChatListData] = useState([]);
+
+  useEffect(() => {
+    setAppChatListData(chatListDemo)
+  }, [])
+
+
+
+  const appPrevChatList = useMemo(() => {
+    const data = appChatListData?.data||appChatListData || [];
+
+    const chatList = [];
+
+    if (currentConversationId && data.length) {
+      data.forEach((item) => {
+        chatList.push({
+          id: `question-${item.id}`,
+          content: item.query,
+          isAnswer: false,
+          message_files:
+            item.message_files?.filter((file) => file.belongs_to === "user") ||
+            [],
+        });
+        chatList.push({
+          id: item.id,
+          content: item.answer,
+          isAnswer: true,
+          message_files:
+            item.message_files?.filter(
+              (file) => file.belongs_to === "assistant"
+            ) || [],
+        });
+      });
+    }
+    return chatList;
+  }, [appChatListData, currentConversationId]);
+
+  useEffect(() => {
+    console.log(appPrevChatList,'appPrevChatList')
+  }, [appPrevChatList])
+  
+  const {
+    chatList,
+    setChatList,
+    conversationId,
+    isResponding,
+    setIsResponding,
+    handleSend,
+    handleRestart,
+    handleStop,
+  } = useChat(appPrevChatList, stopChat);
+
+
   return (
     <div className="flex flex-col h-full">
-        <div className="p-4 border-b flex items-center justify-between">
+      <Chat
+        chatList={chatList}
+        setChatList={setChatList}
+        conversationId={conversationId}
+        handleSend={handleSend}
+        handleRestart={handleRestart}
+        handleStop={handleStop}
+        isResponding={isResponding}
+        setIsResponding={setIsResponding}
+      />
+      {/* <div className="p-4 border-b flex items-center justify-between">
             <div className="text-lg font-semibold">Arxtect</div>
             <div className="flex items-center space-x-2">
                 <button className="text-gray-500"><i className="fas fa-cog"></i></button>
@@ -61,9 +132,9 @@ const AITools = () => {
                     <button className="text-gray-500"><i className="fas fa-paper-plane"></i></button>
                 </div>
             </div>
-        </div>
+        </div> */}
     </div>
-);
-}
+  );
+};
 
 export default AITools;

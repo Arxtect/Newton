@@ -9,8 +9,6 @@ import { usePdfPreviewStore, useFileStore, useLayout } from "store";
 import AssetPreview from "../assetPreview/assetPreview";
 import { readFile } from "domain/filesystem";
 import Aitools from "../aiTools/aiTools";
-import Chat from "../aiTools/chat";
-
 export const PdfPreview = () => {
   const { pdfUrl, compilerLog, showCompilerLog, setCompiledPdfUrl } =
     usePdfPreviewStore((state) => ({
@@ -68,8 +66,7 @@ export const PdfPreview = () => {
       className={`h-full relative  ${willResizing ? "z-10" : ""}`}
       style={{ overflow: "auto" }} // 添加这一行以允许滚动
     >
-      <Chat></Chat>
-      {/* <Aitools></Aitools> */}
+      <Aitools></Aitools>
       {/* {!!assetsFilePath && !!fileContent ? (
         <AssetPreview filename={assetsFilePath} content={fileContent} />
       ) : showCompilerLog ? (

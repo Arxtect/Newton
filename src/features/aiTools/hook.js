@@ -6,7 +6,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { produce, setAutoFreeze } from "immer";
 import { ssePost } from "./ssePost";
-import useTimestamp from "@/useHooks";
+import {useTimestamp} from "@/useHooks";
 
 export const TransferMethod = {
   all: "all",
@@ -123,6 +123,8 @@ export const useChat = (
       handleResponding(true);
       hasStopResponded.current = false;
 
+      console.log(data,'input')
+
       const bodyParams = {
         response_mode: "streaming",
         conversation_id: connversationId.current,
@@ -165,6 +167,7 @@ export const useChat = (
 
             taskIdRef.current = taskId;
             if (messageId) responseItem.id = messageId;
+
 
             updateCurrentQA({
               responseItem,
@@ -322,6 +325,18 @@ export const useChat = (
       formatTime,
     ]
   );
+
+  useEffect(() => {
+  console.log(chatListRef.current,chatList,'item')
+  }, [chatList,chatListRef])
+
+    // 监听 prevChatList 变化，并同步更新 chatList 和 chatListRef
+    useEffect(() => {
+      if (prevChatList) {
+        setChatList(prevChatList);    // 更新 chatList
+        chatListRef.current = prevChatList;  // 同步更新 chatListRef
+      }
+    }, [prevChatList]);
 
   return {
     chatList,

@@ -140,7 +140,8 @@
     "yjs": "^13.6.6",
     "zod": "^3.22.4",
     "zustand": "^4.5.0",
-    "katex": "^0.16.10"
+    "katex": "^0.16.10",
+    "immer": "^9.0.19"
   },
   "scripts": {
     "start": "cross-env NODE_ENV=development node scripts/start.js",

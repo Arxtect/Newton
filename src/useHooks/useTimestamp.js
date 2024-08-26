@@ -12,7 +12,7 @@ import timezone from "dayjs/plugin/timezone";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-const useTimestamp = () => {
+export const useTimestamp = () => {
   // 使用浏览器的默认时区
   const browserTimezone = dayjs.tz.guess();
 
@@ -26,4 +26,3 @@ const useTimestamp = () => {
   return { formatTime };
 };
 
-export default useTimestamp;

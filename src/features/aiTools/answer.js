@@ -5,7 +5,7 @@ import { Markdown } from './markdown'
 
 const BasicContent = ({ item }) => {
   const {
-    answer:content,
+    content,
   } = item
 
   return <Markdown content={content} className={`${item.isError && '!text-[#F04438]'}`} />
@@ -18,7 +18,7 @@ const Answer = ({
   chatAnswerContainerInner,
 }) => {
   const {
-    answer:content,
+    content,
     more,
   } = item
 
