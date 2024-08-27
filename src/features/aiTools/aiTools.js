@@ -2,13 +2,22 @@ import React, { useMemo, useState,useEffect } from "react";
 import Chat from "./chat";
 import { useChat } from "./hook";
 import chatListDemo from './chatListdemo'
+import { stopChat as stopChatApi } from '@/services'
+  import { useUserStore } from "store";
 
 const AITools = () => {
-  const stopChat = (taskId) => {
+  const { user } = useUserStore(
+    (state) => ({
+      user: state.user,
+    })
+  );
+  
+  const stopChat = async (taskId, currentAppToken) => {
     console.log(`Stop chat with taskId: ${taskId}`);
+    await stopChatApi(taskId, currentAppToken);
   };
 
-  const [currentConversationId, setCurrentConversationId] = useState("123");
+  const [currentConversationId, setCurrentConversationId] = useState("");
   const [appChatListData, setAppChatListData] = useState([]);
 
   useEffect(() => {
@@ -18,7 +27,7 @@ const AITools = () => {
 
 
   const appPrevChatList = useMemo(() => {
-    const data = appChatListData?.data||appChatListData || [];
+    const data =  [];
 
     const chatList = [];
 
@@ -59,6 +68,7 @@ const AITools = () => {
     handleSend,
     handleRestart,
     handleStop,
+    currentAppToken,
   } = useChat(appPrevChatList, stopChat);
 
 
@@ -73,6 +83,8 @@ const AITools = () => {
         handleStop={handleStop}
         isResponding={isResponding}
         setIsResponding={setIsResponding}
+        currentAppToken={currentAppToken}
+        user={user}
       />
       {/* <div className="p-4 border-b flex items-center justify-between">
             <div className="text-lg font-semibold">Arxtect</div>

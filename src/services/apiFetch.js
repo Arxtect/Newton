@@ -6,12 +6,13 @@
 import { toast } from "react-toastify"; // 假设你已经安装了react-toastify
 import { updateAccessToken, updateUser } from "store";
 
-export async function apiFetch(url, method, body = null) {
+export async function apiFetch(url, method, body = null, options={}) {
   try {
     const response = await fetch(url, {
       method,
       headers: {
         "Content-Type": "application/json",
+        ...options.headers,
       },
       credentials: "include",
       body: body ? JSON.stringify(body) : null,
@@ -29,11 +30,11 @@ export async function apiFetch(url, method, body = null) {
       toast.warning("Unauthorized");
     } else {
       const errorDetail = await response.json();
-       toast.warning(errorDetail.message || "Failed to complete the request");
+      toast.warning(errorDetail.message || "Failed to complete the request");
       // throw new Error(errorDetail.message || "Failed to complete the request");
     }
   } catch (error) {
-         toast.warning(error.message || "Unknown error");
+    toast.warning(error.message || "Unknown error");
     // throw new Error(error.message || "Unknown error");
   }
 }

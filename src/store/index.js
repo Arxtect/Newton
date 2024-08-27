@@ -6,3 +6,4 @@ export * from "./loginStore.js";
 export * from "./useGitRepo.js";
 export * from "./layout.js";
 export * from "./useEditor.js";
+export * from "./chat.js";

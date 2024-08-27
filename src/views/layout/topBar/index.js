@@ -13,7 +13,9 @@ import { useUserStore, useFileStore } from "@/store";
 import { downloadDirectoryAsZip } from "domain/filesystem";
 import { useNavigate } from "react-router-dom";
 import { Tooltip } from "@mui/material";
-import {getColors} from "@/util";
+import { getColors, getFirstNUpperCaseChars } from "@/util";
+
+
 const maxDisplayCount = 3; // 最大显示的名字数量
 
 const TopBar = (props) => {
@@ -85,14 +87,14 @@ const TopBar = (props) => {
                 key={user.id}
                 className="relative rounded-full w-8 h-8 flex items-center justify-center border-2 border-white"
                 style={{
-                  backgroundColor: user?.color||getColors(index),
+                  backgroundColor: user?.color || getColors(index),
                   marginLeft: index === 0 ? "0" : "-0.5rem", // Adjust the overlap
                   zIndex: 100 - index,
                 }}
                 title={user.name}
               >
                 <span className="text-white text-xs">
-                  {user.name?.charAt(0)?.toUpperCase()}
+                  {getFirstNUpperCaseChars(user.name)}
                 </span>
               </div>
             ))}

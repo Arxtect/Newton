@@ -92,7 +92,10 @@ const ContentTopBar = (props) => {
     user: state.user,
   }));
 
-  const compile = () => compileLatex(sourceCode, currentProjectRoot,true);
+  const compile = () => {
+    console.log(sourceCode, "sourceCode");
+    compileLatex(sourceCode, currentProjectRoot, false);
+  };
 
   const [isAutoCompile, setIsAutoCompile] = useState(false)
 

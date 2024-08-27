@@ -6,18 +6,28 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { produce, setAutoFreeze } from "immer";
 import { ssePost } from "./ssePost";
-import {useTimestamp} from "@/useHooks";
-
+import { useTimestamp } from "@/useHooks";
+import { getChatAccessToken, getChatApp } from "@/services";
+import { chatAccessToken, updateChatAccessToken } from "@/store";
 export const TransferMethod = {
   all: "all",
   local_file: "local_file",
   remote_url: "remote_url",
 };
 
-export const useChat = (
-  prevChatList,
-  stopChat
-) => {
+const getAppList = async () => {
+  let list = await getChatApp();
+  return list;
+};
+
+const getAccessTokenAndStore = async (token) => {
+  if (chatAccessToken[token]) return chatAccessToken[token];
+  let accessToken = await getChatAccessToken(token);
+  updateChatAccessToken(token, accessToken);
+  return accessToken;
+};
+
+export const useChat = (prevChatList, stopChat) => {
   const { formatTime } = useTimestamp();
   const connversationId = useRef("");
   const hasStopResponded = useRef(false);
@@ -27,7 +37,34 @@ export const useChat = (
   const chatListRef = useRef(prevChatList || []);
   const taskIdRef = useRef("");
   const conversationMessagesAbortControllerRef = useRef(null);
-    
+
+  const [appList, setAppList] = useState([]);
+  const [currentApp, setCurrentApp] = useState(null);
+  const [currentAppToken, setCurrentAppToken] = useState(null);
+
+  const handleGetAppList = useCallback(() => {
+    getAppList().then((res) => {
+      setAppList(res);
+      setCurrentApp(res.find((item) => item.default) || res[0]);
+    });
+  }, []);
+
+  const handleGetAccessToken = useCallback(async (token) => {
+    console.log(token, "token");
+    let res = await getAccessTokenAndStore(token)
+    console.log(res, "token");
+    setCurrentAppToken(res);
+  },[]);
+
+  useEffect(() => {
+    if (!currentApp) return;
+    handleGetAccessToken(currentApp.access_token);
+  }, [currentApp]);
+
+  useEffect(() => {
+    handleGetAppList();
+  }, []);
+
   useEffect(() => {
     setAutoFreeze(false);
     return () => {
@@ -39,7 +76,7 @@ export const useChat = (
     setChatList(newChatList);
     chatListRef.current = newChatList;
   }, []);
-    
+
   const handleResponding = useCallback((isResponding) => {
     setIsResponding(isResponding);
     isRespondingRef.current = isResponding;
@@ -48,10 +85,13 @@ export const useChat = (
   const handleStop = useCallback(() => {
     hasStopResponded.current = true;
     handleResponding(false);
-    if (stopChat && taskIdRef.current) stopChat(taskIdRef.current);
+    console.log(stopChat, taskIdRef.current, "stopChat && taskIdRef.current");
+
+    if (stopChat && taskIdRef.current)
+      stopChat(taskIdRef.current, currentAppToken);
     if (conversationMessagesAbortControllerRef.current)
       conversationMessagesAbortControllerRef.current.abort();
-  }, [stopChat, handleResponding]);
+  }, [stopChat, handleResponding, currentAppToken]);
 
   const handleRestart = useCallback(() => {
     connversationId.current = "";
@@ -84,10 +124,7 @@ export const useChat = (
     async (
       url,
       data,
-      {
-        onGetConvesationMessages,
-        onConversationComplete,
-      }
+      { onGetConvesationMessages, onConversationComplete, currentAppToken }
     ) => {
       const questionId = `question-${Date.now()}`;
       const questionItem = {
@@ -123,7 +160,7 @@ export const useChat = (
       handleResponding(true);
       hasStopResponded.current = false;
 
-      console.log(data,'input')
+      console.log(data, "input");
 
       const bodyParams = {
         response_mode: "streaming",
@@ -144,10 +181,15 @@ export const useChat = (
 
       let hasSetResponseId = false;
 
+      console.log(currentAppToken, "token");
+
       ssePost(
         url,
         {
           body: bodyParams,
+          headers: new Headers({
+            "APP-Authorization": `Bearer ${currentAppToken}`,
+          }),
         },
         {
           onData: (
@@ -155,7 +197,7 @@ export const useChat = (
             isFirstMessage,
             { conversationId: newConversationId, messageId, taskId }
           ) => {
-           responseItem.content = responseItem.content + message;
+            responseItem.content = responseItem.content + message;
 
             if (messageId && !hasSetResponseId) {
               responseItem.id = messageId;
@@ -165,9 +207,9 @@ export const useChat = (
             if (isFirstMessage && newConversationId)
               connversationId.current = newConversationId;
 
+
             taskIdRef.current = taskId;
             if (messageId) responseItem.id = messageId;
-
 
             updateCurrentQA({
               responseItem,
@@ -327,16 +369,16 @@ export const useChat = (
   );
 
   useEffect(() => {
-  console.log(chatListRef.current,chatList,'item')
-  }, [chatList,chatListRef])
+    console.log(chatListRef.current, chatList, "item");
+  }, [chatList, chatListRef]);
 
-    // 监听 prevChatList 变化，并同步更新 chatList 和 chatListRef
-    useEffect(() => {
-      if (prevChatList) {
-        setChatList(prevChatList);    // 更新 chatList
-        chatListRef.current = prevChatList;  // 同步更新 chatListRef
-      }
-    }, [prevChatList]);
+  // 监听 prevChatList 变化，并同步更新 chatList 和 chatListRef
+  useEffect(() => {
+    if (prevChatList) {
+      setChatList(prevChatList); // 更新 chatList
+      chatListRef.current = prevChatList; // 同步更新 chatListRef
+    }
+  }, [prevChatList]);
 
   return {
     chatList,
@@ -347,5 +389,10 @@ export const useChat = (
     handleSend,
     handleRestart,
     handleStop,
+    currentApp,
+    setCurrentApp,
+    appList,
+    handleUpdateChatList,
+    currentAppToken,
   };
 };

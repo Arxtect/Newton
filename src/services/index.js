@@ -7,3 +7,4 @@ export * from "./auth";
 export * from "./publish";
 export * from "./users";
 export * from "./yredis";
+export * from "./chat";

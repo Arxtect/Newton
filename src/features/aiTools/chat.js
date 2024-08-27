@@ -5,17 +5,17 @@ import Answer from './answer';
 import ChatInput from './chat-input';
 import Button from './button';
 import {getChatApiUrl} from "./ssePost"
-// import { StopCircle } from '@/app/components/base/icons/src/vender/solid/mediaAndDevices';
-// import "./markdown.scss"
+import  stopIcon  from '@/assets/chat/stop.svg'
 
 const Chat = ({
   chatList,
   isResponding,
   noStopResponding,
-  onStopResponding,
+  handleStop,
   chatContainerInnerClassName,
   chatFooterClassName,
   chatFooterInnerClassName,
+  currentAppToken,
   // showPromptLog,
   // questionIcon,
   // answerIcon,
@@ -25,7 +25,8 @@ const Chat = ({
   // hideProcessDetail,
   inputsForms,
   newConversationInputs,
-  handleSend
+  handleSend,
+  user,
 }) => {
   const [width, setWidth] = useState(0);
   const chatContainerRef = useRef(null);
@@ -33,20 +34,25 @@ const Chat = ({
   const chatFooterRef = useRef(null);
   const chatFooterInnerRef = useRef(null);
   const userScrolledRef = useRef(false);
-  const [newConversationId, setNewConversationId] = useState('')
+  const [newConversationId, setNewConversationId] = useState("");
 
   const handleNewConversationCompleted = useCallback((newConversationId) => {
-    setNewConversationId(newConversationId)
-  }, [])
+    setNewConversationId(newConversationId);
+  }, []);
 
   const handleScrolltoBottom = useCallback(() => {
     if (chatContainerRef.current && !userScrolledRef.current)
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+      chatContainerRef.current.scrollTop =
+        chatContainerRef.current.scrollHeight;
   }, []);
 
   const handleWindowResize = useCallback(() => {
     if (chatContainerRef.current)
-      setWidth(document.body.clientWidth - (chatContainerRef.current.clientWidth + 16) - 8);
+      setWidth(
+        document.body.clientWidth -
+          (chatContainerRef.current.clientWidth + 16) -
+          8
+      );
 
     if (chatContainerRef.current && chatFooterRef.current)
       chatFooterRef.current.style.width = `${chatContainerRef.current.clientWidth}px`;
@@ -98,110 +104,108 @@ const Chat = ({
     if (chatContainer) {
       const setUserScrolled = () => {
         if (chatContainer)
-          userScrolledRef.current = chatContainer.scrollHeight - chatContainer.scrollTop >= chatContainer.clientHeight + 300;
+          userScrolledRef.current =
+            chatContainer.scrollHeight - chatContainer.scrollTop >=
+            chatContainer.clientHeight + 300;
       };
-      chatContainer.addEventListener('scroll', setUserScrolled);
-      return () => chatContainer.removeEventListener('scroll', setUserScrolled);
+      chatContainer.addEventListener("scroll", setUserScrolled);
+      return () => chatContainer.removeEventListener("scroll", setUserScrolled);
     }
   }, []);
 
-  const onSend = useCallback((message, files) => {
-    const data = {
-      query: message,
-      inputs:  newConversationInputs||{},
-      conversation_id: newConversationId,
-      response_mode: "streaming"
-    };
+  const onSend = useCallback(
+    (message, files) => {
+      const data = {
+        query: message,
+        inputs: newConversationInputs || {},
+        conversation_id: newConversationId,
+        response_mode: "streaming",
+      };
 
-    if (files?.length)
-      data.files = files;
+      if (files?.length) data.files = files;
 
-    handleSend(
-      getChatApiUrl(),
-      data,
-      {
-        onConversationComplete: newConversationId ? undefined : handleNewConversationCompleted,
-      }
-    );
-  }, [
-    newConversationId,
-    newConversationInputs,
-    handleNewConversationCompleted,
-  ]);
-
-
+      handleSend(getChatApiUrl(), data, {
+        onConversationComplete: newConversationId
+          ? undefined
+          : handleNewConversationCompleted,
+        currentAppToken,
+      });
+    },
+    [
+      currentAppToken,
+      newConversationId,
+      newConversationInputs,
+      handleNewConversationCompleted,
+    ]
+  );
 
   return (
-      <div className='relative h-full w-full'>
+    <div className="relative h-full w-full">
+      <div
+        ref={chatContainerRef}
+        className={"relative h-full overflow-y-auto px-4 pt-4"}
+      >
+        {chatNode}
         <div
-          ref={chatContainerRef}
-          className={'relative h-full overflow-y-auto'}
+          ref={chatContainerInnerRef}
+          className={`${chatContainerInnerClassName}`}
         >
-          {chatNode}
-          <div
-            ref={chatContainerInnerRef}
-            className={`${chatContainerInnerClassName}`}
-          >
-            {
-              chatList.map((item, index) => {
-                if (item.isAnswer) {
-                  const isLast = item.id === chatList[chatList.length - 1]?.id;
-                  return (
-                    <Answer
-                      key={item.id}
-                      item={item}
-                      question={chatList[index - 1]?.content}
-                      index={index}
-                      // answerIcon={answerIcon}
-                      // responding={isLast && isResponding}
-                      // allToolIcons={allToolIcons}
-                      // showPromptLog={showPromptLog}
-                      // chatAnswerContainerInner={chatAnswerContainerInner}
-                      // hideProcessDetail={hideProcessDetail}
-                    />
-                  );
-                }
-                return (
-                  <Question
-                    key={item.id}
-                    item={item}
-                  />
-                );
-              })
-            }
-          </div>
-        </div>
-        <div
-          className={`absolute bottom-0 ${(!noStopResponding) && chatFooterClassName}`}
-          ref={chatFooterRef}
-          style={{
-            background: 'linear-gradient(0deg, #F9FAFB 40%, rgba(255, 255, 255, 0.00) 100%)',
-          }}
-        >
-          <div
-            ref={chatFooterInnerRef}
-            className={`${chatFooterInnerClassName}`}
-          >
-            {
-              !noStopResponding && isResponding && (
-                <div className='flex justify-center mb-2'>
-                  <Button onClick={onStopResponding}>
-                    {/* <StopCircle className='mr-[5px] w-3.5 h-3.5 text-gray-500' /> */}
-                    <span className='text-xs text-gray-500 font-normal'>{'appDebug.operation.stopResponding'}</span>
-                  </Button>
-                </div>
-              )
-            }
-           
-           <ChatInput
-                  // visionConfig={config?.file_upload?.image}
-                  // speechToTextConfig={config?.speech_to_text}
-                  onSend={onSend}
+          {chatList.map((item, index) => {
+            if (item.isAnswer) {
+              const isLast = item.id === chatList[chatList.length - 1]?.id;
+              return (
+                <Answer
+                  key={item.id}
+                  item={item}
+                  question={chatList[index - 1]?.content}
+                  index={index}
+                  responding={isLast && isResponding}
+                  // answerIcon={answerIcon}
+                  // allToolIcons={allToolIcons}
+                  // showPromptLog={showPromptLog}
+                  // chatAnswerContainerInner={chatAnswerContainerInner}
+                  // hideProcessDetail={hideProcessDetail}
                 />
-          </div>
+              );
+            }
+            return <Question key={item.id} item={item} user={user} />;
+          })}
         </div>
-       
       </div>
+      <div
+        className={`absolute bottom-0 flex justify-center ${
+          !noStopResponding && chatFooterClassName
+        }`}
+        ref={chatFooterRef}
+        style={{
+          background:
+            "linear-gradient(0deg, #F9FAFB 40%, rgba(255, 255, 255, 0.00) 100%)",
+        }}
+      >
+        <div ref={chatFooterInnerRef} className={`${chatFooterInnerClassName}`}>
+          {!noStopResponding && isResponding && (
+            <div className="flex justify-center mb-2">
+              <Button onClick={handleStop}>
+                <img
+                  src={stopIcon}
+                  alt="stop"
+                  className="mr-[5px] w-3.5 h-3.5 text-gray-500"
+                />
+                <span className="text-xs text-gray-500 font-normal">
+                  {"Stop responding" || "appDebug.operation.stopResponding"}
+                </span>
+              </Button>
+            </div>
+          )}
+
+          <ChatInput
+            // visionConfig={config?.file_upload?.image}
+            // speechToTextConfig={config?.speech_to_text}
+            onSend={onSend}
+          />
+        </div>
+      </div>
+    </div>
   );
 };
 

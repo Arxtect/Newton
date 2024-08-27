@@ -119,6 +119,10 @@ module.exports = function (proxy, allowedHost) {
         target: "http://127.0.0.1:8012",
         // target: "http://206.190.239.91:8012",
         changeOrigin: true,
+        onProxyReq: function (proxyReq, req, res) {
+          // 设置 Connection 头为 keep-alive
+          proxyReq.setHeader("Connection", "keep-alive");
+        },
         // pathRewrite: { "^/api/v1": "" }
       },
       "/minio": {

@@ -7,7 +7,8 @@ import RemarkGfm from 'remark-gfm'
 import SyntaxHighlighter from 'react-syntax-highlighter'
 import { atelierHeathLight } from 'react-syntax-highlighter/dist/esm/styles/hljs'
 import { memo, useEffect, useMemo, useRef, useState } from 'react'
-// import CopyBtn from '@/app/components/base/copy-btn'
+import "./markdown.scss";
+import CopyBtn from '@/components/copy-btn'
 // import SVGBtn from '@/app/components/base/svg'
 // import Flowchart from '@/app/components/base/mermaid'
 
@@ -88,42 +89,43 @@ const CodeBlock = memo(({ inline, className, children, ...props }) => {
   const languageShowName = getCorrectCapitalizationLanguageName(language || '')
 
   return useMemo(() => {
-    return (!inline && match)
-      ? (
-        <div>
-          <div
-            className='flex justify-between h-8 items-center p-1 pl-3 border-b'
-            style={{ borderColor: 'rgba(0, 0, 0, 0.05)' }}
-          >
-            <div className='text-[13px] text-gray-500 font-normal'>{languageShowName}</div>
-            <div style={{ display: 'flex' }}>
-              {/* {language === 'mermaid' && (
+    return !inline && match ? (
+      <div>
+        <div
+          className="flex justify-between h-8 items-center p-1 pl-3 border-b"
+          style={{ borderColor: "rgba(0, 0, 0, 0.05)" }}
+        >
+          <div className="text-[13px] text-gray-500 font-normal">
+            {languageShowName}
+          </div>
+          <div style={{ display: "flex" }}>
+            {/* {language === 'mermaid' && (
                 <SVGBtn isSVG={isSVG} setIsSVG={setIsSVG} />
               )} */}
-              {/* <CopyBtn
-                className='mr-1'
-                value={String(children).replace(/\n$/, '')}
-                isPlain
-              /> */}
-            </div>
+            <CopyBtn
+              className="mr-1"
+              position={"top"}
+              value={String(children).replace(/\n$/, "")}
+              isPlain
+            />
           </div>
-          <SyntaxHighlighter
-                {...props}
-                style={atelierHeathLight}
-                customStyle={{ paddingLeft: 12, backgroundColor: '#fff' }}
-                language={match[1]}
-                showLineNumbers
-                PreTag="div"
-              >
-                {String(children).replace(/\n$/, '')}
-              </SyntaxHighlighter>
         </div>
-      )
-      : (
-        <code {...props} className={className}>
-          {children}
-        </code>
-      )
+        <SyntaxHighlighter
+          {...props}
+          style={atelierHeathLight}
+          customStyle={{ paddingLeft: 12, backgroundColor: "#fff" }}
+          language={match[1]}
+          showLineNumbers
+          PreTag="div"
+        >
+          {String(children).replace(/\n$/, "")}
+        </SyntaxHighlighter>
+      </div>
+    ) : (
+      <code {...props} className={className}>
+        {children}
+      </code>
+    );
   }, [children, className, inline, isSVG, language, languageShowName, match, props])
 })
 

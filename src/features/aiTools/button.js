@@ -1,3 +1,8 @@
+/*
+ * @Description: 
+ * @Author: Devin
+ * @Date: 2024-08-26 09:42:55
+ */
 import React from 'react';
 import Spinner from './spinner';
 
@@ -46,6 +51,5 @@ const Button = React.forwardRef(({
   );
 });
 
-Button.displayName = 'Button';
 
 export default Button;

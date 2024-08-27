@@ -45,6 +45,7 @@ const handleStream = (
   function read() {
     let hasError = false;
     reader?.read().then((result) => {
+      console.log(result,'result')
       if (result.done) {
         onCompleted && onCompleted();
         return;
@@ -55,10 +56,10 @@ const handleStream = (
       try {
         lines.forEach((message) => {
           console.log(message, "message");
-          if (message.startsWith("data: ")) {
+          if (message) {
             // check if it starts with data:
             try {
-              bufferObj = JSON.parse(message.substring(6)); // remove data: and parse as json
+              bufferObj = JSON.parse(message); // remove data: and parse as json
             } catch (e) {
               // mute handle message cut off
               onData("", isFirstMessage, {
@@ -109,8 +110,10 @@ const handleStream = (
         onCompleted?.(true, e.toString());
         return;
       }
+      console.log(buffer, "buffer");
       if (!hasError) read();
     });
+
   }
   read();
 };
@@ -138,15 +141,18 @@ export const ssePost = (
       method: "POST",
       signal: abortController.signal,
     },
-    fetchOptions
+    fetchOptions,
   );
 
   const contentType = options.headers.get("Content-Type");
   if (!contentType) options.headers.set("Content-Type", ContentType.json);
+  // options.headers.set("authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIxNWZmZDYxNS1iMDZmLTRjOGQtYmY3OS04MTlhNDA1NzI1OGYiLCJzdWIiOiJXZWIgQVBJIFBhc3Nwb3J0IiwiYXBwX2lkIjoiMTVmZmQ2MTUtYjA2Zi00YzhkLWJmNzktODE5YTQwNTcyNThmIiwiYXBwX2NvZGUiOiJ2TGN3RFJxb1VoTkVnQWpoIiwiZW5kX3VzZXJfaWQiOiI4YWEwNWU1Zi0xMWQyLTRlN2ItYmFjYy1jN2ZjMTkwZjQ2ZmYifQ.kCbfQxeBxZYM88gEC1NFmdVBWjDzwT4UL7WPihXZdPo");
 
   getAbortController?.(abortController);
 
-  const urlWithPrefix = `${url.startsWith("/") ? url : `/${url}`}`;
+  // const urlWithPrefix = "http://network.jancsitech.net:1510/api/chat-messages" || `${url.startsWith("/") ? url : `/${url}`}`;
+    const urlWithPrefix =
+      `${url.startsWith("/") ? url : `/${url}`}`;
 
   const { body } = options;
   if (body) options.body = JSON.stringify(body);
