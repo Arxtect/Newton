@@ -8,15 +8,22 @@ import { useEffect, useState } from "react";
 import { usePdfPreviewStore, useFileStore, useLayout } from "store";
 import AssetPreview from "../assetPreview/assetPreview";
 import { readFile } from "domain/filesystem";
+import FormattedCompilerLog from "./formattedCompilerLog"
 
 export const PdfPreview = () => {
-  const { pdfUrl, compilerLog, showCompilerLog, setCompiledPdfUrl } =
-    usePdfPreviewStore((state) => ({
-      pdfUrl: state.pdfUrl,
-      compilerLog: state.compilerLog,
-      showCompilerLog: state.showCompilerLog,
-      setCompiledPdfUrl: state.setCompiledPdfUrl,
-    }));
+  const {
+    pdfUrl,
+    compilerLog,
+    showCompilerLog,
+    setCompiledPdfUrl,
+    compileMessages,
+  } = usePdfPreviewStore((state) => ({
+    pdfUrl: state.pdfUrl,
+    compilerLog: state.compilerLog,
+    showCompilerLog: state.showCompilerLog,
+    setCompiledPdfUrl: state.setCompiledPdfUrl,
+    compileMessages: state.compileMessages,
+  }));
 
   const { willResizing } = useLayout();
 
@@ -69,10 +76,9 @@ export const PdfPreview = () => {
       {!!assetsFilePath && !!fileContent ? (
         <AssetPreview filename={assetsFilePath} content={fileContent} />
       ) : showCompilerLog ? (
-        formattedCompilerLog
+        <FormattedCompilerLog messages={compileMessages} log={compilerLog} />
       ) : (
-        pdfUrl !== "" &&
-        pdfEmbed
+        pdfUrl !== "" && pdfEmbed
         // <Viewer url={pdfU/rl}></Viewer>
       )}
 

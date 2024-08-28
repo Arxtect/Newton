@@ -7,8 +7,10 @@ import {
   setBusyEngineStatus,
   setErrorEngineStatus,
 } from "store";
-import { setCompiledPdfUrl, setCompilerLog, setShowCompilerLog } from "store";
+import { setCompiledPdfUrl, setCompilerLog, setShowCompilerLog,setCompileMessages } from "store";
 import { getAllFileNames } from "@/domain/filesystem";
+import  HumanReadableLogs  from "./human-readable-logs/HumanReadableLogs";
+
 
 const LATEX_FILE_EXTENSIONS = [
   ".tex",
@@ -152,7 +154,8 @@ export const ensureFileExists = async (list, currentProject, usePdfTeX) => {
   }
 };
 
-export const compileLatex = async (latexCode, currentProject, usePdfTeX=false) => {
+export const compileLatex = async (latexCode, currentProject, usePdfTeX = false) => {
+
   // Make sure the engines are ready for compilation
   if (usePdfTeX) {
     if (!pdftexEngine.isReady()) {
@@ -186,7 +189,17 @@ export const compileLatex = async (latexCode, currentProject, usePdfTeX=false) =
     // Compile the main.tex file
     let pdftexCompilation = await pdftexEngine.compileLaTeX();
     // Print the compilation log
+    let { errors, warnings, typesetting } = HumanReadableLogs.parse(
+      pdftexCompilation.log,
+      {
+        ignoreDuplicates: true,
+      }
+    );
+    
     setCompilerLog(pdftexCompilation.log);
+    setCompileMessages([...errors, ...warnings, ...typesetting]);
+
+        console.log(errors, warnings, typesetting, "parserLog");
 
     // On successful compilation
     if (pdftexCompilation.status === 0) {
@@ -206,7 +219,17 @@ export const compileLatex = async (latexCode, currentProject, usePdfTeX=false) =
     // Compile the main.tex file
     let xetexCompilation = await xetexEngine.compileLaTeX();
     // Print the compilation log
+    let { errors, warnings, typesetting } = HumanReadableLogs.parse(
+      xetexCompilation.log,
+      {
+        ignoreDuplicates: true,
+      }
+    );
+
     setCompilerLog(xetexCompilation.log);
+    setCompileMessages([...errors, ...warnings, ...typesetting]);
+
+    console.log(errors, warnings, typesetting, "parserLog");
 
     if (xetexCompilation.status === 0) {
       dviEngine.writeMemFSFile("main.xdv", xetexCompilation.pdf);

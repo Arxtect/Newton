@@ -193,18 +193,21 @@ function ActionBar({
             },
 
             // {
-            //     label: "Templates",
-            //     separator: true,
-            //     subMenu: [
-            //         {
-            //             label: "Academic Journal",
-            //             onSelect: () => console.log("Academic Journal"),
-            //         },
-            //         {
-            //             label: "Book",
-            //             onSelect: () => console.log("Book"),
-            //         },
-            //     ],
+            //   label: "Templates",
+            //   separator: true,
+            //   type: "radio",
+            //   onSelect: (v) => console.log("Book", v),
+            //   value: "book",
+            //   subMenu: [
+            //     {
+            //       label: "Academic Journal",
+            //       value: "Academic",
+            //     },
+            //     {
+            //       label: "Book",
+            //       value: "book",
+            //     },
+            //   ],
             // },
           ]}
         ></ArMenuRadix>

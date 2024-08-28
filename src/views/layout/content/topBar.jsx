@@ -3,20 +3,18 @@
  * @Author: Devin
  * @Date: 2024-07-18 10:06:45
  */
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, useCallback } from "react";
 import pickUpSvg from "@/assets/layout/pickup.svg";
 import newFileSvg from "@/assets/layout/newFile.svg";
 import newFolderSvg from "@/assets/layout/newFolder.svg";
-import layoutSvg from "@/assets/layout/layout.svg";
 import previewSvg from "@/assets/layout/preview.svg";
 import redoSvg from "@/assets/layout/redo.svg";
 import searchSvg from "@/assets/layout/search.svg";
 import undoSvg from "@/assets/layout/undo.svg";
 import logSvg from "@/assets/layout/log.svg";
-import uploadFileSvg from "@/assets/layout/uploadFile.svg";
-import successSvg from "@/assets/layout/success.svg";
-import { Select, MenuItem, IconButton, Tooltip } from "@mui/material";
+import {  IconButton, Tooltip } from "@mui/material";
 import Controls from "./controls";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import {
   useLayout,
   useFileStore,
@@ -26,6 +24,7 @@ import {
   useUserStore,
   usePdfPreviewStore,
   useEngineStatusStore,
+  useCompileSetting,
 } from "store";
 import { compileLatex } from "@/features/latexCompilation/latexCompilation";
 import { EngineStatus } from "@/features/engineStatus/EngineStatus";
@@ -33,6 +32,9 @@ import { FileUploader, FolderUploader } from "../upload.jsx";
 import UploadFiles from "./uploadFiles"
 import * as constant from "@/constant";
 import path from "path";
+import ArButtonGroup from "@/components/arButtonGroup";
+import ArMenuRadix from "@/components/arMenuRadix";
+
 
 const ContentTopBar = (props) => {
   const {
@@ -80,6 +82,14 @@ const ContentTopBar = (props) => {
     reload: state.repoChanged,
   }));
 
+    const { updateSetting, getSetting, isPdfLatex } = useCompileSetting(
+      (state) => ({
+        updateSetting: state.updateSetting,
+        getSetting: state.getSetting,
+        isPdfLatex: state.isPdfLatex,
+      })
+    );
+
     const { showCompilerLog,toggleCompilerLog, setShowCompilerLog } = usePdfPreviewStore(
       (state) => ({
         showCompilerLog:state.showCompilerLog,
@@ -92,7 +102,10 @@ const ContentTopBar = (props) => {
     user: state.user,
   }));
 
-  const compile = () => compileLatex(sourceCode, currentProjectRoot,true);
+  const compile = useCallback(
+    () => compileLatex(sourceCode, currentProjectRoot, isPdfLatex),
+    [isPdfLatex]
+  );
 
   const [isAutoCompile, setIsAutoCompile] = useState(false)
 
@@ -256,18 +269,47 @@ const ContentTopBar = (props) => {
         style={{ marginLeft: showSide ? sideWidth + 32 : 32 + "px" }}
       >
         <div className="flex items-center space-x-2">
-          <button
-            className={`bg-[#81C784] text-black px-2 py-[2px] rounded-md flex items-center space-x-4`}
-          >
-            <span onClick={compile}>
-              {engineStatus == constant.notReadyEngineStatus ||
-              engineStatus == constant.busyEngineStatus
-                ? "Compiling"
-                : "Compile"}
-              {/* : "Compile\u2009\u2009\u2009\u2009"} */}
-            </span>
-            <EngineStatus className="text-[12px]" />
-          </button>
+          <ArButtonGroup className="bg-[#81C784] text-black rounded-md ">
+            <button
+              className={` text-black px-2 py-[2px] flex items-center space-x-4`}
+            >
+              <span onClick={compile}>
+                {engineStatus == constant.notReadyEngineStatus ||
+                engineStatus == constant.busyEngineStatus
+                  ? "Compiling"
+                  : "Compile"}
+                {/* : "Compile\u2009\u2009\u2009\u2009"} */}
+              </span>
+              <EngineStatus className="text-[12px]" />
+            </button>
+            <button className="px-1">
+              <ArMenuRadix
+                menuAlign="start"
+                buttonCom={<ArrowDropDownIcon />}
+                width="10rem"
+                items={[
+                  {
+                    label: "Compiler",
+                    separator: true,
+                    type: "radio",
+                    onSelect: (v) => updateSetting("compiler", v),
+                    value: getSetting("compiler"),
+                    subMenu: [
+                      {
+                        label: "XeLaTeX",
+                        value: "xeLaTeX",
+                      },
+                      {
+                        label: "pdfLaTeX",
+                        value: "pdfLaTeX",
+                      },
+                    ],
+                  },
+                ]}
+              ></ArMenuRadix>
+            </button>
+          </ArButtonGroup>
+
           <Tooltip title={"Compile Log"}>
             <IconButton
               color="#inherit"

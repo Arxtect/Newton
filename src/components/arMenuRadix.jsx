@@ -7,6 +7,12 @@ import React, {
   forwardRef,
 } from "react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import {
+  HamburgerMenuIcon,
+  DotFilledIcon,
+  CheckIcon,
+  ChevronRightIcon,
+} from "@radix-ui/react-icons";
 
 const ArMenuRadix = forwardRef(
   (
@@ -16,8 +22,10 @@ const ArMenuRadix = forwardRef(
       buttonClassName = "",
       isNeedIcon = true,
       align = "center",
+      menuAlign = "end", // start, center, end
       buttonCom = null,
       getButtonClass = null,
+      width,
     },
     ref
   ) => {
@@ -31,38 +39,93 @@ const ArMenuRadix = forwardRef(
       }
     }, []);
 
-    const renderMenuItems = (items) => {
-      return items.map((item, index) => (
-        <React.Fragment key={index}>
-          {!item.subMenu ? (
+    const getItems = (item, parentItem = {}) => {
+      let type = parentItem?.type || item.type;
+      switch (type) {
+        case "radio":
+          return (
+            <DropdownMenu.RadioGroup
+              key={item.key || item.label}
+              value={item.value}
+              onValueChange={item.onSelect}
+            >
+              {item.subMenu.map((option, idx) => (
+                <DropdownMenu.RadioItem
+                  key={idx}
+                  className={`flex items-center gap-6 px-6 py-1 hover:bg-gray-100 cursor-pointer outline-none ${
+                    align === "center" ? "text-center" : "text-left"
+                  }`}
+                  value={option.value}
+                >
+                  <DropdownMenu.ItemIndicator className="absolute left-0 w-[25px] inline-flex items-center justify-center">
+                    <CheckIcon />
+                  </DropdownMenu.ItemIndicator>
+                  {option.label}
+                </DropdownMenu.RadioItem>
+              ))}
+            </DropdownMenu.RadioGroup>
+          );
+        case "checkbox":
+          return (
+            <DropdownMenu.CheckboxItem
+              key={item.key || item.label}
+              className={`flex items-center gap-4 px-4 py-2 hover:bg-gray-100 cursor-pointer outline-none ${
+                align === "center" ? "text-center" : "text-left"
+              }`}
+              checked={item.checked}
+              onCheckedChange={item.onCheckedChange}
+            >
+              <CheckIcon />
+              {item.label}
+            </DropdownMenu.CheckboxItem>
+          );
+        default:
+          return (
             <DropdownMenu.Item
+              key={item.key || item.label}
               className={`flex items-center gap-4 px-4 py-2 hover:bg-gray-100 cursor-pointer outline-none ${
                 align === "center" ? "text-center" : "text-left"
               }`}
               onSelect={item.onSelect}
             >
-              {item.icon&& <img
-            src={item.icon}
-            alt=""
-            className="w-5 h-5 cursor-pointer"
-          />}
+              {item.icon && (
+                <img
+                  src={item.icon}
+                  alt=""
+                  className="w-5 h-5 cursor-pointer"
+                />
+              )}
               {item.label}
             </DropdownMenu.Item>
-          ) : (
-            <div
-              className={`px-4 pt-2 text-gray-500 cursor-default flex justify-between items-center ${
-                align == "center" ? "text-center" : "text-left"
-              }`}
-            >
-              {item.label}
-            </div>
-          )}
-          {item.separator && (
-            <DropdownMenu.Separator className="h-px bg-gray-200 my-2" />
-          )}
-          {item.subMenu && renderMenuItems(item.subMenu)}
-        </React.Fragment>
-      ));
+          );
+      }
+    };
+
+    const renderMenuItems = (items, parentItem = {}) => {
+      return items.map((item) => {
+        return (
+          <React.Fragment key={item.key || item.label}>
+            {!item.subMenu ? (
+              getItems(item, parentItem)
+            ) : (
+              <div
+                className={`px-4 pt-2 text-gray-500 cursor-default flex justify-between items-center ${
+                  align == "center" ? "text-center" : "text-left"
+                }`}
+              >
+                {item.label}
+              </div>
+            )}
+            {item.separator && (
+              <DropdownMenu.Separator className="h-px bg-gray-200 my-2" />
+            )}
+            {item.subMenu &&
+              item?.type != "radio" &&
+              renderMenuItems(item.subMenu, item)}
+            {item?.type == "radio" && getItems(item)}
+          </React.Fragment>
+        );
+      });
     };
 
     useImperativeHandle(ref, () => ({
@@ -130,9 +193,9 @@ const ArMenuRadix = forwardRef(
 
           <DropdownMenu.Content
             className="bg-white shadow-md rounded-md  py-2 z-50 DropdownMenuContent"
-            align="end"
+            align={menuAlign || "end"}
             sideOffset={5}
-            style={{ minWidth: buttonWidth, width: "auto" }}
+            style={{ minWidth: buttonWidth, width: width || "auto" }}
           >
             {renderMenuItems(items)}
           </DropdownMenu.Content>
