@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useEditor } from "@/store";
 
 const CollapsibleText = ({ content }) => {
   const [isCollapsed, setIsCollapsed] = useState(true);
@@ -59,11 +60,26 @@ const Message = ({ type, title, file, line, details, content }) => {
       headerColor = "bg-gray-500 text-white";
   }
 
+  const { editor } = useEditor();
+
+  const handleLocate = (lineNumber) => {
+    if(editor) {
+      const lineNumberInt = parseInt(lineNumber, 10);
+      if(!isNaN(lineNumberInt)) {
+        editor.focus();
+        editor.gotoLine(lineNumberInt);
+      }
+    }
+  }
+
   return (
     <div className={`mb-4 border`}>
       <div className={`flex justify-between items-center p-2 ${headerColor}`}>
         <div className="font-bold">{title}</div>
-        <div className="text-sm">
+        <div
+          className={`text-sm cursor-pointer text-blue-500 hover:underline`}
+          onClick={() => handleLocate(line)}
+        >
           {file && file}
           {file && ","} {line && line}
         </div>
