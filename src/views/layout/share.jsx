@@ -104,7 +104,7 @@ const Share = forwardRef(({ rootPath, user }, ref) => {
 
   const handleSaveProject = async () => {
     let projectInfo = await getProjectInfo(rootPath);
-     if (projectInfo?.isSync || projectInfo?.isClose) return;
+    //  if (projectInfo?.isSync || projectInfo?.isClose) return;
     setLoading(true);
     try {
       // 创建 ProjectSync 实例

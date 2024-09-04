@@ -57,8 +57,8 @@ const Share = ({
 
 
   const handleSaveProject = async () => {
-    let projectInfo = await getProjectInfo(rootPath);
-    if (projectInfo?.isSync || projectInfo?.isClose) return;
+    // let projectInfo = await getProjectInfo(rootPath);
+    // if (projectInfo?.isSync || projectInfo?.isClose) return;
     setLoading(true);
     try {
       // 创建 ProjectSync 实例
@@ -89,7 +89,7 @@ const Share = ({
         toast.success(`Invite ${searchInput} success`);
         getRoomInfo();
         let projectInfo = await getProjectInfo(rootPath);
-        if (projectInfo?.isSync) return;
+        // if (projectInfo?.isSync) return;
         handleSaveProject();
       }
       return res?.status;
