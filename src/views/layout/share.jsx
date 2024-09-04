@@ -99,7 +99,7 @@ const Share = forwardRef(({ rootPath, user }, ref) => {
       "success",
       document.getElementById("ar-dialog")
     );
-    handleSaveProject();
+    // handleSaveProject();
   };
 
   const handleSaveProject = async () => {

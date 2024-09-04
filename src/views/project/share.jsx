@@ -56,7 +56,6 @@ const Share = ({
   };
 
 
-
   const handleSaveProject = async () => {
     let projectInfo = await getProjectInfo(rootPath);
     if (projectInfo?.isSync || projectInfo?.isClose) return;
@@ -75,7 +74,7 @@ const Share = ({
 
   const copyLink = async () => {
     await copyToClipboard(link, "Link copied to clipboard!","success",document.getElementById("ar-dialog"));
-    handleSaveProject();
+    // handleSaveProject();
   };
   
     const handleInvite = async (searchInput, access) => {

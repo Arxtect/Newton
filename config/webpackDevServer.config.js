@@ -117,7 +117,7 @@ module.exports = function (proxy, allowedHost) {
         // target: "http://3.227.9.181:8012",
         // target: "http://172.17.15.200:8012",
         target: "http://127.0.0.1:8012",
-        // target: "http://206.190.239.91:8012",
+        // target: "https://arxtect.com",
         changeOrigin: true,
         // pathRewrite: { "^/api/v1": "" }
       },
