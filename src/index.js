@@ -27,6 +27,7 @@ import path from "path";
 import latexCodeWelcome from "@/features/latexEditor/welcome";
 // import "@blueprintjs/core/lib/css/blueprint.css";
 // import "@blueprintjs/icons/lib/css/blueprint-icons.css";
+import "./sentry.js";
 
 async function loadBrowserFS() {
   return new Promise((resolve) => {
@@ -50,6 +51,8 @@ if (projectLists.length == 0) {
   await useFileStore.getState().createProject(rootPath);
   await writeFile(filepath, latexCodeWelcome);
 }
+
+
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
