@@ -104,7 +104,7 @@ const ContentTopBar = (props) => {
 
   const compile = useCallback(
     () => compileLatex(sourceCode, currentProjectRoot, isPdfLatex),
-    [isPdfLatex]
+    [isPdfLatex, sourceCode, currentProjectRoot]
   );
 
   const [isAutoCompile, setIsAutoCompile] = useState(false)
