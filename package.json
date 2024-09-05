@@ -139,7 +139,7 @@
   },
   "scripts": {
     "start": "cross-env NODE_ENV=development node scripts/start.js",
-    "build": "cross-env NODE_ENV=production GENERATE_SOURCEMAP=false node scripts/build.js",
+    "build": "cross-env NODE_ENV=production GENERATE_SOURCEMAP=true node scripts/build.js",
     "test": "cross-env NODE_ENV=test node scripts/test.js"
   },
   "eslintConfig": {
