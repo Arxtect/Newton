@@ -1,3 +1,8 @@
+/*
+ * @Description: 
+ * @Author: Devin
+ * @Date: 2024-08-07 10:13:08
+ */
 import React,{useState} from "react";
 import Header from "./header";
 import DropZone from "./dropZone";
@@ -58,24 +63,25 @@ function FileUploader({dialogOpen,setDialogOpen,repoChanged,user,handleUpload,up
       handleCancel={handleCancelUpload}
       buttonList={[{ title: "Cancel", click: handleCancelUpload }]}
     >
-    <div className="flex flex-col font-medium text-center text-black rounded-none max-w-[760px]">
-      <div className="flex flex-col px-4 w-full text-sm leading-none max-md:px-5 max-md:max-w-full">
-         <Box
-        onDragOver={handleDragOver}
-        onDragEnter={handleDragEnter}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
-        onDragEnd={handleDragEnd}
-        className={`flex flex-col items-center justify-center p-4 border-2 py-10 ${
-          isDragOver ? "border-blue-500 bg-blue-100" : "border-dashed"
-        }`}
-      ><DropZone type={type} />
-      </Box>
-        <ActionButtons handleUpload={handleUpload} type={type}/>
+      <div className="flex flex-col font-medium text-center text-black rounded-none max-w-[760px]">
+        <div className="flex flex-col px-4 w-full text-sm leading-none max-md:px-5 max-md:max-w-full">
+          <Box
+            onDragOver={handleDragOver}
+            onDragEnter={handleDragEnter}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            onDragEnd={handleDragEnd}
+            className={`flex flex-col items-center justify-center p-4 border-2 py-10 ${
+              isDragOver ? "border-blue-500 bg-blue-100" : "border-dashed"
+            }`}
+          >
+            <DropZone handleUpload={handleUpload}  type={type} />
+          </Box>
+          <ActionButtons handleUpload={handleUpload} type={type} />
+        </div>
       </div>
-    </div>
-          {uploadProgress > 0 && <UploadProgressBar progress={uploadProgress} />}
-     </ArDialog>
+      {uploadProgress > 0 && <UploadProgressBar progress={uploadProgress} />}
+    </ArDialog>
   );
 }
 

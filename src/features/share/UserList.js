@@ -37,7 +37,7 @@ function UserItem({
         >
           {name?.charAt(0)?.toUpperCase()}
         </div>
-        <div className="text-[1rem] text-[#000000] font-sans font-[600]">
+        <div className="text-[1rem] text-[#000000] font-sans font-[600] select-text">
           {email}
           {user.email == email && <span className="text-stone-500">(you)</span>}
         </div>

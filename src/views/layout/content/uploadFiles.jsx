@@ -3,37 +3,38 @@
  * @Author: Devin
  * @Date: 2024-03-06 22:15:21
  */
-import React, { useState,useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import { useFileStore } from "store";
 import { toast } from "react-toastify";
 import { uploadZip } from "domain/filesystem";
 import path from "path";
 import { useNavigate } from "react-router-dom";
-import FileUploader from "@/features/uploadFiles"
+import FileUploader from "@/features/uploadFiles";
 import { IconButton, Tooltip } from "@mui/material";
-import uploadFileSvg from "@/assets/layout/uploadFile.svg"
-import { uploadFile, uploadFolder,readFile} from "@/domain/filesystem"
+import uploadFileSvg from "@/assets/layout/uploadFile.svg";
+import { uploadFile, uploadFolder, readFile } from "@/domain/filesystem";
 
-
-const UploadFiles = ({ user,title,reload,
-      filepath,
-      currentSelectDir,
-      currentProject,
-  projectSync, }) => {
-  
-  const { repoChanged,updateIsDropFileSystem} = useFileStore((state) => ({
+const UploadFiles = ({
+  user,
+  title,
+  reload,
+  filepath,
+  currentSelectDir,
+  currentProject,
+  projectSync,
+}) => {
+  const { repoChanged, updateIsDropFileSystem } = useFileStore((state) => ({
     repoChanged: state.repoChanged,
-    updateIsDropFileSystem:state.updateIsDropFileSystem
+    updateIsDropFileSystem: state.updateIsDropFileSystem,
   }));
 
   const [uploadProgress, setUploadProgress] = useState(0);
   const [dialogOpen, setDialogOpen] = useState(false);
 
   const handleCancelUpload = () => {
-    updateIsDropFileSystem(true)
+    updateIsDropFileSystem(true);
     setDialogOpen(false);
   };
-
 
   const handleDrop = useCallback(async (event) => {
     event.preventDefault();
@@ -76,45 +77,62 @@ const UploadFiles = ({ user,title,reload,
         // Create a new object to store the file and its relative path
         const fileWithRelativePath = {
           file,
-          webkitRelativePath: fileEntry.fullPath
+          webkitRelativePath: fileEntry.fullPath,
         };
         resolve(fileWithRelativePath);
       });
     });
   };
-const handleUpload = async (files) => {
-  console.log(files,"files")
-  const currentPath = currentSelectDir
-    ? currentSelectDir
-    : !!filepath
-    ? path.dirname(filepath)
+  const handleUpload = async (files) => {
+    console.log(files, "files");
+    const currentPath = currentSelectDir
+      ? currentSelectDir
+      : !!filepath
+      ? path.dirname(filepath)
       : currentProject;
-  
-  console.log(currentPath,currentSelectDir, "currentPath");
-  const fileList = files;
-  const filesArray = Array.from(fileList);
-  const filePaths = await uploadFile(filesArray, currentPath, reload);
-  if (!!projectSync) {
-    for (const filePath of filePaths) {
-      const content = await readFile(filePath);
-      projectSync.syncFileToYMap(filePath, content);
+
+    console.log(currentPath, currentSelectDir, "currentPath");
+    const fileList = files;
+    const filesArray = Array.from(fileList);
+    const filePaths = await uploadFile(filesArray, currentPath, reload);
+    if (!!projectSync) {
+      for (const filePath of filePaths) {
+        const content = await readFile(filePath);
+        projectSync.syncFileToYMap(filePath, content);
+      }
     }
-  }
-  console.log(filePaths, "filePaths");
-  handleCancelUpload();
-};
+    console.log(filePaths, "filePaths");
+    handleCancelUpload();
+  };
 
   return (
-   <>
+    <>
       <Tooltip title={title}>
-          <IconButton color="#inherit" aria-label="controls" size="small" onClick={()=>{
-                updateIsDropFileSystem(false)
-            setDialogOpen(true)}}>
- <img src={uploadFileSvg} alt="" className="w-5 h-5" />
-          </IconButton>
-        </Tooltip>
-   <FileUploader dialogOpen={dialogOpen} setDialogOpen={setDialogOpen} user={user} repoChanged={repoChanged} handleUpload={handleUpload} uploadProgress={uploadProgress} otherHandleInCancle={()=>updateIsDropFileSystem(true)}type="files" title={"Upload files"} handleDrop={handleDrop}></FileUploader>
-   </>
+        <IconButton
+          color="#inherit"
+          aria-label="controls"
+          size="small"
+          onClick={() => {
+            updateIsDropFileSystem(false);
+            setDialogOpen(true);
+          }}
+        >
+          <img src={uploadFileSvg} alt="" className="w-5 h-5" />
+        </IconButton>
+      </Tooltip>
+      <FileUploader
+        dialogOpen={dialogOpen}
+        setDialogOpen={setDialogOpen}
+        user={user}
+        repoChanged={repoChanged}
+        handleUpload={handleUpload}
+        uploadProgress={uploadProgress}
+        otherHandleInCancle={() => updateIsDropFileSystem(true)}
+        type="files"
+        title={"Upload files"}
+        handleDrop={handleDrop}
+      ></FileUploader>
+    </>
   );
 };
 
