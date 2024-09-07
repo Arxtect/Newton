@@ -12,9 +12,10 @@ import redoSvg from "@/assets/layout/redo.svg";
 import searchSvg from "@/assets/layout/search.svg";
 import undoSvg from "@/assets/layout/undo.svg";
 import logSvg from "@/assets/layout/log.svg";
-import {  IconButton, Tooltip } from "@mui/material";
+import { IconButton, Tooltip } from "@mui/material";
 import Controls from "./controls";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import Badge from '@mui/material/Badge';
 import {
   useLayout,
   useFileStore,
@@ -54,8 +55,8 @@ const ContentTopBar = (props) => {
     sideWidth,
   } = useLayout();
 
-    const { engineStatus, selectFormattedEngineStatus } =
-      useEngineStatusStore();
+  const { engineStatus, selectFormattedEngineStatus } =
+    useEngineStatusStore();
 
 
   const {
@@ -82,23 +83,24 @@ const ContentTopBar = (props) => {
     reload: state.repoChanged,
   }));
 
-    const { updateSetting, getSetting, isPdfLatex } = useCompileSetting(
-      (state) => ({
-        updateSetting: state.updateSetting,
-        getSetting: state.getSetting,
-        isPdfLatex: state.isPdfLatex,
-      })
-    );
+  const { updateSetting, getSetting, isPdfLatex } = useCompileSetting(
+    (state) => ({
+      updateSetting: state.updateSetting,
+      getSetting: state.getSetting,
+      isPdfLatex: state.isPdfLatex,
+    })
+  );
 
-    const { showCompilerLog,toggleCompilerLog, setShowCompilerLog } = usePdfPreviewStore(
-      (state) => ({
-        showCompilerLog:state.showCompilerLog,
-        toggleCompilerLog: state.toggleCompilerLog,
-        setShowCompilerLog: state.setShowCompilerLog,
-      })
-    );
+  const { showCompilerLog, toggleCompilerLog, setShowCompilerLog, compileMessagesLength } = usePdfPreviewStore(
+    (state) => ({
+      showCompilerLog: state.showCompilerLog,
+      toggleCompilerLog: state.toggleCompilerLog,
+      setShowCompilerLog: state.setShowCompilerLog,
+      compileMessagesLength: state.compileMessages.length,
+    })
+  );
 
-    const { user } = useUserStore((state) => ({
+  const { user } = useUserStore((state) => ({
     user: state.user,
   }));
 
@@ -109,18 +111,18 @@ const ContentTopBar = (props) => {
 
   const [isAutoCompile, setIsAutoCompile] = useState(false)
 
-    const autoCompileFirst = (compileCallback) => {
-      if (
-        engineStatus === constant.readyEngineStatus &&
-        !isAutoCompile &&
-        sourceCode &&
-        currentProjectRoot
-      ) {
-        setIsAutoCompile(true);
-        compileCallback && compileCallback();
-      }
-    };
-  
+  const autoCompileFirst = (compileCallback) => {
+    if (
+      engineStatus === constant.readyEngineStatus &&
+      !isAutoCompile &&
+      sourceCode &&
+      currentProjectRoot
+    ) {
+      setIsAutoCompile(true);
+      compileCallback && compileCallback();
+    }
+  };
+
   useEffect(() => {
     autoCompileFirst(compile);
   }, [sourceCode, engineStatus, currentProjectRoot]);
@@ -275,7 +277,7 @@ const ContentTopBar = (props) => {
             >
               <span onClick={compile}>
                 {engineStatus == constant.notReadyEngineStatus ||
-                engineStatus == constant.busyEngineStatus
+                  engineStatus == constant.busyEngineStatus
                   ? "Compiling"
                   : "Compile"}
                 {/* : "Compile\u2009\u2009\u2009\u2009"} */}
@@ -315,16 +317,17 @@ const ContentTopBar = (props) => {
               color="#inherit"
               aria-label="toggleView"
               size="small"
-              className={`flex items-center ${
-                showCompilerLog ? "bg-[#81C784]" : ""
-              } `}
+              className={`flex items-center ${showCompilerLog ? "bg-[#81C784]" : ""
+                } `}
               onClick={toggleCompilerLog}
             >
-              <img
-                src={logSvg}
-                alt=""
-                className="w-5 h-5 cursor-pointer hover:opacity-75"
-              />
+              <Badge badgeContent={!showCompilerLog ? compileMessagesLength : 0} color="error">
+                <img
+                  src={logSvg}
+                  alt=""
+                  className="w-5 h-5 cursor-pointer hover:opacity-75"
+                />
+              </Badge>
             </IconButton>
           </Tooltip>
         </div>
