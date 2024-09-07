@@ -26,6 +26,8 @@ const ForkTsCheckerWebpackPlugin =
     : require("react-dev-utils/ForkTsCheckerWebpackPlugin");
 const ReactRefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
+const { sentryWebpackPlugin } = require("@sentry/webpack-plugin");
+
 
 const createEnvironmentHash = require("./webpack/persistentCache/createEnvironmentHash");
 
@@ -643,6 +645,15 @@ module.exports = function (webpackEnv) {
       ].filter(Boolean),
     },
     plugins: [
+      sentryWebpackPlugin({
+        org: "arxtect",
+        project: "arxtect",
+        release: process.env.RELEASE, // 可以使用 Git SHA 或其他唯一标识符
+        include: "./dist", // 指定包含 Source Maps 的目录
+        urlPrefix: "~/", // URL 前缀
+        // Auth tokens can be obtained from https://sentry.io/orgredirect/organizations/:orgslug/settings/auth-tokens/
+        authToken: "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",
+      }),
       new webpack.ProvidePlugin({
         BrowserFS: "bfsGlobal",
         process: "processGlobal",
