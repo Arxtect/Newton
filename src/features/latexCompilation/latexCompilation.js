@@ -183,14 +183,15 @@ export const compileLatex = async (
 
   // Create a temporary main.tex file
   if (usePdfTeX) {
+    console.log(latexCode,'latexCode')
     pdftexEngine.writeMemFSFile("main.tex", latexCode);
   } else {
     xetexEngine.writeMemFSFile("main.tex", latexCode);
   }
+    let list = await getAllFileNames(currentProject);
+    await ensureFolderExists(list, currentProject, usePdfTeX);
+    await ensureFileExists(list, currentProject, usePdfTeX);
 
-  let list = await getAllFileNames(currentProject);
-  await ensureFolderExists(list, currentProject, usePdfTeX);
-  await ensureFileExists(list, currentProject, usePdfTeX);
   if (usePdfTeX) {
     // Associate the PDFTeX engine with this main.tex file
     pdftexEngine.setEngineMainFile("main.tex");
