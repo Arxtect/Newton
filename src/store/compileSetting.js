@@ -14,8 +14,12 @@ export const useCompileSetting = create()(
     (set, get) => ({
       setting: {
         compiler: "xeLaTeX",
+        nonstop: "on"
       },
-      isPdfLatex:false,
+      compileSetting: {
+        isPdfLatex:false,
+        nonstop:true
+      },
       getSetting(key) {
         return get().setting[key];
       },
@@ -30,9 +34,13 @@ export const useCompileSetting = create()(
       },
       getPdfLatex() {
         let isPdfLatex = get().getSetting("compiler") == "pdfLaTeX";
-         set({
-           isPdfLatex
-         });
+        let nonstop = get().getSetting("nonstop") == "on";
+        set({
+          compileSetting: {
+            isPdfLatex,
+            nonstop
+          }
+        })
       }
     }),
     {

@@ -8,7 +8,7 @@ var Module = {};
 self.memlog = "";
 self.initmem = undefined;
 self.mainfile = "main.tex";
-self.texlive_endpoint = "http://10.10.101.100:5000/";
+self.texlive_endpoint = "https://magic.pointer.ai/latex/";
 Module["print"] = function (a) {
   self.memlog += a + "\n";
 };

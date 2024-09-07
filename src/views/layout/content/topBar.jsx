@@ -82,19 +82,18 @@ const ContentTopBar = (props) => {
     reload: state.repoChanged,
   }));
 
-    const { updateSetting, getSetting, isPdfLatex } = useCompileSetting(
+    const { updateSetting, getSetting, compileSetting } = useCompileSetting(
       (state) => ({
         updateSetting: state.updateSetting,
         getSetting: state.getSetting,
-        isPdfLatex: state.isPdfLatex,
+        compileSetting: state.compileSetting,
       })
     );
 
-    const { showCompilerLog,toggleCompilerLog, setShowCompilerLog } = usePdfPreviewStore(
+    const { showCompilerLog,toggleCompilerLog} = usePdfPreviewStore(
       (state) => ({
         showCompilerLog:state.showCompilerLog,
         toggleCompilerLog: state.toggleCompilerLog,
-        setShowCompilerLog: state.setShowCompilerLog,
       })
     );
 
@@ -102,10 +101,7 @@ const ContentTopBar = (props) => {
     user: state.user,
   }));
 
-  const compile = useCallback(
-    () => compileLatex(sourceCode, currentProjectRoot, isPdfLatex),
-    [isPdfLatex, sourceCode, currentProjectRoot]
-  );
+
 
   const [isAutoCompile, setIsAutoCompile] = useState(false)
 
@@ -122,8 +118,8 @@ const ContentTopBar = (props) => {
     };
   
   useEffect(() => {
-    autoCompileFirst(compile);
-  }, [sourceCode, engineStatus, currentProjectRoot]);
+    autoCompileFirst(() => compileLatex(sourceCode, currentProjectRoot, compileSetting));
+  }, [sourceCode, engineStatus, currentProjectRoot,compileSetting]);
 
   const handleActionClick = (key) => {
     switch (key) {
@@ -273,7 +269,7 @@ const ContentTopBar = (props) => {
             <button
               className={` text-black px-2 py-[2px] flex items-center space-x-4`}
             >
-              <span onClick={compile}>
+              <span onClick={() => compileLatex(sourceCode, currentProjectRoot, compileSetting)}>
                 {engineStatus == constant.notReadyEngineStatus ||
                 engineStatus == constant.busyEngineStatus
                   ? "Compiling"
@@ -286,7 +282,7 @@ const ContentTopBar = (props) => {
               <ArMenuRadix
                 menuAlign="start"
                 buttonCom={<ArrowDropDownIcon />}
-                width="10rem"
+                // width="10rem"
                 items={[
                   {
                     label: "Compiler",
@@ -302,6 +298,23 @@ const ContentTopBar = (props) => {
                       {
                         label: "pdfLaTeX",
                         value: "pdfLaTeX",
+                      },
+                    ],
+                  },
+                  {
+                    label: "Compile Error Handling",
+                    separator: true,
+                    type: "radio",
+                    onSelect: (v) => updateSetting("nonstop", v),
+                    value: getSetting("nonstop"),
+                    subMenu: [
+                      {
+                        label: "Stop on first error",
+                        value: "off",
+                      },
+                      {
+                        label: "Try to compile despite errors",
+                        value: "on",
                       },
                     ],
                   },

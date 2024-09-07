@@ -161,8 +161,10 @@ export const ensureFileExists = async (list, currentProject, usePdfTeX) => {
 export const compileLatex = async (
   latexCode,
   currentProject,
-  usePdfTeX = false
+  options,
+  compileCount=1
 ) => {
+  const { isPdfLatex: usePdfTeX, nonstop } = options; // 在函数内部解构 options 参数
   // Make sure the engines are ready for compilation
   if (usePdfTeX) {
     if (!pdftexEngine.isReady()) {
@@ -189,7 +191,6 @@ export const compileLatex = async (
   let list = await getAllFileNames(currentProject);
   await ensureFolderExists(list, currentProject, usePdfTeX);
   await ensureFileExists(list, currentProject, usePdfTeX);
-
   if (usePdfTeX) {
     // Associate the PDFTeX engine with this main.tex file
     pdftexEngine.setEngineMainFile("main.tex");
@@ -209,16 +210,21 @@ export const compileLatex = async (
     console.log(errors, warnings, typesetting, "parserLog");
 
     // On successful compilation
-    if (true || pdftexCompilation.status === 0) {
+    if (nonstop || pdftexCompilation.status === 0) {
       const pdfBlob = new Blob([pdftexCompilation.pdf], {
         type: "application/pdf",
       });
-
+      if (compileCount < 3) {
+        await compileLatex(latexCode, currentProject, options, compileCount + 1);
+        return 
+      }
       await setCompiledPdfUrl(URL.createObjectURL(pdfBlob));
       setShowCompilerLog(false);
       setReadyEngineStatus();
     } else {
       setErrorEngineStatus();
+      setShowCompilerLog(true)
+      await setCompiledPdfUrl("");
     }
   } else {
     // Associate the XeTeX engine with this main.tex file
@@ -238,18 +244,23 @@ export const compileLatex = async (
 
     console.log(errors, warnings, typesetting, "parserLog");
 
-    if (xetexCompilation.status === 0) {
+    if (nonstop || xetexCompilation.status === 0) {
       dviEngine.writeMemFSFile("main.xdv", xetexCompilation.pdf);
       let dviCompilation = await dviEngine.compilePDF();
       const pdfBlob = new Blob([dviCompilation.pdf], {
         type: "application/pdf",
       });
-
+      if (compileCount < 3) {
+        await compileLatex(latexCode, currentProject, options, compileCount + 1);
+        return 
+      }
       await setCompiledPdfUrl(URL.createObjectURL(pdfBlob));
       setShowCompilerLog(false);
       setReadyEngineStatus();
     } else {
       setErrorEngineStatus();
+      setShowCompilerLog(true)
+      await setCompiledPdfUrl("");
     }
   }
 };
