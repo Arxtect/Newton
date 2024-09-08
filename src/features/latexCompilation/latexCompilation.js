@@ -7,7 +7,7 @@ import {
   setBusyEngineStatus,
   setErrorEngineStatus,
 } from "store";
-import { setCompiledPdfUrl, setCompilerLog, setShowCompilerLog,setCompileMessages } from "store";
+import { setCompiledPdfUrl, setCompilerLog, setShowCompilerLog,setCompileMessages, setLogInfo } from "store";
 import { getAllFileNames } from "@/domain/filesystem";
 import  HumanReadableLogs  from "./human-readable-logs/HumanReadableLogs";
 
@@ -196,10 +196,11 @@ export const compileLatex = async (latexCode, currentProject, usePdfTeX = false)
       }
     );
     
+    setLogInfo({ errorsLength: errors.length, warningsLength: warnings.length, typesettingLength: typesetting.length })
     setCompilerLog(pdftexCompilation.log);
     setCompileMessages([...errors, ...warnings, ...typesetting]);
 
-        console.log(errors, warnings, typesetting, "parserLog");
+    console.log(errors, warnings, typesetting, "parserLog");
 
     // On successful compilation
     if (pdftexCompilation.status === 0) {
@@ -226,6 +227,7 @@ export const compileLatex = async (latexCode, currentProject, usePdfTeX = false)
       }
     );
 
+    setLogInfo({ errorsLength: errors.length, warningsLength: warnings.length, typesettingLength: typesetting.length })
     setCompilerLog(xetexCompilation.log);
     setCompileMessages([...errors, ...warnings, ...typesetting]);
 

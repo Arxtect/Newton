@@ -91,14 +91,16 @@ const ContentTopBar = (props) => {
     })
   );
 
-  const { showCompilerLog, toggleCompilerLog, setShowCompilerLog, compileMessagesLength } = usePdfPreviewStore(
+  const { showCompilerLog, toggleCompilerLog, logInfo } = usePdfPreviewStore(
     (state) => ({
       showCompilerLog: state.showCompilerLog,
       toggleCompilerLog: state.toggleCompilerLog,
-      setShowCompilerLog: state.setShowCompilerLog,
-      compileMessagesLength: state.compileMessages.length,
+      logInfo: state.logInfo,
     })
   );
+
+  const messageCount = logInfo.errorsLength + logInfo.warningsLength;
+  const badgeColor = logInfo.errorsLength ? "error" : "warning";
 
   const { user } = useUserStore((state) => ({
     user: state.user,
@@ -321,7 +323,7 @@ const ContentTopBar = (props) => {
                 } `}
               onClick={toggleCompilerLog}
             >
-              <Badge badgeContent={!showCompilerLog ? compileMessagesLength : 0} color="error">
+              <Badge badgeContent={!showCompilerLog ? messageCount : 0} color={badgeColor}>
                 <img
                   src={logSvg}
                   alt=""
