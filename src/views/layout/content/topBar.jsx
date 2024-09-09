@@ -12,9 +12,10 @@ import redoSvg from "@/assets/layout/redo.svg";
 import searchSvg from "@/assets/layout/search.svg";
 import undoSvg from "@/assets/layout/undo.svg";
 import logSvg from "@/assets/layout/log.svg";
-import {  IconButton, Tooltip } from "@mui/material";
+import { IconButton, Tooltip } from "@mui/material";
 import Controls from "./controls";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import Badge from "@mui/material/Badge";
 import {
   useLayout,
   useFileStore,
@@ -29,12 +30,11 @@ import {
 import { compileLatex } from "@/features/latexCompilation/latexCompilation";
 import { EngineStatus } from "@/features/engineStatus/EngineStatus";
 import { FileUploader, FolderUploader } from "../upload.jsx";
-import UploadFiles from "./uploadFiles"
+import UploadFiles from "./uploadFiles";
 import * as constant from "@/constant";
 import path from "path";
 import ArButtonGroup from "@/components/arButtonGroup";
 import ArMenuRadix from "@/components/arMenuRadix";
-
 
 const ContentTopBar = (props) => {
   const {
@@ -54,9 +54,7 @@ const ContentTopBar = (props) => {
     sideWidth,
   } = useLayout();
 
-    const { engineStatus, selectFormattedEngineStatus } =
-      useEngineStatusStore();
-
+  const { engineStatus, selectFormattedEngineStatus } = useEngineStatusStore();
 
   const {
     projectSync,
@@ -82,44 +80,48 @@ const ContentTopBar = (props) => {
     reload: state.repoChanged,
   }));
 
-    const { updateSetting, getSetting, compileSetting } = useCompileSetting(
-      (state) => ({
-        updateSetting: state.updateSetting,
-        getSetting: state.getSetting,
-        compileSetting: state.compileSetting,
-      })
-    );
+  const { updateSetting, getSetting, compileSetting } = useCompileSetting(
+    (state) => ({
+      updateSetting: state.updateSetting,
+      getSetting: state.getSetting,
+      compileSetting: state.compileSetting,
+    })
+  );
 
-    const { showCompilerLog,toggleCompilerLog} = usePdfPreviewStore(
-      (state) => ({
-        showCompilerLog:state.showCompilerLog,
-        toggleCompilerLog: state.toggleCompilerLog,
-      })
-    );
+  const { showCompilerLog, toggleCompilerLog, logInfo } = usePdfPreviewStore(
+    (state) => ({
+      showCompilerLog: state.showCompilerLog,
+      toggleCompilerLog: state.toggleCompilerLog,
+      logInfo: state.logInfo,
+    })
+  );
 
-    const { user } = useUserStore((state) => ({
+  const messageCount = logInfo.errorsLength + logInfo.warningsLength;
+  const badgeColor = logInfo.errorsLength ? "error" : "warning";
+
+  const { user } = useUserStore((state) => ({
     user: state.user,
   }));
 
+  const [isAutoCompile, setIsAutoCompile] = useState(false);
 
+  const autoCompileFirst = (compileCallback) => {
+    if (
+      engineStatus === constant.readyEngineStatus &&
+      !isAutoCompile &&
+      sourceCode &&
+      currentProjectRoot
+    ) {
+      setIsAutoCompile(true);
+      compileCallback && compileCallback();
+    }
+  };
 
-  const [isAutoCompile, setIsAutoCompile] = useState(false)
-
-    const autoCompileFirst = (compileCallback) => {
-      if (
-        engineStatus === constant.readyEngineStatus &&
-        !isAutoCompile &&
-        sourceCode &&
-        currentProjectRoot
-      ) {
-        setIsAutoCompile(true);
-        compileCallback && compileCallback();
-      }
-    };
-  
   useEffect(() => {
-    autoCompileFirst(() => compileLatex(sourceCode, currentProjectRoot, compileSetting));
-  }, [sourceCode, engineStatus, currentProjectRoot,compileSetting]);
+    autoCompileFirst(() =>
+      compileLatex(sourceCode, currentProjectRoot, compileSetting)
+    );
+  }, [sourceCode, engineStatus, currentProjectRoot, compileSetting]);
 
   const handleActionClick = (key) => {
     switch (key) {
@@ -132,7 +134,7 @@ const ContentTopBar = (props) => {
         if (!currentSelectDir) {
           let dir = path.dirname(filepath);
           startFileCreating(dir);
-          break
+          break;
         }
         startFileCreating(currentSelectDir);
         break;
@@ -141,7 +143,7 @@ const ContentTopBar = (props) => {
         if (!currentSelectDir) {
           let dir = path.dirname(filepath);
           startFileCreating(dir);
-          break
+          break;
         }
         startDirCreating(currentSelectDir);
         break;
@@ -269,7 +271,11 @@ const ContentTopBar = (props) => {
             <button
               className={` text-black px-2 py-[2px] flex items-center space-x-4`}
             >
-              <span onClick={() => compileLatex(sourceCode, currentProjectRoot, compileSetting)}>
+              <span
+                onClick={() =>
+                  compileLatex(sourceCode, currentProjectRoot, compileSetting)
+                }
+              >
                 {engineStatus == constant.notReadyEngineStatus ||
                 engineStatus == constant.busyEngineStatus
                   ? "Compiling"
@@ -333,11 +339,16 @@ const ContentTopBar = (props) => {
               } `}
               onClick={toggleCompilerLog}
             >
-              <img
-                src={logSvg}
-                alt=""
-                className="w-5 h-5 cursor-pointer hover:opacity-75"
-              />
+              <Badge
+                badgeContent={!showCompilerLog ? messageCount : 0}
+                color={badgeColor}
+              >
+                <img
+                  src={logSvg}
+                  alt=""
+                  className="w-5 h-5 cursor-pointer hover:opacity-75"
+                />
+              </Badge>
             </IconButton>
           </Tooltip>
         </div>

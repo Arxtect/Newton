@@ -11,6 +11,11 @@ export const usePdfPreviewStore = create((set, get) => ({
   compilerLog: "",
   showCompilerLog: false,
   compileMessages:[],
+  logInfo: {
+    errorsLength: 0,
+    warningsLength: 0,
+    typesettingLength: 0
+  },
   setCompiledPdfUrl:async (pdfUrl) => {
     get().revokeCompiledPdfUrl(get().pdfUrl);
     set(() => ({ pdfUrl }));
@@ -19,6 +24,7 @@ export const usePdfPreviewStore = create((set, get) => ({
   setCompilerLog: (compilerLog) => set(() => ({ compilerLog })),
   setCompileMessages: (compileMessages) => set(() => ({ compileMessages })),
   setShowCompilerLog: (showCompilerLog) => set(() => ({ showCompilerLog })),
+  setLogInfo: (logInfo) => set(() => ({ logInfo })),
   toggleCompilerLog: () =>
     set((state) => ({ showCompilerLog: !state.showCompilerLog })),
   revokeCompiledPdfUrl: (pdfUrl) => {
@@ -33,4 +39,5 @@ export const {
   setShowCompilerLog,
   revokeCompiledPdfUrl,
   setCompileMessages,
+  setLogInfo,
 } = usePdfPreviewStore.getState();

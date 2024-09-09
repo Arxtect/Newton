@@ -12,6 +12,7 @@ import {
   setCompilerLog,
   setShowCompilerLog,
   setCompileMessages,
+  setLogInfo,
 } from "store";
 import { getAllFileNames } from "@/domain/filesystem";
 import HumanReadableLogs from "./human-readable-logs/HumanReadableLogs";
@@ -162,7 +163,7 @@ export const compileLatex = async (
   latexCode,
   currentProject,
   options,
-  compileCount=1
+  compileCount = 1
 ) => {
   const { isPdfLatex: usePdfTeX, nonstop } = options; // 在函数内部解构 options 参数
   // Make sure the engines are ready for compilation
@@ -183,14 +184,14 @@ export const compileLatex = async (
 
   // Create a temporary main.tex file
   if (usePdfTeX) {
-    console.log(latexCode,'latexCode')
+    console.log(latexCode, "latexCode");
     pdftexEngine.writeMemFSFile("main.tex", latexCode);
   } else {
     xetexEngine.writeMemFSFile("main.tex", latexCode);
   }
-    let list = await getAllFileNames(currentProject);
-    await ensureFolderExists(list, currentProject, usePdfTeX);
-    await ensureFileExists(list, currentProject, usePdfTeX);
+  let list = await getAllFileNames(currentProject);
+  await ensureFolderExists(list, currentProject, usePdfTeX);
+  await ensureFileExists(list, currentProject, usePdfTeX);
 
   if (usePdfTeX) {
     // Associate the PDFTeX engine with this main.tex file
@@ -205,6 +206,11 @@ export const compileLatex = async (
       }
     );
 
+    setLogInfo({
+      errorsLength: errors.length,
+      warningsLength: warnings.length,
+      typesettingLength: typesetting.length,
+    });
     setCompilerLog(pdftexCompilation.log);
     setCompileMessages([...errors, ...warnings, ...typesetting]);
 
@@ -216,15 +222,20 @@ export const compileLatex = async (
         type: "application/pdf",
       });
       if (compileCount < 3) {
-        await compileLatex(latexCode, currentProject, options, compileCount + 1);
-        return 
+        await compileLatex(
+          latexCode,
+          currentProject,
+          options,
+          compileCount + 1
+        );
+        return;
       }
       await setCompiledPdfUrl(URL.createObjectURL(pdfBlob));
       setShowCompilerLog(false);
       setReadyEngineStatus();
     } else {
       setErrorEngineStatus();
-      setShowCompilerLog(true)
+      setShowCompilerLog(true);
       await setCompiledPdfUrl("");
     }
   } else {
@@ -240,6 +251,11 @@ export const compileLatex = async (
       }
     );
 
+    setLogInfo({
+      errorsLength: errors.length,
+      warningsLength: warnings.length,
+      typesettingLength: typesetting.length,
+    });
     setCompilerLog(xetexCompilation.log);
     setCompileMessages([...errors, ...warnings, ...typesetting]);
 
@@ -252,15 +268,20 @@ export const compileLatex = async (
         type: "application/pdf",
       });
       if (compileCount < 3) {
-        await compileLatex(latexCode, currentProject, options, compileCount + 1);
-        return 
+        await compileLatex(
+          latexCode,
+          currentProject,
+          options,
+          compileCount + 1
+        );
+        return;
       }
       await setCompiledPdfUrl(URL.createObjectURL(pdfBlob));
       setShowCompilerLog(false);
       setReadyEngineStatus();
     } else {
       setErrorEngineStatus();
-      setShowCompilerLog(true)
+      setShowCompilerLog(true);
       await setCompiledPdfUrl("");
     }
   }
