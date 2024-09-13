@@ -218,6 +218,12 @@ export const compileLatex = async (
 
     // On successful compilation
     if (nonstop || pdftexCompilation.status === 0) {
+      if (!pdftexCompilation.pdf) {
+        setErrorEngineStatus();
+        setShowCompilerLog(true);
+        await setCompiledPdfUrl("");
+        return;
+      }
       const pdfBlob = new Blob([pdftexCompilation.pdf], {
         type: "application/pdf",
       });
@@ -260,10 +266,17 @@ export const compileLatex = async (
     setCompileMessages([...errors, ...warnings, ...typesetting]);
 
     console.log(errors, warnings, typesetting, "parserLog");
-
+    console.log(xetexCompilation.status, "xetexCompilation.status");
     if (nonstop || xetexCompilation.status === 0) {
       dviEngine.writeMemFSFile("main.xdv", xetexCompilation.pdf);
       let dviCompilation = await dviEngine.compilePDF();
+
+      if (!dviCompilation.pdf) {
+        setErrorEngineStatus();
+        setShowCompilerLog(true);
+        await setCompiledPdfUrl("");
+        return;
+      }
       const pdfBlob = new Blob([dviCompilation.pdf], {
         type: "application/pdf",
       });
