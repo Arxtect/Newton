@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { AiOutlineEdit, AiOutlineQuestionCircle, AiOutlineTranslation, AiOutlinePicture } from 'react-icons/ai';
 import { useLayout } from "store";
+import { container } from './../../styles';
 
 
 const DropdownMenu = ({ options, onSelect, activeIndex }) => {
@@ -20,7 +21,7 @@ const DropdownMenu = ({ options, onSelect, activeIndex }) => {
     );
 };
 
-const AiTools = ({ editor }) => {
+const AiTools = ({ editorRef }) => {
     const [toolbarPosition, setToolbarPosition] = useState({ top: 0, left: 0 });
     const [showDropdown, setShowDropdown] = useState(false);
     const [activeIndex, setActiveIndex] = useState(0);
@@ -31,6 +32,7 @@ const AiTools = ({ editor }) => {
     } = useLayout();
 
     const handleCommand = (command) => {
+        const editor = editorRef.current.editor;
         const cursorPosition = editor.getCursorPosition();
         const session = editor.getSession();
         const line = session.getLine(cursorPosition.row);
@@ -64,6 +66,7 @@ const AiTools = ({ editor }) => {
     }, [sideWidth])
 
     const handleCursorChange = (selection) => {
+        const editor = editorRef.current.editor;
         const cursorPosition = editor.getCursorPosition();
         const screenCoordinates = editor.renderer.textToScreenCoordinates(cursorPosition.row, cursorPosition.column);
 
@@ -83,8 +86,9 @@ const AiTools = ({ editor }) => {
             setShowDropdown(false);
         }
     };
-
     const handleKeyDown = (event) => {
+        const editor = editorRef.current.editor;
+        console.log(showDropdown,'showDropdown')
         if (showDropdown) {
             event.preventDefault();
             event.stopPropagation();
@@ -104,19 +108,34 @@ const AiTools = ({ editor }) => {
         }
     };
 
+
     useEffect(() => {
-        if(!editor) return 
+        const keydown =(event)=>{
+            console.log(event,'event')
+        }
+        const editor = editorRef.current.editor;
+        // Hide the dropdown menu
+        editor.container.addEventListener('keyup', keydown);
+
+
+        return () => {
+            editor.container.removeEventListener('keyup', keydown);
+        };
+    }, [showDropdown, activeIndex]);
+
+    
+    useEffect(() => {
+        const editor = editorRef.current.editor;
+        // Hide the dropdown menu
         editor.session.selection.on('changeCursor', handleCursorChange);
-        editor.container.addEventListener('keyup', handleKeyDown);
 
         return () => {
             editor.session.selection.off('changeCursor', handleCursorChange);
-            editor.container.removeEventListener('keyup', handleKeyDown);
         };
-    }, [showDropdown, activeIndex,editor]);
+    }, [activeIndex]);
 
     useEffect(() => {
-        if(!editor) return 
+        const editor = editorRef.current.editor;
         if (showDropdown) {
             setOriginalKeyHandler(editor.keyBinding.getKeyboardHandler());
             editor.keyBinding.addKeyboardHandler({
@@ -134,7 +153,7 @@ const AiTools = ({ editor }) => {
                 setOriginalKeyHandler(null);
             }
         }
-    }, [showDropdown,editor]);
+    }, [showDropdown]);
 
     const options = [
         { icon: <AiOutlineEdit />, label: 'AI 续写', value: 'section' },
@@ -161,4 +180,4 @@ const AiTools = ({ editor }) => {
     );
 };
 
-export default AiTools;
+export default React.memo(AiTools);

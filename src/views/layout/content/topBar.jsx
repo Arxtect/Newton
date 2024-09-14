@@ -105,6 +105,11 @@ const ContentTopBar = (props) => {
 
   const [isAutoCompile, setIsAutoCompile] = useState(false);
 
+  useEffect(() => {
+    autoCompileFirst(() =>
+      compileLatex(sourceCode, currentProjectRoot, compileSetting)
+    );
+  }, [sourceCode, engineStatus, currentProjectRoot, compileSetting]);
   const autoCompileFirst = (compileCallback) => {
     if (
       engineStatus === constant.readyEngineStatus &&
@@ -116,12 +121,6 @@ const ContentTopBar = (props) => {
       compileCallback && compileCallback();
     }
   };
-
-  useEffect(() => {
-    autoCompileFirst(() =>
-      compileLatex(sourceCode, currentProjectRoot, compileSetting)
-    );
-  }, [sourceCode, engineStatus, currentProjectRoot, compileSetting]);
 
   const handleActionClick = (key) => {
     switch (key) {

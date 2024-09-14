@@ -12,3 +12,4 @@ export * from "./useGitRepo.js";
 export * from "./layout.js";
 export * from "./useEditor.js";
 export * from "./compileSetting.js";
+export * from "./chat.js";

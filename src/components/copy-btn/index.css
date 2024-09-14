@@ -1,0 +1,17 @@
+.copyIcon {
+  background-image: url(@/assets/chat/copy.svg);
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.copyIcon:hover {
+  background-image: url(@/assets/chat/copy-hover.svg);
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.copyIcon-copied {
+  background-image: url(@/assets/chat/copied.svg);
+    background-position: center;
+  background-repeat: no-repeat;
+}

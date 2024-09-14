@@ -10,6 +10,8 @@ import AssetPreview from "../assetPreview/assetPreview";
 import { readFile } from "domain/filesystem";
 import FormattedCompilerLog from "./formattedCompilerLog"
 
+import Aitools from "../aiTools/aiTools";
+
 export const PdfPreview = () => {
   const {
     pdfUrl,
@@ -61,9 +63,10 @@ export const PdfPreview = () => {
 
   return (
     <div
-      className={`h-full relative ${willResizing ? "z-10" : ""}`}
+      className={`h-full relative  ${willResizing ? "z-10" : ""}`}
       style={{ overflow: "auto" }} // 添加这一行以允许滚动
     >
+      {/* <Aitools></Aitools> */}
       {!!assetsFilePath && !!fileContent ? (
         <AssetPreview filename={assetsFilePath} content={fileContent} />
       ) : showCompilerLog ? (
