@@ -1,6 +1,11 @@
 /*
  * @Description:
  * @Author: Devin
+ * @Date: 2024-05-28 13:48:03
+ */
+/*
+ * @Description:
+ * @Author: Devin
  * @Date: 2024-03-11 11:53:35
  */
 import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
@@ -19,22 +24,19 @@ const Index = () => {
   useLayoutEffect(() => {
     initializeLatexEngines();
   }, []);
-  const { leaveProjectSyncRoom } =
-    useFileStore((state) => ({
-      leaveProjectSyncRoom: state.leaveProjectSyncRoom,
-     
-    }));
+  const { leaveProjectSyncRoom } = useFileStore((state) => ({
+    leaveProjectSyncRoom: state.leaveProjectSyncRoom,
+  }));
 
   useEffect(() => {
-    return ()=>{
+    return () => {
       leaveProjectSyncRoom();
-    }
-  }, [])
-
+    };
+  }, []);
 
   return (
     <React.Fragment>
-      <TopBar ></TopBar>
+      <TopBar></TopBar>
       <Layout
         left={<FileSystem />}
         // rightBefore={<RightBefore />}

@@ -1,4 +1,3 @@
-
 // Hooks
 import React, { useLayoutEffect, useEffect } from "react";
 // Components
@@ -17,7 +16,7 @@ const Arxtect = () => {
   useSwitchTheme();
   // At component mount, setup all of the LaTeX engines
   useLayoutEffect(() => {
-    initializeLatexEngines();
+    // initializeLatexEngines();
   }, []);
 
   const { pdfUrl } = usePdfPreviewStore();
