@@ -7,7 +7,7 @@ import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
 import Layout from "./layout";
 import FileSystem from "./fileSystem";
 import { LatexEditorContainer } from "@/features/latexEditor/LatexEditorContainer";
-import { initializeLatexEngines } from "@/features/latexCompilation/latexCompilation";
+import { initializeLatexEngines } from "@/features/latexCompilation/loadEngines";
 
 import { PdfPreview } from "@/features/pdfPreview/PdfPreview";
 import { ButtonBarContainer } from "@/features/buttonBar/ButtonBarContainer";
@@ -19,22 +19,20 @@ const Index = () => {
   useLayoutEffect(() => {
     initializeLatexEngines();
   }, []);
-  const { leaveProjectSyncRoom } =
-    useFileStore((state) => ({
-      leaveProjectSyncRoom: state.leaveProjectSyncRoom,
-     
-    }));
+
+  const { leaveProjectSyncRoom } = useFileStore((state) => ({
+    leaveProjectSyncRoom: state.leaveProjectSyncRoom,
+  }));
 
   useEffect(() => {
-    return ()=>{
+    return () => {
       leaveProjectSyncRoom();
-    }
-  }, [])
-
+    };
+  }, []);
 
   return (
     <React.Fragment>
-      <TopBar ></TopBar>
+      <TopBar></TopBar>
       <Layout
         left={<FileSystem />}
         // rightBefore={<RightBefore />}

@@ -16,6 +16,7 @@ import {
 } from "store";
 import { getAllFileNames } from "@/domain/filesystem";
 import HumanReadableLogs from "./human-readable-logs/HumanReadableLogs";
+import { pdftexEngine, xetexEngine, dviEngine } from "./loadEngines";
 
 const LATEX_FILE_EXTENSIONS = [
   ".tex",
@@ -59,30 +60,6 @@ const fsPify = {
   readdir: pify(fs.readdir),
   stat: pify(fs.stat),
   readFile: pify(fs.readFile),
-};
-
-let pdftexEngine, xetexEngine, dviEngine;
-
-const loadEngines = async () => {
-  const { PdfTeXEngine } = await import("./swiftlatex/PdfTeXEngine");
-
-  const { XeTeXEngine } = await import("./swiftlatex/XeTeXEngine");
-  const { DvipdfmxEngine } = await import("./swiftlatex/DvipdfmxEngine");
-  xetexEngine = new XeTeXEngine();
-  dviEngine = new DvipdfmxEngine();
-  pdftexEngine = new PdfTeXEngine();
-  await pdftexEngine.loadEngine();
-  await xetexEngine.loadEngine();
-  await dviEngine.loadEngine();
-  setReadyEngineStatus();
-};
-
-export const initializeLatexEngines = async () => {
-  try {
-    await loadEngines();
-  } catch (e) {
-    console.log(e);
-  }
 };
 
 export const ensureFolderExists = async (list, currentProject, usePdfTeX) => {
@@ -190,8 +167,11 @@ export const compileLatex = async (
     xetexEngine.writeMemFSFile("main.tex", latexCode);
   }
   let list = await getAllFileNames(currentProject);
-  await ensureFolderExists(list, currentProject, usePdfTeX);
-  await ensureFileExists(list, currentProject, usePdfTeX);
+
+  if (compileCount == 1) {
+    await ensureFolderExists(list, currentProject, usePdfTeX);
+    await ensureFileExists(list, currentProject, usePdfTeX);
+  }
 
   if (usePdfTeX) {
     // Associate the PDFTeX engine with this main.tex file
@@ -215,9 +195,9 @@ export const compileLatex = async (
     setCompileMessages([...errors, ...warnings, ...typesetting]);
 
     console.log(errors, warnings, typesetting, "parserLog");
-
+    let error = pdftexCompilation?.log?.includes("No pages of output.");
     // On successful compilation
-    if (nonstop || pdftexCompilation.status === 0) {
+    if ((nonstop || pdftexCompilation.status === 0) && !error) {
       if (!pdftexCompilation.pdf) {
         setErrorEngineStatus();
         setShowCompilerLog(true);
@@ -265,9 +245,9 @@ export const compileLatex = async (
     setCompilerLog(xetexCompilation.log);
     setCompileMessages([...errors, ...warnings, ...typesetting]);
 
-    console.log(errors, warnings, typesetting, "parserLog");
-    console.log(xetexCompilation.status, "xetexCompilation.status");
-    if (nonstop || xetexCompilation.status === 0) {
+    let error = xetexCompilation?.log?.includes("No pages of output.");
+
+    if ((nonstop || xetexCompilation.status === 0) && !error) {
       dviEngine.writeMemFSFile("main.xdv", xetexCompilation.pdf);
       let dviCompilation = await dviEngine.compilePDF();
 
