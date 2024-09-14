@@ -12,7 +12,8 @@ import tableSvg from "@/assets/project/table.svg";
 import gridSvg from "@/assets/project/grid.svg";
 import tipSvg from "@/assets/tip.svg";
 import expandSvg from "@/assets/project/expand.svg";
-import { Tooltip } from "@mui/material";
+import Tooltip from "@/components/tooltip";
+
 import {
   findAllProjectInfo,
   downloadDirectoryAsZip,
@@ -281,9 +282,8 @@ const Content = React.forwardRef(
             Projects Dashboard
             {currentSelectMenu == "trash" && (
               <Tooltip
-                title="Trash project are automatically deleted after 30 days"
-                arrow={true}
-                placement={"top"}
+                content="Trash project are automatically deleted after 30 days"
+                position={"top"}
               >
                 <img src={tipSvg} alt="" className="w-4 ml-2 cursor-pointer" />
               </Tooltip>
@@ -294,7 +294,7 @@ const Content = React.forwardRef(
               Sort By
             </div>
             <div className="flex rounded bg-gray-200 overflow-hidden">
-              <Tooltip title="Table">
+              <Tooltip content="Table" position={"bottom"}>
                 <div
                   className={`flex items-center justify-center w-7 h-7 cursor-pointer ${
                     sortType === "table" ? "bg-arxTheme" : ""
@@ -304,7 +304,7 @@ const Content = React.forwardRef(
                   <img src={tableSvg} alt="Table View" className="w-5 h-5" />
                 </div>
               </Tooltip>
-              <Tooltip title="Grid">
+              <Tooltip content="Grid" position={"bottom"}>
                 <div
                   className={`flex items-center justify-center w-7 h-7 cursor-pointer ${
                     sortType === "grid" ? "bg-arxTheme" : "bg-gray-200"

@@ -10,9 +10,10 @@ import { uploadZip } from "domain/filesystem";
 import path from "path";
 import { useNavigate } from "react-router-dom";
 import FileUploader from "@/features/uploadFiles";
-import { IconButton, Tooltip } from "@mui/material";
+import { IconButton } from "@mui/material";
 import uploadFileSvg from "@/assets/layout/uploadFile.svg";
 import { uploadFile, uploadFolder, readFile } from "@/domain/filesystem";
+import Tooltip from "@/components/tooltip";
 
 const UploadFiles = ({
   user,
@@ -107,7 +108,7 @@ const UploadFiles = ({
 
   return (
     <>
-      <Tooltip title={title}>
+      <Tooltip content={title} position="bottom">
         <IconButton
           color="#inherit"
           aria-label="controls"

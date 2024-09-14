@@ -4,7 +4,8 @@
  * @Date: 2024-03-06 21:26:51
  */
 import React, { useEffect, useState } from "react";
-import { Tooltip } from "@mui/material";
+import Tooltip from "@/components/tooltip";
+
 import ArDialog from "@/components/arDialog";
 import {
   Typography,
@@ -12,16 +13,16 @@ import {
   CircularProgress,
   LinearProgress,
 } from "@mui/material";
-import { useFileStore, useGitRepo,useUserStore } from "store";
+import { useFileStore, useGitRepo, useUserStore } from "store";
 import { toast } from "react-toastify";
 import ArTextField from "@/components/arTextField";
 import path from "path";
 import { setupAndPushToRepo } from "domain/git";
-import {existsPath } from "domain/filesystem";
+import { existsPath } from "domain/filesystem";
 import BottomDrawer from "@/features/bottomDrawer/bottomDrawer";
 import syncSvg from "@/assets/project/gitCloud.svg";
-import {getGitToken,createGitRepo} from "@/services"
-import {getGiteaFullUrl} from "@/util"
+import { getGitToken, createGitRepo } from "@/services";
+import { getGiteaFullUrl } from "@/util";
 
 const GithubProgressBar = ({ progress, messages }) => {
   return (
@@ -77,17 +78,13 @@ const LinkGithub = (props) => {
     getIsExistGit();
   }, [currentProjectRoot]);
 
-  const {
-    githubApiToken,
-    changeConfig,
-    corsProxy,
-  } = useGitRepo((state) => ({
+  const { githubApiToken, changeConfig, corsProxy } = useGitRepo((state) => ({
     githubApiToken: state.githubApiToken,
     changeConfig: state.changeConfig,
     corsProxy: state.corsProxy,
   }));
 
-    const { user } = useUserStore((state) => ({
+  const { user } = useUserStore((state) => ({
     user: state.user,
   }));
 
@@ -98,56 +95,54 @@ const LinkGithub = (props) => {
   const handleCancelProject = () => {
     setDialogOpen(false);
   };
-const handleSaveProject = async () => {
-  try {
-    setLoading(true);
+  const handleSaveProject = async () => {
+    try {
+      setLoading(true);
 
-    if (!user?.id) {
-      toast.warning("Please log in first");
+      if (!user?.id) {
+        toast.warning("Please log in first");
+        setLoading(false);
+        return;
+      }
+
+      if (!projectName) {
+        setLoading(false);
+        toast.warning("Please enter the remote repository URL");
+        return;
+      }
+
+      const res = await createGitRepo(projectName, projectName);
+      console.log(res, "res"); // Debug information
+
+      if (!res || res.error) {
+        console.log(res.error, "res.error"); // Debug information
+        throw new Error(res.error || "Failed to create Git repository");
+      }
+
+      let userName = user?.name;
+      let remoteUrl = getGiteaFullUrl(userName, projectName);
+      console.log(remoteUrl);
+
+      await setupAndPushToRepo(currentProjectRoot, remoteUrl, {
+        singleBranch: false,
+        token: gitConfig.githubApiToken,
+        onProgress,
+        onMessage,
+        committerName: userName,
+        committerEmail: user?.email,
+      });
+
+      setDialogOpen(false);
+      toast.success("Successfully linked repository from GitHub");
+      setIsExistsGit(true);
+      initializeGitStatus({ projectRoot: currentProjectRoot });
       setLoading(false);
-      return;
-    }
-
-    if (!projectName) {
+    } catch (err) {
+      console.error(err); // Debug information
+      toast.warning(err.message || err);
       setLoading(false);
-      toast.warning("Please enter the remote repository URL");
-      return;
     }
-
-    const res = await createGitRepo(projectName, projectName);
-    console.log(res, 'res'); // Debug information
-
-    if (!res || res.error) {
-      console.log(res.error, 'res.error'); // Debug information
-      throw new Error(res.error || "Failed to create Git repository");
-    }
-
-    let userName = user?.name;
-    let remoteUrl = getGiteaFullUrl(userName,projectName) 
-    console.log(remoteUrl);
-
-   await setupAndPushToRepo(currentProjectRoot, remoteUrl, {
-      singleBranch: false,
-      token:gitConfig.githubApiToken,
-      onProgress,
-      onMessage,
-      committerName:userName,
-      committerEmail:user?.email
-    });
-
-
-    setDialogOpen(false);
-    toast.success("Successfully linked repository from GitHub");
-    setIsExistsGit(true);
-    initializeGitStatus({ projectRoot: currentProjectRoot });
-    setLoading(false);
-
-  } catch (err) {
-    console.error(err); // Debug information
-    toast.warning(err.message || err);
-    setLoading(false);
-  }
-};
+  };
 
   const onProgress = (progress) => {
     const rate = progress.loaded / progress.total;
@@ -166,36 +161,35 @@ const handleSaveProject = async () => {
     setIsOpen(open);
   };
 
-   const getGiteaToekn=async (token) =>{
-   try{
-    let res= await getGitToken(token)
-    changeConfig({
-      githubApiToken:res?.data
-    })
-     return res.data
-   }catch(err){
-     changeConfig({githubApiToken:""})
-   }
-  }
-     useEffect(()=>{
-    if(!dialogOpen) {
-      setMessages("")
-      setProgress(0)
-      return
+  const getGiteaToekn = async (token) => {
+    try {
+      let res = await getGitToken(token);
+      changeConfig({
+        githubApiToken: res?.data,
+      });
+      return res.data;
+    } catch (err) {
+      changeConfig({ githubApiToken: "" });
     }
-    if(!user?.id){
-        toast.warning("Plaese login first");
+  };
+  useEffect(() => {
+    if (!dialogOpen) {
+      setMessages("");
+      setProgress(0);
+      return;
     }
-    console.log(currentProjectRoot,'currentProjectRoot')
-    setProjectName(currentProjectRoot)
-    getGiteaToekn(githubApiToken)
-
-  },[dialogOpen])
+    if (!user?.id) {
+      toast.warning("Plaese login first");
+    }
+    console.log(currentProjectRoot, "currentProjectRoot");
+    setProjectName(currentProjectRoot);
+    getGiteaToekn(githubApiToken);
+  }, [dialogOpen]);
 
   return (
     <React.Fragment>
       {!!isExistsGit ? (
-        <Tooltip title="Sync">
+        <Tooltip content="Sync" position="bottom">
           <button
             className={`flex items-center text-gray-700 px-2 py-1 hover:bg-gray-200 active:bg-[#9fd5a2] space-x-1 `}
             onClick={() => toggleDrawer(true)}
@@ -205,7 +199,7 @@ const handleSaveProject = async () => {
           </button>
         </Tooltip>
       ) : (
-        <Tooltip title="Link a git repository">
+        <Tooltip content="Link a git repository" position="bottom">
           <button
             className={`flex items-center text-gray-700 px-2 py-1 hover:bg-gray-200 active:bg-[#9fd5a2] space-x-1 `}
             onClick={() => setDialogOpen(true)}

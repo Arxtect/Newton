@@ -11,13 +11,14 @@ import React, {
   useCallback,
 } from "react";
 import IconButton from "@mui/material/IconButton";
-import { Box, Tooltip } from "@mui/material";
+import { Box } from "@mui/material";
 import { useLayout } from "store";
 import layoutSvg from "@/assets/layout/layout.svg";
 import ArMenuRadix from "@/components/arMenuRadix";
 import editorPdfSvg from "@/assets/layout/editorPdf.svg";
 import onlyPdfSvg from "@/assets/layout/onlyPdf.svg";
 import onlyCodeSvg from "@/assets/layout/onlyCode.svg";
+import Tooltip from "@/components/tooltip";
 
 const CustomDropdownMenu = forwardRef((props, ref) => {
   const {
@@ -65,7 +66,7 @@ const CustomDropdownMenu = forwardRef((props, ref) => {
         title={"New Project"}
         getButtonClass={(open) => getButtonClass(open)}
         buttonCom={
-          <Tooltip title={"Layout"}>
+          <Tooltip content={"Layout"} position="bottom">
             <IconButton
               color="#inherit"
               aria-label="controls"

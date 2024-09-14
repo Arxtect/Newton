@@ -14,10 +14,10 @@ import {
   Typography,
   TextField,
   InputAdornment,
-  Tooltip,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import ArDialog from "@/components/arDialog";
+import Tooltip from "@/components/tooltip";
 
 import { Search as SearchIcon } from "@mui/icons-material";
 import FileCopyIcon from "@mui/icons-material/FileCopy";
@@ -291,7 +291,7 @@ function Project() {
       sortable: false,
       renderCell: (params) => (
         <div>
-          <Tooltip title="Copy">
+          <Tooltip content="Copy" position="bottom">
             <IconButton
               size="small"
               onClick={(e) => {
@@ -310,7 +310,7 @@ function Project() {
               <FileCopyIcon />
             </IconButton>
           </Tooltip>
-          <Tooltip title="Download">
+          <Tooltip content="Download" position="bottom">
             <IconButton
               size="small"
               onClick={(e) => {
@@ -329,7 +329,7 @@ function Project() {
               <CloudDownloadIcon />
             </IconButton>
           </Tooltip>
-          <Tooltip title="Download PDF">
+          <Tooltip content="Download PDF" position="bottom">
             <IconButton
               size="small"
               onClick={(e) => {
@@ -348,7 +348,7 @@ function Project() {
               <PictureAsPdfIcon />
             </IconButton>
           </Tooltip>
-          <Tooltip title="SHARE">
+          <Tooltip content="SHARE" position="bottom">
             <IconButton
               size="small"
               onClick={(e) => {
@@ -374,7 +374,7 @@ function Project() {
               <ShareIcon />
             </IconButton>
           </Tooltip>
-          <Tooltip title="Delete">
+          <Tooltip content="Delete" position="bottom">
             <IconButton
               size="small"
               onClick={(e) => {

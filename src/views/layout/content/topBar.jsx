@@ -12,7 +12,8 @@ import redoSvg from "@/assets/layout/redo.svg";
 import searchSvg from "@/assets/layout/search.svg";
 import undoSvg from "@/assets/layout/undo.svg";
 import logSvg from "@/assets/layout/log.svg";
-import { IconButton, Tooltip } from "@mui/material";
+import { IconButton } from "@mui/material";
+import Tooltip from "@/components/tooltip";
 import Controls from "./controls";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import Badge from "@mui/material/Badge";
@@ -244,7 +245,7 @@ const ContentTopBar = (props) => {
             );
           }
           return (
-            <Tooltip title={icon.alt} id={icon.key}>
+            <Tooltip content={icon.alt} id={icon.key} position="bottom">
               <IconButton
                 color="#inherit"
                 aria-label="toggleView"
@@ -328,7 +329,7 @@ const ContentTopBar = (props) => {
             </button>
           </ArButtonGroup>
 
-          <Tooltip title={"Compile Log"}>
+          <Tooltip content={"Compile Log"} position="bottom">
             <IconButton
               color="#inherit"
               aria-label="toggleView"
@@ -352,7 +353,7 @@ const ContentTopBar = (props) => {
           </Tooltip>
         </div>
         <div className="flex items-center space-x-2">
-          <Tooltip title={"Preview"}>
+          <Tooltip content={"Preview"} position="bottom">
             <IconButton
               color="#inherit"
               aria-label="toggleView"

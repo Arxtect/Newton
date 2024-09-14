@@ -11,7 +11,6 @@ import React, {
 } from "react";
 
 import ArDialog from "@/components/arDialog";
-import { TextField, Box, Tooltip } from "@mui/material";
 import { toast } from "react-toastify";
 import { ProjectSync } from "@/convergence";
 import { getProjectInfo, createProjectInfo } from "domain/filesystem";
@@ -29,6 +28,7 @@ import {
   reopenRoom,
 } from "@/services";
 import { useCopyToClipboard } from "@/useHooks";
+import Tooltip from "@/components/tooltip";
 
 const Share = forwardRef(({ rootPath, user }, ref) => {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -165,23 +165,22 @@ const Share = forwardRef(({ rootPath, user }, ref) => {
       access: access,
     });
     if (res?.status == "success") {
-      getRoomInfo()
+      getRoomInfo();
       toast.success(`Change user access success`);
     }
     return res?.status;
   };
-   const handleReopenRoom = async () => {
-     let res = await reopenRoom({
-       project_name: rootPath + user.id,
-     });
-     if (res?.status == "success") {
-       await getRoomInfo();
-       handleSaveProject()
-       toast.success(`Reopen room success`);
-     }
-     return res?.status;
-   };
-
+  const handleReopenRoom = async () => {
+    let res = await reopenRoom({
+      project_name: rootPath + user.id,
+    });
+    if (res?.status == "success") {
+      await getRoomInfo();
+      handleSaveProject();
+      toast.success(`Reopen room success`);
+    }
+    return res?.status;
+  };
 
   const [roomInfo, setRoomInfo] = useState({});
 
@@ -194,30 +193,28 @@ const Share = forwardRef(({ rootPath, user }, ref) => {
     if (roomInfo?.is_closed) {
       await createProjectInfo(rootPath, {
         ...projectInfo,
-          isSync: false,
-          isClose: true,
+        isSync: false,
+        isClose: true,
       });
-      leaveProjectSyncRoom()
+      leaveProjectSyncRoom();
     } else {
       await createProjectInfo(rootPath, {
         ...projectInfo,
-          isClose: false,
+        isClose: false,
       });
-      
     }
     setRoomInfo(roomInfo);
     const info = await getProjectInfo(rootPath);
     console.log(info, "info");
   };
 
- 
-    useEffect(() => {
-      dialogOpen && getRoomInfo();
-    }, [dialogOpen]);
+  useEffect(() => {
+    dialogOpen && getRoomInfo();
+  }, [dialogOpen]);
 
   return (
     <React.Fragment>
-      <Tooltip title="Share Your Project">
+      <Tooltip content="Share Your Project" position="bottom">
         <button
           className={`flex items-center text-gray-700 px-2 py-1 hover:bg-gray-200 active:bg-[#9fd5a2] space-x-1 `}
           onClick={() => {

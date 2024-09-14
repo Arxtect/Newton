@@ -12,9 +12,9 @@ import PublishDocument from "../publishDocument";
 import { useUserStore, useFileStore } from "@/store";
 import { downloadDirectoryAsZip } from "domain/filesystem";
 import { useNavigate } from "react-router-dom";
-import { Tooltip } from "@mui/material";
-import { getColors, getFirstNUpperCaseChars } from "@/util";
 
+import { getColors, getFirstNUpperCaseChars } from "@/util";
+import Tooltip from "@/components/tooltip";
 
 const maxDisplayCount = 3; // 最大显示的名字数量
 
@@ -123,7 +123,7 @@ const TopBar = (props) => {
               return <LinkGithub></LinkGithub>;
             }
             return (
-              <Tooltip title={button.key}>
+              <Tooltip content={button.key} position="bottom">
                 <button
                   key={index}
                   className={`flex items-center text-gray-700 px-2 py-1 hover:bg-gray-200 active:bg-[#9fd5a2] ${
