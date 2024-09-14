@@ -32,15 +32,6 @@ export const PdfPreview = () => {
     assetsFilePath: state.assetsFilePath,
   }));
 
-  const formattedCompilerLog = (
-    <p className="h-full  p-2 font-mono overflow-y-scroll">
-      <b>Compiler Log:</b>
-      <br />
-      <br />
-      {compilerLog}
-    </p>
-  );
-
   const pdfEmbed = (
     <embed
       src={pdfUrl}
