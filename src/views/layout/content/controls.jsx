@@ -66,20 +66,20 @@ const CustomDropdownMenu = forwardRef((props, ref) => {
         title={"New Project"}
         getButtonClass={(open) => getButtonClass(open)}
         buttonCom={
-          <Tooltip content={"Layout"} position="bottom">
-            <IconButton
-              color="#inherit"
-              aria-label="controls"
-              size="small"
-              onClick={handleClick}
-            >
+          <IconButton
+            color="#inherit"
+            aria-label="controls"
+            size="small"
+            onClick={handleClick}
+          >
+            <Tooltip content={"Layout"} position="bottom">
               <img
                 src={layoutSvg}
                 alt=""
                 className="w-5 h-5 cursor-pointer hover:opacity-75"
               />
-            </IconButton>
-          </Tooltip>
+            </Tooltip>
+          </IconButton>
         }
         items={[
           {
