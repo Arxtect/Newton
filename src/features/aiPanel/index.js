@@ -8,12 +8,14 @@ import * as Popover from "@radix-ui/react-popover";
 import Command from "./components/command";
 
 const AiPanel = ({ children }) => {
+  const memoizedChildren = React.useMemo(() => children, [children]);
+
   return (
     <Popover.Root>
-      <Popover.Trigger asChild>{children}</Popover.Trigger>
+      <Popover.Trigger asChild>{memoizedChildren}</Popover.Trigger>
       <Popover.Portal>
         <Popover.Content
-          className="p-4 z-[999999999] relative"
+          className="p-4 z-[10] relative"
           sideOffset={0}
           align={"start"}
         >

@@ -13,4 +13,4 @@ const Command = () => {
   );
 };
 
-export default Command;
+export default React.memo(Command);

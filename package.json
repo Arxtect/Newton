@@ -33,6 +33,7 @@
     "@react-pdf-viewer/core": "^3.12.0",
     "@react-pdf-viewer/default-layout": "^3.12.0",
     "@react-pdf/renderer": "^3.3.4",
+    "@remixicon/react": "^4.2.0",
     "@sentry/react": "^8.28.0",
     "@sentry/webpack-plugin": "^2.22.4",
     "@svgr/webpack": "^5.5.0",

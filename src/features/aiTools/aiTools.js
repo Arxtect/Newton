@@ -1,17 +1,14 @@
-import React, { useMemo, useState,useEffect } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import Chat from "./chat";
 import { useChat } from "./hook";
-import chatListDemo from './chatListdemo'
-import { stopChat as stopChatApi } from '@/services'
-  import { useUserStore } from "store";
+import { stopChat as stopChatApi } from "@/services";
+import { useUserStore } from "store";
 
 const AITools = () => {
-  const { user } = useUserStore(
-    (state) => ({
-      user: state.user,
-    })
-  );
-  
+  const { user } = useUserStore((state) => ({
+    user: state.user,
+  }));
+
   const stopChat = async (taskId, currentAppToken) => {
     console.log(`Stop chat with taskId: ${taskId}`);
     await stopChatApi(taskId, currentAppToken);
@@ -20,14 +17,8 @@ const AITools = () => {
   const [currentConversationId, setCurrentConversationId] = useState("");
   const [appChatListData, setAppChatListData] = useState([]);
 
-  useEffect(() => {
-    setAppChatListData(chatListDemo)
-  }, [])
-
-
-
   const appPrevChatList = useMemo(() => {
-    const data =  [];
+    const data = [];
 
     const chatList = [];
 
@@ -56,9 +47,9 @@ const AITools = () => {
   }, [appChatListData, currentConversationId]);
 
   useEffect(() => {
-    console.log(appPrevChatList,'appPrevChatList')
-  }, [appPrevChatList])
-  
+    console.log(appPrevChatList, "appPrevChatList");
+  }, [appPrevChatList]);
+
   const {
     chatList,
     setChatList,
@@ -69,8 +60,8 @@ const AITools = () => {
     handleRestart,
     handleStop,
     currentAppToken,
+    currentApp,
   } = useChat(appPrevChatList, stopChat);
-
 
   return (
     <div className="flex flex-col h-full">
@@ -84,6 +75,7 @@ const AITools = () => {
         isResponding={isResponding}
         setIsResponding={setIsResponding}
         currentAppToken={currentAppToken}
+        currentApp={currentApp}
         user={user}
       />
       {/* <div className="p-4 border-b flex items-center justify-between">

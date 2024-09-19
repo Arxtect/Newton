@@ -51,13 +51,14 @@ export const useChat = (prevChatList, stopChat) => {
 
   const handleGetAccessToken = useCallback(async (token) => {
     console.log(token, "token");
-    let res = await getAccessTokenAndStore(token)
+    let res = await getAccessTokenAndStore(token);
     console.log(res, "token");
     setCurrentAppToken(res);
-  },[]);
+  }, []);
 
   useEffect(() => {
     if (!currentApp) return;
+    console.log(currentApp, "currentApp");
     handleGetAccessToken(currentApp.access_token);
   }, [currentApp]);
 
@@ -206,7 +207,6 @@ export const useChat = (prevChatList, stopChat) => {
 
             if (isFirstMessage && newConversationId)
               connversationId.current = newConversationId;
-
 
             taskIdRef.current = taskId;
             if (messageId) responseItem.id = messageId;
@@ -360,12 +360,7 @@ export const useChat = (prevChatList, stopChat) => {
       );
       return true;
     },
-    [
-      updateCurrentQA,
-      handleUpdateChatList,
-      handleResponding,
-      formatTime,
-    ]
+    [updateCurrentQA, handleUpdateChatList, handleResponding, formatTime]
   );
 
   useEffect(() => {

@@ -1,5 +1,9 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Paper, List, ListItem } from "@mui/material";
+import ChatInput from "@/features/aiTools/chat-input";
+import { useChat } from "@/features/aiTools/hook";
+import { stopChat as stopChatApi } from "@/services";
+import { useUserStore } from "store";
 
 const commandOptions = [
   {
@@ -32,8 +36,14 @@ const commandOptions = [
   },
 ];
 
+export function getChatApiUrl() {
+  return `/api/v1/chat/chat-messages`;
+}
+
 const SearchWithSuggestions = () => {
   const [focusedIndex, setFocusedIndex] = useState(-1);
+  const [hoveredIndex, setHoveredIndex] = useState(-1);
+  const [selectedCommand, setSelectedCommand] = useState(null);
   const inputRef = useRef(null);
 
   useEffect(() => {
@@ -44,42 +54,67 @@ const SearchWithSuggestions = () => {
   }, []);
 
   const handleKeyDown = (event) => {
-    if (event.key === "ArrowDown" && focusedIndex < commandOptions.length - 1) {
-      setFocusedIndex(focusedIndex + 1);
-    } else if (event.key === "ArrowUp" && focusedIndex > 0) {
-      setFocusedIndex(focusedIndex - 1);
+    if (event.key === "ArrowDown" && hoveredIndex < commandOptions.length - 1) {
+      setHoveredIndex(hoveredIndex + 1);
+    } else if (event.key === "ArrowUp" && hoveredIndex > 0) {
+      setHoveredIndex(hoveredIndex - 1);
+    } else if (event.key === "Enter" && hoveredIndex >= 0) {
+      handleSelect(hoveredIndex);
     }
+    if (selectedCommand) {
+      return false;
+    }
+    return true;
   };
 
+  const handleSelect = (index) => {
+    setFocusedIndex(index);
+    setSelectedCommand(commandOptions[index]);
+    console.log("Selected command:", commandOptions[index]);
+  };
+
+  const stopChat = async (taskId, currentAppToken) => {
+    console.log(`Stop chat with taskId: ${taskId}`);
+    await stopChatApi(taskId, currentAppToken);
+  };
+
+  const {
+    isResponding,
+    setIsResponding,
+    handleSend,
+    handleRestart,
+    handleStop,
+    currentAppToken,
+    currentApp,
+  } = useChat(null, stopChat);
+
+  const onSend = useCallback(
+    (message, files) => {
+      const data = {
+        query: message,
+        inputs: {},
+        conversation_id: "",
+        response_mode: "streaming",
+      };
+
+      if (files?.length) data.files = files;
+
+      handleSend(getChatApiUrl(), data, {
+        currentAppToken,
+      });
+    },
+    [currentAppToken]
+  );
+
   return (
-    <div>
+    <React.Fragment>
       <div className="flex justify-center items-center w-full">
-        <div className="relative w-full">
-          <input
-            ref={inputRef}
-            type="text"
-            placeholder="Type a command or question"
-            className="w-full pl-12 pr-10 rounded-lg text-sm border-none shadow-lg focus:outline-none focus:ring-1 focus:ring-[#81c784] h-[2.4rem] flex items-center"
-            style={{ display: "flex", alignItems: "center" }}
-            onKeyDown={handleKeyDown}
-          />
-          <button className="absolute right-2 top-1/2 transform -translate-y-1/2 text-green-500 cursor-pointer">
-            <img
-              loading="lazy"
-              src="https://cdn.builder.io/api/v1/image/assets/TEMP/3a8f6fe48b60e23bcd440123fd980a657feba1b4f1a14e3465a06f70616f3fc8?apiKey=6856840afbf04beb865bb666a8346f6d&"
-              className="object-contain shrink-0 w-6 aspect-square"
-              alt=""
-            />
-          </button>
-          <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer">
-            <img
-              loading="lazy"
-              src="https://cdn.builder.io/api/v1/image/assets/TEMP/ba2826dfedc46423da960defd8b842203f5f4a4df7a2c0b590028eb88ffa3b9a?apiKey=6856840afbf04beb865bb666a8346f6d&"
-              className="object-contain shrink-0 w-6 aspect-square"
-              alt=""
-            />
-          </div>
-        </div>
+        <ChatInput
+          visionConfig={currentApp?.file_upload?.image}
+          onSend={onSend}
+          currentAppToken={currentAppToken}
+          onKeyDown={handleKeyDown}
+        />
       </div>
       <Paper
         elevation={3}
@@ -92,7 +127,16 @@ const SearchWithSuggestions = () => {
       >
         <List>
           {commandOptions.map((option, index) => (
-            <ListItem key={index} selected={index === focusedIndex}>
+            <ListItem
+              key={index}
+              selected={index === focusedIndex}
+              onClick={() => handleSelect(index)}
+              onMouseEnter={() => setHoveredIndex(index)}
+              onMouseLeave={() => setHoveredIndex(-1)}
+              sx={{
+                backgroundColor: index === hoveredIndex ? "#f0f0f0" : "inherit",
+              }}
+            >
               <div className="flex items-center space-x-3">
                 <img
                   loading="lazy"
@@ -106,8 +150,8 @@ const SearchWithSuggestions = () => {
           ))}
         </List>
       </Paper>
-    </div>
+    </React.Fragment>
   );
 };
 
-export default SearchWithSuggestions;
+export default React.memo(SearchWithSuggestions);

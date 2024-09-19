@@ -25,7 +25,6 @@ function unicodeToChar(text) {
   });
 }
 
-
 const handleStream = (
   response,
   onData,
@@ -45,14 +44,14 @@ const handleStream = (
   function read() {
     let hasError = false;
     reader?.read().then((result) => {
-      console.log(result,'result')
+      console.log(result, "result");
       if (result.done) {
         onCompleted && onCompleted();
         return;
       }
       buffer += decoder.decode(result.value, { stream: true });
       const lines = buffer.split("\n");
-      console.log(lines,'lines')
+      console.log(lines, "lines");
       try {
         lines.forEach((message) => {
           console.log(message, "message");
@@ -113,11 +112,9 @@ const handleStream = (
       console.log(buffer, "buffer");
       if (!hasError) read();
     });
-
   }
   read();
 };
-
 
 export const ssePost = (
   url,
@@ -141,7 +138,7 @@ export const ssePost = (
       method: "POST",
       signal: abortController.signal,
     },
-    fetchOptions,
+    fetchOptions
   );
 
   const contentType = options.headers.get("Content-Type");
@@ -151,17 +148,16 @@ export const ssePost = (
   getAbortController?.(abortController);
 
   // const urlWithPrefix = "http://network.jancsitech.net:1510/api/chat-messages" || `${url.startsWith("/") ? url : `/${url}`}`;
-    const urlWithPrefix =
-      `${url.startsWith("/") ? url : `/${url}`}`;
+  const urlWithPrefix = `${url.startsWith("/") ? url : `/${url}`}`;
 
   const { body } = options;
   if (body) options.body = JSON.stringify(body);
 
- fetch(urlWithPrefix, options)
+  fetch(urlWithPrefix, options)
     .then((res) => {
       if (!/^(2|3)\d{2}$/.test(String(res.status))) {
         res.json().then((data) => {
-         console.log(data,'data')
+          console.log(data, "data");
         });
         onError?.("Server Error");
         return;
@@ -175,15 +171,15 @@ export const ssePost = (
               moreInfo.errorMessage !==
               "AbortError: The user aborted a request."
             )
-            //   Toast.notify({ type: "error", message: moreInfo.errorMessage });
-            return;
+              //   Toast.notify({ type: "error", message: moreInfo.errorMessage });
+              return;
           }
           onData?.(str, isFirstMessage, moreInfo);
         },
         onCompleted,
         onMessageEnd,
         onMessageReplace,
-        onFile,
+        onFile
       );
     })
     .catch((e) => {
@@ -192,8 +188,6 @@ export const ssePost = (
       onError?.(e);
     });
 };
-
-
 
 // 辅助函数：生成带有统一前缀的URL
 export function getChatApiUrl() {

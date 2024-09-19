@@ -5,9 +5,8 @@
  */
 import { memo } from 'react'
 import questionTriangle from "@/assets/chat/questionTriangle.svg";
-// import { User } from '@/app/components/base/icons/src/public/avatar'
 import { Markdown } from './markdown'
-// import ImageGallery from '@/app/components/base/image-gallery'
+import ImageGallery from './image-uploader/image-gallery'
 import logoIcon from "@/assets/logo-icon.svg";
 import {  getFirstNUpperCaseChars } from "@/util";
 
@@ -32,11 +31,11 @@ const Question = ({
           className="absolute -right-2 top-0 w-2 h-3 text-[#D1E9FF]/50"
         />
         <div className="px-4 py-3 bg-[#D1E9FF]/50 rounded-b-2xl rounded-tl-2xl text-sm text-gray-900">
-          {/* {
+          {
             !!imgSrcs.length && (
               <ImageGallery srcs={imgSrcs} />
             )
-          } */}
+          }
           <Markdown content={content} />
         </div>
         <div className="mt-1 h-[18px]" />

@@ -76,6 +76,10 @@ module.exports = {
       };
       addUtilities(newUtilities, ["responsive", "hover"]);
     },
+    function ({ addVariant }) {
+      addVariant("nth-child-2n", "&:nth-child(2n)");
+      addVariant("nth-child-3n", "&:nth-child(3n)");
+    },
   ],
   important: true,
 };
