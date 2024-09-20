@@ -1,12 +1,34 @@
 import React from "react";
 import CommandInput from "./CommandInput";
 
-const Command = () => {
+const Command = ({
+  chatList,
+  isResponding,
+  setIsResponding,
+  handleSend,
+  handleRestart,
+  handleStop,
+  currentAppToken,
+  currentApp,
+  appList,
+  setCurrentApp,
+}) => {
   return (
-    <div className="flex flex-col items-center justify-center ">
-      <div className="w-full max-w-md">
-        <div className="w-[28rem]">
-          <CommandInput />
+    <div className="flex flex-col items-center justify-center w-full">
+      <div className="w-full">
+        <div className="w-full">
+          <CommandInput
+            chatList={chatList}
+            isResponding={isResponding}
+            setIsResponding={setIsResponding}
+            handleSend={handleSend}
+            handleRestart={handleRestart}
+            handleStop={handleStop}
+            currentAppToken={currentAppToken}
+            currentApp={currentApp}
+            appList={appList}
+            setCurrentApp={setCurrentApp}
+          />
         </div>
       </div>
     </div>

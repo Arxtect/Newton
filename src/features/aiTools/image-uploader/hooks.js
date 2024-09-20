@@ -1,8 +1,3 @@
-/*
- * @Description:
- * @Author: Devin
- * @Date: 2024-09-18 14:04:07
- */
 import { useCallback, useMemo, useRef, useState } from "react";
 import { imageUpload } from "./utils";
 import { toast } from "react-toastify";
@@ -12,7 +7,7 @@ export const useImageFiles = ({ currentAppToken }) => {
   const [files, setFiles] = useState([]);
   const filesRef = useRef([]);
 
-  const handleUpload = (imageFile) => {
+  const handleUpload = useCallback((imageFile) => {
     const files = filesRef.current;
     const index = files.findIndex((file) => file._id === imageFile._id);
 
@@ -30,9 +25,9 @@ export const useImageFiles = ({ currentAppToken }) => {
       setFiles(newFiles);
       filesRef.current = newFiles;
     }
-  };
+  }, []);
 
-  const handleRemove = (imageFileId) => {
+  const handleRemove = useCallback((imageFileId) => {
     const files = filesRef.current;
     const index = files.findIndex((file) => file._id === imageFileId);
 
@@ -46,9 +41,9 @@ export const useImageFiles = ({ currentAppToken }) => {
       setFiles(newFiles);
       filesRef.current = newFiles;
     }
-  };
+  }, []);
 
-  const handleImageLinkLoadError = (imageFileId) => {
+  const handleImageLinkLoadError = useCallback((imageFileId) => {
     const files = filesRef.current;
     const index = files.findIndex((file) => file._id === imageFileId);
 
@@ -62,9 +57,9 @@ export const useImageFiles = ({ currentAppToken }) => {
       filesRef.current = newFiles;
       setFiles(newFiles);
     }
-  };
+  }, []);
 
-  const handleImageLinkLoadSuccess = (imageFileId) => {
+  const handleImageLinkLoadSuccess = useCallback((imageFileId) => {
     const files = filesRef.current;
     const index = files.findIndex((file) => file._id === imageFileId);
 
@@ -78,55 +73,58 @@ export const useImageFiles = ({ currentAppToken }) => {
       filesRef.current = newFiles;
       setFiles(newFiles);
     }
-  };
+  }, []);
 
-  const handleReUpload = (imageFileId) => {
-    const files = filesRef.current;
-    const index = files.findIndex((file) => file._id === imageFileId);
+  const handleReUpload = useCallback(
+    (imageFileId) => {
+      const files = filesRef.current;
+      const index = files.findIndex((file) => file._id === imageFileId);
 
-    if (index > -1) {
-      const currentImageFile = files[index];
-      imageUpload(
-        {
-          file: currentImageFile.file,
-          onProgressCallback: (progress) => {
-            const newFiles = [
-              ...files.slice(0, index),
-              { ...currentImageFile, progress },
-              ...files.slice(index + 1),
-            ];
-            filesRef.current = newFiles;
-            setFiles(newFiles);
+      if (index > -1) {
+        const currentImageFile = files[index];
+        imageUpload(
+          {
+            file: currentImageFile.file,
+            onProgressCallback: (progress) => {
+              const newFiles = [
+                ...files.slice(0, index),
+                { ...currentImageFile, progress },
+                ...files.slice(index + 1),
+              ];
+              filesRef.current = newFiles;
+              setFiles(newFiles);
+            },
+            onSuccessCallback: (res) => {
+              const newFiles = [
+                ...files.slice(0, index),
+                { ...currentImageFile, fileId: res.id, progress: 100 },
+                ...files.slice(index + 1),
+              ];
+              filesRef.current = newFiles;
+              setFiles(newFiles);
+            },
+            onErrorCallback: () => {
+              toast.error("Image upload failed, please upload again.");
+              const newFiles = [
+                ...files.slice(0, index),
+                { ...currentImageFile, progress: -1 },
+                ...files.slice(index + 1),
+              ];
+              filesRef.current = newFiles;
+              setFiles(newFiles);
+            },
           },
-          onSuccessCallback: (res) => {
-            const newFiles = [
-              ...files.slice(0, index),
-              { ...currentImageFile, fileId: res.id, progress: 100 },
-              ...files.slice(index + 1),
-            ];
-            filesRef.current = newFiles;
-            setFiles(newFiles);
-          },
-          onErrorCallback: () => {
-            toast.error("Image upload failed, please upload again.");
-            const newFiles = [
-              ...files.slice(0, index),
-              { ...currentImageFile, progress: -1 },
-              ...files.slice(index + 1),
-            ];
-            filesRef.current = newFiles;
-            setFiles(newFiles);
-          },
-        },
-        currentAppToken
-      );
-    }
-  };
+          currentAppToken
+        );
+      }
+    },
+    [currentAppToken]
+  );
 
-  const handleClear = () => {
+  const handleClear = useCallback(() => {
     setFiles([]);
     filesRef.current = [];
-  };
+  }, []);
 
   const filteredFiles = useMemo(() => {
     return files.filter((file) => !file.deleted);
@@ -205,7 +203,7 @@ export const useLocalFileUploader = ({
       );
       reader.readAsDataURL(file);
     },
-    [disabled, limit, onUpload]
+    [disabled, limit, onUpload, currentAppToken]
   );
 
   return { disabled, handleLocalFileUpload };

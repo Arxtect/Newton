@@ -283,7 +283,7 @@ const ContentTopBar = (props) => {
         {aiList.map((icon) => {
           return (
             <Tooltip content={icon.alt} id={icon.key} position="bottom">
-              <AiPanel>
+              <AiPanel triggerType="click">
                 <IconButton
                   color="#inherit"
                   aria-label="toggleView"

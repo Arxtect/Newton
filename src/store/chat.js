@@ -1,3 +1,8 @@
+/*
+ * @Description:
+ * @Author: Devin
+ * @Date: 2024-09-14 10:36:38
+ */
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
@@ -9,8 +14,8 @@ export const useChatStore = create()(
       chatAccessToken: {},
       updateChatAccessToken(key, value) {
         set((state) => ({
-          accessToken: {
-            ...state.accessToken,
+          chatAccessToken: {
+            ...state.chatAccessToken,
             [key]: value,
           },
         }));
@@ -23,4 +28,5 @@ export const useChatStore = create()(
   )
 );
 
-export const { chatAccessToken, updateChatAccessToken } = useChatStore.getState();
+export const { chatAccessToken, updateChatAccessToken } =
+  useChatStore.getState();

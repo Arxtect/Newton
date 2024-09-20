@@ -62,15 +62,14 @@ export const PdfPreview = () => {
       className={`h-full relative  ${willResizing ? "z-10" : ""}`}
       style={{ overflow: "auto" }} // 添加这一行以允许滚动
     >
-      <Aitools></Aitools>
-      {/* {!!assetsFilePath && !!fileContent ? (
+      {!!assetsFilePath && !!fileContent ? (
         <AssetPreview filename={assetsFilePath} content={fileContent} />
       ) : showCompilerLog ? (
         <FormattedCompilerLog messages={compileMessages} log={compilerLog} />
       ) : (
         pdfUrl !== "" && pdfEmbed
         // <Viewer url={pdfU/rl}></Viewer>
-      )} */}
+      )}
 
       {willResizing && (
         <div className="absolute top-0 left-0 w-full h-full z-20"></div>
