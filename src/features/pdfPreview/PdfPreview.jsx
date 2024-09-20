@@ -8,7 +8,8 @@ import { useEffect, useState } from "react";
 import { usePdfPreviewStore, useFileStore, useLayout } from "store";
 import AssetPreview from "../assetPreview/assetPreview";
 import { readFile } from "domain/filesystem";
-import FormattedCompilerLog from "./formattedCompilerLog"
+import FormattedCompilerLog from "./formattedCompilerLog";
+import PdfPreViewer from "./PdfPreViewer";
 
 import Aitools from "../aiTools/aiTools";
 
@@ -34,32 +35,20 @@ export const PdfPreview = () => {
     assetsFilePath: state.assetsFilePath,
   }));
 
-  const pdfEmbed = (
-    <embed
-      src={pdfUrl}
-      type="application/pdf"
-      style={{ width: "100%", height: "100%" }}
-    />
-  );
-
   useEffect(() => {
     console.log(willResizing, "willResizing");
   }, [willResizing]);
 
-  const [fileContent, setFileContent] = useState("")
+  const [fileContent, setFileContent] = useState("");
 
   useEffect(() => {
-    if (!assetsFilePath && assetsFilePath == "") return
-    console.log(
-      assetsFilePath,
-      "assetsFilePath"
-    );
-      (async () => {
+    if (!assetsFilePath && assetsFilePath == "") return;
+    console.log(assetsFilePath, "assetsFilePath");
+    (async () => {
       const content = await readFile(assetsFilePath);
       setFileContent(content);
     })();
-  
-  }, [assetsFilePath])
+  }, [assetsFilePath]);
 
   return (
     <div
@@ -72,7 +61,7 @@ export const PdfPreview = () => {
       ) : showCompilerLog ? (
         <FormattedCompilerLog messages={compileMessages} log={compilerLog} />
       ) : (
-        pdfUrl !== "" && pdfEmbed
+        pdfUrl !== "" && <PdfPreViewer pdfUrl={pdfUrl} />
         // <Viewer url={pdfU/rl}></Viewer>
       )}
 
