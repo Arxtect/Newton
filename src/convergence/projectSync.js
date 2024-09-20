@@ -8,7 +8,8 @@ import { uploadFile, downloadFile } from "./minio";
 import { assetExtensions } from "@/util";
 import { debounce } from "@/util";
 import { Awareness } from "y-protocols/awareness.js"; // eslint-disable-line
-import {getColors} from "@/util";
+import { getColors } from "@/util";
+import { toast } from "react-toastify";
 
 const host = window.location.hostname;
 const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
@@ -153,7 +154,13 @@ class ProjectSync {
     let contentToStore = content;
     if (assetExtensions.includes(ext)) {
       // 如果是资产文件类型，则转换为 Base64 编码
-      contentToStore = await uploadFile(filePath, content);
+      try {
+        contentToStore = await uploadFile(filePath, content);
+      } catch (err) {
+        contentToStore = content.toString();
+        console.log(err.message, "err.message");
+        toast.error(err.message);
+      }
     } else {
       // 否则将内容转换为字符串
       contentToStore = content.toString();
@@ -195,7 +202,7 @@ class ProjectSync {
 
   // 同步单个文件到 Yjs Map
   async syncFileToYMap(filePath, content) {
-    if(filePath.includes(".git")) return
+    if (filePath.includes(".git")) return;
     try {
       await this.syncToYMap(filePath, content);
       const folderPath = path.dirname(filePath);
@@ -209,7 +216,7 @@ class ProjectSync {
 
   // 同步文件夹列表
   syncFolderInfo(folderPath) {
-    if(folderPath.includes(".git")) return
+    if (folderPath.includes(".git")) return;
     console.log(folderPath, "folderPath");
     this.yDoc.transact(() => {
       let folderMap = this.yMap.get(this.folderMapName) || [];
@@ -221,7 +228,7 @@ class ProjectSync {
 
   // 从 Yjs Map 中删除文件夹
   removeFolderInfo(folderPath) {
-    if(folderPath.includes(".git")) return
+    if (folderPath.includes(".git")) return;
     this.yDoc.transact(() => {
       let folderMap = this.yMap.get(this.folderMapName) || [];
       if (folderMap.includes(folderPath)) {
@@ -233,7 +240,7 @@ class ProjectSync {
 
   // 同步整个文件夹到 Yjs Map
   async syncFolderToYMap(folderPath) {
-    if(folderPath.includes(".git")) return;
+    if (folderPath.includes(".git")) return;
     try {
       this.syncFolderInfo(folderPath);
       const files = await FS.readFileStats(folderPath, false);
@@ -268,7 +275,7 @@ class ProjectSync {
   }
 
   async handleFolderInfo(folderPath, key, content) {
-    if(folderPath.includes(".git")) return;
+    if (folderPath.includes(".git")) return;
     const files = await FS.readFileStats(folderPath, false);
     const fileNames = new Set(files.map((f) => f.name));
     const contentNames = new Set(content);
@@ -276,7 +283,7 @@ class ProjectSync {
     // 删除 files 中有但 content 中没有的文件夹
     for (const file of files) {
       const filePath = path.join(folderPath, file.name);
-      if(file.name.includes(".git")) continue;
+      if (file.name.includes(".git")) continue;
       if (file.type == "dir" && !contentNames.has(filePath)) {
         await this.deleteFolder(filePath);
         console.log(`Deleted folder ${filePath}`);
