@@ -97,14 +97,16 @@ const HistoryVersions = () => {
                 gap: '8px',
                 fontSize: '14px',
             }}>
-                <div aria-label='datetime'>
-                    Viewing&nbsp;
-                    {historyVersions.length > 0 && formatDate(historyVersions[selectedIndex]?.timestamp * 1000)}
+                <div aria-label='datetime' title={`Viewing ${historyVersions.length > 0 ? formatDate(historyVersions[selectedIndex]?.timestamp * 1000) : ''}`}>
+                    datetime
+                    {/* Viewing&nbsp;
+                    {historyVersions.length > 0 && formatDate(historyVersions[selectedIndex]?.timestamp * 1000)} */}
                 </div>
-                <div aria-label='file-info' style={{ flex: 1, textAlign: 'right' }}>
-                    {currentDiff.filter((d) => d.added || d.removed).length}
+                <div aria-label='file-info' style={{ flex: 1, textAlign: 'right' }} title={`${currentDiff.filter((d) => d.added || d.removed).length} changes in ${historyVersions[selectedIndex]?.fileWithChange[0]?.path}`}>
+                    changes
+                    {/* {currentDiff.filter((d) => d.added || d.removed).length}
                     &nbsp;changes in&nbsp;
-                    {historyVersions[selectedIndex]?.fileWithChange[0]?.path}
+                    {historyVersions[selectedIndex]?.fileWithChange[0]?.path} */}
                 </div>
             </DialogTitle>
             <DialogContent sx={{ padding: 0, fontSize: '14px', }}>
