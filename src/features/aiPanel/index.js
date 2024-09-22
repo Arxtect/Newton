@@ -91,7 +91,6 @@ const AiPanel = ({ children, triggerType,
   } = useChat(null, stopChat);
 
   useEffect(() => {
-    console.log(lastMessage,'lastMessage')
     setAnswerContent&&setAnswerContent(lastMessage);
   }, [chatList]);
 

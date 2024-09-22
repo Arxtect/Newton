@@ -224,6 +224,7 @@ export const useChat = (prevChatList, stopChat) => {
           },
           async onCompleted(hasError) {
             handleResponding(false);
+            // setLastMessage((prevMessage) => prevMessage + " "); // 累加消息
 
             if (hasError) return;
 

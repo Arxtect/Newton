@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useLayout } from "store";
 import AiPanel from "@/features/aiPanel";
 import Ace from "ace-builds/src-min-noconflict/ace";
@@ -6,7 +6,7 @@ import "./aiTools.css"; // 引入样式文件
 
 const Range = Ace.require("ace/range").Range;
 
-const AiTools = ({ editorRef }) => {
+const AiTools = ({ editor }) => {
   const [toolbarPosition, setToolbarPosition] = useState({ top: 0, left: 0 });
   const [showDropdown, setShowDropdown] = useState(false);
   const { sideWidth } = useLayout();
@@ -15,10 +15,9 @@ const AiTools = ({ editorRef }) => {
   const [prevContentLength, setPrevContentLength] = useState(0);
   const [markerRange, setMarkerRange] = useState(null);
 
-  const handleCommand = (content) => {
+  const handleCommand = useCallback((content) => {
     if (content.length === 0) return;
     try {
-      const editor = editorRef.current.editor;
       const cursorPosition = editor.getCursorPosition();
       const session = editor.getSession();
       const line = session.getLine(cursorPosition.row);
@@ -45,28 +44,38 @@ const AiTools = ({ editorRef }) => {
       console.log(content, 'content');
       editor.session.replace(range, content);
 
+        const newRange = new Range(
+    range.start.row,
+    range.start.column,
+    range.start.row,
+    range.start.column + content.length
+  );
+
+  const markerId = session.addMarker(newRange, "ace_selection", "text");
+  setMarkerRange({ id: markerId, range: newRange });
+  setShowDropdown(true);
+
+
       setShowDropdown(true);
     } catch (error) {
       console.error("Error handling command:", error);
     }
-  };
+  },[editor]);
 
   const handleAccept = () => {
-    // const editor = editorRef.current.editor;
-    // if (markerRange) {
-    //   editor.session.removeMarker(markerRange.id);
-    //   setMarkerRange(null);
-    // }
+    if (markerRange) {
+      editor.session.removeMarker(markerRange.id);
+      setMarkerRange(null);
+    }
   };
 
   const handleReject = () => {
-    // const editor = editorRef.current.editor;
-    // const session = editor.getSession();
-    // if (markerRange) {
-    //   session.replace(markerRange.range, "");
-    //   editor.session.removeMarker(markerRange.id);
-    //   setMarkerRange(null);
-    // }
+    const session = editor.getSession();
+    if (markerRange) {
+      session.replace(markerRange.range, "");
+      editor.session.removeMarker(markerRange.id);
+      setMarkerRange(null);
+    }
   };
 
   useEffect(() => {
@@ -74,13 +83,12 @@ const AiTools = ({ editorRef }) => {
   }, [sideWidth]);
 
   const handleCursorChange = (selection) => {
-    const editor = editorRef.current.editor;
     const cursorPosition = editor.getCursorPosition();
     const screenCoordinates = editor.renderer.textToScreenCoordinates(
       cursorPosition.row,
       cursorPosition.column
     );
-    const editorElement = editorRef.current.editor.container;
+    const editorElement = editor.container;
     const rect = editorElement.getBoundingClientRect();
     const toolbarTop =
       screenCoordinates.pageY +
@@ -101,27 +109,10 @@ const AiTools = ({ editorRef }) => {
     }
   };
 
-  const handleInput = (event) => {
-    const editor = editorRef.current.editor;
-    const session = editor.getSession();
-    const cursorPosition = editor.getCursorPosition();
-    const line = session.getLine(cursorPosition.row);
-    const beforeCursor = line.slice(0, cursorPosition.column);
-
-    // 检查是否输入了 \begin 或 \end
-    if (beforeCursor.endsWith('\\begin') || beforeCursor.endsWith('\\end')) {
-      // 在光标后面添加一个空格
-      editor.session.insert(cursorPosition, ' ');
-    }
-  };
-
   useEffect(() => {
-    const editor = editorRef.current.editor;
     editor.session.selection.on("changeCursor", handleCursorChange);
-    editor.on('input', handleInput);
     return () => {
       editor.session.selection.off("changeCursor", handleCursorChange);
-      editor.off('input', handleInput);
     };
   }, []);
 
@@ -130,11 +121,24 @@ const AiTools = ({ editorRef }) => {
       setPrevContentLength(0);
       return;
     }
+    console.log("New content (JSON):", JSON.stringify(answerContent));
+
+
 
     const newContent = answerContent.slice(prevContentLength);
+
+    const regex = /\{\s*$/;
+
+    if (regex.test(newContent)) {
+      return;
+    }
+  
+
     handleCommand(newContent);
     setPrevContentLength(answerContent.length);
   }, [answerContent]);
+
+  
 
   return (
     showDropdown && (

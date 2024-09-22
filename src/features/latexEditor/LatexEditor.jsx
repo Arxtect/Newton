@@ -122,7 +122,7 @@ const LatexEditor = ({
         ref={latexRef}
         className={filepath === "" ? "disabled-editor" : "ace_editor ace-tm"}
       ></AceEditor>
-      <AiTools editorRef={latexRef} />
+      {latexRef?.current?.editor&&<AiTools editor={latexRef.current.editor} />}
       <div id="users"></div>
     </div>
   );
