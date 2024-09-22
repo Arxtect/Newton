@@ -42,6 +42,8 @@ export const useChat = (prevChatList, stopChat) => {
   const [currentApp, setCurrentApp] = useState(null);
   const [currentAppToken, setCurrentAppToken] = useState(null);
 
+  const [lastMessage, setLastMessage] = useState("");
+
   const handleGetAppList = useCallback(() => {
     getAppList().then((res) => {
       setAppList(res);
@@ -100,6 +102,7 @@ export const useChat = (prevChatList, stopChat) => {
     handleStop();
     const newChatList = [];
     handleUpdateChatList(newChatList);
+    setLastMessage("");
   }, [handleStop, handleUpdateChatList]);
 
   const updateCurrentQA = useCallback(
@@ -199,6 +202,7 @@ export const useChat = (prevChatList, stopChat) => {
             { conversationId: newConversationId, messageId, taskId }
           ) => {
             responseItem.content = responseItem.content + message;
+            setLastMessage((prevMessage) => prevMessage + message); // 累加消息
 
             if (messageId && !hasSetResponseId) {
               responseItem.id = messageId;
@@ -389,5 +393,6 @@ export const useChat = (prevChatList, stopChat) => {
     appList,
     handleUpdateChatList,
     currentAppToken,
+    lastMessage, 
   };
 };

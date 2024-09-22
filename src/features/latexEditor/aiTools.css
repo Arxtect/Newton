@@ -1,0 +1,7 @@
+/* aiTools.css */
+.highlighted-text {
+    background-color: yellow; /* 更改背景颜色 */
+    text-decoration: underline; /* 添加下划线 */
+    padding: 0; /* 去除任何可能的内边距 */
+    margin: 0; /* 去除任何可能的外边距 */
+}

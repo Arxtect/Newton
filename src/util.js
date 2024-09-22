@@ -314,3 +314,15 @@ export const getFirstNUpperCaseChars =(str, length=1)=> {
 
   return upperCaseChars;
 }
+
+
+function extractLatex(markdown) {
+  const latexBlockRegex = /```latex\s*([\s\S]*?)\s*```/g;
+  let matches = [];
+  let match;
+  while ((match = latexBlockRegex.exec(markdown)) !== null) {
+      const content = match[1].split('\n').map(line => line.trim()).join('\n');
+      matches.push(content);
+  }
+  return matches?.[0] || "";
+}

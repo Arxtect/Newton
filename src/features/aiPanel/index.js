@@ -3,7 +3,7 @@
  * @Author: Devin
  * @Date: 2024-09-14 10:46:18
  */
-import React from "react";
+import React,{useEffect} from "react";
 import * as Popover from "@radix-ui/react-popover";
 import Command from "./components/command";
 import { stopChat as stopChatApi } from "@/services";
@@ -28,7 +28,18 @@ const CommandPopover = ({
       {triggerType === "click" ? (
         <Popover.Trigger asChild>{children}</Popover.Trigger>
       ) : (
-        <div className="editor-trigger">{children}</div>
+        <Command
+        chatList={chatList}
+        isResponding={isResponding}
+        setIsResponding={setIsResponding}
+        handleSend={handleSend}
+        handleRestart={handleRestart}
+        handleStop={handleStop}
+        currentAppToken={currentAppToken}
+        currentApp={currentApp}
+        appList={appList}
+        setCurrentApp={setCurrentApp}
+      />
       )}
       <Popover.Portal>
         <Popover.Content
@@ -56,7 +67,8 @@ const CommandPopover = ({
   );
 };
 
-const AiPanel = ({ children, triggerType }) => {
+const AiPanel = ({ children, triggerType,
+  setAnswerContent }) => {
   const memoizedChildren = React.useMemo(() => children, [children]);
 
   const stopChat = async (taskId, currentAppToken) => {
@@ -75,7 +87,13 @@ const AiPanel = ({ children, triggerType }) => {
     currentApp,
     appList,
     setCurrentApp,
+    lastMessage,
   } = useChat(null, stopChat);
+
+  useEffect(() => {
+    console.log(lastMessage,'lastMessage')
+    setAnswerContent&&setAnswerContent(lastMessage);
+  }, [chatList]);
 
   return (
     <CommandPopover
