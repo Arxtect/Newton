@@ -1,10 +1,6 @@
 import React, { useEffect } from "react";
 import download from "@/assets/download.svg";
-import down from "@/assets/down.svg";
-import review from "@/assets/review.svg";
-import history from "@/assets/history.svg";
 import ellipsis from "@/assets/ellipsis.svg";
-import left from "@/assets/left.svg";
 import logoIcon from "@/assets/logo-icon.svg";
 import Share from "../share";
 import LinkGithub from "../linkGithub";
@@ -12,6 +8,8 @@ import PublishDocument from "../publishDocument";
 import { useUserStore, useFileStore } from "@/store";
 import { downloadDirectoryAsZip } from "domain/filesystem";
 import { useNavigate } from "react-router-dom";
+
+import ArIcon from "@/components/arIcon";
 
 import { getColors, getFirstNUpperCaseChars } from "@/util";
 import Tooltip from "@/components/tooltip";
@@ -23,16 +21,21 @@ const TopBar = (props) => {
     user: state.user,
   }));
   const navigate = useNavigate();
-  const {shareUserList, projectSync, sourceCode, currentProjectRoot, filepath, loadFile } =
-    useFileStore((state) => ({
-      shareUserList:state.shareUserList,
-      projectSync: state.projectSync,
-      sourceCode: state.value,
-      currentProjectRoot: state.currentProjectRoot,
-      filepath: state.filepath,
-      loadFile: state.loadFile,
-    }));
-
+  const {
+    shareUserList,
+    projectSync,
+    sourceCode,
+    currentProjectRoot,
+    filepath,
+    loadFile,
+  } = useFileStore((state) => ({
+    shareUserList: state.shareUserList,
+    projectSync: state.projectSync,
+    sourceCode: state.value,
+    currentProjectRoot: state.currentProjectRoot,
+    filepath: state.filepath,
+    loadFile: state.loadFile,
+  }));
 
   const handleClick = (type) => {
     switch (type) {
@@ -68,9 +71,8 @@ const TopBar = (props) => {
   return (
     <div className="flex items-center justify-between p-2 bg-[#f9fdfd]">
       <div className="flex items-center pl-4 space-x-4">
-        <img
-          src={left}
-          alt=""
+        <ArIcon
+          name="ReturnArrowLeft"
           onClick={() => {
             navigate("/project");
           }}
