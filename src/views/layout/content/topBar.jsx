@@ -278,7 +278,7 @@ const ContentTopBar = (props) => {
           );
         })}
 
-        <div className="border-l border-gray-300 h-6 mx-4"></div>
+        {/* <div className="border-l border-gray-300 h-6 mx-4"></div>
 
         {aiList.map((icon) => {
           return (
@@ -299,7 +299,7 @@ const ContentTopBar = (props) => {
               </AiPanel>
             </Tooltip>
           );
-        })}
+        })} */}
       </div>
       <div
         className={`flex items-center  justify-between space-x-10 mr-4 w-1/2 `}
