@@ -15,10 +15,11 @@ import { toast } from "react-toastify";
 import { ProjectSync } from "@/convergence";
 import { getProjectInfo, createProjectInfo } from "domain/filesystem";
 import { updateDialogLoginOpen, useUserStore, useFileStore } from "@/store";
-import share from "@/assets/share.svg";
+
+import ArIcon from "@/components/arIcon";
+
 import { getYDocToken } from "services";
 import ShareProject from "@/features/share";
-import linkSvg from "@/assets/link.svg";
 import {
   inviteUser,
   deleteInviteUser,
@@ -221,7 +222,11 @@ const Share = forwardRef(({ rootPath, user }, ref) => {
             controlShare();
           }}
         >
-          <img src={share} alt="" className="w-4 h-4" />
+          <ArIcon
+            name={"Share"}
+            loading="lazy"
+            className="w-4 h-4 text-black"
+          />
           <span>Share</span> {/* 使用空格字符 */}
         </button>
       </Tooltip>
@@ -233,13 +238,12 @@ const Share = forwardRef(({ rootPath, user }, ref) => {
               className="flex items-center gap-2.5 text-sm  cursor-pointer"
               onClick={() => copyLink()}
             >
-              <img
+              <ArIcon
+                name={"Link"}
                 loading="lazy"
-                src={linkSvg}
-                className="object-contain shrink-0 w-6 aspect-square"
-                alt=""
+                className="object-contain shrink-0 w-6 aspect-square text-arxTheme"
               />
-              <span className="text-[#81C684]">Copy Link</span>
+              <span className="text-arxTheme">Copy Link</span>
             </div>
           </div>
         }

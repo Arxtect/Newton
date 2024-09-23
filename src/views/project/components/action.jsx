@@ -17,14 +17,6 @@ import Tooltip from "@/components/tooltip";
 
 import { useNavigate } from "react-router-dom";
 import { downloadDirectoryAsZip, createProjectInfo } from "domain/filesystem";
-import copySvg from "@/assets/project/copy.svg";
-import deleteSvg from "@/assets/project/delete.svg";
-import downloadSvg from "@/assets/project/download.svg";
-import gitCloudSvg from "@/assets/project/gitCloud.svg";
-import restoreSvg from "@/assets/project/restore.svg";
-import renameSvg from "@/assets/project/rename.svg";
-import shareSvg from "@/assets/project/share.svg";
-import downloadPdfSvg from "@/assets/project/downloadPdf.svg";
 import { toast } from "react-toastify";
 import ArDialog from "@/components/arDialog";
 import CopyProject from "../copyProject";
@@ -32,6 +24,7 @@ import RenameProject from "../renameProject";
 import Share from "../share";
 import { deleteGitRepo } from "services";
 import { useUserStore, useLoginStore, useFileStore } from "@/store";
+import ArIcon from "@/components/arIcon";
 
 const HoverAction = forwardRef(
   ({ item, auth, getProjectList, handleGithub }, ref) => {
@@ -169,7 +162,7 @@ const HoverAction = forwardRef(
     };
 
     return (
-      <div className="flex items-center">
+      <div className="flex items-center w-full justify-center">
         {item?.type == "git" ? (
           <React.Fragment>
             <Tooltip content="Import" position="bottom">
@@ -180,7 +173,7 @@ const HoverAction = forwardRef(
                   handleGithub(true, item.title);
                 }}
               >
-                <img src={gitCloudSvg} className="w-4" alt="" />
+                <ArIcon name={"GitCloud"}  className="text-black w-4"/>
               </IconButton>
             </Tooltip>
             <Tooltip content="Delete" position="bottom">
@@ -193,7 +186,7 @@ const HoverAction = forwardRef(
                   setIsTrashDelete(false);
                 }}
               >
-                <img src={deleteSvg} alt="" />
+                <ArIcon name={"Delete"}  className="text-black"/>
               </IconButton>
             </Tooltip>
           </React.Fragment>
@@ -207,7 +200,7 @@ const HoverAction = forwardRef(
                   restoreProject(item.title);
                 }}
               >
-                <img src={restoreSvg} className="w-4" alt="" />
+                <ArIcon name={"Restore"}  className="text-black w-4"/>
               </IconButton>
             </Tooltip>
             <Tooltip content="Delete" position="bottom">
@@ -220,7 +213,7 @@ const HoverAction = forwardRef(
                   setIsGitDelete(false);
                 }}
               >
-                <img src={deleteSvg} alt="" />
+                <ArIcon name={"Delete"}  className="text-black"/>
               </IconButton>
             </Tooltip>
           </React.Fragment>
@@ -243,7 +236,7 @@ const HoverAction = forwardRef(
                   downloadDirectoryAsZip(item.title);
                 }}
               >
-                <img src={downloadSvg} alt="" />
+                <ArIcon name={"DownloadProject"}  className="text-black w-4"/>
               </IconButton>
             </Tooltip>
             <Tooltip content="Copy" position="bottom">
@@ -263,7 +256,7 @@ const HoverAction = forwardRef(
                   handleCopy(item.title);
                 }}
               >
-                <img src={copySvg} alt="" />
+                <ArIcon name={"Copy"}  className="text-black"/>
               </IconButton>
             </Tooltip>
             <Tooltip content="Download PDF" position="bottom">
@@ -282,7 +275,7 @@ const HoverAction = forwardRef(
                   downloadPdf(item.title);
                 }}
               >
-                <img src={downloadPdfSvg} alt="" />
+                <ArIcon name={"DownloadPdf"}  className="text-black"/>
               </IconButton>
             </Tooltip>
             <Tooltip content="SHARE" position="bottom">
@@ -307,7 +300,7 @@ const HoverAction = forwardRef(
                   controlShare(item.title);
                 }}
               >
-                <img src={shareSvg} alt="" />
+                <ArIcon name={"Share"}  className="text-black w-4"/>
               </IconButton>
             </Tooltip>
             <Tooltip content="Trash" position="bottom">
@@ -328,7 +321,7 @@ const HoverAction = forwardRef(
                   handleDeleteProject(item.title);
                 }}
               >
-                <img src={deleteSvg} alt="" />
+                <ArIcon name={"Delete"}  className="text-black"/>
               </IconButton>
             </Tooltip>
           </React.Fragment>

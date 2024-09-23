@@ -323,6 +323,8 @@ const Layout = ({
                     className="arrow-img"
                     draggable="false"
                   />
+
+
                 </div>
                 <div className="icon-dots">
                   <img
@@ -371,6 +373,7 @@ const Layout = ({
                       className="dots-img"
                       draggable="false"
                     />
+
                   </div>
                 </div>
               </div>

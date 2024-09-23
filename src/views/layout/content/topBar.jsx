@@ -4,15 +4,9 @@
  * @Date: 2024-07-18 10:06:45
  */
 import React, { useRef, useEffect, useState, useCallback } from "react";
-import pickUpSvg from "@/assets/layout/pickup.svg";
-import newFileSvg from "@/assets/layout/newFile.svg";
-import newFolderSvg from "@/assets/layout/newFolder.svg";
-import previewSvg from "@/assets/layout/preview.svg";
-import redoSvg from "@/assets/layout/redo.svg";
-import searchSvg from "@/assets/layout/search.svg";
-import undoSvg from "@/assets/layout/undo.svg";
 import logSvg from "@/assets/layout/log.svg";
 import magicSvg from "@/assets/layout/magic.svg";
+import ArIcon from "@/components/arIcon";
 import { IconButton } from "@mui/material";
 import Tooltip from "@/components/tooltip";
 import Controls from "./controls";
@@ -170,19 +164,19 @@ const ContentTopBar = (props) => {
     return [
       {
         key: "pickUp",
-        src: pickUpSvg,
+        src: "Pickup",
         alt: "Pick Up",
         click: handleActionClick,
       },
       showSide && {
         key: "newFile",
-        src: newFileSvg,
+        src: "NewFile",
         alt: "New File",
         click: handleActionClick,
       },
       showSide && {
         key: "newFolder",
-        src: newFolderSvg,
+        src: "NewFolder",
         alt: "New Folder",
         click: handleActionClick,
       },
@@ -192,11 +186,11 @@ const ContentTopBar = (props) => {
         // alt: "Upload File",
         // click: handleActionClick,
       },
-      { key: "redo", src: redoSvg, alt: "Redo", click: handleActionClick },
-      { key: "undo", src: undoSvg, alt: "Undo", click: handleActionClick },
+      { key: "redo", src: "Redo", alt: "Redo", click: handleActionClick },
+      { key: "undo", src: "Undo", alt: "Undo", click: handleActionClick },
       {
         key: "search",
-        src: searchSvg,
+        src: "Search",
         alt: "Search",
         click: handleActionClick,
       },
@@ -268,11 +262,12 @@ const ContentTopBar = (props) => {
                 size="small"
                 onClick={() => icon.click(icon.key)}
               >
-                <img
+                {/* <img
                   src={icon.src}
                   alt={icon.alt}
                   className="w-5 h-5 cursor-pointer hover:opacity-75"
-                />
+                /> */}
+                   <ArIcon name={icon.src}  className="text-black w-5 h-5 cursor-pointer hover:opacity-75"/>
               </IconButton>
             </Tooltip>
           );
@@ -387,6 +382,7 @@ const ContentTopBar = (props) => {
                   alt=""
                   className="w-5 h-5 cursor-pointer hover:opacity-75"
                 />
+                
               </Badge>
             </IconButton>
           </Tooltip>
@@ -399,11 +395,7 @@ const ContentTopBar = (props) => {
               size="small"
               onClick={toggleView}
             >
-              <img
-                src={previewSvg}
-                alt=""
-                className="w-5 h-5 cursor-pointer hover:opacity-75"
-              />
+                           <ArIcon name={"Preview"}  className="text-black w-5 h-5 cursor-pointer hover:opacity-75"/>
             </IconButton>
           </Tooltip>
 

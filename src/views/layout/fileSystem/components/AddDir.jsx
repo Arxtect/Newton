@@ -5,12 +5,11 @@
  */
 import React, { useState, useRef, useEffect } from "react";
 import { Box, TextField } from "@mui/material";
-import FolderIcon from "@mui/icons-material/Folder";
 import { useFileStore } from "store";
 
 import path from "path";
 import { ListItemIcon } from "@mui/material";
-import folderCloseSvg from "@/assets/layout/folderClose.svg";
+import ArIcon from "@/components/arIcon";
 
 const AddDir = ({ parentDir, depth }) => {
   const { createFile, createDirectory, finishDirCreating, cancelDirCreating } =
@@ -64,8 +63,7 @@ const AddDir = ({ parentDir, depth }) => {
           minWidth: "unset",
         }}
       >
-        {/* <FolderIcon /> */}
-        <img src={folderCloseSvg} alt="" />
+        <ArIcon name={"FolderClose"} className="text-black w-[1.5rem]" />
       </ListItemIcon>
       <TextField
         className="tailwind-classes-for-input"

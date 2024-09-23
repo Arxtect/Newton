@@ -116,8 +116,8 @@ module.exports = function (proxy, allowedHost) {
       "/api/v1": {
         // target: "http://3.227.9.181:8012",
         // target: "http://172.17.15.200:8012",
-        target: "http://127.0.0.1:8012",
-        // target: "https://arxtect.com",
+        // target: "http://127.0.0.1:8012",
+        target: "https://arxtect.com",
         changeOrigin: true,
         onProxyReq: function (proxyReq, req, res) {
           // 设置 Connection 头为 keep-alive
@@ -132,8 +132,8 @@ module.exports = function (proxy, allowedHost) {
         pathRewrite: { "^/minio": "" },
       },
       "/git": {
-        // target: "http://3.227.9.181:3006",
-        target: "http://10.10.101.126:3006",
+        target: "http://3.227.9.181:3006",
+        // target: "http://10.10.101.126:3006",
         changeOrigin: true,
         pathRewrite: { "^/git": "" },
       },

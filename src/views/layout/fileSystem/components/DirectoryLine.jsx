@@ -20,9 +20,8 @@ import FileIcon from "@mui/icons-material/InsertDriveFile";
 import { Box, TextField } from "@mui/material";
 
 import { readFileStats } from "domain/filesystem";
-import folderOpenSvg from "@/assets/layout/folderOpen.svg";
-import folderCloseSvg from "@/assets/layout/folderClose.svg";
 import { useFileStore } from "store";
+import ArIcon from "@/components/arIcon";
 
 const LinkedLines = ({
   dirpath,
@@ -262,9 +261,10 @@ const DirectoryLineContent = ({
             <ListItemIcon style={{ minWidth: "unset" }}>
               {/* {opened ? <FolderOpenIcon /> : <FolderIcon />} */}
               {opened ? (
-                <img src={folderOpenSvg} alt="" />
+                <ArIcon name={"FolderOpen"} className="text-black w-[1.5rem]" />
               ) : (
-                <img src={folderCloseSvg} alt="" />
+                <ArIcon name={"FolderClose"} className="text-black w-[1.5rem]" />
+
               )}
             </ListItemIcon>
             {renamingPathname === dirpath ? (

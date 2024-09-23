@@ -85,7 +85,7 @@ const Grid = ({
               >
                 {item.title}
               </div>
-              <div className="action absolute top-[50%] transform -translate-y-[50%]">
+              <div className="action absolute top-[50%] transform -translate-y-[50%] w-full">
                 <Action
                   item={item}
                   auth={auth}

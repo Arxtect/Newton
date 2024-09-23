@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import download from "@/assets/download.svg";
 import ellipsis from "@/assets/ellipsis.svg";
 import logoIcon from "@/assets/logo-icon.svg";
 import Share from "../share";
@@ -8,6 +7,7 @@ import PublishDocument from "../publishDocument";
 import { useUserStore, useFileStore } from "@/store";
 import { downloadDirectoryAsZip } from "domain/filesystem";
 import { useNavigate } from "react-router-dom";
+
 
 import ArIcon from "@/components/arIcon";
 
@@ -60,7 +60,7 @@ const TopBar = (props) => {
     // { key: "History", src: history, label: "History", click: handleClick },
     { key: "Publish", src: "", label: "Publish", click: handleClick },
     { key: "Share", src: "", label: "Share", click: handleClick },
-    { key: "Download", src: download, label: "", click: handleClick },
+    { key: "Download", src: "Download", label: "", click: handleClick },
     // { key: "More", src: down, label: "", click: handleClick },
   ];
 
@@ -136,7 +136,7 @@ const TopBar = (props) => {
                   }}
                 >
                   {!button.label && <span>{"\u00A0"}</span>}
-                  <img src={button.src} alt="" className="w-4 h-4" />
+                  <ArIcon name={button.src}  className="text-black w-4"/>
                   <span>{button.label || "\u00A0"}</span> {/* 使用空格字符 */}
                 </button>
               </Tooltip>

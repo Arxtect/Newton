@@ -18,6 +18,8 @@ import ArMenuRadix from "@/components/arMenuRadix";
 import editorPdfSvg from "@/assets/layout/editorPdf.svg";
 import onlyPdfSvg from "@/assets/layout/onlyPdf.svg";
 import onlyCodeSvg from "@/assets/layout/onlyCode.svg";
+import ArIcon from "@/components/arIcon";
+
 import Tooltip from "@/components/tooltip";
 
 const CustomDropdownMenu = forwardRef((props, ref) => {
@@ -73,11 +75,7 @@ const CustomDropdownMenu = forwardRef((props, ref) => {
             onClick={handleClick}
           >
             <Tooltip content={"Layout"} position="bottom">
-              <img
-                src={layoutSvg}
-                alt=""
-                className="w-5 h-5 cursor-pointer hover:opacity-75"
-              />
+                           <ArIcon name={"Layout"}  className="text-black w-5 h-5 cursor-pointer hover:opacity-75"/>
             </Tooltip>
           </IconButton>
         }

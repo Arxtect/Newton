@@ -16,8 +16,7 @@ import { saveZipToBlob } from "domain/filesystem";
 import ArDialog from "@/components/arDialog";
 import ArButton from "@/components/arButton";
 import { useUserStore, updateDialogLoginOpen, usePdfPreviewStore } from "store";
-
-import publish from "@/assets/publish.svg";
+import ArIcon from "@/components/arIcon";
 import Tooltip from "@/components/tooltip";
 
 const ProductDialog = () => {
@@ -159,7 +158,7 @@ const ProductDialog = () => {
             handleOpenPublish();
           }}
         >
-          <img src={publish} alt="" className="w-4 h-4" />
+          <ArIcon name={"Publish"}  className="text-black w-4 h-4"/>
           <span>Publish</span> {/* 使用空格字符 */}
         </button>
       </Tooltip>

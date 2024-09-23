@@ -8,10 +8,6 @@ import React, {
 import ContentBar from "./contentBar";
 import Grid from "./grid";
 import Table from "./table";
-import tableSvg from "@/assets/project/table.svg";
-import gridSvg from "@/assets/project/grid.svg";
-import tipSvg from "@/assets/tip.svg";
-import expandSvg from "@/assets/project/expand.svg";
 import Tooltip from "@/components/tooltip";
 
 import {
@@ -28,6 +24,8 @@ import ArDialog from "@/components/arDialog";
 import { getYDocToken, deleteGitRepo,getGitRepoList, getRoomUserAccess } from "services";
 import { useNavigate } from "react-router-dom";
 import { ProjectSync } from "@/convergence";
+
+import ArIcon from "@/components/arIcon";
 
 const Content = React.forwardRef(
   ({ currentSelectMenu, setCurrentSelectMenu }, ref) => {
@@ -285,7 +283,7 @@ const Content = React.forwardRef(
                 content="Trash project are automatically deleted after 30 days"
                 position={"top"}
               >
-                <img src={tipSvg} alt="" className="w-4 ml-2 cursor-pointer" />
+                <ArIcon name={"Tip"}  className="w-4 ml-2 cursor-pointer text-arxTheme"/>
               </Tooltip>
             )}
           </div>
@@ -301,7 +299,8 @@ const Content = React.forwardRef(
                   }`}
                   onClick={() => setSortType("table")}
                 >
-                  <img src={tableSvg} alt="Table View" className="w-5 h-5" />
+                  <ArIcon name={"Table"}  className="w-5 h-5"/>
+
                 </div>
               </Tooltip>
               <Tooltip content="Grid" position={"bottom"}>
@@ -319,7 +318,7 @@ const Content = React.forwardRef(
                       : null
                   }
                 >
-                  <img src={gridSvg} alt="Grid View" className="w-5 h-5" />
+                  <ArIcon name={"Grid"}  className="w-5 h-5"/>
                 </div>
               </Tooltip>
             </div>
@@ -334,7 +333,8 @@ const Content = React.forwardRef(
                 <option value="alphabetical">Alphabetical</option>
               </select>
               <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                <img src={expandSvg} alt="expand" />
+   
+                <ArIcon name={"Expand"}/>
               </div>
             </div>
           </div>

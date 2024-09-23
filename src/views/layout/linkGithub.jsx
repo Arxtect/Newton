@@ -20,7 +20,8 @@ import path from "path";
 import { setupAndPushToRepo } from "domain/git";
 import { existsPath } from "domain/filesystem";
 import BottomDrawer from "@/features/bottomDrawer/bottomDrawer";
-import syncSvg from "@/assets/project/gitCloud.svg";
+import ArIcon from "@/components/arIcon";
+
 import { getGitToken, createGitRepo } from "@/services";
 import { getGiteaFullUrl } from "@/util";
 
@@ -194,7 +195,7 @@ const LinkGithub = (props) => {
             className={`flex items-center text-gray-700 px-2 py-1 hover:bg-gray-200 active:bg-[#9fd5a2] space-x-1 `}
             onClick={() => toggleDrawer(true)}
           >
-            <img src={syncSvg} alt="" className="w-4 h-4" />
+            <ArIcon name={"GitCloud"}  className="text-black w-4 h-4"/>
             <span>Sync</span>
           </button>
         </Tooltip>
@@ -204,7 +205,7 @@ const LinkGithub = (props) => {
             className={`flex items-center text-gray-700 px-2 py-1 hover:bg-gray-200 active:bg-[#9fd5a2] space-x-1 `}
             onClick={() => setDialogOpen(true)}
           >
-            <img src={syncSvg} alt="" className="w-4 h-4" />
+            <ArIcon name={"GitCloud"}  className="text-black w-4 h-4"/>
             <span>Sync</span>
           </button>
         </Tooltip>

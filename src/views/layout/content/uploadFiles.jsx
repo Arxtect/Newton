@@ -11,9 +11,9 @@ import path from "path";
 import { useNavigate } from "react-router-dom";
 import FileUploader from "@/features/uploadFiles";
 import { IconButton } from "@mui/material";
-import uploadFileSvg from "@/assets/layout/uploadFile.svg";
 import { uploadFile, uploadFolder, readFile } from "@/domain/filesystem";
 import Tooltip from "@/components/tooltip";
+import ArIcon from "@/components/arIcon";
 
 const UploadFiles = ({
   user,
@@ -118,7 +118,7 @@ const UploadFiles = ({
             setDialogOpen(true);
           }}
         >
-          <img src={uploadFileSvg} alt="" className="w-5 h-5" />
+          <ArIcon name={"UploadFile"}  className="text-black w-5 h-5"/>
         </IconButton>
       </Tooltip>
       <FileUploader

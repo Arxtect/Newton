@@ -5,17 +5,12 @@ import path from "path";
 import pify from "pify";
 import Draggable from "./Draggable"; // Adjust the import path as needed
 import Pathname from "./Pathname"; // Adjust the import path as needed
-import FileIcon from "@mui/icons-material/InsertDriveFile"; // Assuming you have a FileIcon component
 import { ListItemIcon } from "@mui/material";
 import { Box, TextField } from "@mui/material";
-
-import ContextMenu from "@mui/material/Menu";
-import ContextMenuItem from "@mui/material/MenuItem";
-import ContextMenuTrigger from "@mui/material/IconButton";
 import { useFileStore } from "store";
 
 import HoverMenu from "./HoverMenu";
-import fileSvg from "@/assets/layout/file.svg";
+import ArIcon from "@/components/arIcon";
 
 const Container = ({ selected, children }) => {
   // Define the base classes for the component
@@ -47,7 +42,7 @@ const FileLine = ({
     editingFilepath,
     currentSelectDir,
     renamingPathname,
-    isDropFileSystem
+    isDropFileSystem,
   } = useFileStore((state) => ({
     editorValue: state.value,
     saveFile: state.saveFile,
@@ -55,7 +50,7 @@ const FileLine = ({
     currentSelectDir: state.currentSelectDir,
     deleteFile: state.deleteFile,
     renamingPathname: state.renamingPathname,
-    isDropFileSystem:state.isDropFileSystem
+    isDropFileSystem: state.isDropFileSystem,
   }));
   const basename = path.basename(filepath);
 
@@ -119,8 +114,7 @@ const FileLine = ({
             minWidth: "unset",
           }}
         >
-          {/* <FileIcon /> */}
-          <img src={fileSvg} alt="" />
+          <ArIcon name={"File"} className="text-black w-[1.5rem]" />
         </ListItemIcon>
         <TextField
           className="tailwind-classes-for-input"
@@ -131,23 +125,23 @@ const FileLine = ({
           onBlur={handleBlur}
           onKeyDown={handleKeyDown}
           inputRef={inputRef}
-       sx={{
-          "& .MuiInputBase-input": {
-            height: "24px",
-            padding: "0 6px",
-          },
-          "& .MuiOutlinedInput-root": {
-            "& fieldset": {
-              borderColor: "#81C784",
+          sx={{
+            "& .MuiInputBase-input": {
+              height: "24px",
+              padding: "0 6px",
             },
-            "&:hover fieldset": {
-              borderColor: "#81C784",
+            "& .MuiOutlinedInput-root": {
+              "& fieldset": {
+                borderColor: "#81C784",
+              },
+              "&:hover fieldset": {
+                borderColor: "#81C784",
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "#81C784",
+              },
             },
-            "&.Mui-focused fieldset": {
-              borderColor: "#81C784",
-            },
-          },
-        }}
+          }}
         />
       </Box>
     );
@@ -190,8 +184,8 @@ const FileLine = ({
                 minWidth: "unset",
               }}
             >
-              <img src={fileSvg} alt="" />
-            </ListItemIcon>
+          <ArIcon name={"File"} className="text-black w-[1.5rem]" />
+          </ListItemIcon>
             <Pathname ignoreGit={ignoreGit}>{basename}</Pathname>
             {hovered && (
               <HoverMenu
@@ -213,30 +207,6 @@ const FileLine = ({
   );
 };
 
-// const FileContextMenu = ({
-//   root,
-//   addToStage,
-//   deleteFile,
-//   startRenaming,
-//   // include other props as necessary
-// }) => {
 
-//   const handleDelete = (event) => {
-//     deleteFile({ filename: event.currentTarget.dataset.filepath });
-//   };
-
-//   const handleAddToStage = (event) => {
-//     const relpath = path.relative(root, event.currentTarget.dataset.filepath);
-//     addToStage({ projectRoot: root, relpath });
-//   };
-
-//   return (
-//     <ContextMenu id="file">
-//       <ContextMenuItem onClick={handleRename}>Rename</ContextMenuItem>
-//       <ContextMenuItem onClick={handleDelete}>Delete</ContextMenuItem>
-//       <ContextMenuItem onClick={handleAddToStage}>Add to stage</ContextMenuItem>
-//     </ContextMenu>
-//   );
-// };
 
 export default FileLine;

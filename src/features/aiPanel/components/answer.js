@@ -5,9 +5,7 @@
  */
 import { memo, useEffect, useRef, useState } from "react";
 // import More from './more'
-import answerTriangleSvg from "@/assets/chat/answerTriangle.svg";
 import { Markdown } from "@/features/aiTools/markdown";
-import logoIcon from "@/assets/logo-icon.svg";
 import CopyBtn from "@/components/copy-btn";
 import LoadingAnim from "@/components/loading-anim";
 

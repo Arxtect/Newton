@@ -1,10 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Box, TextField } from "@mui/material";
-import FileIcon from "@mui/icons-material/InsertDriveFile"; // Assuming you have a FileIcon component
 import path from "path";
 import { useFileStore } from "store";
 import { ListItemIcon } from "@mui/material";
-import fileSvg from "@/assets/layout/file.svg";
+import ArIcon from "@/components/arIcon";
 
 const AddFile = ({ parentDir, depth }) => {
   const {
@@ -63,9 +62,8 @@ const AddFile = ({ parentDir, depth }) => {
           minWidth: "unset",
         }}
       >
-        {/* <FileIcon /> */}
-        <img src={fileSvg} alt="" />
-      </ListItemIcon>
+          <ArIcon name={"File"} className="text-black w-[1.5rem]" />
+          </ListItemIcon>
       <TextField
         className="tailwind-classes-for-input"
         variant="outlined"

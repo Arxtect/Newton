@@ -5,12 +5,10 @@
  */
 import React, { useEffect, useState } from "react";
 import ArDialog from "@/components/arDialog";
-import { TextField, Box } from "@mui/material";
 import { toast } from "react-toastify";
 import { ProjectSync } from "@/convergence";
 import { useFileStore } from "store";
 import { getYDocToken } from "services";
-import linkSvg from "@/assets/link.svg";
 import { getProjectInfo, createProjectInfo } from "domain/filesystem";
 import ShareProject from "@/features/share";
 import {
@@ -22,6 +20,7 @@ import {
   reopenRoom,
 } from "@/services";
 import { useCopyToClipboard } from "@/useHooks";
+import ArIcon from "@/components/arIcon";
 
 const Share = ({
   dialogOpen,
@@ -178,13 +177,8 @@ const Share = ({
             className="flex items-center gap-2.5 text-sm  cursor-pointer"
             onClick={() => copyLink()}
           >
-            <img
-              loading="lazy"
-              src={linkSvg}
-              className="object-contain shrink-0 w-6 aspect-square"
-              alt=""
-            />
-            <span className="text-[#81C684]">Copy Link</span>
+             <ArIcon name={"Link"} className="object-contain shrink-0 w-6 aspect-square text-arxTheme"  loading="lazy"/>
+            <span className="text-arxTheme">Copy Link</span>
           </div>
         </div>
       }
