@@ -1,0 +1,26 @@
+{
+  "icon": {
+    "type": "element",
+    "isRootNode": true,
+    "name": "svg",
+    "attributes": {
+      "xmlns": "http://www.w3.org/2000/svg",
+      "viewBox": "0 0 1024 1024",
+      "width": "20",
+      "height": "20"
+    },
+    "children": [
+      {
+        "type": "element",
+        "name": "path",
+        "attributes": {
+          "d": "M512 1024A512 512 0 1 1 512 0a512 512 0 0 1 0 1024z m38.229333-816.469333h-85.333333v426.666666h85.333333v-426.666666z m0.256 533.333333h-85.333333v85.333333h85.333333v-85.333333z",
+          "fill": "currentColor"
+        },
+        "children": []
+      }
+    ]
+  },
+  "name": "Error"
+}
+

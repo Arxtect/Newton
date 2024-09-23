@@ -7,9 +7,12 @@ import React, { forwardRef, useMemo } from "react";
 import IconBase from "./IconBase";
 
 // 动态导入所有 JSON 数据
-const context = require.context("./data", false, /\.json$/);
+const context = require.context("./data", true, /\.json$/);
+
 const icons = context.keys().reduce((acc, key) => {
-  const iconName = key.replace("./", "").replace(".json", "");
+  const iconName = key
+    .replace(/^.*[\\\/]/, "") // 移除路径，只保留文件名
+    .replace(".json", ""); // 移除文件扩展名
   acc[iconName] = context(key);
   return acc;
 }, {});

@@ -1,0 +1,27 @@
+{
+  "icon": {
+    "type": "element",
+    "isRootNode": true,
+    "name": "svg",
+    "attributes": {
+      "width": "24",
+      "height": "24",
+      "viewBox": "0 0 24 24",
+      "fill": "none",
+      "xmlns": "http://www.w3.org/2000/svg"
+    },
+    "children": [
+      {
+        "type": "element",
+        "name": "path",
+        "attributes": {
+          "d": "M16.8 7.7V9.3H16.5V8.5V8H16H11.3V3.3V2.8H10.8H4.3H3.8V3.3V17.6V18.1H4.3H9V18.4H3.85711L3.5 18.0429V2.85711L3.85711 2.5H11.6V3.3V7.2V7.7H12.1H15.87H16.8ZM12.0221 2.5H12.2789L12.4763 2.5658L16.7176 6.93185L16.8 7.26155V7.44267L16.2295 6.85249L12.4595 2.95249L12.0221 2.5ZM17.3 16.8H20.7V17.1H17.3H16.8V17.6V21H16.5V17.6V17.1H16H12.6V16.8H16H16.5V16.3V12.9H16.8V16.3V16.8H17.3Z",
+          "fill": "currentColor",
+          "stroke": "currentColor"
+        },
+        "children": []
+      }
+    ]
+  },
+  "name": "NewFile"
+}

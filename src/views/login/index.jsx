@@ -1,4 +1,8 @@
-import { loginUser, registerUser, refreshAuth, logoutUser } from "services";
+/*
+ * @Description:
+ * @Author: Devin
+ * @Date: 2024-05-28 13:48:03
+ */
 
 // LoginPage.js
 import React, { useState, useEffect } from "react";
@@ -9,11 +13,12 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { updateAccessToken } from "store";
 import { useUserStore } from "store";
-import emailSvg from "@/assets/website/email.svg";
-import passwordSvg from "@/assets/website/password.svg";
 import ArButton from "@/components/arButton";
 import ArInput from "@/components/arInput";
 import { getMe } from "@/services";
+import { loginUser, registerUser, refreshAuth, logoutUser } from "services";
+
+import ArIcon from "@/components/arIcon";
 
 const loginSchema = object({
   email: string()
@@ -98,7 +103,7 @@ const LoginPage = ({ isDialog = false, handleClose }) => {
               placeholder="Email"
               register={register}
               errors={errors}
-              icon={emailSvg}
+              icon={<ArIcon name="Email" className="h-5 w-5" />}
             />
             <ArInput
               label="Password"
@@ -107,7 +112,7 @@ const LoginPage = ({ isDialog = false, handleClose }) => {
               placeholder="Password"
               register={register}
               errors={errors}
-              icon={passwordSvg}
+              icon={<ArIcon name="Password" className="h-5 w-5" />}
             />
 
             <div className="flex justify-end mb-4">
