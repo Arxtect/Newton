@@ -12,12 +12,11 @@ import React, {
   forwardRef,
   useImperativeHandle,
 } from "react";
-import { IconButton, Tooltip } from "@mui/material";
+import { IconButton } from "@mui/material";
+import Tooltip from "@/components/tooltip";
+
 import { useNavigate } from "react-router-dom";
-import {
-  downloadDirectoryAsZip,
-  createProjectInfo,
-} from "domain/filesystem";
+import { downloadDirectoryAsZip, createProjectInfo } from "domain/filesystem";
 import copySvg from "@/assets/project/copy.svg";
 import deleteSvg from "@/assets/project/delete.svg";
 import downloadSvg from "@/assets/project/download.svg";
@@ -31,7 +30,7 @@ import ArDialog from "@/components/arDialog";
 import CopyProject from "../copyProject";
 import RenameProject from "../renameProject";
 import Share from "../share";
-import {  deleteGitRepo } from "services";
+import { deleteGitRepo } from "services";
 import { useUserStore, useLoginStore, useFileStore } from "@/store";
 
 const HoverAction = forwardRef(
@@ -170,10 +169,10 @@ const HoverAction = forwardRef(
     };
 
     return (
-      <div>
+      <div className="flex items-center">
         {item?.type == "git" ? (
           <React.Fragment>
-            <Tooltip title="Import">
+            <Tooltip content="Import" position="bottom">
               <IconButton
                 size="small"
                 onClick={(e) => {
@@ -184,7 +183,7 @@ const HoverAction = forwardRef(
                 <img src={gitCloudSvg} className="w-4" alt="" />
               </IconButton>
             </Tooltip>
-            <Tooltip title="Delete">
+            <Tooltip content="Delete" position="bottom">
               <IconButton
                 size="small"
                 onClick={(e) => {
@@ -200,7 +199,7 @@ const HoverAction = forwardRef(
           </React.Fragment>
         ) : item?.isClosed ? (
           <React.Fragment>
-            <Tooltip title="Restore">
+            <Tooltip content="Restore" position="bottom">
               <IconButton
                 size="small"
                 onClick={(e) => {
@@ -211,7 +210,7 @@ const HoverAction = forwardRef(
                 <img src={restoreSvg} className="w-4" alt="" />
               </IconButton>
             </Tooltip>
-            <Tooltip title="Delete">
+            <Tooltip content="Delete" position="bottom">
               <IconButton
                 size="small"
                 onClick={(e) => {
@@ -226,8 +225,8 @@ const HoverAction = forwardRef(
             </Tooltip>
           </React.Fragment>
         ) : (
-          <div>
-            <Tooltip title="Download">
+          <React.Fragment>
+            <Tooltip content="Download" position="bottom">
               <IconButton
                 size="small"
                 onClick={(e) => {
@@ -247,7 +246,7 @@ const HoverAction = forwardRef(
                 <img src={downloadSvg} alt="" />
               </IconButton>
             </Tooltip>
-            <Tooltip title="Copy">
+            <Tooltip content="Copy" position="bottom">
               <IconButton
                 size="small"
                 onClick={(e) => {
@@ -267,7 +266,7 @@ const HoverAction = forwardRef(
                 <img src={copySvg} alt="" />
               </IconButton>
             </Tooltip>
-            <Tooltip title="Download PDF">
+            <Tooltip content="Download PDF" position="bottom">
               <IconButton
                 size="small"
                 onClick={(e) => {
@@ -286,7 +285,7 @@ const HoverAction = forwardRef(
                 <img src={downloadPdfSvg} alt="" />
               </IconButton>
             </Tooltip>
-            <Tooltip title="SHARE">
+            <Tooltip content="SHARE" position="bottom">
               <IconButton
                 size="small"
                 onClick={(e) => {
@@ -311,7 +310,7 @@ const HoverAction = forwardRef(
                 <img src={shareSvg} alt="" />
               </IconButton>
             </Tooltip>
-            <Tooltip title="Trash">
+            <Tooltip content="Trash" position="bottom">
               <IconButton
                 size="small"
                 onClick={(e) => {
@@ -332,7 +331,7 @@ const HoverAction = forwardRef(
                 <img src={deleteSvg} alt="" />
               </IconButton>
             </Tooltip>
-          </div>
+          </React.Fragment>
         )}
 
         <CopyProject

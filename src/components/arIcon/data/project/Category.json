@@ -1,0 +1,51 @@
+{
+  "icon": {
+    "type": "element",
+    "isRootNode": true,
+    "name": "svg",
+    "attributes": {
+      "width": "26",
+      "height": "26",
+      "viewBox": "0 0 26 26",
+      "fill": "none",
+      "xmlns": "http://www.w3.org/2000/svg"
+    },
+    "children": [
+      {
+        "type": "element",
+        "name": "path",
+        "attributes": {
+          "d": "M7.58334 13L18.4167 13",
+          "stroke": "currentColor",
+          "stroke-width": "2",
+          "stroke-linecap": "round",
+          "stroke-linejoin": "round"
+        },
+        "children": []
+      },
+      {
+        "type": "element",
+        "name": "path",
+        "attributes": {
+          "d": "M13 7.58337V18.4167",
+          "stroke": "currentColor",
+          "stroke-width": "2",
+          "stroke-linecap": "round",
+          "stroke-linejoin": "round"
+        },
+        "children": []
+      },
+      {
+        "type": "element",
+        "name": "path",
+        "attributes": {
+          "d": "M22.75 13C22.75 18.3848 18.3848 22.75 13 22.75C7.61523 22.75 3.25 18.3848 3.25 13C3.25 7.61523 7.61523 3.25 13 3.25C18.3848 3.25 22.75 7.61523 22.75 13Z",
+          "stroke": "currentColor",
+          "stroke-width": "2"
+        },
+        "children": []
+      }
+    ]
+  },
+  "name": "Category"
+}

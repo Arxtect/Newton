@@ -12,7 +12,9 @@ import redoSvg from "@/assets/layout/redo.svg";
 import searchSvg from "@/assets/layout/search.svg";
 import undoSvg from "@/assets/layout/undo.svg";
 import logSvg from "@/assets/layout/log.svg";
-import { IconButton, Tooltip } from "@mui/material";
+import magicSvg from "@/assets/layout/magic.svg";
+import { IconButton } from "@mui/material";
+import Tooltip from "@/components/tooltip";
 import Controls from "./controls";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import Badge from "@mui/material/Badge";
@@ -35,6 +37,7 @@ import * as constant from "@/constant";
 import path from "path";
 import ArButtonGroup from "@/components/arButtonGroup";
 import ArMenuRadix from "@/components/arMenuRadix";
+import AiPanel from "@/features/aiPanel";
 
 const ContentTopBar = (props) => {
   const {
@@ -105,6 +108,12 @@ const ContentTopBar = (props) => {
 
   const [isAutoCompile, setIsAutoCompile] = useState(false);
 
+  // useEffect(() => {
+  //   autoCompileFirst(() =>
+  //     compileLatex(sourceCode, currentProjectRoot, compileSetting)
+  //   );
+  // }, [sourceCode, engineStatus, currentProjectRoot, compileSetting]);
+
   const autoCompileFirst = (compileCallback) => {
     if (
       engineStatus === constant.readyEngineStatus &&
@@ -116,12 +125,6 @@ const ContentTopBar = (props) => {
       compileCallback && compileCallback();
     }
   };
-
-  useEffect(() => {
-    autoCompileFirst(() =>
-      compileLatex(sourceCode, currentProjectRoot, compileSetting)
-    );
-  }, [sourceCode, engineStatus, currentProjectRoot, compileSetting]);
 
   const handleActionClick = (key) => {
     switch (key) {
@@ -162,8 +165,6 @@ const ContentTopBar = (props) => {
         break;
     }
   };
-  const fileUploaderRef = useRef(null);
-  const folderUploaderRef = useRef(null);
 
   const actionList = React.useMemo(() => {
     return [
@@ -201,6 +202,21 @@ const ContentTopBar = (props) => {
       },
     ].filter(Boolean);
   }, [showSide, currentSelectDir]);
+
+  const handleAiClick = (key) => {
+    console.log(key, "key");
+  };
+
+  const aiList = React.useMemo(() => {
+    return [
+      {
+        key: "ai",
+        src: magicSvg,
+        alt: "AI",
+        // click: handleAiClick,
+      },
+    ].filter(Boolean);
+  }, []);
 
   return (
     <div className="flex items-center justify-between bg-[#e8f9ef] w-full">
@@ -245,7 +261,7 @@ const ContentTopBar = (props) => {
             );
           }
           return (
-            <Tooltip title={icon.alt} id={icon.key}>
+            <Tooltip content={icon.alt} id={icon.key} position="bottom">
               <IconButton
                 color="#inherit"
                 aria-label="toggleView"
@@ -261,6 +277,29 @@ const ContentTopBar = (props) => {
             </Tooltip>
           );
         })}
+
+        {/* <div className="border-l border-gray-300 h-6 mx-4"></div>
+
+        {aiList.map((icon) => {
+          return (
+            <Tooltip content={icon.alt} id={icon.key} position="bottom">
+              <AiPanel triggerType="click">
+                <IconButton
+                  color="#inherit"
+                  aria-label="toggleView"
+                  size="small"
+                  // onClick={() => icon.click(icon.key)}
+                >
+                  <img
+                    src={icon.src}
+                    alt={icon.alt}
+                    className="w-5 h-5 cursor-pointer hover:opacity-75"
+                  />
+                </IconButton>
+              </AiPanel>
+            </Tooltip>
+          );
+        })} */}
       </div>
       <div
         className={`flex items-center  justify-between space-x-10 mr-4 w-1/2 `}
@@ -329,7 +368,7 @@ const ContentTopBar = (props) => {
             </button>
           </ArButtonGroup>
 
-          <Tooltip title={"Compile Log"}>
+          <Tooltip content={"Compile Log"} position="bottom">
             <IconButton
               color="#inherit"
               aria-label="toggleView"
@@ -353,7 +392,7 @@ const ContentTopBar = (props) => {
           </Tooltip>
         </div>
         <div className="flex items-center space-x-2">
-          <Tooltip title={"Preview"}>
+          <Tooltip content={"Preview"} position="bottom">
             <IconButton
               color="#inherit"
               aria-label="toggleView"

@@ -6,7 +6,6 @@ import {
   FormControl,
   InputLabel,
   Checkbox,
-  Tooltip,
 } from "@mui/material";
 import { AddCircleOutline } from "@mui/icons-material";
 import { getAllTags, uploadDocument } from "services";
@@ -19,6 +18,7 @@ import ArButton from "@/components/arButton";
 import { useUserStore, updateDialogLoginOpen, usePdfPreviewStore } from "store";
 
 import publish from "@/assets/publish.svg";
+import Tooltip from "@/components/tooltip";
 
 const ProductDialog = () => {
   const { pdfUrl } = usePdfPreviewStore((state) => ({
@@ -63,12 +63,12 @@ const ProductDialog = () => {
   };
 
   const getAllTagsList = async () => {
-       try {
-         const list = await getAllTags();
-         setCustomTags(list.data.tags);
-       } catch (error) {
-         console.error(error);
-       }
+    try {
+      const list = await getAllTags();
+      setCustomTags(list.data.tags);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   useEffect(() => {
@@ -152,7 +152,7 @@ const ProductDialog = () => {
 
   return (
     <React.Fragment>
-      <Tooltip title="Share Your Project">
+      <Tooltip content="Share Your Project" position="bottom">
         <button
           className={`flex items-center text-gray-700 px-2 py-1 hover:bg-gray-200 active:bg-[#9fd5a2] space-x-1 `}
           onClick={() => {

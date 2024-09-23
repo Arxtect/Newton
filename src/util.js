@@ -292,3 +292,37 @@ export function getColors(i) {
     return colors[Math.floor(Math.random() * colors.length)];
   }
 }
+
+
+const chars =
+  "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_";
+
+export function randomString(length) {
+  let result = "";
+  for (let i = length; i > 0; --i)
+    result += chars[Math.floor(Math.random() * chars.length)];
+  return result;
+}
+
+export const getFirstNUpperCaseChars =(str, length=1)=> {
+  if (!str) {
+    return ""; // 如果输入字符串为空，返回空字符串
+  }
+
+  const firstNChars = str.slice(0, length); // 取前n个字符
+  const upperCaseChars = firstNChars.toUpperCase(); // 转换为大写
+
+  return upperCaseChars;
+}
+
+
+function extractLatex(markdown) {
+  const latexBlockRegex = /```latex\s*([\s\S]*?)\s*```/g;
+  let matches = [];
+  let match;
+  while ((match = latexBlockRegex.exec(markdown)) !== null) {
+      const content = match[1].split('\n').map(line => line.trim()).join('\n');
+      matches.push(content);
+  }
+  return matches?.[0] || "";
+}

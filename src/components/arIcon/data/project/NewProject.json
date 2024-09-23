@@ -1,0 +1,61 @@
+{
+  "icon": {
+    "type": "element",
+    "isRootNode": true,
+    "name": "svg",
+    "attributes": {
+      "width": "28",
+      "height": "28",
+      "viewBox": "0 0 28 28",
+      "fill": "none",
+      "xmlns": "http://www.w3.org/2000/svg"
+    },
+    "children": [
+      {
+        "type": "element",
+        "name": "path",
+        "attributes": {
+          "d": "M9.33331 14H10.5M18.6666 14H14",
+          "stroke": "currentColor",
+          "stroke-width": "2.15385",
+          "stroke-linecap": "round"
+        },
+        "children": []
+      },
+      {
+        "type": "element",
+        "name": "path",
+        "attributes": {
+          "d": "M18.6666 9.33325H17.5M14 9.33325H9.33331",
+          "stroke": "currentColor",
+          "stroke-width": "2.15385",
+          "stroke-linecap": "round"
+        },
+        "children": []
+      },
+      {
+        "type": "element",
+        "name": "path",
+        "attributes": {
+          "d": "M9.33331 18.6667H15.1666",
+          "stroke": "currentColor",
+          "stroke-width": "2.15385",
+          "stroke-linecap": "round"
+        },
+        "children": []
+      },
+      {
+        "type": "element",
+        "name": "path",
+        "attributes": {
+          "d": "M3.5 16.3333V11.6666C3.5 7.26681 3.5 5.06693 4.86683 3.70008C6.23367 2.33325 8.43355 2.33325 12.8333 2.33325H15.1667C19.5664 2.33325 21.7664 2.33325 23.1331 3.70008C23.8952 4.46214 24.2324 5.48312 24.3816 6.99992M24.5 11.6666V16.3333C24.5 20.733 24.5 22.933 23.1331 24.2997C21.7664 25.6666 19.5664 25.6666 15.1667 25.6666H12.8333C8.43355 25.6666 6.23367 25.6666 4.86683 24.2997C4.10479 23.5377 3.7676 22.5167 3.61841 20.9999",
+          "stroke": "currentColor",
+          "stroke-width": "2.15385",
+          "stroke-linecap": "round"
+        },
+        "children": []
+      }
+    ]
+  },
+  "name": "NewProject"
+}

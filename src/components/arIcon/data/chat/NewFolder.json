@@ -1,0 +1,29 @@
+{
+  "icon": {
+    "type": "element",
+    "isRootNode": true,
+    "name": "svg",
+    "attributes": {
+      "t": "1721270374308",
+      "class": "icon",
+      "viewBox": "0 0 1024 1024",
+      "version": "1.1",
+      "xmlns": "http://www.w3.org/2000/svg",
+      "p-id": "9857",
+      "width": "16",
+      "height": "16"
+    },
+    "children": [
+      {
+        "type": "element",
+        "name": "path",
+        "attributes": {
+          "d": "M618.666667 128l128 128H938.666667v298.666667h-64V320h-682.666667v469.333333H640V853.333333H128V128h490.666667z m202.666666 426.666667v117.333333H938.666667v64h-117.333334V853.333333h-64v-117.333333H640v-64h117.333333V554.666667h64z m-229.162666-362.666667H192V256h464.170667l-64-64z",
+          "fill": "currentColor"
+        },
+        "children": []
+      }
+    ]
+  },
+  "name": "NewFolder"
+}

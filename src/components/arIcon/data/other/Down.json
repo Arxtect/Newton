@@ -1,0 +1,31 @@
+{
+  "icon": {
+    "type": "element",
+    "isRootNode": true,
+    "name": "svg",
+    "attributes": {
+      "t": "1721222725477",
+      "class": "icon",
+      "viewBox": "0 0 1024 1024",
+      "version": "1.1",
+      "xmlns": "http://www.w3.org/2000/svg",
+      "p-id": "8892",
+      "width": "20",
+      "height": "20"
+    },
+    "children": [
+      {
+        "type": "element",
+        "name": "path",
+        "attributes": {
+          "d": "M954.898691 343.255785 870.554724 258.913864 511.998465 617.447611 153.438113 258.913864 69.099263 343.255785 511.997442 786.15601 512.591983 785.16545 512.741385 785.412067Z",
+          "fill": "currentColor",
+          "p-id": "8893"
+        },
+        "children": []
+      }
+    ]
+  },
+  "name": "Down"
+}
+

@@ -11,6 +11,7 @@ import emailSvg from "@/assets/website/email.svg";
 import passwordSvg from "@/assets/website/password.svg";
 import ArButton from "@/components/arButton";
 import ArInput from "@/components/arInput";
+import ArIcon from "@/components/arIcon";
 
 const loginSchema = object({
   email: string()
@@ -97,7 +98,7 @@ const NoRouteLogin = ({ handleClose }) => {
               placeholder="Email"
               register={register}
               errors={errors}
-              icon={emailSvg}
+              icon={<ArIcon name="Email" className="h-5 w-5" />}
             />
             <ArInput
               label="Password"
@@ -106,7 +107,7 @@ const NoRouteLogin = ({ handleClose }) => {
               placeholder="Password"
               register={register}
               errors={errors}
-              icon={passwordSvg}
+              icon={<ArIcon name="Password" className="h-5 w-5" />}
             />
 
             <div className="flex justify-end mb-4">

@@ -1,7 +1,8 @@
 import React, { useMemo, useRef, useState, useEffect } from "react";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
-import Tooltip from "@mui/material/Tooltip";
+import Tooltip from "@/components/tooltip";
+
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import ArDialog from "@/components/arDialog";
@@ -70,7 +71,7 @@ function ActionBar({
     <div className="flex items-center justify-center px-2 rounded-lg ">
       {/* Group the first three buttons */}
       <div className="flex divide-x divide-gray-300">
-        <Tooltip title="Download">
+        <Tooltip content="Download" position="bottom">
           <IconButton
             onClick={downloadClick}
             variant="outlined"
@@ -87,7 +88,7 @@ function ActionBar({
             <CloudDownloadIcon />
           </IconButton>
         </Tooltip>
-        <Tooltip title="Delete">
+        <Tooltip content="Delete" position="bottom">
           <IconButton
             onClick={handleDeleteProject}
             variant="outlined"
@@ -104,22 +105,6 @@ function ActionBar({
             <DeleteIcon />
           </IconButton>
         </Tooltip>
-        {/* <Tooltip title="Print">
-                    <IconButton
-                        variant="outlined"
-                        className="rounded-full"
-                        sx={{
-                            borderColor: 'var(--black)',
-                            color: 'var(--black)',
-                            '&:hover': {
-                                borderColor: '#687384',
-                                backgroundColor: 'rgba(104, 115, 132, 0.04)'
-                            },
-                        }}
-                    >
-                        <PrintIcon />
-                    </IconButton>
-                </Tooltip> */}
       </div>
 
       {/* Spacer */}

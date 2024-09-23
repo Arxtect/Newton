@@ -1,3 +1,8 @@
+/*
+ * @Description:
+ * @Author: Devin
+ * @Date: 2024-05-28 12:37:50
+ */
 module.exports = {
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
   important: false,
@@ -8,6 +13,7 @@ module.exports = {
       },
       fontFamily: {
         sans: ["Lato", "sans-serif"],
+        inter: ["Inter", "sans-serif"],
       },
       colors: {
         link: "#13678a",
@@ -69,6 +75,10 @@ module.exports = {
         },
       };
       addUtilities(newUtilities, ["responsive", "hover"]);
+    },
+    function ({ addVariant }) {
+      addVariant("nth-child-2n", "&:nth-child(2n)");
+      addVariant("nth-child-3n", "&:nth-child(3n)");
     },
   ],
   important: true,

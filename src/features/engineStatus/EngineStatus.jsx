@@ -3,9 +3,9 @@
  * @Author: Devin
  * @Date: 2024-05-28 12:37:50
  */
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import ReactTooltip from "react-tooltip";
+import { Tooltip as ReactTooltip } from "react-tooltip";
 import { useEffect } from "react";
 import { usePdfPreviewStore, useEngineStatusStore } from "store";
 import { CircularProgress } from "@mui/material";
@@ -13,6 +13,8 @@ import ErrorSvg from "@/assets/website/error.svg";
 import SuccessSvg from "@/assets/layout/success.svg";
 import * as constant from "@/constant";
 import RotatingIcon from "./RotatingIconButton";
+import { randomString } from "@/util";
+import Tooltip from "@/components/tooltip";
 
 export const EngineStatus = ({ className }) => {
   const { engineStatus, selectFormattedEngineStatus } = useEngineStatusStore();
@@ -32,20 +34,21 @@ export const EngineStatus = ({ className }) => {
     }
   };
 
-  useEffect(() => {
-    ReactTooltip.rebuild();
-  }, []);
-
+  // useEffect(() => {
+  //   ReactTooltip.rebuild();
+  // }, []);
+  const selector = useRef(`status-tooltip-${randomString(4)}`);
 
 
   return (
     <div className={`flex justify-center items-center ${className}`}>
-      <a data-tip={tooltip} data-for="engineStatus">
-        {[
-          constant.notReadyEngineStatus,
-          constant.busyEngineStatus,
-        ].includes(engineStatus) ? (
+      <Tooltip selector={selector.current} content={tooltip} position="bottom">
+        {[constant.notReadyEngineStatus, constant.busyEngineStatus].includes(
+          engineStatus
+        ) ? (
+          <div>
             <RotatingIcon isRotating={true} />
+          </div>
         ) : (
           <img
             src={
@@ -61,15 +64,7 @@ export const EngineStatus = ({ className }) => {
             // onClick={handleClick}
           />
         )}
-      </a>
-
-      <ReactTooltip
-        id="engineStatus"
-        place="bottom"
-        type="dark"
-        effect="solid"
-        html={true}
-      />
+      </Tooltip>
     </div>
   );
 };

@@ -66,3 +66,9 @@ export async function reopenRoom({ project_name }) {
   });
   return response;
 }
+
+
+export async function checkHealth() {
+  const response = await apiFetch(getApiUrl("/healthcheck"), "GET");
+  return response;
+}

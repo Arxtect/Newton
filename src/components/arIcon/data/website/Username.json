@@ -1,0 +1,35 @@
+{
+  "icon": {
+    "type": "element",
+    "isRootNode": true,
+    "name": "svg",
+    "attributes": {
+      "xmlns": "http://www.w3.org/2000/svg",
+      "viewBox": "0 0 1024 1024",
+      "width": "200",
+      "height": "200"
+    },
+    "children": [
+      {
+        "type": "element",
+        "name": "path",
+        "attributes": {
+          "d": "M512 347.52a85.76 85.76 0 1 0 82.56 85.76A85.76 85.76 0 0 0 512 347.52z",
+          "fill": "currentColor"
+        },
+        "children": []
+      },
+      {
+        "type": "element",
+        "name": "path",
+        "attributes": {
+          "d": "M512 64a448 448 0 1 0 448 448 448 448 0 0 0-448-448z m165.76 657.92a23.04 23.04 0 0 1-23.04-22.4 139.52 139.52 0 0 0-146.56-128 139.52 139.52 0 0 0-145.92 128 23.04 23.04 0 0 1-46.08 0 176.64 176.64 0 0 1 114.56-161.28A128 128 0 1 1 640 433.28a128 128 0 0 1-53.76 104.96 176 176 0 0 1 113.92 161.28 22.4 22.4 0 0 1-22.4 22.4z",
+          "fill": "currentColor"
+        },
+        "children": []
+      }
+    ]
+  },
+  "name": "Username"
+}
+
