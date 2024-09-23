@@ -42,6 +42,8 @@ export const useChat = (prevChatList, stopChat) => {
   const [currentApp, setCurrentApp] = useState(null);
   const [currentAppToken, setCurrentAppToken] = useState(null);
 
+  const [lastMessage, setLastMessage] = useState("");
+
   const handleGetAppList = useCallback(() => {
     getAppList().then((res) => {
       setAppList(res);
@@ -51,13 +53,14 @@ export const useChat = (prevChatList, stopChat) => {
 
   const handleGetAccessToken = useCallback(async (token) => {
     console.log(token, "token");
-    let res = await getAccessTokenAndStore(token)
+    let res = await getAccessTokenAndStore(token);
     console.log(res, "token");
     setCurrentAppToken(res);
-  },[]);
+  }, []);
 
   useEffect(() => {
     if (!currentApp) return;
+    console.log(currentApp, "currentApp");
     handleGetAccessToken(currentApp.access_token);
   }, [currentApp]);
 
@@ -99,6 +102,7 @@ export const useChat = (prevChatList, stopChat) => {
     handleStop();
     const newChatList = [];
     handleUpdateChatList(newChatList);
+    setLastMessage("");
   }, [handleStop, handleUpdateChatList]);
 
   const updateCurrentQA = useCallback(
@@ -198,6 +202,7 @@ export const useChat = (prevChatList, stopChat) => {
             { conversationId: newConversationId, messageId, taskId }
           ) => {
             responseItem.content = responseItem.content + message;
+            setLastMessage((prevMessage) => prevMessage + message); // 累加消息
 
             if (messageId && !hasSetResponseId) {
               responseItem.id = messageId;
@@ -206,7 +211,6 @@ export const useChat = (prevChatList, stopChat) => {
 
             if (isFirstMessage && newConversationId)
               connversationId.current = newConversationId;
-
 
             taskIdRef.current = taskId;
             if (messageId) responseItem.id = messageId;
@@ -220,6 +224,7 @@ export const useChat = (prevChatList, stopChat) => {
           },
           async onCompleted(hasError) {
             handleResponding(false);
+            // setLastMessage((prevMessage) => prevMessage + " "); // 累加消息
 
             if (hasError) return;
 
@@ -360,12 +365,7 @@ export const useChat = (prevChatList, stopChat) => {
       );
       return true;
     },
-    [
-      updateCurrentQA,
-      handleUpdateChatList,
-      handleResponding,
-      formatTime,
-    ]
+    [updateCurrentQA, handleUpdateChatList, handleResponding, formatTime]
   );
 
   useEffect(() => {
@@ -394,5 +394,6 @@ export const useChat = (prevChatList, stopChat) => {
     appList,
     handleUpdateChatList,
     currentAppToken,
+    lastMessage, 
   };
 };

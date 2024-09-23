@@ -1,183 +1,225 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { AiOutlineEdit, AiOutlineQuestionCircle, AiOutlineTranslation, AiOutlinePicture } from 'react-icons/ai';
+import React, {
+  useEffect,
+  useState,
+  useRef,
+  useCallback,
+  useMemo,
+} from "react";
 import { useLayout } from "store";
-import { container } from './../../styles';
+import AiPanel from "@/features/aiPanel";
+import Ace from "ace-builds/src-min-noconflict/ace";
+import "./aiTools.css"; // 引入样式文件
 
+import acceptIcon from "@/assets/chat/accept.svg";
+import discardIcon from "@/assets/chat/discard.svg";
 
-const DropdownMenu = ({ options, onSelect, activeIndex }) => {
-    return (
-        <div className="bg-white border border-gray-300 shadow-md mt-2 z-10">
-            {options.map((option, index) => (
-                <div
-                    key={index}
-                    className={`flex items-center gap-2 py-3 w-36 px-4 focus:bg-gray-200 ${index === activeIndex ? 'bg-gray-200' : 'hover:bg-gray-200'} cursor-pointer`}
-                    onClick={() => onSelect(option.value)}
-                >
-                    {option.icon}
-                    <span>{option.label}</span>
-                </div>
-            ))}
-        </div>
-    );
-};
+const Range = Ace.require("ace/range").Range;
 
-const AiTools = ({ editorRef }) => {
-    const [toolbarPosition, setToolbarPosition] = useState({ top: 0, left: 0 });
-    const [showDropdown, setShowDropdown] = useState(false);
-    const [activeIndex, setActiveIndex] = useState(0);
-    const [originalKeyHandler, setOriginalKeyHandler] = useState(null);
+const AiTools = ({ editor, completer }) => {
+  const [toolbarPosition, setToolbarPosition] = useState({ top: 0, left: 0 });
+  const [showDropdown, setShowDropdown] = useState(false);
+  const { sideWidth } = useLayout();
+  const sideWidthRef = useRef();
+  const [answerContent, setAnswerContent] = useState("");
+  const [isResponding, setIsResponding] = useState(false);
+  const [prevContentLength, setPrevContentLength] = useState(0);
+  const [markerRange, setMarkerRange] = useState(null);
 
-    const {
-        sideWidth,
-    } = useLayout();
+  const [incomeCommandOptions, setIncomeCommandOptions] = useState([]);
 
-    const handleCommand = (command) => {
-        const editor = editorRef.current.editor;
-        const cursorPosition = editor.getCursorPosition();
-        const session = editor.getSession();
-        const line = session.getLine(cursorPosition.row);
+  const handleAccept = useCallback(() => {
+    if (markerRange) {
+      editor.session.removeMarker(markerRange.id);
+      setMarkerRange(null);
+    }
+    setShowDropdown(false);
+  }, [markerRange]);
 
-        const previousChar = line.charAt(cursorPosition.column - 1);
+  const handleReject = useCallback(() => {
+    const session = editor.getSession();
+    if (markerRange) {
+      session.replace(markerRange.range, "");
+      editor.session.removeMarker(markerRange.id);
+      setMarkerRange(null);
+    }
+    setShowDropdown(false);
+  }, [markerRange]);
 
-        // Only remove the / character if it is actually there
-        if (previousChar === '/') {
-            // Move the cursor back one position
-            editor.moveCursorToPosition({ row: cursorPosition.row, column: cursorPosition.column - 1 });
-        }
-
-        switch (command) {
-            case 'section':
-                editor.remove('/');
-                editor.insert('\\section{title}\n');
-                break;
-            case 'itemize':
-                editor.remove('/');
-                editor.insert('\\begin{itemize}\n  \\item project1\n  \\item project2\n\\end{itemize}\n');
-                break;
-            default:
-                break;
-        }
-    };
-
-    const sideWidthRef = useRef()
-
-    useEffect(() => {
-        sideWidthRef.current = sideWidth
-    }, [sideWidth])
-
-    const handleCursorChange = (selection) => {
-        const editor = editorRef.current.editor;
-        const cursorPosition = editor.getCursorPosition();
-        const screenCoordinates = editor.renderer.textToScreenCoordinates(cursorPosition.row, cursorPosition.column);
-
-        const toolbarTop = screenCoordinates.pageY - editor.renderer.layerConfig.lineHeight;
-        const toolbarLeft = screenCoordinates.pageX - sideWidthRef.current;
-
-        setToolbarPosition({ top: toolbarTop, left: toolbarLeft });
-
-        const session = editor.getSession();
-        const line = session.getLine(cursorPosition.row);
-        const previousChar = line.charAt(cursorPosition.column - 1);
-        const previousChar2 = line.charAt(cursorPosition.column - 2);
-
-        if (previousChar === '/' && previousChar2 !== "/") {
-            setShowDropdown(true);
-        } else {
-            setShowDropdown(false);
-        }
-    };
-    const handleKeyDown = (event) => {
-        const editor = editorRef.current.editor;
-        console.log(showDropdown,'showDropdown')
-        if (showDropdown) {
-            event.preventDefault();
-            event.stopPropagation();
-            if (event.key === 'ArrowDown') {
-                setActiveIndex((prevIndex) => (prevIndex + 1) % options.length);
-            } else if (event.key === 'ArrowUp') {
-                setActiveIndex((prevIndex) => (prevIndex - 1 + options.length) % options.length);
-            } else if (event.key === 'Enter') {
-                handleCommand(options[activeIndex].value);
-                setShowDropdown(false);
-            } else {
-                if (originalKeyHandler) {
-                    editor.keyBinding.setKeyboardHandler(originalKeyHandler);
-                    setOriginalKeyHandler(null);
-                }
-            }
-        }
-    };
-
-
-    useEffect(() => {
-        const keydown =(event)=>{
-            console.log(event,'event')
-        }
-        const editor = editorRef.current.editor;
-        // Hide the dropdown menu
-        editor.container.addEventListener('keyup', keydown);
-
-
-        return () => {
-            editor.container.removeEventListener('keyup', keydown);
-        };
-    }, [showDropdown, activeIndex]);
-
-    
-    useEffect(() => {
-        const editor = editorRef.current.editor;
-        // Hide the dropdown menu
-        editor.session.selection.on('changeCursor', handleCursorChange);
-
-        return () => {
-            editor.session.selection.off('changeCursor', handleCursorChange);
-        };
-    }, [activeIndex]);
-
-    useEffect(() => {
-        const editor = editorRef.current.editor;
-        if (showDropdown) {
-            setOriginalKeyHandler(editor.keyBinding.getKeyboardHandler());
-            editor.keyBinding.addKeyboardHandler({
-                handleKeyboard: function (data, hash, keyString, keyCode, event) {
-                    if (keyString === 'down' || keyString === 'up' || keyCode === 13) {
-                        return { command: 'null', passEvent: false };
-                    }
-                    // Otherwise, allow default behavior
-                    return { command: null, passEvent: true };
-                }
-            });
-        } else {
-            if (originalKeyHandler) {
-                editor.keyBinding.setKeyboardHandler(originalKeyHandler);
-                setOriginalKeyHandler(null);
-            }
-        }
-    }, [showDropdown]);
-
-    const options = [
-        { icon: <AiOutlineEdit />, label: 'AI 续写', value: 'section' },
-        { icon: <AiOutlineQuestionCircle />, label: 'AI 优化', value: 'itemize' },
-        // { icon: <AiOutlinePicture />, label: 'AI 生图', value: 'generate' },
+  const incomeCommandOptionsCallback = useMemo(() => {
+    return [
+      {
+        text: "Accept",
+        icon: acceptIcon,
+        click: handleAccept,
+      },
+      {
+        text: "Discard",
+        icon: discardIcon,
+        click: handleReject,
+      },
     ];
+  }, [handleReject, handleAccept]);
 
-    return (
-        showDropdown && (
-            <div
-                className="toolbar"
-                style={{
-                    position: 'absolute',
-                    top: toolbarPosition.top + 10,
-                    left: toolbarPosition.left,
-                    zIndex: 10,
-                    display: 'flex',
-                    gap: '5px',
-                }}
-            >
-                <DropdownMenu options={options} onSelect={handleCommand} activeIndex={activeIndex} />
-            </div>
-        )
+  const handleCommand = useCallback(
+    (content) => {
+      if (content.length === 0) return;
+      try {
+        const cursorPosition = editor.getCursorPosition();
+        const session = editor.getSession();
+        const line = session.getLine(cursorPosition.row);
+        const previousChar = line.charAt(cursorPosition.column - 1);
+
+        if (previousChar === "/") {
+          editor.moveCursorToPosition({
+            row: cursorPosition.row,
+            column: cursorPosition.column - 1,
+          });
+          editor.session.replace(
+            {
+              start: {
+                row: cursorPosition.row,
+                column: cursorPosition.column - 1,
+              },
+              end: { row: cursorPosition.row, column: cursorPosition.column },
+            },
+            ""
+          );
+        }
+
+        const range = editor.getSelectionRange();
+        editor.session.replace(range, content);
+
+        // 计算新内容的行数和列数
+        const lines = content.split("\n");
+        const newEndRow = range.start.row + lines.length - 1;
+        const newEndColumn =
+          lines.length === 1
+            ? range.start.column + content.length
+            : lines[lines.length - 1].length;
+
+        let newRange;
+        if (markerRange) {
+          // 扩展现有的范围
+          newRange = new Range(
+            markerRange.range.start.row,
+            markerRange.range.start.column,
+            newEndRow,
+            newEndColumn
+          );
+          session.removeMarker(markerRange.id);
+        } else {
+          // 创建新的范围
+          newRange = new Range(
+            range.start.row,
+            range.start.column,
+            newEndRow,
+            newEndColumn
+          );
+        }
+
+        const markerId = session.addMarker(newRange, "ai-marker", "text");
+        setMarkerRange({ id: markerId, range: newRange });
+        setShowDropdown(true);
+      } catch (error) {
+        console.error("Error handling command:", error);
+      }
+    },
+    [editor, markerRange]
+  );
+
+  useEffect(() => {
+    sideWidthRef.current = sideWidth;
+  }, [sideWidth]);
+
+  const handleCursorChange = (selection) => {
+    const cursorPosition = editor.getCursorPosition();
+    const screenCoordinates = editor.renderer.textToScreenCoordinates(
+      cursorPosition.row,
+      0
+      // cursorPosition.column
     );
+    const editorElement = editor.container;
+    const rect = editorElement.getBoundingClientRect();
+    const toolbarTop =
+      screenCoordinates.pageY +
+      editor.renderer.layerConfig.lineHeight -
+      rect.top +
+      3;
+    const toolbarLeft = screenCoordinates.pageX - sideWidthRef.current;
+    setToolbarPosition({ top: toolbarTop, left: toolbarLeft });
+
+    const session = editor.getSession();
+    const line = session.getLine(cursorPosition.row);
+    const previousChar = line.charAt(cursorPosition.column - 1);
+    const previousChar2 = line.charAt(cursorPosition.column - 2);
+
+    if (previousChar === "/" && previousChar2 !== "/") {
+      setShowDropdown(true);
+    } else {
+      setShowDropdown(false);
+    }
+  };
+
+  useEffect(() => {
+    editor.session.selection.on("changeCursor", handleCursorChange);
+    return () => {
+      editor.session.selection.off("changeCursor", handleCursorChange);
+      handleReject();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!answerContent) {
+      setPrevContentLength(0);
+      return;
+    }
+    console.log("New content (JSON):", JSON.stringify(answerContent));
+
+    const newContent = answerContent.slice(prevContentLength);
+
+    const regex = /\{\s*$/;
+
+    if (regex.test(newContent)) {
+      return;
+    }
+
+    handleCommand(newContent);
+    setPrevContentLength(answerContent.length);
+    if (isResponding) {
+      setIncomeCommandOptions(incomeCommandOptionsCallback);
+    }
+  }, [answerContent, handleCommand, isResponding]);
+
+  useEffect(() => {
+    if (!showDropdown) {
+      handleReject();
+      setIncomeCommandOptions([]);
+      editor.focus();
+      completer && completer.enable();
+    } else {
+      completer && completer.disable();
+    }
+  }, [showDropdown]);
+
+  return (
+    showDropdown && (
+      <div
+        className="toolbar"
+        style={{
+          position: "absolute",
+          top: toolbarPosition.top,
+          left: toolbarPosition.left,
+        }}
+      >
+        <AiPanel
+          triggerType="show"
+          setAnswerContent={setAnswerContent}
+          incomeCommandOptions={incomeCommandOptions}
+          setIsResponding={setIsResponding}
+        />
+      </div>
+    )
+  );
 };
 
 export default React.memo(AiTools);

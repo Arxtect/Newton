@@ -8,7 +8,6 @@ import { useEditor, useFileStore } from "@/store";
 import AutoCompleteManager from "@/features/autoComplete/AutoCompleteManager";
 import EditorStateManager from "./EditorStateManager"; // Import the class
 
-
 const LatexEditor = ({
   handleChange,
   sourceCode,
@@ -82,7 +81,7 @@ const LatexEditor = ({
   const [editorStateManager, setEditorStateManager] = useState(null);
 
   useEffect(() => {
-    if(editorStateManager) {
+    if (editorStateManager) {
       editorStateManager.destroy();
     }
     if (latexRef.current && latexRef.current.editor) {
@@ -99,7 +98,7 @@ const LatexEditor = ({
       updateEditor(null);
     };
   }, [latexRef, filepath]);
- 
+
   return (
     <div className="h-full relative" id="editor">
       <AceEditor
@@ -122,7 +121,9 @@ const LatexEditor = ({
         ref={latexRef}
         className={filepath === "" ? "disabled-editor" : "ace_editor ace-tm"}
       ></AceEditor>
-      {/* <AiTools editorRef={latexRef} /> */}
+      {latexRef?.current?.editor && (
+        <AiTools editor={latexRef.current.editor} completer={completer} />
+      )}
       <div id="users"></div>
     </div>
   );

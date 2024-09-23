@@ -1,11 +1,11 @@
-import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
+import React, { memo, useCallback, useEffect, useRef, useState } from "react";
 // import { debounce } from 'lodash-es';
-import Question from './question';
-import Answer from './answer';
-import ChatInput from './chat-input';
-import Button from './button';
-import {getChatApiUrl} from "./ssePost"
-import  stopIcon  from '@/assets/chat/stop.svg'
+import Question from "./question";
+import Answer from "./answer";
+import ChatInput from "./chat-input";
+import Button from "./button";
+import { getChatApiUrl } from "./ssePost";
+import stopIcon from "@/assets/chat/stop.svg";
 
 const Chat = ({
   chatList,
@@ -16,16 +16,11 @@ const Chat = ({
   chatFooterClassName,
   chatFooterInnerClassName,
   currentAppToken,
-  // showPromptLog,
-  // questionIcon,
-  // answerIcon,
-  // allToolIcons,
   chatNode,
-  // chatAnswerContainerInner,
-  // hideProcessDetail,
   inputsForms,
   newConversationInputs,
   handleSend,
+  currentApp,
   user,
 }) => {
   const [width, setWidth] = useState(0);
@@ -74,11 +69,6 @@ const Chat = ({
       });
     }
   });
-
-  // useEffect(() => {
-  //   window.addEventListener('resize', debounce(handleWindowResize));
-  //   return () => window.removeEventListener('resize', handleWindowResize);
-  // }, [handleWindowResize]);
 
   useEffect(() => {
     if (chatFooterRef.current && chatContainerRef.current) {
@@ -182,7 +172,10 @@ const Chat = ({
             "linear-gradient(0deg, #F9FAFB 40%, rgba(255, 255, 255, 0.00) 100%)",
         }}
       >
-        <div ref={chatFooterInnerRef} className={`${chatFooterInnerClassName}`}>
+        <div
+          ref={chatFooterInnerRef}
+          className={`${chatFooterInnerClassName} mb-2`}
+        >
           {!noStopResponding && isResponding && (
             <div className="flex justify-center mb-2">
               <Button onClick={handleStop}>
@@ -199,9 +192,10 @@ const Chat = ({
           )}
 
           <ChatInput
-            // visionConfig={config?.file_upload?.image}
+            visionConfig={currentApp?.file_upload?.image}
             // speechToTextConfig={config?.speech_to_text}
             onSend={onSend}
+            currentAppToken={currentAppToken}
           />
         </div>
       </div>
