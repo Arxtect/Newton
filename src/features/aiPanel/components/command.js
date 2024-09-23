@@ -12,6 +12,9 @@ const Command = ({
   currentApp,
   appList,
   setCurrentApp,
+  incomeCommandOptions,
+  triggerType,
+  ...res
 }) => {
   return (
     <div className="flex flex-col items-center justify-center w-full">
@@ -28,6 +31,9 @@ const Command = ({
             currentApp={currentApp}
             appList={appList}
             setCurrentApp={setCurrentApp}
+            incomeCommandOptions={incomeCommandOptions}
+            triggerType={triggerType}
+            {...res}
           />
         </div>
       </div>

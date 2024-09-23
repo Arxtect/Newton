@@ -11,6 +11,8 @@ const IconList = {
   "Image Equation": equationIcon,
   "Query Equation": equationIcon,
   "Section Polisher": explainIcon,
+  Accept: equationIcon,
+  Discard: explainIcon,
 };
 
 const commandOptions = [
@@ -106,6 +108,8 @@ const SearchWithSuggestions = ({
   currentApp,
   setCurrentApp,
   appList,
+  incomeCommandOptions = [],
+  triggerType,
 }) => {
   const [focusedIndex, setFocusedIndex] = useState(-1);
   const [hoveredIndex, setHoveredIndex] = useState(0);
@@ -136,12 +140,16 @@ const SearchWithSuggestions = ({
   }, [appList]);
 
   const filteredCommandOptions = React.useMemo(() => {
+    let newCommandOptions = commandOptions;
+    if (incomeCommandOptions.length > 0) {
+      newCommandOptions = incomeCommandOptions;
+    }
     console.log(query, "handleSelect");
-    if (!query || !query.trim()) return commandOptions;
-    return commandOptions.filter((option) =>
+    if (!query || !query.trim()) return newCommandOptions;
+    return newCommandOptions.filter((option) =>
       option.text.toLowerCase().includes(query.toLowerCase())
     );
-  }, [query, commandOptions]);
+  }, [query, commandOptions, incomeCommandOptions]);
 
   const handleKeyDown = (event) => {
     if (focusedIndex !== -1 || filteredCommandOptions.length === 0) {
@@ -155,23 +163,30 @@ const SearchWithSuggestions = ({
       return true;
     } else if (event.key === "Enter" && hoveredIndex >= 0 && !event.shiftKey) {
       handleSelect(hoveredIndex);
-
       return true;
     }
   };
 
   const handleSelect = (index) => {
-    setFocusedIndex(index);
-    setSelectedCommand(commandOptions[index]);
-    setCurrentApp(commandOptions[index]);
-    if (inputRef.current) {
-      inputRef.current.focus();
+    const option = filteredCommandOptions[index];
+    if (option.click) {
+      option.click();
+    } else {
+      setFocusedIndex(index);
+      setSelectedCommand(option);
+      setCurrentApp(option);
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
     }
   };
 
   const onSend = useCallback(
     (message, files) => {
       handleRestart();
+      setSelectedCommand(null);
+      setFocusedIndex(-1);
+      setHoveredIndex(0);
       const data = {
         query: message,
         inputs: {},
@@ -210,12 +225,17 @@ const SearchWithSuggestions = ({
           inputRef={inputRef}
         />
       </div>
-      {chatList.length > 1 ? (
+      {chatList.length > 1 && triggerType == "click" ? (
         <ShowLastChat
           chatList={chatList}
           isResponding={isResponding}
         ></ShowLastChat>
-      ) : filteredCommandOptions?.length && !selectedCommand?.text ? (
+      ) : (filteredCommandOptions?.length &&
+          !selectedCommand?.text &&
+          !isResponding) ||
+        (triggerType !== "click" &&
+          incomeCommandOptions?.length > 0 &&
+          isResponding) ? (
         <Paper
           elevation={3}
           sx={{
@@ -232,6 +252,7 @@ const SearchWithSuggestions = ({
                 onClick={() => handleSelect(index)}
                 onMouseEnter={() => setHoveredIndex(index)}
                 sx={{
+                  borderRadius: "10px",
                   backgroundColor:
                     index === hoveredIndex ? "#f0f0f0" : "inherit",
                 }}

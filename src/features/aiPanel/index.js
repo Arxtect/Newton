@@ -3,7 +3,12 @@
  * @Author: Devin
  * @Date: 2024-09-14 10:46:18
  */
-import React,{useEffect} from "react";
+/*
+ * @Description:
+ * @Author: Devin
+ * @Date: 2024-09-14 10:46:18
+ */
+import React, { useEffect } from "react";
 import * as Popover from "@radix-ui/react-popover";
 import Command from "./components/command";
 import { stopChat as stopChatApi } from "@/services";
@@ -22,24 +27,31 @@ const CommandPopover = ({
   appList,
   setCurrentApp,
   triggerType = "click",
+  incomeCommandOptions,
+  ...res
 }) => {
   return (
     <Popover.Root>
       {triggerType === "click" ? (
         <Popover.Trigger asChild>{children}</Popover.Trigger>
       ) : (
-        <Command
-        chatList={chatList}
-        isResponding={isResponding}
-        setIsResponding={setIsResponding}
-        handleSend={handleSend}
-        handleRestart={handleRestart}
-        handleStop={handleStop}
-        currentAppToken={currentAppToken}
-        currentApp={currentApp}
-        appList={appList}
-        setCurrentApp={setCurrentApp}
-      />
+        <div className="flex flex-col items-start text-sm font-medium leading-none text-left min-w-[28rem] w-[30vw]">
+          <Command
+            chatList={chatList}
+            isResponding={isResponding}
+            setIsResponding={setIsResponding}
+            handleSend={handleSend}
+            handleRestart={handleRestart}
+            handleStop={handleStop}
+            currentAppToken={currentAppToken}
+            currentApp={currentApp}
+            appList={appList}
+            setCurrentApp={setCurrentApp}
+            incomeCommandOptions={incomeCommandOptions}
+            triggerType={triggerType}
+            {...res}
+          />
+        </div>
       )}
       <Popover.Portal>
         <Popover.Content
@@ -47,7 +59,7 @@ const CommandPopover = ({
           sideOffset={0}
           align={"start"}
         >
-          <div className="flex flex-col items-start text-sm font-medium leading-none text-left min-w-[28rem] w-[30vw]">
+          <div className="flex flex-col items-start text-sm font-medium leading-none text-left min-w-[32rem] w-[30vw]">
             <Command
               chatList={chatList}
               isResponding={isResponding}
@@ -59,6 +71,8 @@ const CommandPopover = ({
               currentApp={currentApp}
               appList={appList}
               setCurrentApp={setCurrentApp}
+              incomeCommandOptions={incomeCommandOptions}
+              triggerType={triggerType}
             />
           </div>
         </Popover.Content>
@@ -67,8 +81,13 @@ const CommandPopover = ({
   );
 };
 
-const AiPanel = ({ children, triggerType,
-  setAnswerContent }) => {
+const AiPanel = ({
+  children,
+  triggerType,
+  setAnswerContent,
+  setIsResponding: handleSetIsResponding,
+  incomeCommandOptions,
+}) => {
   const memoizedChildren = React.useMemo(() => children, [children]);
 
   const stopChat = async (taskId, currentAppToken) => {
@@ -91,8 +110,12 @@ const AiPanel = ({ children, triggerType,
   } = useChat(null, stopChat);
 
   useEffect(() => {
-    setAnswerContent&&setAnswerContent(lastMessage);
+    setAnswerContent && setAnswerContent(lastMessage);
   }, [chatList]);
+
+  useEffect(() => {
+    handleSetIsResponding && handleSetIsResponding(isResponding);
+  }, [isResponding]);
 
   return (
     <CommandPopover
@@ -107,6 +130,7 @@ const AiPanel = ({ children, triggerType,
       appList={appList}
       setCurrentApp={setCurrentApp}
       triggerType={triggerType}
+      incomeCommandOptions={incomeCommandOptions}
     >
       {memoizedChildren}
     </CommandPopover>
