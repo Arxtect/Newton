@@ -15,7 +15,7 @@ import discardIcon from "@/assets/chat/discard.svg";
 
 const Range = Ace.require("ace/range").Range;
 
-const AiTools = ({ editor }) => {
+const AiTools = ({ editor, completer }) => {
   const [toolbarPosition, setToolbarPosition] = useState({ top: 0, left: 0 });
   const [showDropdown, setShowDropdown] = useState(false);
   const { sideWidth } = useLayout();
@@ -195,6 +195,9 @@ const AiTools = ({ editor }) => {
       handleReject();
       setIncomeCommandOptions([]);
       editor.focus();
+      completer && completer.enable();
+    } else {
+      completer && completer.disable();
     }
   }, [showDropdown]);
 

@@ -169,7 +169,7 @@ const SearchWithSuggestions = ({
 
   const handleSelect = (index) => {
     const option = filteredCommandOptions[index];
-    if (option.click) {
+    if (option?.click) {
       option.click();
     } else {
       setFocusedIndex(index);
