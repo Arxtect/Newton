@@ -17,6 +17,8 @@ const icons = context.keys().reduce((acc, key) => {
   return acc;
 }, {});
 
+console.log(icons, "icons");
+
 const ArIcon = forwardRef(({ name, ...props }, ref) => {
   const data = useMemo(() => icons[name], [name]);
 

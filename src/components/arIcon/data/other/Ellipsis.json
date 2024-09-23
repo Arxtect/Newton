@@ -1,0 +1,51 @@
+{
+  "icon": {
+    "type": "element",
+    "isRootNode": true,
+    "name": "svg",
+    "attributes": {
+      "t": "1721222586244",
+      "class": "icon",
+      "viewBox": "0 0 1024 1024",
+      "version": "1.1",
+      "xmlns": "http://www.w3.org/2000/svg",
+      "p-id": "4256",
+      "width": "20",
+      "height": "20"
+    },
+    "children": [
+      {
+        "type": "element",
+        "name": "path",
+        "attributes": {
+          "d": "M232 511m-56 0a56 56 0 1 0 112 0 56 56 0 1 0-112 0Z",
+          "fill": "currentColor",
+          "p-id": "4257"
+        },
+        "children": []
+      },
+      {
+        "type": "element",
+        "name": "path",
+        "attributes": {
+          "d": "M512 511m-56 0a56 56 0 1 0 112 0 56 56 0 1 0-112 0Z",
+          "fill": "currentColor",
+          "p-id": "4258"
+        },
+        "children": []
+      },
+      {
+        "type": "element",
+        "name": "path",
+        "attributes": {
+          "d": "M792 511m-56 0a56 56 0 1 0 112 0 56 56 0 1 0-112 0Z",
+          "fill": "currentColor",
+          "p-id": "4259"
+        },
+        "children": []
+      }
+    ]
+  },
+  "name": "Ellipsis"
+}
+

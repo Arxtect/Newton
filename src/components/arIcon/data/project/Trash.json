@@ -1,0 +1,62 @@
+{
+  "icon": {
+    "type": "element",
+    "isRootNode": true,
+    "name": "svg",
+    "attributes": {
+      "width": "29",
+      "height": "29",
+      "viewBox": "0 0 29 29",
+      "fill": "none",
+      "xmlns": "http://www.w3.org/2000/svg"
+    },
+    "children": [
+      {
+        "type": "element",
+        "name": "path",
+        "attributes": {
+          "d": "M6.34375 6.34375L7.47656 24.4688C7.53037 25.516 8.29219 26.2812 9.28906 26.2812H19.7109C20.7118 26.2812 21.4594 25.516 21.5234 24.4688L22.6562 6.34375",
+          "stroke": "currentColor",
+          "stroke-width": "1.8125",
+          "stroke-linecap": "round",
+          "stroke-linejoin": "round"
+        },
+        "children": []
+      },
+      {
+        "type": "element",
+        "name": "path",
+        "attributes": {
+          "d": "M4.53125 6.34375H24.4688H4.53125Z",
+          "fill": "currentColor"
+        },
+        "children": []
+      },
+      {
+        "type": "element",
+        "name": "path",
+        "attributes": {
+          "d": "M4.53125 6.34375H24.4688",
+          "stroke": "currentColor",
+          "stroke-width": "1.8125",
+          "stroke-miterlimit": "10",
+          "stroke-linecap": "round"
+        },
+        "children": []
+      },
+      {
+        "type": "element",
+        "name": "path",
+        "attributes": {
+          "d": "M10.875 6.34376V4.07813C10.8745 3.89947 10.9093 3.72247 10.9774 3.5573C11.0455 3.39214 11.1457 3.24207 11.272 3.11574C11.3983 2.98941 11.5484 2.8893 11.7135 2.82117C11.8787 2.75304 12.0557 2.71823 12.2344 2.71876H16.7656C16.9443 2.71823 17.1213 2.75304 17.2865 2.82117C17.4516 2.8893 17.6017 2.98941 17.728 3.11574C17.8544 3.24207 17.9545 3.39214 18.0226 3.5573C18.0907 3.72247 18.1255 3.89947 18.125 4.07813V6.34376M14.5 9.96876V22.6563M10.4219 9.96876L10.875 22.6563M18.5781 9.96876L18.125 22.6563",
+          "stroke": "currentColor",
+          "stroke-width": "1.8125",
+          "stroke-linecap": "round",
+          "stroke-linejoin": "round"
+        },
+        "children": []
+      }
+    ]
+  },
+  "name": "Trash"
+}

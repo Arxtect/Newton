@@ -4,32 +4,26 @@
  * @Date: 2024-07-30 15:02:25
  */
 import React, { useRef, useState, useEffect } from "react";
-import allProjectSvg from "@/assets/project/allProject.svg";
-import yourProjectSvg from "@/assets/project/yourProject.svg";
-import shareProjectSvg from "@/assets/project/shareProject.svg";
-import categorySvg from "@/assets/project/category.svg";
-import newProjectSvg from "@/assets/project/newProject.svg";
-import trashSvg from "@/assets/project/trash.svg";
-import gitCloudSvg from "@/assets/project/gitCloud.svg";
+import ArIcon from "@/components/arIcon";
 
 import ArMenuRadix from "@/components/arMenuRadix";
 
 const menuItems = [
-  { key: "new", label: "New Project", icon: newProjectSvg },
-  { key: "all", label: "All Projects", icon: allProjectSvg },
+  { key: "new", label: "New Project", icon: "NewProject" },
+  { key: "all", label: "All Projects", icon: "AllProject" },
   {
     key: "your",
     label: "Your Projects",
-    icon: yourProjectSvg,
+    icon: "YourProject",
   },
   {
     key: "shared",
     label: "Shared With You",
-    icon: shareProjectSvg,
+    icon: "ShareProject",
   },
-  { key: "trash", label: "Trash", icon: trashSvg },
-  { key: "git", label: "Git Cloud", icon: gitCloudSvg },
-  // { key: "category", label: "Project Category", icon: categorySvg },
+  { key: "trash", label: "Trash", icon: "Trash" },
+  { key: "git", label: "Git Cloud", icon: "GitCloud" },
+  // { key: "category", label: "Project Category", icon: "Category" },
 ];
 
 const subCategories = [
@@ -37,10 +31,9 @@ const subCategories = [
   // { key: "sub_category_2", label: "Sub Category 2" },
 ];
 
-const Slide = ({ contentRef,currentSelectMenu, setCurrentSelectMenu }) => {
-
+const Slide = ({ contentRef, currentSelectMenu, setCurrentSelectMenu }) => {
   const handleClick = (key) => {
-    setCurrentSelectMenu(key)
+    setCurrentSelectMenu(key);
   };
 
   const getButtonClass = (open) => {
@@ -65,7 +58,7 @@ const Slide = ({ contentRef,currentSelectMenu, setCurrentSelectMenu }) => {
                   key={item.key}
                   className={`flex gap-5 px-5 py-3 rounded-2xl h-14 text-[1rem] items-center $ cursor-pointer`}
                 >
-                  <img src={item.icon} className="w-6" />
+                  <ArIcon name={item.icon} className="w-6" />
                   <div>{item.label}</div>
                 </div>
               }
@@ -108,7 +101,7 @@ const Slide = ({ contentRef,currentSelectMenu, setCurrentSelectMenu }) => {
             } cursor-pointer`}
             onClick={() => handleClick(item.key)}
           >
-            <img src={item.icon} className="w-6" />
+            <ArIcon name={item.icon} className="w-6" />
             <div>{item.label}</div>
           </div>
         );

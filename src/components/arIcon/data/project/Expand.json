@@ -1,0 +1,26 @@
+{
+  "icon": {
+    "type": "element",
+    "isRootNode": true,
+    "name": "svg",
+    "attributes": {
+      "width": "12",
+      "height": "12",
+      "viewBox": "0 0 12 12",
+      "fill": "none",
+      "xmlns": "http://www.w3.org/2000/svg"
+    },
+    "children": [
+      {
+        "type": "element",
+        "name": "path",
+        "attributes": {
+          "d": "M6 11L3 8L3.7125 7.2875L6 9.575L8.2875 7.2875L9 8L6 11ZM3.725 4.7L3 4L6 1L9 4L8.275 4.7L6 2.425L3.725 4.7Z",
+          "fill": "currentColor"
+        },
+        "children": []
+      }
+    ]
+  },
+  "name": "Expand"
+}

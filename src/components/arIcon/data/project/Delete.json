@@ -1,0 +1,71 @@
+{
+  "icon": {
+    "type": "element",
+    "isRootNode": true,
+    "name": "svg",
+    "attributes": {
+      "width": "15",
+      "height": "15",
+      "viewBox": "0 0 15 15",
+      "fill": "none",
+      "xmlns": "http://www.w3.org/2000/svg"
+    },
+    "children": [
+      {
+        "type": "element",
+        "name": "path",
+        "attributes": {
+          "d": "M12.8126 3.75H2.18753",
+          "stroke": "currentColor",
+          "strokeWidth": "1.37195",
+          "strokeLinecap": "round"
+        },
+        "children": []
+      },
+      {
+        "type": "element",
+        "name": "path",
+        "attributes": {
+          "d": "M5.93753 6.875L6.25003 10",
+          "stroke": "currentColor",
+          "strokeWidth": "1.37195",
+          "strokeLinecap": "round"
+        },
+        "children": []
+      },
+      {
+        "type": "element",
+        "name": "path",
+        "attributes": {
+          "d": "M9.06253 6.875L8.75003 10",
+          "stroke": "currentColor",
+          "strokeWidth": "1.37195",
+          "strokeLinecap": "round"
+        },
+        "children": []
+      },
+      {
+        "type": "element",
+        "name": "path",
+        "attributes": {
+          "d": "M4.06253 3.75C4.09746 3.75 4.11492 3.75 4.13075 3.7496C4.6454 3.73656 5.09942 3.40932 5.27454 2.9252C5.27993 2.91031 5.28545 2.89374 5.29649 2.86061L5.35717 2.67857C5.40897 2.52317 5.43487 2.44547 5.46922 2.3795C5.60629 2.11629 5.85987 1.93352 6.15291 1.88673C6.22636 1.875 6.30828 1.875 6.47209 1.875H8.52797C8.69178 1.875 8.77372 1.875 8.84716 1.88673C9.14022 1.93352 9.39378 2.11629 9.53084 2.3795C9.56522 2.44547 9.59109 2.52317 9.64291 2.67857L9.70359 2.86061C9.71459 2.8937 9.72015 2.91032 9.72553 2.9252C9.90065 3.40932 10.3547 3.73656 10.8693 3.7496C10.8852 3.75 10.9026 3.75 10.9375 3.75",
+          "stroke": "currentColor",
+          "strokeWidth": "1.37195"
+        },
+        "children": []
+      },
+      {
+        "type": "element",
+        "name": "path",
+        "attributes": {
+          "d": "M11.4834 9.62444C11.3728 11.2837 11.3175 12.1134 10.7768 12.6192C10.2362 13.125 9.40472 13.125 7.74172 13.125H7.25834C5.59534 13.125 4.76384 13.125 4.22321 12.6192C3.68258 12.1134 3.62727 11.2837 3.51665 9.62444L3.22919 5.3125M11.7708 5.3125L11.6458 7.1875",
+          "stroke": "currentColor",
+          "strokeWidth": "1.37195",
+          "strokeLinecap": "round"
+        },
+        "children": []
+      }
+    ]
+  },
+  "name": "Delete"
+}
