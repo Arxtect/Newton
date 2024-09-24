@@ -2,17 +2,13 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Paper, List, ListItem } from "@mui/material";
 import ChatInput from "@/features/aiTools/chat-input";
 import Answer from "./answer";
-import stopIcon from "@/assets/chat/stop.svg";
 import Button from "@/features/aiTools/button";
-import equationIcon from "@/assets/chat/equation.svg";
-import explainIcon from "@/assets/chat/explain.svg";
+import ArIcon from "@/components/arIcon";
 
 const IconList = {
-  "Image Equation": equationIcon,
-  "Query Equation": equationIcon,
-  "Section Polisher": explainIcon,
-  Accept: equationIcon,
-  Discard: explainIcon,
+  "Image Equation": "Equation",
+  "Query Equation": "Equation",
+  "Section Polisher": "Explain",
 };
 
 const commandOptions = [
@@ -87,10 +83,9 @@ const StopButton = ({ isResponding, handleStop }) => {
         className="group flex items-center justify-center w-8 h-8 rounded-lg hover:bg-[#EBF5FF] cursor-pointer"
         onClick={handleStop}
       >
-        <img
-          src={stopIcon}
-          alt="Stop"
-          className={`w-5 h-5 text-gray-300 group-hover:text-primary-600`}
+        <ArIcon
+          name="Stop"
+          className={`w-5 h-5 text-black group-hover:text-primary-600`}
         />
       </div>
     )
@@ -258,11 +253,11 @@ const SearchWithSuggestions = ({
                 }}
               >
                 <div className="flex items-center space-x-3">
-                  <img
+                  <ArIcon
                     loading="lazy"
-                    src={option.icon}
+                    name={option.icon}
                     alt={option.text}
-                    className="object-contain shrink-0 w-6 aspect-square"
+                    className="object-contain shrink-0 w-6 h-5 aspect-square"
                   />
                   <span className="font-medium text-gray-900">
                     {option.text}

@@ -7,12 +7,6 @@ import React, {
   useImperativeHandle,
 } from "react";
 import Textarea from "rc-textarea";
-// import { CssTransform } from '../embedded-chatbot/theme/utils';
-// import TooltipPlus from '@/app/components/base/tooltip-plus';
-// import { ToastContext } from '@/app/components/base/toast';
-// import useBreakpoints, { MediaType } from '@/hooks/use-breakpoints';
-// import { XCircle } from '@/app/components/base/icons/src/vender/solid/general';
-// import { Send03 } from '@/app/components/base/icons/src/vender/solid/communication';
 import ChatImageUploader from "./image-uploader/uploadOnlyFromLocal";
 import ImageList from "./image-uploader/imageList";
 import {
@@ -20,9 +14,7 @@ import {
   useDraggableUploader,
   useImageFiles,
 } from "./image-uploader/hooks";
-import circleSvg from "@/assets/chat/circle.svg";
-import sendSvg from "@/assets/chat/send.svg";
-import newChatIcon from "@/assets/chat/new-chat.svg";
+import ArIcon from "@/components/arIcon";
 
 const ChatInput = forwardRef(
   (
@@ -129,12 +121,12 @@ const ChatInput = forwardRef(
         className="group flex items-center justify-center w-8 h-8 rounded-lg hover:bg-[#EBF5FF] cursor-pointer"
         onClick={handleSend}
       >
-        <img
-          src={sendSvg}
+        <ArIcon
+          name="Send"
           alt="Send"
           className={`
-          w-5 h-5 text-gray-300 group-hover:text-primary-600
-          ${!!query.trim() && "text-[#d1d5db]"}
+          w-5 h-5 text-gray-300 group-hover:text-primary-600 
+          ${!!query.trim() ? "text-[#155eef]" : "text-primary-600"}
         `}
           style={sendIconThemeStyle}
         />
@@ -165,11 +157,10 @@ const ChatInput = forwardRef(
                   className={`relative flex items-center justify-center w-8 h-8 rounded-lg cursor-pointer
                       hover:bg-gray-100`}
                 >
-                  <img
-                    src={newChatIcon}
-                    alt="new chat"
+                  <ArIcon
+                    name="NewChat"
+                    className="text-black w-4 h-4"
                     title={"new chat"}
-                    className="w-4 h-4 text-gray-500"
                   />
                 </div>
                 {!visionConfig?.enabled && (
@@ -229,7 +220,7 @@ const ChatInput = forwardRef(
                     setQuery("");
                   }}
                 >
-                  <img src={circleSvg} alt="send" />
+                  <ArIcon name="Circle" />
                 </div>
               ) : null}
               <div className="mx-2 w-[1px] h-4 bg-black opacity-5" />

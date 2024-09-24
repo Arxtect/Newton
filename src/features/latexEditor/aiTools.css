@@ -1,9 +1,10 @@
 .ace_marker-layer .ai-marker {
     position: absolute;
-    background: rgba(35, 131, 226, .036);
+    background: #81c78463 ;
     border-bottom: 1px solid #81c78487;
     padding-bottom: 2px;
     padding-bottom: 2px;
     color: rgba(16, 95, 173, 1);
     transition: background 0.2s ease, border 0.2s ease, color 0.2s ease, text-decoration 0.2s ease;
+    z-index: 2;
 }

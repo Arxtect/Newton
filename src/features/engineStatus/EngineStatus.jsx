@@ -1,20 +1,15 @@
 /*
- * @Description: 
+ * @Description:
  * @Author: Devin
  * @Date: 2024-05-28 12:37:50
  */
 import { useRef, useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Tooltip as ReactTooltip } from "react-tooltip";
-import { useEffect } from "react";
 import { usePdfPreviewStore, useEngineStatusStore } from "store";
-import { CircularProgress } from "@mui/material";
-import ErrorSvg from "@/assets/website/error.svg";
-import SuccessSvg from "@/assets/layout/success.svg";
 import * as constant from "@/constant";
 import RotatingIcon from "./RotatingIconButton";
 import { randomString } from "@/util";
 import Tooltip from "@/components/tooltip";
+import ArIcon from "@/components/arIcon";
 
 export const EngineStatus = ({ className }) => {
   const { engineStatus, selectFormattedEngineStatus } = useEngineStatusStore();
@@ -34,11 +29,7 @@ export const EngineStatus = ({ className }) => {
     }
   };
 
-  // useEffect(() => {
-  //   ReactTooltip.rebuild();
-  // }, []);
   const selector = useRef(`status-tooltip-${randomString(4)}`);
-
 
   return (
     <div className={`flex justify-center items-center ${className}`}>
@@ -50,18 +41,17 @@ export const EngineStatus = ({ className }) => {
             <RotatingIcon isRotating={true} />
           </div>
         ) : (
-          <img
-            src={
+          <ArIcon
+            name={
               engineStatus == constant.readyEngineStatus
-                ? SuccessSvg
+                ? "StatusSuccess"
                 : engineStatus == constant.errorEngineStatus
-                ? ErrorSvg
+                ? "Error"
                 : ""
             }
             alt="engineStatus"
             engineStatus={engineStatus}
             className={`text-center ${color} hover:cursor-pointer h-4 w-4`}
-            // onClick={handleClick}
           />
         )}
       </Tooltip>

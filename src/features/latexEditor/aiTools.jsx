@@ -10,9 +10,6 @@ import AiPanel from "@/features/aiPanel";
 import Ace from "ace-builds/src-min-noconflict/ace";
 import "./aiTools.css"; // 引入样式文件
 
-import acceptIcon from "@/assets/chat/accept.svg";
-import discardIcon from "@/assets/chat/discard.svg";
-
 const Range = Ace.require("ace/range").Range;
 
 const AiTools = ({ editor, completer }) => {
@@ -49,12 +46,12 @@ const AiTools = ({ editor, completer }) => {
     return [
       {
         text: "Accept",
-        icon: acceptIcon,
+        icon: "Accept",
         click: handleAccept,
       },
       {
         text: "Discard",
-        icon: discardIcon,
+        icon: "Discard",
         click: handleReject,
       },
     ];

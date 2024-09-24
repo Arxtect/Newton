@@ -8,7 +8,7 @@ import { resetPassword } from "services";
 import { Link } from "react-router-dom";
 import ArButton from "@/components/arButton";
 import ArInput from "@/components/arInput";
-import passwordSvg from "@/assets/website/password.svg";
+import ArIcon from "@/components/arIcon";
 
 const resetPasswordSchema = object({
   password: string()
@@ -88,7 +88,7 @@ const ResetPasswordPage = () => {
               placeholder="Password"
               register={register}
               errors={errors}
-              icon={passwordSvg}
+              icon={<ArIcon name="Password" className="h-5 w-5" />}
             />
             <ArInput
               label="Confirm Password"
@@ -97,7 +97,7 @@ const ResetPasswordPage = () => {
               placeholder="Confirm Password"
               register={register}
               errors={errors}
-              icon={passwordSvg}
+              icon={<ArIcon name="Password" className="h-5 w-5" />}
             />
             <div className="my-8"></div>
             <ArButton

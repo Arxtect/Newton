@@ -1,38 +1,32 @@
 /*
- * @Description: 
+ * @Description:
  * @Author: Devin
  * @Date: 2024-08-26 09:42:55
  */
-import { memo, useEffect, useRef, useState } from 'react'
+import { memo, useEffect, useRef, useState } from "react";
 // import More from './more'
-import answerTriangleSvg from "@/assets/chat/answerTriangle.svg";
-import { Markdown } from './markdown'
+import { Markdown } from "./markdown";
 import logoIcon from "@/assets/logo-icon.svg";
 import CopyBtn from "@/components/copy-btn";
 import LoadingAnim from "@/components/loading-anim";
+import ArIcon from "@/components/arIcon";
 
 const BasicContent = ({ item }) => {
-  const {
-    content,
-  } = item
+  const { content } = item;
 
-  return <Markdown content={content} className={`${item.isError && '!text-[#F04438]'}`} />
-}
+  return (
+    <Markdown
+      content={content}
+      className={`${item.isError && "!text-[#F04438]"}`}
+    />
+  );
+};
 
+const Answer = ({ item, answerIcon, responding, chatAnswerContainerInner }) => {
+  const { content, more } = item;
 
-const Answer = ({
-  item,
-  answerIcon,
-  responding,
-  chatAnswerContainerInner,
-}) => {
-  const {
-    content,
-    more,
-  } = item
-
-  const containerRef = useRef(null)
-  const contentRef = useRef(null)
+  const containerRef = useRef(null);
+  const contentRef = useRef(null);
 
   return (
     <div className="flex mb-2 last:mb-0">
@@ -49,9 +43,8 @@ const Answer = ({
         ref={containerRef}
       >
         <div className={`group relative pr-10 ${chatAnswerContainerInner}`}>
-          <img
-            src={answerTriangleSvg}
-            alt="answerTriangle"
+          <ArIcon
+            name="AnswerTriangle"
             className="absolute -left-2 top-0 w-2 h-3 text-gray-100"
           />
           <div
@@ -79,6 +72,6 @@ const Answer = ({
       </div>
     </div>
   );
-}
+};
 
-export default memo(Answer)
+export default memo(Answer);

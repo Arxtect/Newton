@@ -5,7 +5,7 @@ import Answer from "./answer";
 import ChatInput from "./chat-input";
 import Button from "./button";
 import { getChatApiUrl } from "./ssePost";
-import stopIcon from "@/assets/chat/stop.svg";
+import ArIcon from "@/components/arIcon";
 
 const Chat = ({
   chatList,
@@ -179,9 +179,8 @@ const Chat = ({
           {!noStopResponding && isResponding && (
             <div className="flex justify-center mb-2">
               <Button onClick={handleStop}>
-                <img
-                  src={stopIcon}
-                  alt="stop"
+                <ArIcon
+                  name="Stop"
                   className="mr-[5px] w-3.5 h-3.5 text-gray-500"
                 />
                 <span className="text-xs text-gray-500 font-normal">

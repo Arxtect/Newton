@@ -15,7 +15,8 @@ export const useEngineStatusStore = create((set) => ({
     set(() => ({ engineStatus: constant.readyEngineStatus })),
   setBusyEngineStatus: () =>
     set(() => ({ engineStatus: constant.busyEngineStatus })),
-  setErrorEngineStatus: () => set(() => ({ engineStatus: constant.errorEngineStatus })),
+  setErrorEngineStatus: () =>
+    set(() => ({ engineStatus: constant.errorEngineStatus })),
   selectFormattedEngineStatus: () => {
     const { engineStatus } = useEngineStatusStore.getState();
     switch (engineStatus) {
@@ -26,7 +27,7 @@ export const useEngineStatusStore = create((set) => ({
         };
       case 2:
         return {
-          color: "text-green-500",
+          color: "text-black",
           tooltip: "LaTeX Engine Ready for Use! ",
         };
       case 3:
