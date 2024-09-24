@@ -51,7 +51,7 @@ export const EngineStatus = ({ className }) => {
             }
             alt="engineStatus"
             engineStatus={engineStatus}
-            className={`text-center ${color} hover:cursor-pointer h-4 w-4`}
+            className={`text-center ${color} hover:cursor-pointer h-4 `}
           />
         )}
       </Tooltip>
