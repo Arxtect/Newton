@@ -57,7 +57,7 @@ const CustomDropdownMenu = forwardRef((props, ref) => {
   const getButtonClass = (open) => {
     console.log(open, "open");
     if (open) {
-      return "bg-[#81c784]";
+      return "bg-[#81c784] ";
     }
   };
 
@@ -75,7 +75,10 @@ const CustomDropdownMenu = forwardRef((props, ref) => {
             onClick={handleClick}
           >
             <Tooltip content={"Layout"} position="bottom">
-                           <ArIcon name={"Layout"}  className="text-black w-5 h-5 cursor-pointer hover:opacity-75"/>
+              <ArIcon
+                name={"Layout"}
+                className="text-black w-6 h-6 cursor-pointer hover:opacity-75"
+              />
             </Tooltip>
           </IconButton>
         }

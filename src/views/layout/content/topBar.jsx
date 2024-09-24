@@ -263,7 +263,7 @@ const ContentTopBar = (props) => {
               >
                 <ArIcon
                   name={icon.src}
-                  className="text-black w-5 h-5 cursor-pointer hover:opacity-75"
+                  className="text-black w-6 h-6 cursor-pointer hover:opacity-75"
                 />
               </IconButton>
             </Tooltip>
@@ -392,7 +392,7 @@ const ContentTopBar = (props) => {
             >
               <ArIcon
                 name={"Preview"}
-                className="text-black w-5 h-5 cursor-pointer hover:opacity-75"
+                className="text-black w-6 h-6 cursor-pointer hover:opacity-75"
               />
             </IconButton>
           </Tooltip>

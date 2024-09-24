@@ -118,7 +118,7 @@ const UploadFiles = ({
             setDialogOpen(true);
           }}
         >
-          <ArIcon name={"UploadFile"}  className="text-black w-5 h-5"/>
+          <ArIcon name={"UploadFile"} className="text-black w-6 h-6" />
         </IconButton>
       </Tooltip>
       <FileUploader
