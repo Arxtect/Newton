@@ -15,7 +15,7 @@ import {
   downloadDirectoryAsZip,
   getProjectInfo,
 } from "domain/filesystem";
-import { useUserStore, useLoginStore, useFileStore } from "@/store";
+import { useUserStore, useFileStore } from "@/store";
 import NewProject from "../newProject";
 import UploadProject from "../uploadProject";
 import Github from "../github";
@@ -39,12 +39,6 @@ const Content = React.forwardRef(
     const { changeCurrentProjectRoot } = useFileStore((state) => ({
       changeCurrentProjectRoot: state.changeCurrentProjectRoot,
     }));
-    const { updateDialogLoginOpen, updateOtherOperation } = useLoginStore(
-      (state) => ({
-        updateDialogLoginOpen: state.updateDialogLoginOpen,
-        updateOtherOperation: state.updateOtherOperation,
-      })
-    );
 
     const auth = (condition, callback) => {
       if (condition) {
@@ -184,7 +178,7 @@ const Content = React.forwardRef(
 
     useEffect(() => {
       getProjectList();
-    }, [currentSelectMenu]);
+    }, [currentSelectMenu]); //user
 
     const sortedRows = useMemo(() => {
       return [...projectData]
@@ -227,7 +221,6 @@ const Content = React.forwardRef(
     };
     const getYDocTokenReq = async () => {
       const token = await getYDocToken();
-      console.log(token, "token");
       return token;
     };
     const handleConfirmSync = async () => {

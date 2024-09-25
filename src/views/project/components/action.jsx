@@ -25,13 +25,14 @@ import Share from "../share";
 import { deleteGitRepo } from "services";
 import { useUserStore, useLoginStore, useFileStore } from "@/store";
 import ArIcon from "@/components/arIcon";
+import { useAuthCallback } from "@/useHooks";
 
 const HoverAction = forwardRef(
-  ({ item, auth, getProjectList, handleGithub }, ref) => {
-    const navigate = useNavigate();
-    const { user, accessToken } = useUserStore((state) => ({
+  ({ item, getProjectList, handleGithub }, ref) => {
+    const authCallback = useAuthCallback();
+
+    const { user } = useUserStore((state) => ({
       user: state.user,
-      accessToken: state.accessToken,
     }));
 
     useImperativeHandle(ref, () => ({
@@ -57,12 +58,6 @@ const HoverAction = forwardRef(
       archivedDeleteProject: state.archivedDeleteProject,
     }));
 
-    const { updateDialogLoginOpen, updateOtherOperation } = useLoginStore(
-      (state) => ({
-        updateDialogLoginOpen: state.updateDialogLoginOpen,
-        updateOtherOperation: state.updateOtherOperation,
-      })
-    );
     //copy project
     const [sourceProject, setSourceProject] = useState("");
     const [copyDialogOpen, setCopyDialogOpen] = useState(false);
@@ -101,14 +96,10 @@ const HoverAction = forwardRef(
     const [shareProjectName, setShareProjectName] = useState("");
 
     const controlShare = (project) => {
-      console.log(user, accessToken, "user");
-      if (!user || JSON.stringify(user) === "{}") {
-        toast.warning("Please login");
-        updateDialogLoginOpen(true);
-        return;
-      }
-      setShareProjectName(project);
-      setShareDialogOpen(true);
+      authCallback(() => {
+        setShareProjectName(project);
+        setShareDialogOpen(true);
+      }, "Please login first");
     };
 
     // download pdf
@@ -225,15 +216,10 @@ const HoverAction = forwardRef(
                 onClick={(e) => {
                   e.stopPropagation();
                   e.preventDefault();
-                  const isAuth = auth(
-                    item.name != "YOU" &&
-                      (!user || JSON.stringify(user) === "{}"),
-                    () => {
-                      downloadDirectoryAsZip(item.title);
-                    }
-                  );
-                  if (isAuth) return;
-                  downloadDirectoryAsZip(item.title);
+
+                  authCallback(() => {
+                    downloadDirectoryAsZip(item.title);
+                  });
                 }}
               >
                 <ArIcon
@@ -248,15 +234,9 @@ const HoverAction = forwardRef(
                 onClick={(e) => {
                   e.stopPropagation();
                   e.preventDefault();
-                  const isAuth = auth(
-                    item.name != "YOU" &&
-                      (!user || JSON.stringify(user) === "{}"),
-                    () => {
-                      handleCopy(item.title);
-                    }
-                  );
-                  if (isAuth) return;
-                  handleCopy(item.title);
+                  authCallback(() => {
+                    handleCopy(item.title);
+                  });
                 }}
               >
                 <ArIcon name={"Copy"} className="text-black" />
@@ -267,15 +247,10 @@ const HoverAction = forwardRef(
                 size="small"
                 onClick={(e) => {
                   e.stopPropagation();
-                  const isAuth = auth(
-                    item.name != "YOU" &&
-                      (!user || JSON.stringify(user) === "{}"),
-                    () => {
-                      downloadPdf(item.title);
-                    }
-                  );
-                  if (isAuth) return;
-                  downloadPdf(item.title);
+
+                  authCallback(() => {
+                    downloadPdf(item.title);
+                  });
                 }}
               >
                 <ArIcon name={"DownloadPdf"} className="text-black" />
@@ -292,15 +267,10 @@ const HoverAction = forwardRef(
                     );
                     return;
                   }
-                  const isAuth = auth(
-                    item.name != "YOU" &&
-                      (!user || JSON.stringify(user) === "{}"),
-                    () => {
-                      controlShare(item.title);
-                    }
-                  );
-                  if (isAuth) return;
-                  controlShare(item.title);
+
+                  authCallback(() => {
+                    controlShare(item.title);
+                  });
                 }}
               >
                 <ArIcon name={"Share"} className="text-black w-4 h-4" />
@@ -313,15 +283,9 @@ const HoverAction = forwardRef(
                   e.stopPropagation();
                   setIsGitDelete(false);
                   setIsTrashDelete(false);
-                  const isAuth = auth(
-                    item.name != "YOU" &&
-                      (!user || JSON.stringify(user) === "{}"),
-                    () => {
-                      handleDeleteProject(item.title);
-                    }
-                  );
-                  if (isAuth) return;
-                  handleDeleteProject(item.title);
+                  authCallback(() => {
+                    handleDeleteProject(item.title);
+                  });
                 }}
               >
                 <ArIcon name={"Delete"} className="text-black" />

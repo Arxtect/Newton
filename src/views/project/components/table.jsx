@@ -9,13 +9,24 @@ import React, {
 } from "react";
 import { useNavigate } from "react-router-dom";
 import { DataGrid } from "@mui/x-data-grid";
-import { useUserStore, useLoginStore, useFileStore } from "@/store";
+import { useUserStore, useFileStore } from "@/store";
 import { formatDate } from "@/util";
 import "./index.scss";
 import Action from "./action";
 
 const Table = forwardRef(
-  ({ setSelectedRows, getProjectList, projectData, sortedRows, auth,currentSelectMenu,handleGithub }, ref) => {
+  (
+    {
+      setSelectedRows,
+      getProjectList,
+      projectData,
+      sortedRows,
+      auth,
+      currentSelectMenu,
+      handleGithub,
+    },
+    ref
+  ) => {
     const navigate = useNavigate();
     const { changeCurrentProjectRoot } = useFileStore((state) => ({
       changeCurrentProjectRoot: state.changeCurrentProjectRoot,
@@ -26,13 +37,6 @@ const Table = forwardRef(
       accessToken: state.accessToken,
     }));
 
-    const { updateDialogLoginOpen, updateOtherOperation } = useLoginStore(
-      (state) => ({
-        updateDialogLoginOpen: state.updateDialogLoginOpen,
-        updateOtherOperation: state.updateOtherOperation,
-      })
-    );
-
     // 根据父容器宽度计算列宽度
 
     const handleSelection = (selectedIDs) => {
@@ -41,7 +45,6 @@ const Table = forwardRef(
       );
       setSelectedRows(selectedRowData);
     };
-
 
     // table
     const columns = [
@@ -64,35 +67,37 @@ const Table = forwardRef(
         align: "center",
         sortable: false,
         renderCell: (params) => {
-           if(params.row?.type=="git" || params.row?.isClosed){
-            return <span className="font-[500]">{params.value}</span>
+          if (params.row?.type == "git" || params.row?.isClosed) {
+            return <span className="font-[500]">{params.value}</span>;
           }
-          return <div
-            style={{ cursor: "pointer", color: "inherit" }}
-            onMouseOver={(e) => (e.target.style.textDecoration = "underline")}
-            onMouseOut={(e) => (e.target.style.textDecoration = "none")}
-            onClick={async (e) => {
-              const isAuth = auth(
-                params.row.name != "YOU" &&
-                  (!user || JSON.stringify(user) === "{}"),
-                () => {
-                  e.stopPropagation();
-                  changeCurrentProjectRoot({
-                    projectRoot: params.value,
-                  });
-                  navigate(`/newton`);
-                }
-              );
-              if (isAuth) return;
-              e.stopPropagation();
-              changeCurrentProjectRoot({
-                projectRoot: params.value,
-              });
-              navigate(`/newton`);
-            }}
-          >
-            <span className="text-[#22c55e]">{params.value}</span>
-          </div>
+          return (
+            <div
+              style={{ cursor: "pointer", color: "inherit" }}
+              onMouseOver={(e) => (e.target.style.textDecoration = "underline")}
+              onMouseOut={(e) => (e.target.style.textDecoration = "none")}
+              onClick={async (e) => {
+                const isAuth = auth(
+                  params.row.name != "YOU" &&
+                    (!user || JSON.stringify(user) === "{}"),
+                  () => {
+                    e.stopPropagation();
+                    changeCurrentProjectRoot({
+                      projectRoot: params.value,
+                    });
+                    navigate(`/newton`);
+                  }
+                );
+                if (isAuth) return;
+                e.stopPropagation();
+                changeCurrentProjectRoot({
+                  projectRoot: params.value,
+                });
+                navigate(`/newton`);
+              }}
+            >
+              <span className="text-[#22c55e]">{params.value}</span>
+            </div>
+          );
         },
       },
       {
@@ -134,8 +139,7 @@ const Table = forwardRef(
               ref={actionRef}
             ></Action>
           );
-        }
-          
+        },
       },
     ];
 
@@ -160,14 +164,13 @@ const Table = forwardRef(
       window.addEventListener("resize", updateColumns);
 
       return () => window.removeEventListener("resize", updateColumns);
-    }, [user,currentSelectMenu]);
+    }, [user, currentSelectMenu]);
 
-    
-    const actionRef = useRef(null)
+    const actionRef = useRef(null);
 
     useImperativeHandle(ref, () => ({
-      handleCopy:actionRef.current && actionRef.current.handleCopy,
-      handleRename:actionRef.current  && actionRef.current.handleRename,
+      handleCopy: actionRef.current && actionRef.current.handleCopy,
+      handleRename: actionRef.current && actionRef.current.handleRename,
     }));
 
     return (
@@ -183,7 +186,11 @@ const Table = forwardRef(
           }}
           pageSizeOptions={[5, 10]}
           pageSize={10}
-          checkboxSelection={currentSelectMenu != "git"&& currentSelectMenu !="trash" ? true : false}
+          checkboxSelection={
+            currentSelectMenu != "git" && currentSelectMenu != "trash"
+              ? true
+              : false
+          }
           onRowSelectionModelChange={handleSelection}
           disableRowSelectionOnClick
           onCellDoubleClick={(params) => console.log(params)}
@@ -198,7 +205,6 @@ const Table = forwardRef(
             },
           }}
         />
-        
       </div>
     );
   }
