@@ -125,7 +125,7 @@ const ChatInput = forwardRef(
           name="Send"
           alt="Send"
           className={`
-          w-5 h-5 text-gray-300 group-hover:text-primary-600 
+          w-5 h-5 group-hover:text-primary-600 
           ${!!query.trim() ? "text-[#155eef]" : "text-primary-600"}
         `}
           style={sendIconThemeStyle}
