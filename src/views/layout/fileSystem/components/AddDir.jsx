@@ -33,7 +33,8 @@ const AddDir = ({ parentDir, depth }) => {
   };
 
   const handleInputBlur = () => {
-    cancelDirCreating({});
+    // cancelDirCreating({});
+    handleDirCreate(parentDir, value);
   };
 
   const handleKeyDown = (ev) => {
@@ -41,13 +42,17 @@ const AddDir = ({ parentDir, depth }) => {
       cancelDirCreating({});
     }
     if (ev.key === "Enter") {
-      if (!value || value == "") {
-        cancelDirCreating({});
-        return;
-      }
-      const dirpath = path.join(parentDir, value);
-      finishDirCreating({ dirpath });
+      handleDirCreate(parentDir, value);
     }
+  };
+
+  const handleDirCreate = (parentDir, value) => {
+    if (!value || value == "") {
+      cancelDirCreating({});
+      return;
+    }
+    const dirpath = path.join(parentDir, value);
+    finishDirCreating({ dirpath });
   };
 
   return (

@@ -137,7 +137,7 @@ const ContentTopBar = (props) => {
         updateDirOpen(true);
         if (!currentSelectDir) {
           let dir = path.dirname(filepath);
-          startFileCreating(dir);
+          startDirCreating(dir);
           break;
         }
         startDirCreating(currentSelectDir);

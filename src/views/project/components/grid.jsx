@@ -78,14 +78,7 @@ const Grid = ({
               <div className="relative">
                 <PdfImageLocal url={pdfUrl} height={178} />
                 <div className="absolute inset-0 bg-gradient-to-b from-[#afccb7] to-[#7da97fd1] opacity-50"></div>
-              </div>
-              <div
-                className="self-center mt-3 hover:text-[#81c784] hover:underline"
-                onClick={(e) => handleItemClick(item, e)}
-              >
-                {item.title}
-              </div>
-              <div className="action absolute top-[50%] transform -translate-y-[50%] w-full">
+                <div className="action absolute top-[50%] transform -translate-y-[50%] w-full">
                 <Action
                   item={item}
                   auth={auth}
@@ -93,6 +86,14 @@ const Grid = ({
                   handleGithub={handleGithub}
                 ></Action>
               </div>
+              </div>
+              <div
+                className="self-center mt-3 hover:text-[#81c784] hover:underline"
+                onClick={(e) => handleItemClick(item, e)}
+              >
+                {item.title}
+              </div>
+              
             </div>
           );
         })}
