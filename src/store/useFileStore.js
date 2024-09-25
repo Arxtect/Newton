@@ -7,7 +7,7 @@ import {
   updateStatusMatrixOnSaveFile,
 } from "./useGitRepo";
 import { savePdfToIndexedDB, getPdfFromIndexedDB } from "@/util";
-import { useUserStore } from "./user";
+import { useUserStore } from "./useUserStore";
 import { ProjectSync } from "@/convergence";
 import { useEditor } from "./useEditor";
 import { isAssetExtension } from "@/util";

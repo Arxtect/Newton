@@ -40,17 +40,17 @@ export const EngineStatus = ({ className }) => {
           <div>
             <RotatingIcon isRotating={true} />
           </div>
+        ) : engineStatus == constant.readyEngineStatus ? (
+          <RotatingIcon isRotating={false} />
         ) : (
           <ArIcon
             name={
-              engineStatus == constant.readyEngineStatus
-                ? "StatusSuccess"
-                : engineStatus == constant.errorEngineStatus
-                ? "Error"
-                : ""
+              // engineStatus == constant.readyEngineStatus
+              //   ? "StatusSuccess"
+              //   :
+              engineStatus == constant.errorEngineStatus ? "Error" : ""
             }
             alt="engineStatus"
-            engineStatus={engineStatus}
             className={`text-center ${color} hover:cursor-pointer h-4 `}
           />
         )}

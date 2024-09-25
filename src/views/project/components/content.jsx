@@ -21,14 +21,21 @@ import UploadProject from "../uploadProject";
 import Github from "../github";
 import { toast } from "react-toastify";
 import ArDialog from "@/components/arDialog";
-import { getYDocToken, deleteGitRepo,getGitRepoList, getRoomUserAccess } from "services";
+import {
+  getYDocToken,
+  deleteGitRepo,
+  getGitRepoList,
+  getRoomUserAccess,
+} from "services";
 import { useNavigate } from "react-router-dom";
 import { ProjectSync } from "@/convergence";
 
 import ArIcon from "@/components/arIcon";
+import { useAuthCallback } from "@/useHooks";
 
 const Content = React.forwardRef(
   ({ currentSelectMenu, setCurrentSelectMenu }, ref) => {
+    const authCallback = useAuthCallback();
     const { changeCurrentProjectRoot } = useFileStore((state) => ({
       changeCurrentProjectRoot: state.changeCurrentProjectRoot,
     }));
@@ -41,15 +48,12 @@ const Content = React.forwardRef(
 
     const auth = (condition, callback) => {
       if (condition) {
-        toast.warning("Nonanonymous project，Please login first");
-        updateDialogLoginOpen(true);
-        updateOtherOperation(callback);
+        authCallback(callback, "Please login first");
         return true;
       }
       return false;
     };
-        const navigate = useNavigate();
-
+    const navigate = useNavigate();
 
     const [sortType, setSortType] = useState("table");
     const [sortSelect, setSortSelect] = useState("lastModified");
@@ -100,6 +104,64 @@ const Content = React.forwardRef(
       }
     };
 
+    // handle switch slide menu
+    const handleSwitchMenu = (menu, user, item, index) => {
+      if (!user?.email && item.name != "YOU") {
+        return null;
+      }
+      switch (menu) {
+        case "trash":
+          if (item.isClosed) {
+            return {
+              id: index + 1,
+              ...item,
+            };
+          }
+          break;
+        case "category":
+          return null;
+        case "shared":
+          if (item?.email != user?.email && item?.isSync && !item.isClosed) {
+            return {
+              id: index + 1,
+              ...item,
+            };
+          }
+          break;
+        case "your":
+          if (
+            !item.isClosed &&
+            (item?.email == user?.email || item.name == "YOU")
+          ) {
+            return {
+              id: index + 1,
+              ...item,
+            };
+          }
+          break;
+        case "all":
+          if (user?.email && !item.isClosed) {
+            return {
+              id: index + 1,
+              ...item,
+            };
+          } else if (item.name == "YOU" && !item.isClosed) {
+            return {
+              id: index + 1,
+              ...item,
+            };
+          }
+          break;
+        case "git":
+          return {
+            id: index + 1,
+            ...item,
+          };
+        default:
+          break;
+      }
+    };
+
     const getProjectList = async () => {
       console.log(currentSelectMenu, "currentSelectMenu");
       let project = [];
@@ -112,44 +174,19 @@ const Content = React.forwardRef(
       if (!project) return;
 
       console.log(project, "project");
-      setProjectData(
-        project
-          .map((item, index) => {
-            if (currentSelectMenu == "trash" && !item.isClosed) {
-              console.log(item, "item.is_closed");
-              return null;
-            }
-            if (currentSelectMenu == "category") {
-              return null;
-            }
-            if (
-              currentSelectMenu == "shared" &&
-              (!item?.userId || item?.userId == user?.id || !item?.isSync)
-            ) {
-              return null;
-            }
-            if (
-              currentSelectMenu == "your" &&
-              item?.userId &&
-              item?.userId != user?.id
-            ) {
-              return null;
-            }
-            if (currentSelectMenu != "trash" && item.isClosed) return null;
-            return {
-              id: index + 1,
-              ...item,
-            };
-          })
-          .filter((item) => item !== null)
-      );
+      const projectData = project
+        .map((item, index) => {
+          return handleSwitchMenu(currentSelectMenu, user, item, index);
+        })
+        .filter((item) => item?.title);
+      setProjectData(projectData);
     };
+
     useEffect(() => {
       getProjectList();
     }, [currentSelectMenu]);
 
     const sortedRows = useMemo(() => {
-      console.log("sortedRows", sortSelect);
       return [...projectData]
         .filter((data) => data.title.includes(searchInput))
         .sort((a, b) => {
@@ -222,9 +259,7 @@ const Content = React.forwardRef(
       if (!project || !roomId) return;
 
       if (!user || JSON.stringify(user) === "{}") {
-        toast.warning("Please login");
-        updateDialogLoginOpen(true);
-        updateOtherOperation(() => handleSyncProject(project, roomId));
+        authCallback(() => handleSyncProject(project, roomId));
         return;
       }
 
@@ -283,7 +318,10 @@ const Content = React.forwardRef(
                 content="Trash project are automatically deleted after 30 days"
                 position={"top"}
               >
-                <ArIcon name={"Tip"}  className="w-4 ml-2 cursor-pointer text-arxTheme"/>
+                <ArIcon
+                  name={"Tip"}
+                  className="w-4 ml-2 cursor-pointer text-arxTheme"
+                />
               </Tooltip>
             )}
           </div>
@@ -299,8 +337,7 @@ const Content = React.forwardRef(
                   }`}
                   onClick={() => setSortType("table")}
                 >
-                  <ArIcon name={"Table"}  className="w-5 h-5"/>
-
+                  <ArIcon name={"Table"} className="w-5 h-5" />
                 </div>
               </Tooltip>
               <Tooltip content="Grid" position={"bottom"}>
@@ -318,7 +355,7 @@ const Content = React.forwardRef(
                       : null
                   }
                 >
-                  <ArIcon name={"Grid"}  className="w-5 h-5"/>
+                  <ArIcon name={"Grid"} className="w-5 h-5" />
                 </div>
               </Tooltip>
             </div>
@@ -333,8 +370,7 @@ const Content = React.forwardRef(
                 <option value="alphabetical">Alphabetical</option>
               </select>
               <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-   
-                <ArIcon name={"Expand"}/>
+                <ArIcon name={"Expand"} />
               </div>
             </div>
           </div>

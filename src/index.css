@@ -2,17 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
-.text-primary-600{
+.text-primary-600 {
   --tw-text-opacity: 1;
   color: rgb(21 94 239 / var(--tw-text-opacity));
 }
 
-.bg-primary-600{
+.bg-primary-600 {
   --tw-bg-opacity: 1;
   background-color: rgb(21 94 239 / var(--tw-bg-opacity));
 }
 
-.bg-primary-700{
+.bg-primary-700 {
   --tw-bg-opacity: 1;
   background-color: rgb(0 78 235 / var(--tw-bg-opacity));
 }
@@ -21,11 +21,10 @@
   background-color: rgb(0 78 235 / var(--tw-bg-opacity));
 }
 
-.text-white{
+.text-white {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity));
 }
-
 
 @layer components {
   .btn {
@@ -37,15 +36,15 @@
   }
 
   .btn-small {
-    @apply px-2 h-6 rounded-md text-xs
+    @apply px-2 h-6 rounded-md text-xs;
   }
 
   .btn-medium {
-    @apply px-3.5 h-8 rounded-lg text-[13px]
+    @apply px-3.5 h-8 rounded-lg text-[13px];
   }
 
   .btn-large {
-    @apply px-4 h-9 rounded-[10px] text-sm font-semibold
+    @apply px-4 h-9 rounded-[10px] text-sm font-semibold;
   }
 
   .btn-secondary {
@@ -73,33 +72,28 @@
   }
 }
 
-/* .css-78trlr-MuiButtonBase-root-MuiIconButton-root:hover {
-  background-color: transparent !important;
-} */
-.css-etipxg-MuiButtonBase-root-MuiIconButton-root:hover {
-    background-color: #91c48a !important;
-
+.MuiIconButton-root:hover {
+  background-color: #91c48a !important;
 }
-.css-etipxg-MuiButtonBase-root-MuiIconButton-root{
-    border-radius: 8px !important;
-    padding: 2px !important;
-   margin:2px 2px !important;
+.MuiIconButton-root {
+  border-radius: 8px !important;
+  padding: 2px !important;
+  margin: 2px 2px !important;
 }
 
-#root{
+#root {
   height: 100%;
-    width: 100%;
+  width: 100%;
 }
 body {
-  padding-right:0 !important;
-  overflow:hidden !important;
+  padding-right: 0 !important;
+  overflow: hidden !important;
   overflow-x: hidden !important;
 }
 
-
-.disabled-editor  {
+.disabled-editor {
   background-color: #f0f0f0;
-    color: #888888;
+  color: #888888;
   cursor: not-allowed;
 }
 
@@ -112,7 +106,7 @@ body {
 }
 
 .disabled-editor .ace_text-layer {
-  cursor: not-allowed; 
+  cursor: not-allowed;
 }
 
 .disabled-editor .ace_gutter {
@@ -121,14 +115,14 @@ body {
   cursor: not-allowed;
 }
 
-.ace_gutter-cell{
+.ace_gutter-cell {
   font-size: 14px;
   font-weight: 100;
   text-align: center;
-  background: #FFFFFF;
-  color: #A0A0A0;;
+  background: #ffffff;
+  color: #a0a0a0;
 }
-.ace_gutter-active-line.ace_gutter-cell{
+.ace_gutter-active-line.ace_gutter-cell {
   background-color: #f4f4f4;
 }
 
@@ -146,9 +140,8 @@ body {
   /* 移除默认背景 */
 }
 
-
-.ace_content{
-  border-left: 0.5px solid #D7D7D7;
+.ace_content {
+  border-left: 0.5px solid #d7d7d7;
 }
 
 /* scrollbar handle */
@@ -159,11 +152,9 @@ body {
 
 .ace_editor ::-webkit-scrollbar-track {
   background-color: #f4f4f4;
-    /* background: #fff; */
+  /* background: #fff; */
   /* Background of the track */
 }
-
-
 
 .ace_editor ::-webkit-scrollbar-thumb {
   background: #ccc;
@@ -184,23 +175,18 @@ body {
   /* Rounded corners for the scrollbar handle */
 }
 
-
-
-
 .DropdownMenuContent {
   animation-duration: 0.6s;
   animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.DropdownMenuContent[data-side='top'] {
+.DropdownMenuContent[data-side="top"] {
   animation-name: slideUp;
 }
 
-.DropdownMenuContent[data-side='bottom'] {
+.DropdownMenuContent[data-side="bottom"] {
   animation-name: slideDown;
 }
-
-
 
 @keyframes slideUp {
   from {

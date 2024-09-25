@@ -31,8 +31,9 @@ const NoRouteLogin = ({ handleClose }) => {
     updateUser: state.updateUser,
   }));
 
-  const { otherOperation } = useLoginStore((state) => ({
+  const { otherOperation, updateOtherOperation } = useLoginStore((state) => ({
     otherOperation: state.otherOperation,
+    updateOtherOperation: state.updateOtherOperation,
   }));
 
   const handleRouteClick = (href) => {
@@ -52,6 +53,7 @@ const NoRouteLogin = ({ handleClose }) => {
         handleClose();
 
         otherOperation && otherOperation();
+        updateOtherOperation(null)
       }, [0]);
     } catch (error) {
       const errorMessage =

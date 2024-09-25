@@ -1,3 +1,8 @@
+/*
+ * @Description: 
+ * @Author: Devin
+ * @Date: 2024-06-26 14:37:08
+ */
 import { useEffect, useState } from "react";
 
 const useClipboard = () => {

@@ -5,10 +5,9 @@ import { existsPath } from "domain/filesystem";
 import path from "path";
 import * as Git from "domain/git";
 import { useFileStore, startUpdate } from "./useFileStore";
-import { useUserStore } from "./user";
+import { useUserStore } from "./useUserStore";
 import { toast } from "react-toastify";
 import fs from "fs";
-
 
 export const GIT_STORE = "git_store";
 
@@ -209,8 +208,7 @@ export const useGitRepo = create()(
         let user = useUserStore.getState().user;
         console.log(user, "user");
         const state = get();
-        const { statusMatrix, currentBranch } =
-          get();
+        const { statusMatrix, currentBranch } = get();
         const { currentProjectRoot: projectRoot } = useFileStore.getState();
         if (statusMatrix) {
           const author = {

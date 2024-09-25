@@ -173,7 +173,7 @@ const HoverAction = forwardRef(
                   handleGithub(true, item.title);
                 }}
               >
-                <ArIcon name={"GitCloud"}  className="text-black w-4"/>
+                <ArIcon name={"GitCloud"} className="text-black w-4 h-4" />
               </IconButton>
             </Tooltip>
             <Tooltip content="Delete" position="bottom">
@@ -186,7 +186,7 @@ const HoverAction = forwardRef(
                   setIsTrashDelete(false);
                 }}
               >
-                <ArIcon name={"Delete"}  className="text-black"/>
+                <ArIcon name={"Delete"} className="text-black w-4 h-4" />
               </IconButton>
             </Tooltip>
           </React.Fragment>
@@ -200,7 +200,7 @@ const HoverAction = forwardRef(
                   restoreProject(item.title);
                 }}
               >
-                <ArIcon name={"Restore"}  className="text-black w-4"/>
+                <ArIcon name={"Restore"} className="text-black w-4 h-4" />
               </IconButton>
             </Tooltip>
             <Tooltip content="Delete" position="bottom">
@@ -213,7 +213,7 @@ const HoverAction = forwardRef(
                   setIsGitDelete(false);
                 }}
               >
-                <ArIcon name={"Delete"}  className="text-black"/>
+                <ArIcon name={"Delete"} className="text-black  w-4 h-4" />
               </IconButton>
             </Tooltip>
           </React.Fragment>
@@ -236,7 +236,10 @@ const HoverAction = forwardRef(
                   downloadDirectoryAsZip(item.title);
                 }}
               >
-                <ArIcon name={"DownloadProject"}  className="text-black w-4"/>
+                <ArIcon
+                  name={"DownloadProject"}
+                  className="text-black w-4 h-4"
+                />
               </IconButton>
             </Tooltip>
             <Tooltip content="Copy" position="bottom">
@@ -256,7 +259,7 @@ const HoverAction = forwardRef(
                   handleCopy(item.title);
                 }}
               >
-                <ArIcon name={"Copy"}  className="text-black"/>
+                <ArIcon name={"Copy"} className="text-black" />
               </IconButton>
             </Tooltip>
             <Tooltip content="Download PDF" position="bottom">
@@ -275,7 +278,7 @@ const HoverAction = forwardRef(
                   downloadPdf(item.title);
                 }}
               >
-                <ArIcon name={"DownloadPdf"}  className="text-black"/>
+                <ArIcon name={"DownloadPdf"} className="text-black" />
               </IconButton>
             </Tooltip>
             <Tooltip content="SHARE" position="bottom">
@@ -300,7 +303,7 @@ const HoverAction = forwardRef(
                   controlShare(item.title);
                 }}
               >
-                <ArIcon name={"Share"}  className="text-black w-4"/>
+                <ArIcon name={"Share"} className="text-black w-4 h-4" />
               </IconButton>
             </Tooltip>
             <Tooltip content="Trash" position="bottom">
@@ -321,7 +324,7 @@ const HoverAction = forwardRef(
                   handleDeleteProject(item.title);
                 }}
               >
-                <ArIcon name={"Delete"}  className="text-black"/>
+                <ArIcon name={"Delete"} className="text-black" />
               </IconButton>
             </Tooltip>
           </React.Fragment>
