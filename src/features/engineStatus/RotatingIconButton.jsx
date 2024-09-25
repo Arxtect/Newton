@@ -1,15 +1,21 @@
-
+/*
+ * @Description:
+ * @Author: Devin
+ * @Date: 2024-08-20 10:53:02
+ */
 import React, { useState } from "react";
-import rotatingSvg from "@/assets/rotating.svg";
-const RotatingIcon = ({ isRotating=false }) => {
+import ArIcon from "@/components/arIcon";
 
+const RotatingIcon = ({ isRotating = false }) => {
   return (
     <div className="flex h-full w-full hover:cursor-pointer text-arxTheme flex justify-center items-center">
       <button className="flex items-center text-white rounded">
-        <img
-          src={rotatingSvg}
-          alt="Rotating Icon"
-          className={`h-4 w-4 ${isRotating ? "animate-spin-slow" : ""}`}
+        <ArIcon
+          name={"Rotating"}
+          alt="Rotating"
+          className={`text-black h-4 w-4 ${
+            isRotating ? "animate-spin-slow" : ""
+          }`}
         />
       </button>
     </div>

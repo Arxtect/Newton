@@ -7,7 +7,7 @@ import { toast } from "react-toastify";
 import { forgotPassword } from "services";
 import ArButton from "@/components/arButton";
 import ArInput from "@/components/arInput";
-import emailSvg from "@/assets/website/email.svg";
+import ArIcon from "@/components/arIcon";
 
 const forgotPasswordSchema = object({
   email: string()
@@ -77,7 +77,7 @@ const ForgotPasswordPage = () => {
               placeholder="Email"
               register={register}
               errors={errors}
-              icon={emailSvg}
+              icon={<ArIcon name="Email" className="h-5 w-5" />}
             />
             <ArButton
               loading={isLoading}

@@ -7,12 +7,16 @@ import { toast } from "react-toastify";
 import { registerUser } from "services";
 import ArButton from "@/components/arButton";
 import ArInput from "@/components/arInput";
-import emailSvg from "@/assets/website/email.svg";
-import passwordSvg from "@/assets/website/password.svg";
-import usernameSvg from "@/assets/website/username.svg";
+import ArIcon from "@/components/arIcon";
 
 const registerSchema = object({
-  name: string().min(1, "Full username required").max(100).regex(/^(?!.*[-_.]{2})([a-zA-Z0-9]+[-_.])*[a-zA-Z0-9]+$/, "Username can only contain alphanumeric chars ('0-9','a-z','A-Z'), dash ('-'), underscore ('_') and dot ('.'). It cannot begin or end with non-alphanumeric chars, and consecutive non-alphanumeric chars are also forbidden!"),
+  name: string()
+    .min(1, "Full username required")
+    .max(100)
+    .regex(
+      /^(?!.*[-_.]{2})([a-zA-Z0-9]+[-_.])*[a-zA-Z0-9]+$/,
+      "Username can only contain alphanumeric chars ('0-9','a-z','A-Z'), dash ('-'), underscore ('_') and dot ('.'). It cannot begin or end with non-alphanumeric chars, and consecutive non-alphanumeric chars are also forbidden!"
+    ),
   email: string()
     .min(1, "Need to fill in the mailbox")
     .email("Incorrect email address"),
@@ -92,7 +96,7 @@ const RegisterPage = () => {
               placeholder="Email"
               register={register}
               errors={errors}
-              icon={usernameSvg}
+              icon={<ArIcon name="Username" className="h-5 w-5" />}
             />
             <ArInput
               label="Email"
@@ -101,7 +105,7 @@ const RegisterPage = () => {
               placeholder="Email"
               register={register}
               errors={errors}
-              icon={emailSvg}
+              icon={<ArIcon name="Email" className="h-5 w-5" />}
             />
             <ArInput
               label="Password"
@@ -110,7 +114,7 @@ const RegisterPage = () => {
               placeholder="Password"
               register={register}
               errors={errors}
-              icon={passwordSvg}
+              icon={<ArIcon name="Password" className="h-5 w-5" />}
             />
             <ArInput
               label="Confirm Password"
@@ -119,7 +123,7 @@ const RegisterPage = () => {
               placeholder="Confirm Password"
               register={register}
               errors={errors}
-              icon={passwordSvg}
+              icon={<ArIcon name="Password" className="h-5 w-5" />}
             />
             <div className="my-4">
               Have an account already?

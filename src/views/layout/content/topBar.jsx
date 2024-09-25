@@ -4,8 +4,6 @@
  * @Date: 2024-07-18 10:06:45
  */
 import React, { useRef, useEffect, useState, useCallback } from "react";
-import logSvg from "@/assets/layout/log.svg";
-import magicSvg from "@/assets/layout/magic.svg";
 import ArIcon from "@/components/arIcon";
 import { IconButton } from "@mui/material";
 import Tooltip from "@/components/tooltip";
@@ -151,7 +149,7 @@ const ContentTopBar = (props) => {
         updateDirOpen(true);
         if (!currentSelectDir) {
           let dir = path.dirname(filepath);
-          startFileCreating(dir);
+          startDirCreating(dir);
           break;
         }
         startDirCreating(currentSelectDir);
@@ -217,7 +215,7 @@ const ContentTopBar = (props) => {
     return [
       {
         key: "ai",
-        src: magicSvg,
+        src: "Magic",
         alt: "AI",
         // click: handleAiClick,
       },
@@ -274,18 +272,16 @@ const ContentTopBar = (props) => {
                 size="small"
                 onClick={() => icon.click(icon.key)}
               >
-                {/* <img
-                  src={icon.src}
-                  alt={icon.alt}
-                  className="w-5 h-5 cursor-pointer hover:opacity-75"
-                /> */}
-                   <ArIcon name={icon.src}  className="text-black w-5 h-5 cursor-pointer hover:opacity-75"/>
+                <ArIcon
+                  name={icon.src}
+                  className="text-black w-6 h-6 cursor-pointer hover:opacity-75"
+                />
               </IconButton>
             </Tooltip>
           );
         })}
 
-        {/* <div className="border-l border-gray-300 h-6 mx-4"></div>
+        <div className="border-l border-gray-300 h-6 mx-4"></div>
 
         {aiList.map((icon) => {
           return (
@@ -297,16 +293,15 @@ const ContentTopBar = (props) => {
                   size="small"
                   // onClick={() => icon.click(icon.key)}
                 >
-                  <img
-                    src={icon.src}
-                    alt={icon.alt}
-                    className="w-5 h-5 cursor-pointer hover:opacity-75"
+                  <ArIcon
+                    name={icon.src}
+                    className="text-[#41DE07] w-6 h-6 cursor-pointer hover:opacity-75"
                   />
                 </IconButton>
               </AiPanel>
             </Tooltip>
           );
-        })} */}
+        })}
       </div>
       <div
         className={`flex items-center  justify-between space-x-10 mr-4 w-1/2 `}
@@ -406,12 +401,10 @@ const ContentTopBar = (props) => {
                 badgeContent={!showCompilerLog ? messageCount : 0}
                 color={badgeColor}
               >
-                <img
-                  src={logSvg}
-                  alt=""
-                  className="w-5 h-5 cursor-pointer hover:opacity-75"
+                <ArIcon
+                  name={"Log"}
+                  className="text-black w-6 h-6 cursor-pointer hover:opacity-75"
                 />
-                
               </Badge>
             </IconButton>
           </Tooltip>
@@ -424,7 +417,10 @@ const ContentTopBar = (props) => {
               size="small"
               onClick={toggleView}
             >
-                           <ArIcon name={"Preview"}  className="text-black w-5 h-5 cursor-pointer hover:opacity-75"/>
+              <ArIcon
+                name={"Preview"}
+                className="text-black w-6 h-6 cursor-pointer hover:opacity-75"
+              />
             </IconButton>
           </Tooltip>
 

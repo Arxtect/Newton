@@ -32,20 +32,25 @@ const AddFile = ({ parentDir, depth }) => {
   };
 
   const handleBlur = () => {
-    cancelFileCreating();
+    // cancelFileCreating();
+    handleDirCreate(parentDir, value);
   };
 
   const handleKeyDown = (ev) => {
     if (ev.key === "Escape") {
       cancelFileCreating();
     } else if (ev.key === "Enter") {
-      if (!value || value == "") {
-        cancelFileCreating({});
-        return;
-      }
-      const filepath = path.join(parentDir, value);
-      finishFileCreating({ filepath });
+      handleDirCreate(parentDir, value);
     }
+  };
+
+  const handleDirCreate = (parentDir, value) => {
+    if (!value || value == "") {
+      cancelFileCreating({});
+      return;
+    }
+    const filepath = path.join(parentDir, value);
+    finishFileCreating({ filepath });
   };
 
   return (
@@ -62,8 +67,8 @@ const AddFile = ({ parentDir, depth }) => {
           minWidth: "unset",
         }}
       >
-          <ArIcon name={"File"} className="text-black w-[1.5rem]" />
-          </ListItemIcon>
+        <ArIcon name={"File"} className="text-black w-[1.5rem]" />
+      </ListItemIcon>
       <TextField
         className="tailwind-classes-for-input"
         variant="outlined"

@@ -7,8 +7,6 @@ import { toast } from "react-toastify";
 import { updateAccessToken } from "store";
 import { loginUser, getMe } from "@/services";
 import { useUserStore, useLoginStore } from "store";
-import emailSvg from "@/assets/website/email.svg";
-import passwordSvg from "@/assets/website/password.svg";
 import ArButton from "@/components/arButton";
 import ArInput from "@/components/arInput";
 import ArIcon from "@/components/arIcon";

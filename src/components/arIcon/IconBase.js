@@ -1,5 +1,5 @@
 /*
- * @Description: 
+ * @Description:
  * @Author: Devin
  * @Date: 2024-09-23 11:55:36
  */
@@ -13,8 +13,8 @@ const IconBase = forwardRef((props, ref) => {
     className,
     onClick,
     style,
-    "data-icon": data.name,
-    "aria-hidden": "true",
+    dataIcon: data.name,
+    ariaHidden: "true",
     ...restProps,
     ref,
   });

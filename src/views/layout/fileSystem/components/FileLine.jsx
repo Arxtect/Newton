@@ -55,11 +55,16 @@ const FileLine = ({
   const basename = path.basename(filepath);
 
   const handleRenameConfirm = async (value) => {
+    if (!value || value == "") {
+      endRenaming();
+      return;
+    }
     const dirname = path.dirname(filepath);
     const destPath = path.join(dirname, value);
     await pify(fs.rename)(filepath, destPath);
 
     endRenaming();
+    setValue(value);
     fileMoved({ fromPath: filepath, destPath });
   };
   const handleMouseOver = () => setHovered(true);
@@ -80,21 +85,18 @@ const FileLine = ({
   };
 
   const handleBlur = () => {
-    endRenaming();
+    // endRenaming();
+    handleRenameConfirm(value);
   };
   const handleRename = () => {
-    console.log(filepath, renamingPathname, "filepath");
     startRenaming({ pathname: filepath });
   };
 
   const handleKeyDown = (ev) => {
     if (ev.key === "Escape") {
       endRenaming();
+      setValue(basename);
     } else if (ev.key === "Enter") {
-      if (!value || value == "") {
-        endRenaming();
-        return;
-      }
       handleRenameConfirm(value);
     }
   };
@@ -184,8 +186,8 @@ const FileLine = ({
                 minWidth: "unset",
               }}
             >
-          <ArIcon name={"File"} className="text-black w-[1.5rem]" />
-          </ListItemIcon>
+              <ArIcon name={"File"} className="text-black w-[1.5rem]" />
+            </ListItemIcon>
             <Pathname ignoreGit={ignoreGit}>{basename}</Pathname>
             {hovered && (
               <HoverMenu
@@ -206,7 +208,5 @@ const FileLine = ({
     </div>
   );
 };
-
-
 
 export default FileLine;

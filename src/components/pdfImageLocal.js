@@ -1,5 +1,5 @@
 /*
- * @Description: 
+ * @Description:
  * @Author: Devin
  * @Date: 2024-05-28 13:48:03
  */
@@ -9,7 +9,7 @@ import Skeleton from "@mui/material/Skeleton";
 import { getPreViewUrl } from "@/util";
 
 // 设置 pdf.js 的 worker，这是必须的步骤
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
+pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs`;
 
 const PdfImageLocal = ({ url, height = 250, ...res }) => {
   const [pageImage, setPageImage] = useState("");
@@ -66,7 +66,7 @@ const PdfImageLocal = ({ url, height = 250, ...res }) => {
           src={pageImage}
           alt="PDF thumbnail"
           className="w-full"
-          style={{height: height}}
+          style={{ height: height }}
           {...res}
         />
       ) : (

@@ -46,7 +46,7 @@ const LinkedLines = ({
             />
           );
         } else if (f.type === "dir") {
-          if(f.name === ".git") return null;
+          if (f.name === ".git") return null;
           return (
             <DirectoryLine
               {...res}
@@ -92,15 +92,13 @@ const DirectoryLineContent = ({
   changePreRenamingDirpath,
   changeCurrentProjectRoot,
 }) => {
-  const { dirOpen,isDropFileSystem,filepath } = useFileStore((state) => ({
+  const { dirOpen, isDropFileSystem, filepath } = useFileStore((state) => ({
     dirOpen: state.dirOpen,
     isDropFileSystem: state.isDropFileSystem,
-    filepath: state.filepath
+    filepath: state.filepath,
   }));
 
-  const [opened, setOpened] = useState(
-    preRenamingDirpath == dirpath ? true : open
-  );
+  const [opened, setOpened] = useState(open);
   const [fileList, setFileList] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -145,7 +143,7 @@ const DirectoryLineContent = ({
   };
 
   const handleFileMove = (result) => {
-    console.log(result)
+    console.log(result);
     if (result) {
       fileMoved(result);
     }
@@ -176,7 +174,8 @@ const DirectoryLineContent = ({
   };
 
   const handleBlur = () => {
-    endRenaming();
+    // endRenaming();
+    handleDirRenameConfirm(value);
   };
   const handleRename = () => {
     startRenaming({ pathname: dirpath });
@@ -185,15 +184,17 @@ const DirectoryLineContent = ({
   const handleKeyDown = (ev) => {
     if (ev.key === "Escape") {
       endRenaming();
+      setValue(path.basename(dirpath));
     } else if (ev.key === "Enter") {
-      if (!value || value == "") {
-        endRenaming();
-        return;
-      }
       handleDirRenameConfirm(value);
     }
   };
+
   const handleDirRenameConfirm = async (value) => {
+    if (!value || value == "") {
+      endRenaming();
+      return;
+    }
     const parentDir = path.dirname(dirpath);
     const newDirPath = path.join(parentDir, value);
     if (opened) {
@@ -204,6 +205,7 @@ const DirectoryLineContent = ({
       await pify(fs.rename)(dirpath, newDirPath);
 
       endRenaming();
+      setValue(path.basename(newDirPath));
       fileMoved({ fromPath: dirpath, destPath: newDirPath });
       if (depth == 0) {
         changeCurrentProjectRoot({ projectRoot: newDirPath });
@@ -218,13 +220,12 @@ const DirectoryLineContent = ({
     if (!!dirOpen) {
       if (!currentSelectDir) {
         let dir = path.dirname(filepath);
-        setOpened(dir == dirpath ? true : false);
-        return 
+        setOpened(open || dir == dirpath ? true : false);
+        return;
       }
-        setOpened(currentSelectDir == dirpath ? true : false);
+      setOpened(open || currentSelectDir == dirpath ? true : false);
     }
   }, [dirOpen]);
-
 
   return (
     <List className="p-0">
@@ -235,7 +236,9 @@ const DirectoryLineContent = ({
           onDrop={handleFileMove}
           onDropByOther={() => setOpened(true)}
           isEnabled={isDropFileSystem}
-          setHover={()=>{console.log('setHover')}}
+          setHover={() => {
+            console.log("setHover");
+          }}
         >
           <ListItem
             onMouseOver={handleMouseOver}
@@ -263,8 +266,10 @@ const DirectoryLineContent = ({
               {opened ? (
                 <ArIcon name={"FolderOpen"} className="text-black w-[1.5rem]" />
               ) : (
-                <ArIcon name={"FolderClose"} className="text-black w-[1.5rem]" />
-
+                <ArIcon
+                  name={"FolderClose"}
+                  className="text-black w-[1.5rem]"
+                />
               )}
             </ListItemIcon>
             {renamingPathname === dirpath ? (

@@ -1,0 +1,30 @@
+{
+  "icon": {
+    "type": "element",
+    "isRootNode": true,
+    "name": "svg",
+    "attributes": {
+      "width": "50",
+      "height": "50",
+      "viewBox": "0 0 50 50",
+      "fill": "none",
+      "xmlns": "http://www.w3.org/2000/svg"
+    },
+    "children": [
+      {
+        "type": "element",
+        "name": "path",
+        "attributes": {
+          "d": "M14.584 39.5833C14.584 40.6884 15.023 41.7482 15.8044 42.5296C16.5858 43.311 17.6456 43.75 18.7507 43.75C22.9173 43.75 22.9173 35.4167 25.0007 25C27.084 14.5833 27.084 6.25 31.2507 6.25C32.3557 6.25 33.4155 6.68899 34.1969 7.47039C34.9783 8.25179 35.4173 9.3116 35.4173 10.4167",
+          "stroke": "currentColor",
+          "stroke-width": "3.30909",
+          "stroke-linecap": "round",
+          "stroke-linejoin": "round"
+        },
+        "children": []
+      }
+    ]
+  },
+  "name": "Equation"
+}
+
