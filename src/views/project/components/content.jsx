@@ -313,7 +313,7 @@ const Content = React.forwardRef(
               >
                 <ArIcon
                   name={"Tip"}
-                  className="w-4 ml-2 cursor-pointer text-arxTheme"
+                  className="w-[0.9rem] h-[0.9rem] ml-2 cursor-pointer text-arxTheme"
                 />
               </Tooltip>
             )}
