@@ -33,7 +33,6 @@ const LatexEditor = ({
       updateEditor(latexRef.current.editor);
     }
     return () => {
-      console.log("Cleaning up editor reference");
       updateEditor(null);
     };
   }, [latexRef]);

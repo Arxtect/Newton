@@ -66,27 +66,33 @@ export const useFileStore = create()(
           return file.replace(new RegExp(`^${relativePathPrefix}`), "");
         });
 
-        await get().updateCurrentProjectBibFilepathList(files)
+        await get().updateCurrentProjectBibFilepathList(files);
 
         let fileList = modifiedFiles.filter((i) => !!i);
-        
-        let mainFile = await FS.findMainFile(files);
+
         set({ currentProjectFileList: fileList });
-        await get().loadFile({ filepath: mainFile });
+
+        // await get().changeMainFile(files);
       },
       updateCurrentProjectBibFilepathList: async (files) => {
-        let list = files.filter((item) => {  
+        let list = files.filter((item) => {
           let fileExt = path.extname(item);
           return fileExt === ".bib";
         });
         set({ currentProjectBibFilepathList: list });
       },
+      changeMainFile: async (currentProjectRoot) => {
+        let newFiles = await FS.getFilesRecursively(currentProjectRoot);
+
+        let mainFile = await FS.findMainFile(newFiles);
+        await get().loadFile({ filepath: mainFile });
+      },
       changeSingleBibFilepath: (bibFilepath, isAdd = true) => {
         let fileExt = path.extname(bibFilepath);
         if (fileExt !== ".bib") return;
-      
+
         let bibFilepathList = get().currentProjectBibFilepathList;
-      
+
         if (isAdd) {
           // Create a Set to ensure uniqueness
           let bibFilepathSet = new Set(bibFilepathList);
@@ -96,7 +102,9 @@ export const useFileStore = create()(
           });
         } else {
           set({
-            currentProjectBibFilepathList: bibFilepathList.filter((item) => item !== bibFilepath),
+            currentProjectBibFilepathList: bibFilepathList.filter(
+              (item) => item !== bibFilepath
+            ),
           });
         }
       },
@@ -225,7 +233,7 @@ export const useFileStore = create()(
         withReload = false
       ) => {
         const state = get();
-       state.changeSingleBibFilepath(filepath);
+        state.changeSingleBibFilepath(filepath);
         if (!!state.shareIsRead) return;
         await state.saveFile(filepath, value, withReload);
         if (!isSync) return;
@@ -292,14 +300,14 @@ export const useFileStore = create()(
         // 假设 loadFile 已适配 Zustand
         get().loadFile({ filepath });
         get().changeSingleBibFilepath(filepath);
-        get().updateDirOpen(false)
+        get().updateDirOpen(false);
       },
       cancelFileCreating: () => {
-         get().updateDirOpen(false);
+        get().updateDirOpen(false);
         set({ fileCreatingDir: null });
       },
       cancelDirCreating: () => {
-         get().updateDirOpen(false);
+        get().updateDirOpen(false);
         set({ dirCreatingDir: null });
       },
       finishDirCreating: async ({ dirpath }) => {
@@ -331,7 +339,7 @@ export const useFileStore = create()(
         if (projectSync && filename) {
           projectSync.deleteFile(filename);
         }
-        get().changeSingleBibFilepath(filename,false);
+        get().changeSingleBibFilepath(filename, false);
         get().startUpdate({ changedPath: filename });
       },
       deleteDirectory: async ({ dirpath }) => {
@@ -339,11 +347,11 @@ export const useFileStore = create()(
           set({ filepath: "", value: "", currentSelectDir: "" });
           const files = await FS.getFilesRecursively(dirpath);
           const projectSync = get().projectSync;
-          files.map(item=>{
-            if(path.extname(item) === ".bib"){
-              get().changeSingleBibFilepath(item,false);
+          files.map((item) => {
+            if (path.extname(item) === ".bib") {
+              get().changeSingleBibFilepath(item, false);
             }
-          })
+          });
           if (projectSync && dirpath) {
             projectSync.deleteFolder(dirpath);
           }
@@ -429,10 +437,8 @@ export function getInitialState() {
     value: "",
     lastSavedValue: "",
     reloadCounter: 0,
-    autosave: true,
     assetsFilePath: "",
     assetValue: "",
-    lastSavedValue: "",
   };
 }
 

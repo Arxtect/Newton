@@ -64,6 +64,7 @@ const ContentTopBar = (props) => {
     currentSelectDir,
     updateDirOpen,
     reload,
+    changeMainFile,
   } = useFileStore((state) => ({
     projectSync: state.projectSync,
     sourceCode: state.value,
@@ -75,15 +76,16 @@ const ContentTopBar = (props) => {
     currentSelectDir: state.currentSelectDir,
     updateDirOpen: state.updateDirOpen,
     reload: state.repoChanged,
+    changeMainFile: state.changeMainFile,
   }));
 
-  const { updateSetting, getSetting, compileSetting } = useCompileSetting(
-    (state) => ({
+  const { updateSetting, getSetting, compileSetting, initializeDefaults } =
+    useCompileSetting((state) => ({
       updateSetting: state.updateSetting,
       getSetting: state.getSetting,
       compileSetting: state.compileSetting,
-    })
-  );
+      initializeDefaults: state.initializeDefaults,
+    }));
 
   const { showCompilerLog, toggleCompilerLog, logInfo } = usePdfPreviewStore(
     (state) => ({
@@ -102,11 +104,21 @@ const ContentTopBar = (props) => {
 
   const [isAutoCompile, setIsAutoCompile] = useState(false);
 
-  // useEffect(() => {
-  //   autoCompileFirst(() =>
-  //     compileLatex(sourceCode, currentProjectRoot, compileSetting)
-  //   );
-  // }, [sourceCode, engineStatus, currentProjectRoot, compileSetting]);
+  useEffect(() => {
+    compileSetting["autoCompile"] &&
+      autoCompileFirst(() =>
+        compileLatex(sourceCode, currentProjectRoot, compileSetting)
+      );
+  }, [sourceCode, engineStatus, currentProjectRoot, compileSetting]);
+
+  // TODO: delete
+  useEffect(() => {
+    initializeDefaults(compileSetting);
+  }, []);
+
+  useEffect(() => {
+    changeMainFile(currentProjectRoot);
+  }, [currentProjectRoot]);
 
   const autoCompileFirst = (compileCallback) => {
     if (
@@ -324,6 +336,23 @@ const ContentTopBar = (props) => {
                 buttonCom={<ArrowDropDownIcon />}
                 // width="10rem"
                 items={[
+                  {
+                    label: "Auto Compile",
+                    separator: true,
+                    type: "radio",
+                    onSelect: (v) => updateSetting("autoCompile", v),
+                    value: getSetting("autoCompile"),
+                    subMenu: [
+                      {
+                        label: "On",
+                        value: "on",
+                      },
+                      {
+                        label: "Off",
+                        value: "off",
+                      },
+                    ],
+                  },
                   {
                     label: "Compiler",
                     separator: true,

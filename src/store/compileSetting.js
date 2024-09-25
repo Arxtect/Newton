@@ -1,25 +1,31 @@
 /*
  * @Description:
  * @Author: Devin
- * @Date: 2024-05-28 13:48:03
+ * @Date: 2024-09-14 10:36:22
  */
-
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 export const COMPILE_SETTING = "COMPILE_SETTING";
 
-export const useCompileSetting = create()(
+// 定义默认设置
+const defaultSetting = {
+  compiler: "xeLaTeX",
+  nonstop: "on",
+  autoCompile: "on",
+};
+
+const defaultCompileSetting = {
+  isPdfLatex: false,
+  nonstop: true,
+  autoCompile: true,
+};
+
+export const useCompileSetting = create(
   persist(
     (set, get) => ({
-      setting: {
-        compiler: "xeLaTeX",
-        nonstop: "on"
-      },
-      compileSetting: {
-        isPdfLatex:false,
-        nonstop:true
-      },
+      setting: defaultSetting,
+      compileSetting: defaultCompileSetting,
       getSetting(key) {
         return get().setting[key];
       },
@@ -33,15 +39,26 @@ export const useCompileSetting = create()(
         get().getPdfLatex();
       },
       getPdfLatex() {
-        let isPdfLatex = get().getSetting("compiler") == "pdfLaTeX";
-        let nonstop = get().getSetting("nonstop") == "on";
+        let isPdfLatex = get().getSetting("compiler") === "pdfLaTeX";
+        let nonstop = get().getSetting("nonstop") === "on";
+        let autoCompile = get().getSetting("autoCompile") === "on";
         set({
           compileSetting: {
             isPdfLatex,
-            nonstop
-          }
-        })
-      }
+            nonstop,
+            autoCompile,
+          },
+        });
+      },
+      initializeDefaults(currentCompileSettings) {
+        const currentSettings = get().setting;
+        const updatedSettings = { ...defaultSetting, ...currentSettings };
+        const updateCompileSetting = {
+          ...defaultCompileSetting,
+          ...currentCompileSettings,
+        };
+        set({ setting: updatedSettings, compileSetting: updateCompileSetting });
+      },
     }),
     {
       name: COMPILE_SETTING,
