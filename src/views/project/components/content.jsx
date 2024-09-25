@@ -178,7 +178,7 @@ const Content = React.forwardRef(
 
     useEffect(() => {
       getProjectList();
-    }, [currentSelectMenu]); //user
+    }, [currentSelectMenu, user]);
 
     const sortedRows = useMemo(() => {
       return [...projectData]

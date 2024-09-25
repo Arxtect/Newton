@@ -32,6 +32,7 @@ const UserMenu = () => {
       .then((res) => {
         setUserInfo("");
         updateAccessToken("")
+              updateAccessToken("");
         updateUser({})
       })
       .catch((error) => {
