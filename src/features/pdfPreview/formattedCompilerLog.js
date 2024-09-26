@@ -66,12 +66,14 @@ const Message = ({ type, title, file, line, details, content }) => {
     loadFile: state.loadFile,
     fileList: state.currentProjectFileList,
   }));
-  const handleLocateLine = (lineNumber) => {
+  const handleLocate = async(file, line) => {
     if(editor) {
-      const lineNumberInt = parseInt(lineNumber, 10);
-      if(!isNaN(lineNumberInt)) {
+      const filePath = `${currentProjectRoot}/${file}`;
+      await loadFile({ filepath: filePath });
+      const lineInt = parseInt(line, 10);
+      if(!isNaN(lineInt)) {
         editor.focus();
-        editor.gotoLine(lineNumberInt);
+        editor.gotoLine(lineInt);
       }
     }
   }
@@ -82,11 +84,7 @@ const Message = ({ type, title, file, line, details, content }) => {
         <div className="font-bold">{title}</div>
         <div
           className={`text-sm cursor-pointer text-blue-500 hover:underline`}
-          onClick={fileList.includes(file) ? async () => {
-            const filePath = `${currentProjectRoot}/${file}`;
-            await loadFile({ filepath: filePath });
-            handleLocateLine(line);
-          } : null}
+          onClick={fileList.includes(file) ? () => handleLocate(file, line) : null}
         >
           {file && file}
           {file && ","} {line && line}
