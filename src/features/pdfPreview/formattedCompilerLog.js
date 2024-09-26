@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useEditor } from "@/store";
+import { useEditor, useFileStore } from "@/store";
 
 const CollapsibleText = ({ content }) => {
   const [isCollapsed, setIsCollapsed] = useState(true);
@@ -61,8 +61,12 @@ const Message = ({ type, title, file, line, details, content }) => {
   }
 
   const { editor } = useEditor();
-
-  const handleLocate = (lineNumber) => {
+  const { fileList, currentProjectRoot, loadFile } = useFileStore((state) => ({
+    currentProjectRoot: state.currentProjectRoot,
+    loadFile: state.loadFile,
+    fileList: state.currentProjectFileList,
+  }));
+  const handleLocateLine = (lineNumber) => {
     if(editor) {
       const lineNumberInt = parseInt(lineNumber, 10);
       if(!isNaN(lineNumberInt)) {
@@ -78,7 +82,11 @@ const Message = ({ type, title, file, line, details, content }) => {
         <div className="font-bold">{title}</div>
         <div
           className={`text-sm cursor-pointer text-blue-500 hover:underline`}
-          onClick={() => handleLocate(line)}
+          onClick={fileList.includes(file) ? async () => {
+            const filePath = `${currentProjectRoot}/${file}`;
+            await loadFile({ filepath: filePath });
+            handleLocateLine(line);
+          } : null}
         >
           {file && file}
           {file && ","} {line && line}
@@ -93,6 +101,8 @@ const Message = ({ type, title, file, line, details, content }) => {
 };
 
 const FormattedCompilerLog = ({ messages, log }) => {
+  
+  console.log(messages, "messages");
   return (
     <div className="p-6">
       {messages.map((msg, index) => (
