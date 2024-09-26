@@ -260,14 +260,13 @@ export function debounce(func, wait) {
   };
 }
 
-
 export function isNullOrUndefined(value) {
   return value === undefined || value === null;
 }
 
-export function getGiteaFullUrl(userName,repoName){
- let remoteUrl = window.origin + "/git/" + userName + "/" + repoName + ".git";
- return remoteUrl
+export function getGiteaFullUrl(userName, repoName) {
+  let remoteUrl = window.origin + "/git/" + userName + "/" + repoName + ".git";
+  return remoteUrl;
 }
 
 export function getColors(i) {
@@ -286,13 +285,12 @@ export function getColors(i) {
 
   if (typeof i === "number" && i >= 0) {
     return colors[i];
-  } else if(i > colors.length){
+  } else if (i > colors.length) {
     return colors[colors.length - 1];
-  }else{
+  } else {
     return colors[Math.floor(Math.random() * colors.length)];
   }
 }
-
 
 const chars =
   "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_";
@@ -304,7 +302,7 @@ export function randomString(length) {
   return result;
 }
 
-export const getFirstNUpperCaseChars =(str, length=1)=> {
+export const getFirstNUpperCaseChars = (str, length = 1) => {
   if (!str) {
     return ""; // 如果输入字符串为空，返回空字符串
   }
@@ -313,16 +311,22 @@ export const getFirstNUpperCaseChars =(str, length=1)=> {
   const upperCaseChars = firstNChars.toUpperCase(); // 转换为大写
 
   return upperCaseChars;
-}
+};
 
-
-function extractLatex(markdown) {
+export function extractLatex(markdown) {
   const latexBlockRegex = /```latex\s*([\s\S]*?)\s*```/g;
   let matches = [];
   let match;
   while ((match = latexBlockRegex.exec(markdown)) !== null) {
-      const content = match[1].split('\n').map(line => line.trim()).join('\n');
-      matches.push(content);
+    const content = match[1]
+      .split("\n")
+      .map((line) => line.trim())
+      .join("\n");
+    matches.push(content);
   }
   return matches?.[0] || "";
 }
+
+export const test = () => {
+  console.log("test");
+};

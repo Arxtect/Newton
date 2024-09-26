@@ -8,7 +8,10 @@ import React, {
 import { useLayout } from "store";
 import AiPanel from "@/features/aiPanel";
 import Ace from "ace-builds/src-min-noconflict/ace";
-import "./aiTools.css"; // 引入样式文件
+import "./index.css"; // 引入样式文件
+import SelectionTooltip from "./SelectionTooltip";
+import AiConfirm from "../aiConfirm";
+import { useChatStore } from "@/store";
 
 const Range = Ace.require("ace/range").Range;
 
@@ -21,8 +24,14 @@ const AiTools = ({ editor, completer }) => {
   const [isResponding, setIsResponding] = useState(false);
   const [prevContentLength, setPrevContentLength] = useState(0);
   const [markerRange, setMarkerRange] = useState(null);
+  const [showTooltip, setShowTooltip] = useState(false);
 
   const [incomeCommandOptions, setIncomeCommandOptions] = useState([]);
+
+  const { showPromptMessage,saveHandleAccept,saveHandleReject } = useChatStore();
+
+  //commandInput
+  const commandInputRef = useRef();
 
   const handleAccept = useCallback(() => {
     if (markerRange) {
@@ -124,31 +133,51 @@ const AiTools = ({ editor, completer }) => {
     [editor, markerRange]
   );
 
-  useEffect(() => {
-    sideWidthRef.current = sideWidth;
-  }, [sideWidth]);
-
-  const handleCursorChange = (selection) => {
-    const cursorPosition = editor.getCursorPosition();
+  const setCurrentPosition = (cursorPosition, session) => {
+    console.log(cursorPosition, "cursorPosition");
     const screenCoordinates = editor.renderer.textToScreenCoordinates(
       cursorPosition.row,
-      0
-      // cursorPosition.column
+      0 //使用0替换cursorPosition.column
     );
+    const visualLineCount = session.getRowLength(cursorPosition.row);
+
     const editorElement = editor.container;
     const rect = editorElement.getBoundingClientRect();
     const toolbarTop =
       screenCoordinates.pageY +
-      editor.renderer.layerConfig.lineHeight -
+      editor.renderer.layerConfig.lineHeight * visualLineCount -
       rect.top +
       3;
     const toolbarLeft = screenCoordinates.pageX - sideWidthRef.current;
     setToolbarPosition({ top: toolbarTop, left: toolbarLeft });
+  };
 
+  const handleCursorChange = () => {
+    console.log(isResponding, "isResponding");
+    if (markerRange && !isResponding) {
+      console.log("markerRange2", markerRange);
+      setShowDropdown(true);
+      return;
+    }
     const session = editor.getSession();
+    const range = editor.getSelectionRange();
+    const selectText = editor.getSelectedText();
+    const cursorPosition = range.isEmpty()
+      ? editor.getCursorPosition()
+      : range.end;
+
+    if (selectText && selectText.trim() != "") {
+      setShowTooltip(true);
+    } else {
+      setShowTooltip(false);
+    }
+
+    setCurrentPosition(cursorPosition, session);
+
     const line = session.getLine(cursorPosition.row);
     const previousChar = line.charAt(cursorPosition.column - 1);
     const previousChar2 = line.charAt(cursorPosition.column - 2);
+    console.log("markerRange1", markerRange);
 
     if (previousChar === "/" && previousChar2 !== "/") {
       setShowDropdown(true);
@@ -157,15 +186,43 @@ const AiTools = ({ editor, completer }) => {
     }
   };
 
-  useEffect(() => {
-    editor.session.selection.on("changeCursor", handleCursorChange);
-    return () => {
-      editor.session.selection.off("changeCursor", handleCursorChange);
-      handleReject();
-    };
-  }, []);
+  const handleChange = () => {
+    const session = editor.getSession();
+    const cursorPosition = editor.getCursorPosition();
+    const line = session.getLine(cursorPosition.row);
+    const previousChar = line.charAt(cursorPosition.column - 1);
+    const previousChar2 = line.charAt(cursorPosition.column - 2);
 
-  useEffect(() => {
+    // if (previousChar === "/" && previousChar2 !== "/") {
+    //   setShowDropdown(true);
+    // } else {
+    //   setShowDropdown(false);
+    // }
+  };
+
+  const handleSelectViaName = (name = "Section Polisher") => {
+    //Section Polisher
+    if (commandInputRef.current) {
+      commandInputRef.current.handleSelectViaName(name);
+    }
+  };
+
+  const addCustomCommand = (editor) => {
+    editor.commands.addCommand({
+      name: "showCustomComponent",
+      bindKey: { win: "Ctrl-I", mac: "Cmd-I" },
+      exec: () => {
+        const selectedText = editor.getSelectedText();
+        setShowTooltip(false);
+        if (!selectedText) return;
+        console.log(selectedText, "selectedText");
+        handleSelectViaName("Section Polisher");
+        setShowDropdown(true);
+      },
+    });
+  };
+
+  const insertTextToEditor = () => {
     if (!answerContent) {
       setPrevContentLength(0);
       return;
@@ -185,6 +242,25 @@ const AiTools = ({ editor, completer }) => {
     if (isResponding) {
       setIncomeCommandOptions(incomeCommandOptionsCallback);
     }
+  };
+
+  const handleClickOutside = (event) => {
+    // 检查点击是否在特定区域外
+    if (
+      markerRange &&
+      !event.target.closest(".prompt-container") &&
+      !event.target.closest(".toolbar")
+    ) {
+      showPromptMessage();
+      saveHandleAccept(handleAccept);
+      saveHandleReject(handleReject);
+      editor.blur();
+      event.stopPropagation();
+    }
+  };
+
+  useEffect(() => {
+    insertTextToEditor();
   }, [answerContent, handleCommand, isResponding]);
 
   useEffect(() => {
@@ -198,14 +274,50 @@ const AiTools = ({ editor, completer }) => {
     }
   }, [showDropdown]);
 
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setShowDropdown(false);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    addCustomCommand(editor);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+
+      handleReject();
+    };
+  }, []);
+
+  useEffect(() => {
+    sideWidthRef.current = sideWidth;
+  }, [sideWidth]);
+
+  useEffect(() => {
+    editor.session.selection.on("changeCursor", handleCursorChange);
+    editor.session.on("change", handleChange);
+    document.addEventListener("click", handleClickOutside, true); // 使用捕获阶段
+
+    return () => {
+      editor.session.selection.off("changeCursor", handleCursorChange);
+      editor.session.off("change", handleChange);
+      document.removeEventListener("click", handleClickOutside, true);
+    };
+  }, [markerRange, showPromptMessage, isResponding]);
+
   return (
-    showDropdown && (
+    <React.Fragment>
       <div
         className="toolbar"
         style={{
           position: "absolute",
           top: toolbarPosition.top,
           left: toolbarPosition.left,
+          visibility: showDropdown ? "visible" : "hidden",
+          zIndex: 99,
         }}
       >
         <AiPanel
@@ -213,9 +325,18 @@ const AiTools = ({ editor, completer }) => {
           setAnswerContent={setAnswerContent}
           incomeCommandOptions={incomeCommandOptions}
           setIsResponding={setIsResponding}
+          showPanel={showDropdown}
+          commandInputRef={commandInputRef}
         />
       </div>
-    )
+      {showTooltip && (
+        <SelectionTooltip
+          message={"Ctrl+I  AI Command"}
+          position={toolbarPosition}
+        />
+      )}
+      <AiConfirm />
+    </React.Fragment>
   );
 };
 

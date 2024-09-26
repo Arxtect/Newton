@@ -1,3 +1,8 @@
+/*
+ * @Description:
+ * @Author: Devin
+ * @Date: 2024-09-23 15:08:59
+ */
 import React from "react";
 import CommandInput from "./CommandInput";
 
@@ -14,6 +19,7 @@ const Command = ({
   setCurrentApp,
   incomeCommandOptions,
   triggerType,
+  commandInputRef,
   ...res
 }) => {
   return (
@@ -33,6 +39,7 @@ const Command = ({
             setCurrentApp={setCurrentApp}
             incomeCommandOptions={incomeCommandOptions}
             triggerType={triggerType}
+            ref={commandInputRef}
             {...res}
           />
         </div>

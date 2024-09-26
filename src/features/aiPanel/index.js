@@ -30,12 +30,14 @@ const CommandPopover = ({
   incomeCommandOptions,
   ...res
 }) => {
+  let cssCommand =
+    "flex flex-col items-start text-sm font-medium leading-none text-left min-w-[28rem] w-[30vw]";
   return (
     <Popover.Root>
       {triggerType === "click" ? (
         <Popover.Trigger asChild>{children}</Popover.Trigger>
       ) : (
-        <div className="flex flex-col items-start text-sm font-medium leading-none text-left min-w-[28rem] w-[30vw]">
+        <div className={cssCommand}>
           <Command
             chatList={chatList}
             isResponding={isResponding}
@@ -59,7 +61,7 @@ const CommandPopover = ({
           sideOffset={0}
           align={"start"}
         >
-          <div className="flex flex-col items-start text-sm font-medium leading-none text-left min-w-[32rem] w-[30vw]">
+          <div className={cssCommand}>
             <Command
               chatList={chatList}
               isResponding={isResponding}
@@ -87,6 +89,7 @@ const AiPanel = ({
   setAnswerContent,
   setIsResponding: handleSetIsResponding,
   incomeCommandOptions,
+  ...res
 }) => {
   const memoizedChildren = React.useMemo(() => children, [children]);
 
@@ -114,6 +117,7 @@ const AiPanel = ({
   }, [chatList]);
 
   useEffect(() => {
+    console.log(isResponding, "isResponding2");
     handleSetIsResponding && handleSetIsResponding(isResponding);
   }, [isResponding]);
 
@@ -131,6 +135,7 @@ const AiPanel = ({
       setCurrentApp={setCurrentApp}
       triggerType={triggerType}
       incomeCommandOptions={incomeCommandOptions}
+      {...res}
     >
       {memoizedChildren}
     </CommandPopover>

@@ -3,10 +3,12 @@ import AceEditor from "react-ace";
 import "ace-builds/src-noconflict/mode-latex";
 import "ace-builds/src-min-noconflict/ext-language_tools";
 import "ace-builds/src-min-noconflict/ext-searchbox";
-import AiTools from "./aiTools";
+
 import { useEditor, useFileStore } from "@/store";
 import AutoCompleteManager from "@/features/autoComplete/AutoCompleteManager";
-import EditorStateManager from "./EditorStateManager"; // Import the class
+
+import EditorStateManager from "./component/editorStateManager"; // Import the class
+import AiTools from "./component/aiTools";
 
 const LatexEditor = ({
   handleChange,

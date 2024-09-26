@@ -20,6 +20,13 @@ export const useChatStore = create()(
           },
         }));
       },
+      showPrompt: false,
+      handleAccept: null,
+      handleReject: null,
+      showPromptMessage: () => set({ showPrompt: true }),
+      hidePromptMessage: () => set({ showPrompt: false }),
+      saveHandleAccept: (handle) => set({ handleAccept: handle }),
+      saveHandleReject: (handle) => set({ handleReject: handle }),
     }),
     {
       name: CHAT_KEY,
