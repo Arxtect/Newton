@@ -29,6 +29,7 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 const { sentryWebpackPlugin } = require("@sentry/webpack-plugin");
 
 const createEnvironmentHash = require("./webpack/persistentCache/createEnvironmentHash");
+const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
 
 // Source maps are resource heavy and can cause out of memory issue for large source files.
 const shouldUseSourceMap = process.env.GENERATE_SOURCEMAP !== "false";
@@ -644,6 +645,7 @@ module.exports = function (webpackEnv) {
       ].filter(Boolean),
     },
     plugins: [
+      !isEnvProduction && new BundleAnalyzerPlugin(),
       isEnvProduction &&
         sentryWebpackPlugin({
           org: "arxtect",

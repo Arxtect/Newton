@@ -25,8 +25,6 @@ import DialogLogin from "@/views/login/dialog-login.js";
 import { writeFile } from "domain/filesystem";
 import path from "path";
 import latexCodeWelcome from "@/features/latexEditor/welcome";
-// import "@blueprintjs/core/lib/css/blueprint.css";
-// import "@blueprintjs/icons/lib/css/blueprint-icons.css";
 import "./sentry.js";
 
 async function loadBrowserFS() {
