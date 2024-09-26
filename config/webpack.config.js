@@ -316,7 +316,7 @@ module.exports = function (webpackEnv) {
                 enforce: true,
               },
               mui: {
-                test: /[\\/]node_modules[\\/](@mui|@emotion|@atlaskit)[\\/]/,
+                test: /[\\/]node_modules[\\/](@mui|@atlaskit)[\\/]/,
                 name: "chunk-mui",
                 chunks: "all",
                 priority: 20,
