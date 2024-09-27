@@ -63,13 +63,11 @@ const ArDialog = ({
   return (
     <Dialog
       header={
-        <div className="flex">
-          <span>{title}</span>
+        <div className="flex w-full">
+          {title}
           {tooltipText && (
             <Tooltip content={tooltipText} position="top">
-              <IconButton aria-label="warning">
-                <GppMaybeIcon fontSize="inherit" />
-              </IconButton>
+              <GppMaybeIcon fontSize="inherit" className="cursor-pointer" />
             </Tooltip>
           )}
         </div>

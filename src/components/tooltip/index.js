@@ -1,3 +1,8 @@
+/*
+ * @Description:
+ * @Author: Devin
+ * @Date: 2024-09-14 10:36:38
+ */
 import React, { useRef } from "react";
 import { Tooltip as ReactTooltip } from "react-tooltip";
 import { randomString } from "@/util";
@@ -15,7 +20,7 @@ const Tooltip = ({
   noArrow,
 }) => {
   // Generate a unique ID for the tooltip if selector is not provided
-  const uniqueId = useRef(`${content}-tooltip-${randomString(4)}`);
+  const uniqueId = useRef(`${content.slice(0, 10)}-tooltip-${randomString(4)}`);
   const tooltipId = selector || uniqueId.current;
 
   return (

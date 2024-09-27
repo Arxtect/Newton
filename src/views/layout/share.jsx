@@ -232,7 +232,7 @@ const Share = forwardRef(({ rootPath, user }, ref) => {
       </Tooltip>
       <ArDialog
         title={
-          <div className="flex justify-between mr-8" id="ar-dialog">
+          <div className="flex justify-between mr-8 w-full" id="ar-dialog">
             {"Share Project"}
             <div
               className="flex items-center gap-2.5 text-sm  cursor-pointer"

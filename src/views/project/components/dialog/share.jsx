@@ -33,7 +33,6 @@ const Share = ({
   const [link, setLink] = useState("");
   const [copyToClipboard] = useCopyToClipboard();
 
-
   useEffect(() => {
     if (!rootPath || !user || JSON.stringify(user) === "{}") return;
     const generatedLink = `${window.location.origin}/project#/project?project=${rootPath}&&roomId=${user.id}`;
@@ -54,7 +53,6 @@ const Share = ({
     projectSync.syncFolderToYMapRootPath(getProjectList);
   };
 
-
   const handleSaveProject = async () => {
     // let projectInfo = await getProjectInfo(rootPath);
     // if (projectInfo?.isSync || projectInfo?.isClose) return;
@@ -72,112 +70,121 @@ const Share = ({
   };
 
   const copyLink = async () => {
-    await copyToClipboard(link, "Link copied to clipboard!","success",document.getElementById("ar-dialog"));
+    await copyToClipboard(
+      link,
+      "Link copied to clipboard!",
+      "success",
+      document.getElementById("ar-dialog")
+    );
     // handleSaveProject();
   };
-  
-    const handleInvite = async (searchInput, access) => {
-      console.log(searchInput, access, "searchInput");
-      let res = await inviteUser({
-        email: searchInput,
-        share_link: link,
-        project_name: rootPath + user.id,
-        access: access,
-      });
-      if (res?.status == "success") {
-        toast.success(`Invite ${searchInput} success`);
-        getRoomInfo();
-        let projectInfo = await getProjectInfo(rootPath);
-        // if (projectInfo?.isSync) return;
-        handleSaveProject();
-      }
-      return res?.status;
-    };
 
-    const handleRemoveUser = async (email) => {
-      let res = await deleteInviteUser({
-        email: email,
-        project_name: rootPath + user.id,
-      });
-      if (res?.status == "success") {
-        getRoomInfo();
-        toast.success(`Remove user success`);
-      }
-      return res?.status;
-    };
+  const handleInvite = async (searchInput, access) => {
+    console.log(searchInput, access, "searchInput");
+    let res = await inviteUser({
+      email: searchInput,
+      share_link: link,
+      project_name: rootPath + user.id,
+      access: access,
+    });
+    if (res?.status == "success") {
+      toast.success(`Invite ${searchInput} success`);
+      getRoomInfo();
+      let projectInfo = await getProjectInfo(rootPath);
+      // if (projectInfo?.isSync) return;
+      handleSaveProject();
+    }
+    return res?.status;
+  };
 
-    const handleCloseRoom = async () => {
-      let res = await closeRoom({
-        project_name: rootPath + user.id,
-      });
-      if (res?.status == "success") {
-        toast.success(`Close room success`);
-        getRoomInfo();
-      }
-      return res?.status;
-    };
+  const handleRemoveUser = async (email) => {
+    let res = await deleteInviteUser({
+      email: email,
+      project_name: rootPath + user.id,
+    });
+    if (res?.status == "success") {
+      getRoomInfo();
+      toast.success(`Remove user success`);
+    }
+    return res?.status;
+  };
 
-    const handleUpdateUser = async (searchInput, access) => {
-      let res = await inviteUser({
-        email: searchInput,
-        share_link: link,
-        project_name: rootPath + user.id,
-        access: access,
-      });
-      if (res?.status == "success") {
-        getRoomInfo();
-        toast.success(`Change user access success`);
-      }
-      return res?.status;
-    };
-    const handleReopenRoom = async () => {
-      let res = await reopenRoom({
-        project_name: rootPath + user.id,
-      });
-      if (res?.status == "success") {
-        getRoomInfo();
-        toast.success(`Reopen room success`);
-      }
-      return res?.status;
-    };
+  const handleCloseRoom = async () => {
+    let res = await closeRoom({
+      project_name: rootPath + user.id,
+    });
+    if (res?.status == "success") {
+      toast.success(`Close room success`);
+      getRoomInfo();
+    }
+    return res?.status;
+  };
 
-    const [roomInfo, setRoomInfo] = useState({});
+  const handleUpdateUser = async (searchInput, access) => {
+    let res = await inviteUser({
+      email: searchInput,
+      share_link: link,
+      project_name: rootPath + user.id,
+      access: access,
+    });
+    if (res?.status == "success") {
+      getRoomInfo();
+      toast.success(`Change user access success`);
+    }
+    return res?.status;
+  };
+  const handleReopenRoom = async () => {
+    let res = await reopenRoom({
+      project_name: rootPath + user.id,
+    });
+    if (res?.status == "success") {
+      getRoomInfo();
+      toast.success(`Reopen room success`);
+    }
+    return res?.status;
+  };
 
-    const getRoomInfo = async () => {
-      let res = await getRoomInfoList({
-        project_name: rootPath + user.id,
+  const [roomInfo, setRoomInfo] = useState({});
+
+  const getRoomInfo = async () => {
+    let res = await getRoomInfoList({
+      project_name: rootPath + user.id,
+    });
+    const roomInfo = res?.data?.room;
+    if (roomInfo?.is_closed) {
+      await createProjectInfo(rootPath, {
+        isSync: false,
+        isClose: true,
       });
-      const roomInfo = res?.data?.room;
-      if (roomInfo?.is_closed) {
-        await createProjectInfo(rootPath, {
-          isSync: false,
-          isClose: true,
-        });
-      } else {
-        await createProjectInfo(rootPath, {
-          isSync: true,
-          isClose: false,
-        });
-      }
-      setRoomInfo(roomInfo);
-      const info = await getProjectInfo(rootPath);
-      console.log(info, "info");
-    };
+    } else {
+      await createProjectInfo(rootPath, {
+        isSync: true,
+        isClose: false,
+      });
+    }
+    setRoomInfo(roomInfo);
+    const info = await getProjectInfo(rootPath);
+    console.log(info, "info");
+  };
 
-    useEffect(() => {
-      dialogOpen&&getRoomInfo();
-    }, [dialogOpen]);
+  useEffect(() => {
+    dialogOpen && getRoomInfo();
+  }, [dialogOpen]);
 
   return (
     <ArDialog
       title={
-        <div className="flex justify-between mr-8" id="ar-dialog">
+        <div className="flex justify-between mr-8 w-full" id="ar-dialog">
           {"Share Project"}
           <div
             className="flex items-center gap-2.5 text-sm  cursor-pointer"
             onClick={() => copyLink()}
           >
-             <ArIcon name={"Link"} className="object-contain shrink-0 w-6 aspect-square text-arxTheme"  loading="lazy"/>
+            <ArIcon
+              name={"Link"}
+              className="object-contain shrink-0 w-6 aspect-square text-arxTheme"
+              loading="lazy"
+            />
             <span className="text-arxTheme">Copy Link</span>
           </div>
         </div>
