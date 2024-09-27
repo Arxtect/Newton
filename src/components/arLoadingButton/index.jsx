@@ -24,7 +24,7 @@ const ArLoadingButton = ({
         },
         "&.Mui-disabled": {
           color: "#6c757d7d", // 覆盖禁用颜色
-          border: `1px solid`,
+          // border: `1px solid`,
         },
       }}
       {...res}
