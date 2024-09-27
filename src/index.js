@@ -9,13 +9,7 @@ import { HashRouter, Route, Routes } from "react-router-dom"; // Use HashRouter
 // Styles and components
 import "./index.css";
 import reportWebVitals from "./reportWebVitals";
-import { Header } from "./features/header/Header";
-import { Footer } from "./features/footer/Footer";
-import { lazy, Suspense } from "react";
 import "./styles/globals.scss";
-import CircularProgress from "@mui/material/CircularProgress";
-import * as git from "isomorphic-git";
-import fs from "fs";
 import { findAllProject } from "domain/filesystem";
 import { useFileStore } from "store";
 import { ToastContainer } from "react-toastify";

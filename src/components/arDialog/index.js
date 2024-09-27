@@ -1,10 +1,11 @@
 import React, { useEffect, useCallback } from "react";
 import { Dialog } from "primereact/dialog";
+import { Divider } from "primereact/divider";
 import IconButton from "@mui/material/IconButton";
-import CloseIcon from "@mui/icons-material/Close";
 import Tooltip from "@mui/material/Tooltip";
 import GppMaybeIcon from "@mui/icons-material/GppMaybe";
 import ArLoadingButton from "@/components/arLoadingButton";
+import "./index.css";
 
 const ArDialog = ({
   title,
@@ -12,7 +13,7 @@ const ArDialog = ({
   dialogOpen,
   handleCancel,
   buttonList,
-  isIconClose = true,
+  isIconClose = false,
   tooltipText,
   width = "50vw",
   shouldScrollInViewport,
@@ -79,7 +80,6 @@ const ArDialog = ({
       style={{ width, top }}
       onHide={handleCancel}
       footer={renderFooter()}
-      className="custom-modal"
       blockScroll={!shouldScrollInViewport}
     >
       <div>

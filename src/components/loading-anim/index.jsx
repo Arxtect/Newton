@@ -6,8 +6,8 @@
 import React from "react";
 import "./index.css";
 
-const LoaidingAnim = ({ type }) => {
+const LoadingAnim = ({ type }) => {
   return <div className={`dot-flashing ${type}`} />;
 };
 
-export default React.memo(LoaidingAnim);
+export default React.memo(LoadingAnim);
