@@ -1,9 +1,9 @@
 /*
- * @Description: 
+ * @Description:
  * @Author: Devin
  * @Date: 2024-08-07 10:13:08
  */
-import React,{useState} from "react";
+import React, { useState } from "react";
 import Header from "./header";
 import DropZone from "./dropZone";
 import ActionButtons from "./actionButton";
@@ -18,25 +18,35 @@ import {
   Typography,
 } from "@mui/material";
 import { toast } from "react-toastify";
-import UploadProgressBar from "./uploadProgressBar"
+import UploadProgressBar from "./uploadProgressBar";
 
-function FileUploader({dialogOpen,setDialogOpen,repoChanged,user,handleUpload,uploadProgress,otherHandleInCancle,title="Upload Zipped Project",type="zip",...props}) {
-
-   const handleDragOver = (event) => {
-      event.preventDefault(); // 阻止默认行为
+function FileUploader({
+  dialogOpen,
+  setDialogOpen,
+  repoChanged,
+  user,
+  handleUpload,
+  uploadProgress,
+  otherHandleInCancle,
+  title = "Upload Zipped Project",
+  type = "zip",
+  ...props
+}) {
+  const handleDragOver = (event) => {
+    event.preventDefault(); // 阻止默认行为
     setIsDragOver(true);
   };
 
-    const handleCancelUpload = () => {
+  const handleCancelUpload = () => {
     setDialogOpen(false);
-    otherHandleInCancle&&otherHandleInCancle()
+    otherHandleInCancle && otherHandleInCancle();
   };
 
   // 处理文件放置的事件
   const handleDrop = (event) => {
     event.preventDefault();
     setIsDragOver(false);
-    props.handleDrop(event)
+    props.handleDrop(event);
   };
   const [isDragOver, setIsDragOver] = useState(false);
 
@@ -53,7 +63,7 @@ function FileUploader({dialogOpen,setDialogOpen,repoChanged,user,handleUpload,up
   };
   const handleDragEnd = (event) => {
     event.preventDefault();
-     console.log('Drag end event',event);
+    console.log("Drag end event", event);
     setIsDragOver(false);
   };
   return (
@@ -75,7 +85,7 @@ function FileUploader({dialogOpen,setDialogOpen,repoChanged,user,handleUpload,up
               isDragOver ? "border-blue-500 bg-blue-100" : "border-dashed"
             }`}
           >
-            <DropZone handleUpload={handleUpload}  type={type} />
+            <DropZone handleUpload={handleUpload} type={type} />
           </Box>
           <ActionButtons handleUpload={handleUpload} type={type} />
         </div>

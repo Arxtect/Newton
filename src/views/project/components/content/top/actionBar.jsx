@@ -70,7 +70,7 @@ function ActionBar({
   return (
     <div className="flex items-center justify-center px-2 rounded-lg ">
       {/* Group the first three buttons */}
-      <div className="flex divide-x divide-gray-300">
+      <div className="flex">
         <Tooltip content="Download" position="bottom">
           <IconButton
             onClick={downloadClick}
