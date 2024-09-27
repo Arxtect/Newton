@@ -3,7 +3,7 @@
  * @Author: Devin
  * @Date: 2024-03-06 21:26:51
  */
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import ArDialog from "@/components/arDialog";
@@ -11,36 +11,23 @@ import { TextField, Box } from "@mui/material";
 import { useFileStore } from "store";
 import { toast } from "react-toastify";
 
-const CopyProject = ({
-  dialogOpen,
-  setDialogOpen,
-  setSourceProject,
-  getProjectList,
-  sourceProject = "",
-}) => {
+const NewProject = ({ dialogOpen, setDialogOpen }) => {
+  let navigate = useNavigate();
+
   const [projectName, setProjectName] = useState("");
-
-  const { copyProject } = useFileStore((state) => ({
-    copyProject: state.copyProject,
+  const { createProject, initFile } = useFileStore((state) => ({
+    createProject: state.createProject,
+    initFile: state.initFile,
   }));
-
-  useEffect(() => {
-    setProjectName(sourceProject !== "" ? sourceProject + "(Copy)" : "");
-  }, [sourceProject]);
 
   const handleCancelProject = () => {
     setDialogOpen(false);
   };
   const handleSaveProject = () => {
-    if (!projectName) {
-      toast.warning("Please enter project name");
-      return;
-    }
-    copyProject(sourceProject, projectName)
+    createProject(projectName)
       .then(() => {
-        getProjectList();
+        navigate("/newton");
         setDialogOpen(false);
-        setSourceProject("")
       })
       .catch((error) => {
         toast.warning(error.message);
@@ -48,7 +35,7 @@ const CopyProject = ({
   };
   return (
     <ArDialog
-      title="Copy Project"
+      title="Create Project"
       dialogOpen={dialogOpen}
       handleCancel={handleCancelProject}
       buttonList={[
@@ -75,4 +62,4 @@ const CopyProject = ({
   );
 };
 
-export default CopyProject;
+export default NewProject;

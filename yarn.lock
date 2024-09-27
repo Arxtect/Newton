@@ -3804,6 +3804,13 @@
   dependencies:
     "@types/react" "*"
 
+"@types/react-transition-group@^4.4.1":
+  version "4.4.11"
+  resolved "https://registry.npmmirror.com/@types/react-transition-group/-/react-transition-group-4.4.11.tgz#d963253a611d757de01ebb241143b1017d5d63d5"
+  integrity sha512-RM05tAniPZ5DZPzzNFP+DmrcOdD0efDUxMy3145oljWSl3x9ZV5vhme98gTxFrj2lhXvmGNnUiuDyJgY9IKkNA==
+  dependencies:
+    "@types/react" "*"
+
 "@types/react-transition-group@^4.4.10":
   version "4.4.10"
   resolved "https://registry.yarnpkg.com/@types/react-transition-group/-/react-transition-group-4.4.10.tgz#6ee71127bdab1f18f11ad8fb3322c6da27c327ac"
@@ -11438,6 +11445,14 @@ pretty-format@^29.0.0, pretty-format@^29.7.0:
     ansi-styles "^5.0.0"
     react-is "^18.0.0"
 
+primereact@^10.8.3:
+  version "10.8.3"
+  resolved "https://registry.npmmirror.com/primereact/-/primereact-10.8.3.tgz#124696b4fd6de45f1aa11a249b01e6c74ad0bae2"
+  integrity sha512-LYa7DL1TDmWWrPCeh3CMsx89LXgcf4+rYhJ6YiA7z164WsdzJK388Bp1Qdv5cfpyL/Nm0eIWxIApxwWBv8kwuA==
+  dependencies:
+    "@types/react-transition-group" "^4.4.1"
+    react-transition-group "^4.4.1"
+
 printj@~1.1.0:
   version "1.1.2"
   resolved "https://registry.npmmirror.com/printj/-/printj-1.1.2.tgz#d90deb2975a8b9f600fb3a1c94e3f4c53c78a222"
@@ -11962,7 +11977,7 @@ react-tooltip@5.8.3:
     "@floating-ui/dom" "1.1.1"
     classnames "^2.3.2"
 
-react-transition-group@^4.4.5:
+react-transition-group@^4.4.1, react-transition-group@^4.4.5:
   version "4.4.5"
   resolved "https://registry.yarnpkg.com/react-transition-group/-/react-transition-group-4.4.5.tgz#e53d4e3f3344da8521489fbef8f2581d42becdd1"
   integrity sha512-pZcd1MCJoiKiBR2NRxeCRg13uCXbydPnmB4EOeRrY7480qNWO8IIgQG6zlDkm6uRMsURXPuKq0GWtiM59a5Q6g==

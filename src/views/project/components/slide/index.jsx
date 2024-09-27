@@ -7,6 +7,10 @@ import React, { useRef, useState, useEffect } from "react";
 import ArIcon from "@/components/arIcon";
 
 import ArMenuRadix from "@/components/arMenuRadix";
+//slide
+import NewProject from "./newProject";
+import UploadProject from "./uploadProject";
+import Github from "./github";
 
 const menuItems = [
   { key: "new", label: "New Project", icon: "NewProject" },
@@ -31,7 +35,12 @@ const subCategories = [
   // { key: "sub_category_2", label: "Sub Category 2" },
 ];
 
-const Slide = ({ contentRef, currentSelectMenu, setCurrentSelectMenu }) => {
+const Slide = ({
+  contentRef,
+  currentSelectMenu,
+  setCurrentSelectMenu,
+  user,
+}) => {
   const handleClick = (key) => {
     setCurrentSelectMenu(key);
   };
@@ -41,6 +50,18 @@ const Slide = ({ contentRef, currentSelectMenu, setCurrentSelectMenu }) => {
     if (open) {
       return "bg-[#81c784]";
     }
+  };
+  //new project
+  const [newDialogOpen, setNewDialogOpen] = useState(false);
+  const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
+
+  //github
+  const [githubDialogOpen, setGithubDialogOpen] = useState(false);
+  const [projectName, setProjectName] = useState("");
+
+  const handleGithub = (open, proejctName) => {
+    setGithubDialogOpen(open);
+    setProjectName(proejctName);
   };
 
   return (
@@ -65,15 +86,15 @@ const Slide = ({ contentRef, currentSelectMenu, setCurrentSelectMenu }) => {
               items={[
                 {
                   label: "New Project",
-                  onSelect: () => contentRef.current.setNewDialogOpen(true),
+                  onSelect: () => setNewDialogOpen(true),
                 },
                 {
                   label: "Upload Project",
-                  onSelect: () => contentRef.current.setUploadDialogOpen(true),
+                  onSelect: () => setUploadDialogOpen(true),
                 },
                 {
                   label: "Import From Cloud",
-                  onSelect: () => contentRef.current.setGithubDialogOpen(true),
+                  onSelect: () => setGithubDialogOpen(true),
                 },
                 // {
                 //   label: "Templates",
@@ -119,6 +140,21 @@ const Slide = ({ contentRef, currentSelectMenu, setCurrentSelectMenu }) => {
           ))}
         </div>
       </div>
+      <NewProject dialogOpen={newDialogOpen} setDialogOpen={setNewDialogOpen} />
+      <UploadProject
+        dialogOpen={uploadDialogOpen}
+        setDialogOpen={setUploadDialogOpen}
+        user={user}
+      />
+      <Github
+        dialogOpen={githubDialogOpen}
+        setDialogOpen={setGithubDialogOpen}
+        getProjectList={contentRef.current && contentRef.current.getProjectList}
+        user={user}
+        projectName={projectName}
+        setProjectName={setProjectName}
+        currentSelectMenu={currentSelectMenu}
+      ></Github>
     </div>
   );
 };

@@ -16,6 +16,12 @@ const Grid = ({
   changeCurrentProjectRoot,
   getProjectList,
   handleGithub,
+  handleCopy,
+  handleRename,
+  controlShare,
+  handleDeleteProject,
+  setIsGitDelete,
+  setIsTrashDelete,
 }) => {
   const { getCurrentProjectPdf } = useFileStore((state) => ({
     getCurrentProjectPdf: state.getCurrentProjectPdf,
@@ -39,23 +45,23 @@ const Grid = ({
   }, [sortedRows]);
 
   const handleItemClick = (item, e) => {
-          e.stopPropagation();
-      const isAuth = auth(
-        item.name !== "YOU" && (!user || JSON.stringify(user) === "{}"),
-        () => {
-          changeCurrentProjectRoot({
-            projectRoot: item.title,
-          });
-          navigate("/newton");
-        }
-      );
-      if (isAuth) return;
-      e.stopPropagation();
-      changeCurrentProjectRoot({
-        projectRoot: item.title,
-      });
-      navigate("/newton");
-    };
+    e.stopPropagation();
+    const isAuth = auth(
+      item.name !== "YOU" && (!user || JSON.stringify(user) === "{}"),
+      () => {
+        changeCurrentProjectRoot({
+          projectRoot: item.title,
+        });
+        navigate("/newton");
+      }
+    );
+    if (isAuth) return;
+    e.stopPropagation();
+    changeCurrentProjectRoot({
+      projectRoot: item.title,
+    });
+    navigate("/newton");
+  };
 
   return (
     <div>
@@ -79,13 +85,20 @@ const Grid = ({
                 <PdfImageLocal url={pdfUrl} height={178} />
                 <div className="absolute inset-0 bg-gradient-to-b from-[#afccb7] to-[#7da97fd1] opacity-50"></div>
                 <div className="action absolute top-[50%] transform -translate-y-[50%] w-full">
-                <Action
-                  item={item}
-                  auth={auth}
-                  getProjectList={getProjectList}
-                  handleGithub={handleGithub}
-                ></Action>
-              </div>
+                  <Action
+                    item={item}
+                    auth={auth}
+                    getProjectList={getProjectList}
+                    handleGithub={handleGithub}
+                    user={user}
+                    handleCopy={handleCopy}
+                    handleRename={handleRename}
+                    controlShare={controlShare}
+                    handleDeleteProject={handleDeleteProject}
+                    setIsGitDelete={setIsGitDelete}
+                    setIsTrashDelete={setIsTrashDelete}
+                  ></Action>
+                </div>
               </div>
               <div
                 className="self-center mt-3 hover:text-[#81c784] hover:underline"
@@ -93,7 +106,6 @@ const Grid = ({
               >
                 {item.title}
               </div>
-              
             </div>
           );
         })}

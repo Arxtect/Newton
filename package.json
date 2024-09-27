@@ -84,6 +84,7 @@
     "postcss-loader": "^6.2.1",
     "postcss-normalize": "^10.0.1",
     "postcss-preset-env": "^7.0.1",
+    "primereact": "^10.8.3",
     "prompts": "^2.4.2",
     "querystring-es3": "^0.2.1",
     "rc-textarea": "^1.8.1",

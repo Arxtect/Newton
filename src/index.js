@@ -26,6 +26,8 @@ import { writeFile } from "domain/filesystem";
 import path from "path";
 import latexCodeWelcome from "@/features/latexEditor/welcome";
 import "./sentry.js";
+import "primereact/resources/themes/saga-blue/theme.css"; // 主题样式
+import "primereact/resources/primereact.min.css"; // 核心样式
 
 async function loadBrowserFS() {
   return new Promise((resolve) => {
@@ -50,13 +52,11 @@ if (projectLists.length == 0) {
   await writeFile(filepath, latexCodeWelcome);
 }
 
-
-
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.Fragment>
     <ToastContainer />
-      <AppRouter />
+    <AppRouter />
     <DialogLogin></DialogLogin>
   </React.Fragment>
 );

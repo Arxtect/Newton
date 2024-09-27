@@ -1,14 +1,10 @@
-/*
- * @Description:
- * @Author: Devin
- * @Date: 2024-03-06 21:13:41
- */
 import React, { useEffect, useCallback } from "react";
-import ModalDialog, { ModalTransition } from "@atlaskit/modal-dialog";
+import { Dialog } from "primereact/dialog";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import Tooltip from "@mui/material/Tooltip";
 import GppMaybeIcon from "@mui/icons-material/GppMaybe";
+import ArLoadingButton from "@/components/arLoadingButton";
 
 const ArDialog = ({
   title,
@@ -19,6 +15,8 @@ const ArDialog = ({
   isIconClose = true,
   tooltipText,
   width = "50vw",
+  shouldScrollInViewport,
+  top,
 }) => {
   const handleKeyDown = useCallback(
     (event) => {
@@ -46,21 +44,26 @@ const ArDialog = ({
     };
   }, [dialogOpen, handleKeyDown]);
 
-  const actions = buttonList.map((button, index) => ({
-    text: button.title,
-    onClick: button.click,
-    isLoading: button?.loading,
-  }));
+  const renderFooter = () => (
+    <div>
+      {buttonList.map((button, index) => (
+        <ArLoadingButton
+          key={index}
+          onClick={button.click}
+          color="primary"
+          loading={button?.loading}
+          className="text-arxTheme"
+        >
+          {button.title}
+        </ArLoadingButton>
+      ))}
+    </div>
+  );
 
   return (
-    <ModalTransition>
-      {dialogOpen && (
-        <ModalDialog
-          heading={title}
-          onClose={handleCancel}
-          actions={actions}
-          width={width}
-        >
+    <Dialog
+      header={
+        <div>
           {tooltipText && (
             <Tooltip title={tooltipText}>
               <IconButton aria-label="warning">
@@ -68,24 +71,28 @@ const ArDialog = ({
               </IconButton>
             </Tooltip>
           )}
-          {isIconClose && (
-            <IconButton
-              aria-label="close"
-              onClick={handleCancel}
-              style={{
-                position: "absolute",
-                right: 8,
-                top: 8,
-                color: "grey",
-              }}
-            >
-              <CloseIcon />
+          <span>{title}</span>
+        </div>
+      }
+      focusOnShow={true}
+      visible={dialogOpen}
+      style={{ width, top }}
+      onHide={handleCancel}
+      footer={renderFooter()}
+      className="custom-modal"
+      blockScroll={!shouldScrollInViewport}
+    >
+      <div>
+        {tooltipText && (
+          <Tooltip title={tooltipText}>
+            <IconButton aria-label="warning">
+              <GppMaybeIcon fontSize="inherit" />
             </IconButton>
-          )}
-          <div>{children}</div>
-        </ModalDialog>
-      )}
-    </ModalTransition>
+          </Tooltip>
+        )}
+        <div>{children}</div>
+      </div>
+    </Dialog>
   );
 };
 

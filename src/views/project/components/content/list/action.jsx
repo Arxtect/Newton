@@ -15,73 +15,28 @@ import React, {
 import { IconButton } from "@mui/material";
 import Tooltip from "@/components/tooltip";
 
-import { useNavigate } from "react-router-dom";
 import { downloadDirectoryAsZip, createProjectInfo } from "domain/filesystem";
 import { toast } from "react-toastify";
-import ArDialog from "@/components/arDialog";
-import CopyProject from "../copyProject";
-import RenameProject from "../renameProject";
-import Share from "../share";
-import { deleteGitRepo } from "services";
-import { useUserStore, useLoginStore, useFileStore } from "@/store";
+import { useFileStore } from "@/store";
 import ArIcon from "@/components/arIcon";
 import { useAuthCallback } from "@/useHooks";
 
 const HoverAction = forwardRef(
-  ({ item, getProjectList, handleGithub }, ref) => {
+  ({ item, getProjectList, handleGithub, user, ...props }, ref) => {
     const authCallback = useAuthCallback();
 
-    const { user } = useUserStore((state) => ({
-      user: state.user,
-    }));
-
-    useImperativeHandle(ref, () => ({
+    const {
       handleCopy,
       handleRename,
-    }));
+      controlShare,
+      setIsGitDelete,
+      setIsTrashDelete,
+      handleDeleteProject,
+    } = props;
 
-    const {
-      projectLists,
-      currentProjectRoot,
-      deleteProject,
-      changeCurrentProjectRoot,
-      getCurrentProjectPdf,
-      initFile,
-      archivedDeleteProject,
-    } = useFileStore((state) => ({
-      allProject: state.allProject,
-      currentProjectRoot: state.currentProjectRoot,
-      deleteProject: state.deleteProject,
-      changeCurrentProjectRoot: state.changeCurrentProjectRoot,
+    const { getCurrentProjectPdf } = useFileStore((state) => ({
       getCurrentProjectPdf: state.getCurrentProjectPdf,
-      initFile: state.initFile,
-      archivedDeleteProject: state.archivedDeleteProject,
     }));
-
-    //copy project
-    const [sourceProject, setSourceProject] = useState("");
-    const [copyDialogOpen, setCopyDialogOpen] = useState(false);
-    const handleCopy = (title) => {
-      setSourceProject(title);
-      setCopyDialogOpen(true);
-    };
-
-    //rename project
-    const [renameSourceProject, setRenameSourceProject] = useState("");
-    const [renameDialogOpen, setRenameDialogOpen] = useState(false);
-    const handleRename = (title) => {
-      setRenameSourceProject(title);
-      setRenameDialogOpen(true);
-    };
-
-    const handleDeleteGitRepo = async () => {
-      let res = await deleteGitRepo(deleteProjectName);
-      if (res?.status == "success") {
-        getProjectList();
-        setDeleteDialogOpen(false);
-        toast.success("Delete success");
-      }
-    };
 
     const restoreProject = async (rootName) => {
       await createProjectInfo(rootName, {
@@ -89,17 +44,6 @@ const HoverAction = forwardRef(
       });
 
       getProjectList();
-    };
-
-    // share project
-    const [shareDialogOpen, setShareDialogOpen] = useState(false);
-    const [shareProjectName, setShareProjectName] = useState("");
-
-    const controlShare = (project) => {
-      authCallback(() => {
-        setShareProjectName(project);
-        setShareDialogOpen(true);
-      }, "Please login first");
     };
 
     // download pdf
@@ -118,38 +62,6 @@ const HoverAction = forwardRef(
       setTimeout(() => {
         URL.revokeObjectURL(blobUrl);
       }, 30000);
-    };
-
-    // delete project
-    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-    const [deleteProjectName, setDeleteProjectName] = useState("");
-    const [isGitDelete, setIsGitDelete] = useState(false);
-    const [isTrashDelete, setIsTrashDelete] = useState(false);
-
-    const handleDeleteProject = (deleteProjectName) => {
-      if (!deleteProjectName) {
-        toast.error("Please select a project to delete");
-        return;
-      }
-      setDeleteDialogOpen(true);
-      setDeleteProjectName(deleteProjectName);
-    };
-
-    const handleConfirmDelete = async () => {
-      await archivedDeleteProject({ dirpath: deleteProjectName });
-      toast.success("trash project success");
-      getProjectList();
-      setDeleteDialogOpen(false);
-    };
-    const handlTrashDelete = async () => {
-      await deleteProject({ dirpath: deleteProjectName });
-      toast.success("delete project success");
-      getProjectList();
-      setDeleteDialogOpen(false);
-    };
-
-    const handleCancelDelete = () => {
-      setDeleteDialogOpen(false);
     };
 
     return (
@@ -293,54 +205,9 @@ const HoverAction = forwardRef(
             </Tooltip>
           </React.Fragment>
         )}
-
-        <CopyProject
-          dialogOpen={copyDialogOpen}
-          setDialogOpen={setCopyDialogOpen}
-          sourceProject={sourceProject}
-          setSourceProject={setSourceProject}
-          getProjectList={getProjectList}
-        />
-        <RenameProject
-          dialogOpen={renameDialogOpen}
-          setDialogOpen={setRenameDialogOpen}
-          sourceProject={renameSourceProject}
-          setSourceProject={setRenameSourceProject}
-          getProjectList={getProjectList}
-        />
-        <Share
-          dialogOpen={shareDialogOpen}
-          setDialogOpen={setShareDialogOpen}
-          rootPath={shareProjectName}
-          user={user}
-          getProjectList={getProjectList}
-        ></Share>
-        <ArDialog
-          title={
-            isTrashDelete || isGitDelete ? "Delete Project" : "Trash Project"
-          }
-          dialogOpen={deleteDialogOpen}
-          handleCancel={handleCancelDelete}
-          buttonList={[
-            { title: "Cancel", click: handleCancelDelete },
-            {
-              title: "Delete",
-              click: isGitDelete
-                ? handleDeleteGitRepo
-                : isTrashDelete
-                ? handlTrashDelete
-                : handleConfirmDelete,
-            },
-          ]}
-        >
-          {`Are you sure you want to ${
-            isTrashDelete || isGitDelete ? "delete" : "trash"
-          } the project：`}
-          <span className="text-red-500 mr-1">{deleteProjectName}</span>
-        </ArDialog>
       </div>
     );
   }
 );
 
-export default HoverAction;
+export default React.memo(HoverAction);

@@ -6,6 +6,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import ArDialog from "@/components/arDialog";
+import ArDialogAt from "@/components/arDialogAt";
 import { TextField, Box } from "@mui/material";
 import { useFileStore } from "store";
 import { toast } from "react-toastify";
@@ -60,7 +61,7 @@ const RenameProject = ({
   };
 
   return (
-    <ArDialog
+    <ArDialogAt
       title="Rename Project"
       dialogOpen={dialogOpen}
       handleCancel={handleCancelProject}
@@ -84,7 +85,7 @@ const RenameProject = ({
           className="w-full"
         />
       </Box>
-    </ArDialog>
+    </ArDialogAt>
   );
 };
 
