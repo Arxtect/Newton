@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Uploader from "./uploader";
-import ImagePlus from "@/assets/chat/ImagePlus.svg";
+import ArIcon from "@/components/arIcon";
 
 const UploadOnlyFromLocal = ({
   onUpload,
@@ -22,7 +22,7 @@ const UploadOnlyFromLocal = ({
             ${hovering && "bg-gray-100"}
           `}
         >
-          <img src={ImagePlus} alt="Upload" className="w-4 h-4 text-gray-500" />
+          <ArIcon name="ImagePlus" className="text-black w-4 h-4 "></ArIcon>
         </div>
       )}
     </Uploader>

@@ -15,6 +15,7 @@ import {
   useImageFiles,
 } from "./image-uploader/hooks";
 import ArIcon from "@/components/arIcon";
+import Tooltip from "@/components/tooltip";
 
 const ChatInput = forwardRef(
   (
@@ -157,11 +158,13 @@ const ChatInput = forwardRef(
                   className={`relative flex items-center justify-center w-8 h-8 rounded-lg cursor-pointer
                       hover:bg-gray-100`}
                 >
-                  <ArIcon
-                    name="NewChat"
-                    className="text-black w-4 h-4"
-                    title={"new chat"}
-                  />
+                  <Tooltip content={"new chat"} id={"new chat"} position="top">
+                    <ArIcon
+                      name="NewChat"
+                      className="text-black w-4 h-4"
+                      title={"new chat"}
+                    />
+                  </Tooltip>
                 </div>
                 {!visionConfig?.enabled && (
                   <div className="mx-1 w-[1px] h-4 bg-black/5" />

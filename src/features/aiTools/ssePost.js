@@ -1,3 +1,5 @@
+import { toast } from "react-toastify";
+
 const ContentType = {
   json: "application/json",
   stream: "text/event-stream",
@@ -157,6 +159,7 @@ export const ssePost = (
     .then((res) => {
       if (!/^(2|3)\d{2}$/.test(String(res.status))) {
         res.json().then((data) => {
+          toast.error(data.message || "Server Error");
           console.log(data, "data");
         });
         onError?.("Server Error");

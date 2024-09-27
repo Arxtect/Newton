@@ -1,11 +1,12 @@
 /*
- * @Description: 
+ * @Description:
  * @Author: Devin
  * @Date: 2024-09-18 14:26:22
  */
 import { useState } from "react";
 import { useLocalFileUploader } from "./hooks";
 import { ALLOW_FILE_EXTENSIONS } from "./types";
+import Tooltip from "@/components/tooltip";
 
 const Uploader = ({
   children,
@@ -39,14 +40,16 @@ const Uploader = ({
       onMouseLeave={() => setHovering(false)}
     >
       {children(hovering)}
-      <input
-        className="absolute block inset-0 opacity-0 text-[0] w-full disabled:cursor-not-allowed cursor-pointer"
-        onClick={(e) => (e.target.value = "")}
-        type="file"
-        accept={ALLOW_FILE_EXTENSIONS.map((ext) => `.${ext}`).join(",")}
-        onChange={handleChange}
-        disabled={disabled}
-      />
+      <Tooltip content={"upload"} id={"upload"} position="top">
+        <input
+          className="absolute block inset-0 opacity-0 text-[0] w-full disabled:cursor-not-allowed cursor-pointer"
+          onClick={(e) => (e.target.value = "")}
+          type="file"
+          accept={ALLOW_FILE_EXTENSIONS.map((ext) => `.${ext}`).join(",")}
+          onChange={handleChange}
+          disabled={disabled}
+        />
+      </Tooltip>
     </div>
   );
 };
