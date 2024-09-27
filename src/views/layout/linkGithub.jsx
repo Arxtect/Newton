@@ -23,7 +23,7 @@ import BottomDrawer from "@/features/bottomDrawer/bottomDrawer";
 import ArIcon from "@/components/arIcon";
 
 import { getGitToken, createGitRepo } from "@/services";
-import { getGiteaFullUrl } from "@/util";
+import { getGiteaFullUrl, formatRepoName } from "@/util";
 
 const GithubProgressBar = ({ progress, messages }) => {
   return (
@@ -183,7 +183,7 @@ const LinkGithub = (props) => {
       toast.warning("Plaese login first");
     }
     console.log(currentProjectRoot, "currentProjectRoot");
-    setProjectName(currentProjectRoot);
+    setProjectName(formatRepoName(currentProjectRoot));
     getGiteaToekn(githubApiToken);
   }, [dialogOpen]);
 
@@ -195,7 +195,7 @@ const LinkGithub = (props) => {
             className={`flex items-center text-gray-700 px-2 py-1 hover:bg-gray-200 active:bg-[#9fd5a2] space-x-1 `}
             onClick={() => toggleDrawer(true)}
           >
-            <ArIcon name={"GitCloud"}  className="text-black w-4 h-4"/>
+            <ArIcon name={"GitCloud"} className="text-black w-4 h-4" />
             <span>Sync</span>
           </button>
         </Tooltip>
@@ -205,7 +205,7 @@ const LinkGithub = (props) => {
             className={`flex items-center text-gray-700 px-2 py-1 hover:bg-gray-200 active:bg-[#9fd5a2] space-x-1 `}
             onClick={() => setDialogOpen(true)}
           >
-            <ArIcon name={"GitCloud"}  className="text-black w-4 h-4"/>
+            <ArIcon name={"GitCloud"} className="text-black w-4 h-4" />
             <span>Sync</span>
           </button>
         </Tooltip>
@@ -214,9 +214,9 @@ const LinkGithub = (props) => {
         title="Sync Remote Cloud Repository"
         dialogOpen={dialogOpen}
         handleCancel={handleCancelProject}
-        // tooltipText={
-        //   "Ensure that the remote repository is empty when you link it"
-        // }
+        tooltipText={
+          "Special characters detected and will be replaced with underscores '_'. Please modify the repo name if you do not want underscores"
+        }
         buttonList={[
           { title: "Cancel", click: handleCancelProject },
           { title: "Save", click: handleSaveProject, loading: loading },
@@ -232,9 +232,9 @@ const LinkGithub = (props) => {
               onChange={(event) => {
                 setProjectName(event.target.value);
               }}
-              InputProps={{
-                readOnly: true,
-              }}
+              // InputProps={{
+              //   readOnly: true,
+              // }}
               margin="normal"
               fullWidth
               className="my-3"

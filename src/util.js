@@ -330,3 +330,20 @@ export function extractLatex(markdown) {
 export const test = () => {
   console.log("test");
 };
+
+export function formatRepoName(input) {
+  // 替换不符合要求的字符为下划线
+  let formatted = input.replace(/[^a-zA-Z0-9._-]/g, "_");
+
+  // 确保名称长度在1到100个字符之间
+  if (formatted.length > 100) {
+    formatted = formatted.substring(0, 100);
+  } else if (formatted.length === 0) {
+    formatted = "default_repo_name";
+  }
+
+  // 确保名称不以连字符或点开头或结尾
+  formatted = formatted.replace(/^[.-]+|[.-]+$/g, "");
+
+  return formatted;
+}

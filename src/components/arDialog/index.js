@@ -1,8 +1,7 @@
 import React, { useEffect, useCallback } from "react";
 import { Dialog } from "primereact/dialog";
-import { Divider } from "primereact/divider";
+import Tooltip from "@/components/tooltip";
 import IconButton from "@mui/material/IconButton";
-import Tooltip from "@mui/material/Tooltip";
 import GppMaybeIcon from "@mui/icons-material/GppMaybe";
 import ArLoadingButton from "@/components/arLoadingButton";
 import "./index.css";
@@ -64,15 +63,15 @@ const ArDialog = ({
   return (
     <Dialog
       header={
-        <div>
+        <div className="flex">
+          <span>{title}</span>
           {tooltipText && (
-            <Tooltip title={tooltipText}>
+            <Tooltip content={tooltipText} position="top">
               <IconButton aria-label="warning">
                 <GppMaybeIcon fontSize="inherit" />
               </IconButton>
             </Tooltip>
           )}
-          <span>{title}</span>
         </div>
       }
       focusOnShow={true}
@@ -82,16 +81,7 @@ const ArDialog = ({
       footer={renderFooter()}
       blockScroll={!shouldScrollInViewport}
     >
-      <div>
-        {tooltipText && (
-          <Tooltip title={tooltipText}>
-            <IconButton aria-label="warning">
-              <GppMaybeIcon fontSize="inherit" />
-            </IconButton>
-          </Tooltip>
-        )}
-        <div>{children}</div>
-      </div>
+      <div>{children}</div>
     </Dialog>
   );
 };

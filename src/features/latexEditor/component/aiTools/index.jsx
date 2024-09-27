@@ -28,7 +28,8 @@ const AiTools = ({ editor, completer }) => {
 
   const [incomeCommandOptions, setIncomeCommandOptions] = useState([]);
 
-  const { showPromptMessage,saveHandleAccept,saveHandleReject } = useChatStore();
+  const { showPromptMessage, saveHandleAccept, saveHandleReject } =
+    useChatStore();
 
   //commandInput
   const commandInputRef = useRef();
@@ -134,7 +135,6 @@ const AiTools = ({ editor, completer }) => {
   );
 
   const setCurrentPosition = (cursorPosition, session) => {
-    console.log(cursorPosition, "cursorPosition");
     const screenCoordinates = editor.renderer.textToScreenCoordinates(
       cursorPosition.row,
       0 //使用0替换cursorPosition.column
@@ -153,9 +153,7 @@ const AiTools = ({ editor, completer }) => {
   };
 
   const handleCursorChange = () => {
-    console.log(isResponding, "isResponding");
     if (markerRange && !isResponding) {
-      console.log("markerRange2", markerRange);
       setShowDropdown(true);
       return;
     }
@@ -166,18 +164,22 @@ const AiTools = ({ editor, completer }) => {
       ? editor.getCursorPosition()
       : range.end;
 
-    if (selectText && selectText.trim() != "") {
+    console.log(selectText, "selectText");
+
+    if (selectText?.length > 1 && selectText.trim() != "") {
       setShowTooltip(true);
     } else {
       setShowTooltip(false);
     }
 
     setCurrentPosition(cursorPosition, session);
+    handleShowDropdown(cursorPosition, session);
+  };
 
+  const handleShowDropdown = (cursorPosition, session) => {
     const line = session.getLine(cursorPosition.row);
     const previousChar = line.charAt(cursorPosition.column - 1);
     const previousChar2 = line.charAt(cursorPosition.column - 2);
-    console.log("markerRange1", markerRange);
 
     if (previousChar === "/" && previousChar2 !== "/") {
       setShowDropdown(true);
@@ -189,15 +191,7 @@ const AiTools = ({ editor, completer }) => {
   const handleChange = () => {
     const session = editor.getSession();
     const cursorPosition = editor.getCursorPosition();
-    const line = session.getLine(cursorPosition.row);
-    const previousChar = line.charAt(cursorPosition.column - 1);
-    const previousChar2 = line.charAt(cursorPosition.column - 2);
-
-    // if (previousChar === "/" && previousChar2 !== "/") {
-    //   setShowDropdown(true);
-    // } else {
-    //   setShowDropdown(false);
-    // }
+    handleShowDropdown(cursorPosition, session);
   };
 
   const handleSelectViaName = (name = "Section Polisher") => {
