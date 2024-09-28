@@ -29,217 +29,6 @@
     jsonpointer "^5.0.0"
     leven "^3.1.0"
 
-"@atlaskit/analytics-next-stable-react-context@1.0.1":
-  version "1.0.1"
-  resolved "https://registry.npmmirror.com/@atlaskit/analytics-next-stable-react-context/-/analytics-next-stable-react-context-1.0.1.tgz#93c4c7a1a35f4ab606d727af443f49f0842fd96f"
-  integrity sha512-iO6+hIp09dF4iAZQarVz3vKY1kM5Ij5CExYcK9jgc2q+OH8nv8n+BPFeJTdzGOGopmbUZn5Opj9pYQvge1Gr4Q==
-  dependencies:
-    tslib "^2.0.0"
-
-"@atlaskit/analytics-next@^10.1.0":
-  version "10.1.1"
-  resolved "https://registry.npmmirror.com/@atlaskit/analytics-next/-/analytics-next-10.1.1.tgz#46c4ee963cfdebbf18159240517547cb0d4b68ba"
-  integrity sha512-vEfwhV/gLADRcyONqBw6MagQJpztp/BaFswiw7RtdqdITgLLpOuOl95zc/Sqnme7B7f8xIpC0A94mcoK2SChIA==
-  dependencies:
-    "@atlaskit/analytics-next-stable-react-context" "1.0.1"
-    "@atlaskit/platform-feature-flags" "^0.3.0"
-    "@babel/runtime" "^7.0.0"
-    prop-types "^15.5.10"
-    use-memo-one "^1.1.1"
-
-"@atlaskit/app-provider@^1.4.0":
-  version "1.4.0"
-  resolved "https://registry.npmmirror.com/@atlaskit/app-provider/-/app-provider-1.4.0.tgz#ee890a3e62209045c7ebc1e5864daa801e7ce4e1"
-  integrity sha512-OheQY4ObKhawVhp2r/tTTL/a1eOa9QTkywaN2YMPEk+HiO3TinSxr3zu162nDlokdPvxo81AyzpAYtWYHBhz0Q==
-  dependencies:
-    "@atlaskit/tokens" "^1.58.0"
-    "@babel/runtime" "^7.0.0"
-    bind-event-listener "^3.0.0"
-
-"@atlaskit/blanket@^13.3.0":
-  version "13.3.1"
-  resolved "https://registry.npmmirror.com/@atlaskit/blanket/-/blanket-13.3.1.tgz#fff653bdaf37c7a21ee51a5cb81552b79471cdfe"
-  integrity sha512-pB8sxf83MoA433jcpd23Sh5Wl6LR3zOulLcFdxMho8QTf9DpslkQouJox85XS/715u6rcoGy5k5V3A/oh7zh/g==
-  dependencies:
-    "@atlaskit/analytics-next" "^10.1.0"
-    "@atlaskit/codemod-utils" "^4.2.0"
-    "@atlaskit/ds-lib" "^2.4.0"
-    "@atlaskit/theme" "^13.0.0"
-    "@atlaskit/tokens" "^1.58.0"
-    "@babel/runtime" "^7.0.0"
-    "@emotion/react" "^11.7.1"
-
-"@atlaskit/codemod-utils@^4.2.0":
-  version "4.2.4"
-  resolved "https://registry.npmmirror.com/@atlaskit/codemod-utils/-/codemod-utils-4.2.4.tgz#995a8060486f35bf77b8114b863688e551641eb1"
-  integrity sha512-ETeLShTnEpLvsEhm0wmIlC7toRPy9hrMGbttdsiKzyUeGQQ3VqBxvOOPZNA6Uvi0660Jjd3lS7n5u7R/Ku0OHg==
-  dependencies:
-    "@babel/runtime" "^7.0.0"
-
-"@atlaskit/css@^0.5.0":
-  version "0.5.0"
-  resolved "https://registry.npmmirror.com/@atlaskit/css/-/css-0.5.0.tgz#e16170b5c332ddbfbae7c0c6cd197d2149dcf840"
-  integrity sha512-WfE1u8c+mgAnoba1wEQfAx3OyiAWUkMrKJPcT66lG4urabaUhozz648Zbxi2JaGrqszZYe8xlqz/GEyb770rsQ==
-  dependencies:
-    "@atlaskit/tokens" "^1.60.0"
-    "@babel/runtime" "^7.0.0"
-    "@compiled/react" "^0.17.3"
-
-"@atlaskit/ds-lib@^2.4.0", "@atlaskit/ds-lib@^2.5.0", "@atlaskit/ds-lib@^2.6.0":
-  version "2.6.0"
-  resolved "https://registry.npmmirror.com/@atlaskit/ds-lib/-/ds-lib-2.6.0.tgz#23d375444c50044423bef8966ececd349dfc612f"
-  integrity sha512-gH3QzUJMEvFoc0CryjneYxDWbd2bR50rstrCVGrWYa2rKWHO7zAB2zj0RFT2L6bijX5tIe5aMa+tWX7KaJRT8g==
-  dependencies:
-    "@atlaskit/platform-feature-flags" "^0.3.0"
-    "@babel/runtime" "^7.0.0"
-    bind-event-listener "^3.0.0"
-    react-uid "^2.2.0"
-
-"@atlaskit/focus-ring@^1.6.0":
-  version "1.6.0"
-  resolved "https://registry.npmmirror.com/@atlaskit/focus-ring/-/focus-ring-1.6.0.tgz#fa29840ffc7acf55a56a6aa947e45a0827e56908"
-  integrity sha512-5lvBUSSwQ892qMUjLNXKQ1MCOcywaDpa3AIVriBOGpzQscEpqwPO7qmr4HrYoHBYhrWQcKQ9XJURfsJAfm0V+A==
-  dependencies:
-    "@atlaskit/tokens" "^1.58.0"
-    "@babel/runtime" "^7.0.0"
-    "@emotion/react" "^11.7.1"
-
-"@atlaskit/icon@^22.18.0":
-  version "22.18.0"
-  resolved "https://registry.npmmirror.com/@atlaskit/icon/-/icon-22.18.0.tgz#29b6fc2a187b9f7fca15a0e557bd40953255e6ad"
-  integrity sha512-t1utmsYF3WqImRNDHrO1Y/H69oYrkcfY0o28VX9/+wPqsxzcmsVWephnPlgoMKwXc8mOjZa5QxlrVVG+GtTMtw==
-  dependencies:
-    "@atlaskit/platform-feature-flags" "^0.3.0"
-    "@atlaskit/tokens" "^1.59.0"
-    "@babel/runtime" "^7.0.0"
-    "@emotion/react" "^11.7.1"
-
-"@atlaskit/interaction-context@^2.1.0":
-  version "2.1.6"
-  resolved "https://registry.npmmirror.com/@atlaskit/interaction-context/-/interaction-context-2.1.6.tgz#dd4d280b077d137656a121f96bfb18eab75a09c3"
-  integrity sha512-g4pFeUNxHzEJ9o8vK4PnnmiS8CuP1+LpWFcx86pbYJxZqI1i3/irnUkO07dNEJuBDCmMLFUpWSilAgl7HbKE0w==
-  dependencies:
-    "@babel/runtime" "^7.0.0"
-
-"@atlaskit/layering@^0.4.0":
-  version "0.4.1"
-  resolved "https://registry.npmmirror.com/@atlaskit/layering/-/layering-0.4.1.tgz#e72830c3c930cdb11decc9a9ac72e9222fbd1d56"
-  integrity sha512-I1Y8Tm0BVJ6gijuAvliJO6fTvDKTA2wtnPqaGTh3pFURTbXfqFWKqjVR9DzbSbB40YyJ7C/rstoCWbcmXQ3KJg==
-  dependencies:
-    "@atlaskit/ds-lib" "^2.5.0"
-    "@babel/runtime" "^7.0.0"
-    bind-event-listener "^3.0.0"
-
-"@atlaskit/modal-dialog@^12.17.0":
-  version "12.17.0"
-  resolved "https://registry.npmmirror.com/@atlaskit/modal-dialog/-/modal-dialog-12.17.0.tgz#1882be688bc2056e160ea4df7d4ba74348f9accd"
-  integrity sha512-2/5ItqiZsYAyEIM1jZOZ7YNb+wT044UoUvQVfo0stkSeHeJlWlnWY7/ziFPuOrsVhKik18YIgPv61VmYywfBjA==
-  dependencies:
-    "@atlaskit/analytics-next" "^10.1.0"
-    "@atlaskit/blanket" "^13.3.0"
-    "@atlaskit/codemod-utils" "^4.2.0"
-    "@atlaskit/ds-lib" "^2.6.0"
-    "@atlaskit/focus-ring" "^1.6.0"
-    "@atlaskit/icon" "^22.18.0"
-    "@atlaskit/layering" "^0.4.0"
-    "@atlaskit/motion" "^1.9.0"
-    "@atlaskit/platform-feature-flags" "^0.3.0"
-    "@atlaskit/portal" "^4.9.0"
-    "@atlaskit/pragmatic-drag-and-drop" "^1.3.0"
-    "@atlaskit/primitives" "^12.2.0"
-    "@atlaskit/theme" "^13.0.0"
-    "@atlaskit/tokens" "^1.61.0"
-    "@babel/runtime" "^7.0.0"
-    "@emotion/react" "^11.7.1"
-    bind-event-listener "^3.0.0"
-    raf-schd "^4.0.3"
-    react-focus-lock "^2.9.5"
-    react-focus-lock-next "npm:react-focus-lock@^2.13.2"
-    react-scrolllock "^5.0.1"
-
-"@atlaskit/motion@^1.9.0":
-  version "1.9.0"
-  resolved "https://registry.npmmirror.com/@atlaskit/motion/-/motion-1.9.0.tgz#d5016050a5ddd172b9cfac6cb4a8061dbc579750"
-  integrity sha512-z0GrDXJyPSydTNfXA2RPjUJweRAaqK2Z6wtBT907C+NdrusGN4aHH6Lh1IrJY3jhSSRnCKFcK+LOazkH1FNmNA==
-  dependencies:
-    "@atlaskit/ds-lib" "^2.4.0"
-    "@babel/runtime" "^7.0.0"
-    "@emotion/react" "^11.7.1"
-    bind-event-listener "^3.0.0"
-
-"@atlaskit/platform-feature-flags@^0.3.0":
-  version "0.3.0"
-  resolved "https://registry.npmmirror.com/@atlaskit/platform-feature-flags/-/platform-feature-flags-0.3.0.tgz#94dfa0a4ef0a140f6ab0a6de006464de925ecea7"
-  integrity sha512-/0u5fFJ0Rw2j4M5wzsXgaHO6Ey12oekPCDTRvmmAIp4GO9T2Swbl80bavLAPSOmSHMhHTSuvRxiJveZXfQ21IQ==
-  dependencies:
-    "@babel/runtime" "^7.0.0"
-
-"@atlaskit/portal@^4.9.0":
-  version "4.9.1"
-  resolved "https://registry.npmmirror.com/@atlaskit/portal/-/portal-4.9.1.tgz#db70427b8f50dd577a5a60aaf4a5140ec558912d"
-  integrity sha512-qIvzSCXtZ/B77QgaR8Ifjl58GpKnWl1eNSVSIIyClVdubpSyCHTz+smEkqZxsO+1ZxcFZ9R5laCjnwTk+WOdIQ==
-  dependencies:
-    "@atlaskit/platform-feature-flags" "^0.3.0"
-    "@atlaskit/theme" "^13.0.0"
-    "@babel/runtime" "^7.0.0"
-
-"@atlaskit/pragmatic-drag-and-drop@^1.3.0":
-  version "1.3.1"
-  resolved "https://registry.npmmirror.com/@atlaskit/pragmatic-drag-and-drop/-/pragmatic-drag-and-drop-1.3.1.tgz#512fd498bad525d29dedaa398d8977acef0a1cd2"
-  integrity sha512-MptcLppK78B2eplL5fHk93kfCbZ6uCpt33YauBPrOwI5zcHYJhZGeaGEaAXoVAHnSJOdQUhy6kGVVC9qggz2Fg==
-  dependencies:
-    "@babel/runtime" "^7.0.0"
-    bind-event-listener "^3.0.0"
-    raf-schd "^4.0.3"
-
-"@atlaskit/primitives@^12.2.0":
-  version "12.2.0"
-  resolved "https://registry.npmmirror.com/@atlaskit/primitives/-/primitives-12.2.0.tgz#7b6837fad0fea5de74425e15cddedb2ea039503b"
-  integrity sha512-gY7fLFRKKj1dOiumjKwaPhg7AllTHQYSpJm2jnRXW6kh8BmKa00DD79XfQ7CwleFUEhOCxaYIbUjksVdTbncHw==
-  dependencies:
-    "@atlaskit/analytics-next" "^10.1.0"
-    "@atlaskit/app-provider" "^1.4.0"
-    "@atlaskit/css" "^0.5.0"
-    "@atlaskit/ds-lib" "^2.6.0"
-    "@atlaskit/interaction-context" "^2.1.0"
-    "@atlaskit/tokens" "^1.60.0"
-    "@atlaskit/visually-hidden" "^1.5.0"
-    "@babel/runtime" "^7.0.0"
-    "@emotion/react" "^11.7.1"
-    "@emotion/serialize" "^1.1.0"
-    bind-event-listener "^3.0.0"
-    tiny-invariant "^1.2.0"
-
-"@atlaskit/theme@^13.0.0":
-  version "13.0.0"
-  resolved "https://registry.npmmirror.com/@atlaskit/theme/-/theme-13.0.0.tgz#d59899b2ed3a596a7aa6adffd718ab871c961c12"
-  integrity sha512-tvyFtHrRDvEUvLM8B7f9O6vtqB5Aappev73jsU+Btp5oyDqIh/3SBeDWRR2n/AiROoWqhDBQoesUdNBi0+QB+A==
-  dependencies:
-    "@atlaskit/codemod-utils" "^4.2.0"
-    "@atlaskit/ds-lib" "^2.4.0"
-    "@atlaskit/tokens" "^1.58.0"
-    "@babel/runtime" "^7.0.0"
-
-"@atlaskit/tokens@^1.58.0", "@atlaskit/tokens@^1.59.0", "@atlaskit/tokens@^1.60.0", "@atlaskit/tokens@^1.61.0":
-  version "1.61.0"
-  resolved "https://registry.npmmirror.com/@atlaskit/tokens/-/tokens-1.61.0.tgz#101856f96be03daaaeb3a756d68a665af297de06"
-  integrity sha512-gRkBDZOaQffJHg9g+hYFgPjQ0Hz4XIDaK5WEttIGyhi2USsGsvDvUeED8liqcQNwssH/5UFxIFp3FmEwo0DoFA==
-  dependencies:
-    "@atlaskit/ds-lib" "^2.6.0"
-    "@atlaskit/platform-feature-flags" "^0.3.0"
-    "@babel/runtime" "^7.0.0"
-    "@babel/traverse" "^7.23.2"
-    "@babel/types" "^7.20.0"
-    bind-event-listener "^3.0.0"
-
-"@atlaskit/visually-hidden@^1.5.0":
-  version "1.5.0"
-  resolved "https://registry.npmmirror.com/@atlaskit/visually-hidden/-/visually-hidden-1.5.0.tgz#88f6c8e92d62182b680750e890a4af9ce3c084e2"
-  integrity sha512-Khq3mgRcCVwvF8LhDnC4kkmqhYwVcTcAs3YqLGOXufqnoc8H/SD0orjKdFYm1lv8mdz6c1YmyS1zRHCbIXYiDw==
-  dependencies:
-    "@babel/runtime" "^7.0.0"
-    "@emotion/react" "^11.7.1"
-
 "@babel/code-frame@^7.0.0", "@babel/code-frame@^7.0.0-beta.36", "@babel/code-frame@^7.10.4", "@babel/code-frame@^7.12.13", "@babel/code-frame@^7.16.0", "@babel/code-frame@^7.24.6", "@babel/code-frame@^7.8.3":
   version "7.24.6"
   resolved "https://registry.yarnpkg.com/@babel/code-frame/-/code-frame-7.24.6.tgz#ab88da19344445c3d8889af2216606d3329f3ef2"
@@ -1447,13 +1236,6 @@
   resolved "https://registry.yarnpkg.com/@babel/regjsgen/-/regjsgen-0.8.0.tgz#f0ba69b075e1f05fb2825b7fad991e7adbb18310"
   integrity sha512-x/rqGMdzj+fWZvCOYForTghzbtqPDZ5gPwaoNGHdgDfF2QA/XZbCBp4Moo5scrkAMPhB7z26XM/AaHuIJdgauA==
 
-"@babel/runtime@^7.0.0", "@babel/runtime@^7.12.13":
-  version "7.25.6"
-  resolved "https://registry.npmmirror.com/@babel/runtime/-/runtime-7.25.6.tgz#9afc3289f7184d8d7f98b099884c26317b9264d2"
-  integrity sha512-VBj9MYyDb9tuLq7yzqjgzt6Q+IBQLrGZfdjOekyEirZPHxXWoTSGUTMrpsfi58Up73d13NfYLv8HT9vmznjzhQ==
-  dependencies:
-    regenerator-runtime "^0.14.0"
-
 "@babel/runtime@^7.10.1", "@babel/runtime@^7.11.1", "@babel/runtime@^7.20.7":
   version "7.25.4"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.25.4.tgz#6ef37d678428306e7d75f054d5b1bdb8cf8aa8ee"
@@ -1509,7 +1291,7 @@
     debug "^4.3.1"
     globals "^11.1.0"
 
-"@babel/traverse@^7.23.2", "@babel/traverse@^7.24.7", "@babel/traverse@^7.25.2":
+"@babel/traverse@^7.24.7", "@babel/traverse@^7.25.2":
   version "7.25.6"
   resolved "https://registry.yarnpkg.com/@babel/traverse/-/traverse-7.25.6.tgz#04fad980e444f182ecf1520504941940a90fea41"
   integrity sha512-9Vrcx5ZW6UwK5tvqsj0nGpp/XzqthkT0dqIc9g1AdtygFToNtTF67XzYS//dm+SAK9cp3B9R4ZO/46p63SCjlQ==
@@ -1531,7 +1313,7 @@
     "@babel/helper-validator-identifier" "^7.24.6"
     to-fast-properties "^2.0.0"
 
-"@babel/types@^7.20.0", "@babel/types@^7.24.7", "@babel/types@^7.25.0", "@babel/types@^7.25.2", "@babel/types@^7.25.6":
+"@babel/types@^7.24.7", "@babel/types@^7.25.0", "@babel/types@^7.25.2", "@babel/types@^7.25.6":
   version "7.25.6"
   resolved "https://registry.yarnpkg.com/@babel/types/-/types-7.25.6.tgz#893942ddb858f32ae7a004ec9d3a76b3463ef8e6"
   integrity sha512-/l42B1qxpG6RdfYf343Uw1vmDjeNhneUXtzhojE7pDgfpEypmRhI6j1kr17XCVv4Cgl9HdAiQY2x0GwKm7rWCw==
@@ -1544,13 +1326,6 @@
   version "0.2.3"
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
-
-"@compiled/react@^0.17.3":
-  version "0.17.3"
-  resolved "https://registry.npmmirror.com/@compiled/react/-/react-0.17.3.tgz#56ec899386f166a731ea3dd00d96786fb64692c2"
-  integrity sha512-aE7U1IGZrmxm/PNIWRcWjER9nYD4XsLoriSVXIFXXT9WMUUk5S82zjoGOwGQ7nirGNNOXgrCbuoS4JMfFVKqSg==
-  dependencies:
-    csstype "^3.1.2"
 
 "@csstools/normalize.css@*":
   version "12.1.1"
@@ -1734,7 +1509,7 @@
   resolved "https://registry.npmmirror.com/@emotion/memoize/-/memoize-0.9.0.tgz#745969d649977776b43fc7648c556aaa462b4102"
   integrity sha512-30FAj7/EoJ5mwVPOWhAyCX+FPfMDrVecJAM+Iw9NRoSl4BBAQeqj4cApHHUXOVvIPgLVDsCFoz/hGD+5QQD1GQ==
 
-"@emotion/react@^11.13.3", "@emotion/react@^11.7.1":
+"@emotion/react@^11.13.3":
   version "11.13.3"
   resolved "https://registry.npmmirror.com/@emotion/react/-/react-11.13.3.tgz#a69d0de2a23f5b48e0acf210416638010e4bd2e4"
   integrity sha512-lIsdU6JNrmYfJ5EbUCf4xW1ovy5wKQ2CkPRM4xogziOxH1nXxBSjpC9YqbFAP7circxMfYp+6x676BqWcEiixg==
@@ -1748,7 +1523,7 @@
     "@emotion/weak-memoize" "^0.4.0"
     hoist-non-react-statics "^3.3.1"
 
-"@emotion/serialize@^1.1.0", "@emotion/serialize@^1.2.0", "@emotion/serialize@^1.3.0", "@emotion/serialize@^1.3.1":
+"@emotion/serialize@^1.2.0", "@emotion/serialize@^1.3.0", "@emotion/serialize@^1.3.1":
   version "1.3.2"
   resolved "https://registry.npmmirror.com/@emotion/serialize/-/serialize-1.3.2.tgz#e1c1a2e90708d5d85d81ccaee2dfeb3cc0cccf7a"
   integrity sha512-grVnMvVPK9yUVE6rkKfAJlYZgo0cu3l9iMC77V7DW6E1DUIrU68pSEXRmFZFOFB1QFo57TncmOcvcbMDWsL4yA==
@@ -2474,6 +2249,16 @@
     "@radix-ui/react-primitive" "1.0.3"
     "@radix-ui/react-slot" "1.0.2"
 
+"@radix-ui/react-collection@1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@radix-ui/react-collection/-/react-collection-1.1.0.tgz#f18af78e46454a2360d103c2251773028b7724ed"
+  integrity sha512-GZsZslMJEyo1VKm5L1ZJY8tGDxZNPAoUeQUIbKeJfoi7Q4kmig5AsgLMYYuyYbfjd8fBmFORAIwYAkXMnXZgZw==
+  dependencies:
+    "@radix-ui/react-compose-refs" "1.1.0"
+    "@radix-ui/react-context" "1.1.0"
+    "@radix-ui/react-primitive" "2.0.0"
+    "@radix-ui/react-slot" "1.1.0"
+
 "@radix-ui/react-compose-refs@1.0.1":
   version "1.0.1"
   resolved "https://registry.npmmirror.com/@radix-ui/react-compose-refs/-/react-compose-refs-1.0.1.tgz#7ed868b66946aa6030e580b1ffca386dd4d21989"
@@ -2485,6 +2270,18 @@
   version "1.1.0"
   resolved "https://registry.npmmirror.com/@radix-ui/react-compose-refs/-/react-compose-refs-1.1.0.tgz#656432461fc8283d7b591dcf0d79152fae9ecc74"
   integrity sha512-b4inOtiaOnYf9KWyO3jAeeCG6FeyfY6ldiEPanbUjWd+xIk5wZeHa8yVwmrJ2vderhu/BQvzCrJI0lHd+wIiqw==
+
+"@radix-ui/react-context-menu@^2.2.1":
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/@radix-ui/react-context-menu/-/react-context-menu-2.2.1.tgz#a2c7812336a40cd22900c888336ad6e1adc6a1bc"
+  integrity sha512-wvMKKIeb3eOrkJ96s722vcidZ+2ZNfcYZWBPRHIB1VWrF+fiF851Io6LX0kmK5wTDQFKdulCCKJk2c3SBaQHvA==
+  dependencies:
+    "@radix-ui/primitive" "1.1.0"
+    "@radix-ui/react-context" "1.1.0"
+    "@radix-ui/react-menu" "2.1.1"
+    "@radix-ui/react-primitive" "2.0.0"
+    "@radix-ui/react-use-callback-ref" "1.1.0"
+    "@radix-ui/react-use-controllable-state" "1.1.0"
 
 "@radix-ui/react-context@1.0.1":
   version "1.0.1"
@@ -2504,6 +2301,11 @@
   integrity sha512-RXcvnXgyvYvBEOhCBuddKecVkoMiI10Jcm5cTI7abJRAHYfFxeu+FBQs/DvdxSYucxR5mna0dNsL6QFlds5TMA==
   dependencies:
     "@babel/runtime" "^7.13.10"
+
+"@radix-ui/react-direction@1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@radix-ui/react-direction/-/react-direction-1.1.0.tgz#a7d39855f4d077adc2a1922f9c353c5977a09cdc"
+  integrity sha512-BUuBvgThEiAXh2DWu93XsT+a3aWrGqolGlqqw5VU1kG7p/ZH2cuDlM1sRLNnY3QcBS69UIz2mcKhMxDsdewhjg==
 
 "@radix-ui/react-dismissable-layer@1.0.5":
   version "1.0.5"
@@ -2617,6 +2419,30 @@
     "@radix-ui/react-use-callback-ref" "1.0.1"
     aria-hidden "^1.1.1"
     react-remove-scroll "2.5.5"
+
+"@radix-ui/react-menu@2.1.1":
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/@radix-ui/react-menu/-/react-menu-2.1.1.tgz#bd623ace0e1ae1ac78023a505fec0541d59fb346"
+  integrity sha512-oa3mXRRVjHi6DZu/ghuzdylyjaMXLymx83irM7hTxutQbD+7IhPKdMdRHD26Rm+kHRrWcrUkkRPv5pd47a2xFQ==
+  dependencies:
+    "@radix-ui/primitive" "1.1.0"
+    "@radix-ui/react-collection" "1.1.0"
+    "@radix-ui/react-compose-refs" "1.1.0"
+    "@radix-ui/react-context" "1.1.0"
+    "@radix-ui/react-direction" "1.1.0"
+    "@radix-ui/react-dismissable-layer" "1.1.0"
+    "@radix-ui/react-focus-guards" "1.1.0"
+    "@radix-ui/react-focus-scope" "1.1.0"
+    "@radix-ui/react-id" "1.1.0"
+    "@radix-ui/react-popper" "1.2.0"
+    "@radix-ui/react-portal" "1.1.1"
+    "@radix-ui/react-presence" "1.1.0"
+    "@radix-ui/react-primitive" "2.0.0"
+    "@radix-ui/react-roving-focus" "1.1.0"
+    "@radix-ui/react-slot" "1.1.0"
+    "@radix-ui/react-use-callback-ref" "1.1.0"
+    aria-hidden "^1.1.1"
+    react-remove-scroll "2.5.7"
 
 "@radix-ui/react-popover@^1.1.1":
   version "1.1.1"
@@ -2735,6 +2561,21 @@
     "@radix-ui/react-primitive" "1.0.3"
     "@radix-ui/react-use-callback-ref" "1.0.1"
     "@radix-ui/react-use-controllable-state" "1.0.1"
+
+"@radix-ui/react-roving-focus@1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@radix-ui/react-roving-focus/-/react-roving-focus-1.1.0.tgz#b30c59daf7e714c748805bfe11c76f96caaac35e"
+  integrity sha512-EA6AMGeq9AEeQDeSH0aZgG198qkfHSbvWTf1HvoDmOB5bBG/qTxjYMWUKMnYiV6J/iP/J8MEFSuB2zRU2n7ODA==
+  dependencies:
+    "@radix-ui/primitive" "1.1.0"
+    "@radix-ui/react-collection" "1.1.0"
+    "@radix-ui/react-compose-refs" "1.1.0"
+    "@radix-ui/react-context" "1.1.0"
+    "@radix-ui/react-direction" "1.1.0"
+    "@radix-ui/react-id" "1.1.0"
+    "@radix-ui/react-primitive" "2.0.0"
+    "@radix-ui/react-use-callback-ref" "1.1.0"
+    "@radix-ui/react-use-controllable-state" "1.1.0"
 
 "@radix-ui/react-slot@1.0.2":
   version "1.0.2"
@@ -4846,11 +4687,6 @@ binary-extensions@^2.0.0:
   resolved "https://registry.yarnpkg.com/binary-extensions/-/binary-extensions-2.3.0.tgz#f6e14a97858d327252200242d4ccfe522c445522"
   integrity sha512-Ceh+7ox5qe7LJuLHoY0feh3pHuUDHAcRUeyL2VYghZwfpkNIy/+8Ocg0a3UuSoYzavmylwuLWQOf3hl0jjMMIw==
 
-bind-event-listener@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.npmmirror.com/bind-event-listener/-/bind-event-listener-3.0.0.tgz#c90f9a7fcb65cac21045f810c20ef7e647a74921"
-  integrity sha512-PJvH288AWQhKs2v9zyfYdPzlPqf5bXbGMmhmUIY9x4dAUGIWgomO771oBQNwJnMQSnUIXhKu6sgzpBRXTlvb8Q==
-
 bluebird@^3.7.2:
   version "3.7.2"
   resolved "https://registry.yarnpkg.com/bluebird/-/bluebird-3.7.2.tgz#9f229c15be272454ffa973ace0dbee79a1b0c36f"
@@ -5752,7 +5588,7 @@ cssstyle@^2.3.0:
   dependencies:
     cssom "~0.3.6"
 
-csstype@^3.0.2, csstype@^3.1.2, csstype@^3.1.3:
+csstype@^3.0.2, csstype@^3.1.3:
   version "3.1.3"
   resolved "https://registry.yarnpkg.com/csstype/-/csstype-3.1.3.tgz#d80ff294d114fb0e6ac500fbf85b60137d7eff81"
   integrity sha512-M1uQkMl8rQK/szD0LNhtqxIPLpimGm8sOBwU7lLnCpSbTyY3yeU1Vc7l4KT5zT4s/yOxHH5O7tIuuLOCnLADRw==
@@ -6811,11 +6647,6 @@ execa@^5.0.0:
     signal-exit "^3.0.3"
     strip-final-newline "^2.0.0"
 
-exenv@^1.2.2:
-  version "1.2.2"
-  resolved "https://registry.npmmirror.com/exenv/-/exenv-1.2.2.tgz#2ae78e85d9894158670b03d47bec1f03bd91bb9d"
-  integrity sha512-Z+ktTxTwv9ILfgKCk32OX3n/doe+OcLTRtqK9pcL+JsP3J1/VW8Uvl4ZjLlKqeW4rzK4oesDOGMEMRIZqtP4Iw==
-
 exit-on-epipe@~1.0.1:
   version "1.0.1"
   resolved "https://registry.npmmirror.com/exit-on-epipe/-/exit-on-epipe-1.0.1.tgz#0bdd92e87d5285d267daa8171d0eb06159689692"
@@ -7070,13 +6901,6 @@ flatted@^3.2.9:
   version "3.3.1"
   resolved "https://registry.yarnpkg.com/flatted/-/flatted-3.3.1.tgz#21db470729a6734d4997002f439cb308987f567a"
   integrity sha512-X8cqMLLie7KsNUDSdzeN8FYK9rEt4Dt67OsG/DNGnYTSDBG4uFAJFBnUeiV+zCVAvwFy56IjM9sH51jVaEhNxw==
-
-focus-lock@^1.3.5:
-  version "1.3.5"
-  resolved "https://registry.npmmirror.com/focus-lock/-/focus-lock-1.3.5.tgz#aa644576e5ec47d227b57eb14e1efb2abf33914c"
-  integrity sha512-QFaHbhv9WPUeLYBDe/PAuLKJ4Dd9OPvKs9xZBr3yLXnUrDNaVXKu2baDBXe3naPY30hgHYSsf2JW4jzas2mDEQ==
-  dependencies:
-    tslib "^2.0.3"
 
 follow-redirects@^1.0.0:
   version "1.15.6"
@@ -11595,11 +11419,6 @@ queue@^6.0.1:
   dependencies:
     inherits "~2.0.3"
 
-raf-schd@^4.0.3:
-  version "4.0.3"
-  resolved "https://registry.npmmirror.com/raf-schd/-/raf-schd-4.0.3.tgz#5d6c34ef46f8b2a0e880a8fcdb743efc5bfdbc1a"
-  integrity sha512-tQkJl2GRWh83ui2DiPTJz9wEiMN20syf+5oKfB03yYP7ioZcJwsIK8FjrtLwH1m7C7e+Tt2yYBlrOpdT+dyeIQ==
-
 raf@^3.4.1:
   version "3.4.1"
   resolved "https://registry.yarnpkg.com/raf/-/raf-3.4.1.tgz#0742e99a4a6552f445d73e3ee0328af0ff1ede39"
@@ -11697,13 +11516,6 @@ react-app-rewired@^2.2.1:
   dependencies:
     semver "^5.6.0"
 
-react-clientside-effect@^1.2.6:
-  version "1.2.6"
-  resolved "https://registry.npmmirror.com/react-clientside-effect/-/react-clientside-effect-1.2.6.tgz#29f9b14e944a376b03fb650eed2a754dd128ea3a"
-  integrity sha512-XGGGRQAKY+q25Lz9a/4EPqom7WRjz3z9R2k4jhVKA/puQFH/5Nt27vFZYql4m4NVNdUvX8PS3O7r/Zzm7cjUlg==
-  dependencies:
-    "@babel/runtime" "^7.12.13"
-
 react-contexify@3.0.3:
   version "3.0.3"
   resolved "https://registry.yarnpkg.com/react-contexify/-/react-contexify-3.0.3.tgz#30d5c349dbc7726b03f9874d16e30e79ee552877"
@@ -11800,18 +11612,6 @@ react-file-viewer@^1.2.1:
     react-visibility-sensor "^5.0.2"
     three "0.85.2"
     xlsx "^0.10.1"
-
-"react-focus-lock-next@npm:react-focus-lock@^2.13.2", react-focus-lock@^2.9.5:
-  version "2.13.2"
-  resolved "https://registry.npmmirror.com/react-focus-lock/-/react-focus-lock-2.13.2.tgz#e1addac2f8b9550bc0581f3c416755ba0f81f5ef"
-  integrity sha512-T/7bsofxYqnod2xadvuwjGKHOoL5GH7/EIPI5UyEvaU/c2CcphvGI371opFtuY/SYdbMsNiuF4HsHQ50nA/TKQ==
-  dependencies:
-    "@babel/runtime" "^7.0.0"
-    focus-lock "^1.3.5"
-    prop-types "^15.6.2"
-    react-clientside-effect "^1.2.6"
-    use-callback-ref "^1.3.2"
-    use-sidecar "^1.1.2"
 
 react-hook-form@^7.50.0:
   version "7.51.5"
@@ -11935,13 +11735,6 @@ react-router@6.23.1:
   dependencies:
     "@remix-run/router" "1.16.1"
 
-react-scrolllock@^5.0.1:
-  version "5.0.1"
-  resolved "https://registry.npmmirror.com/react-scrolllock/-/react-scrolllock-5.0.1.tgz#da1cfb7b6d55c86ae41dbad5274b778c307752b7"
-  integrity sha512-poeEsjnZAlpA6fJlaNo4rZtcip2j6l5mUGU/SJe1FFlicEudS943++u7ZSdA7lk10hoyYK3grOD02/qqt5Lxhw==
-  dependencies:
-    exenv "^1.2.2"
-
 react-style-singleton@^2.2.1:
   version "2.2.1"
   resolved "https://registry.npmmirror.com/react-style-singleton/-/react-style-singleton-2.2.1.tgz#f99e420492b2d8f34d38308ff660b60d0b1205b4"
@@ -11986,13 +11779,6 @@ react-transition-group@^4.4.1, react-transition-group@^4.4.5:
     dom-helpers "^5.0.1"
     loose-envify "^1.4.0"
     prop-types "^15.6.2"
-
-react-uid@^2.2.0:
-  version "2.3.3"
-  resolved "https://registry.npmmirror.com/react-uid/-/react-uid-2.3.3.tgz#6a485ccc868555997f3506c6db97a3e735d97adf"
-  integrity sha512-iNpDovcb9qBpBTo8iUgqRSQOS8GV3bWoNaTaUptHkXtAooXSo0OWe7vN6TqqB8x3x0bNBbQx96kkmSltQ5h9kQ==
-  dependencies:
-    tslib "^2.0.0"
 
 react-visibility-sensor@^5.0.2:
   version "5.1.1"
@@ -13317,7 +13103,7 @@ tiny-inflate@^1.0.0, tiny-inflate@^1.0.3:
   resolved "https://registry.npmmirror.com/tiny-inflate/-/tiny-inflate-1.0.3.tgz#122715494913a1805166aaf7c93467933eea26c4"
   integrity sha512-pkY1fj1cKHb2seWDy0B16HeWyczlJA9/WW3u3c4z/NiWDsO3DOU5D7nhTLE9CF0yXv/QZFY7sEJmj24dK+Rrqw==
 
-tiny-invariant@^1.0.0, tiny-invariant@^1.2.0:
+tiny-invariant@^1.0.0:
   version "1.3.3"
   resolved "https://registry.yarnpkg.com/tiny-invariant/-/tiny-invariant-1.3.3.tgz#46680b7a873a0d5d10005995eb90a70d74d60127"
   integrity sha512-+FbBPE1o9QAYvviau/qC5SE3caw21q3xkvWKBtja5vgqOWIHHJ3ioaq1VPfn/Szqctz2bU/oYeKd9/z5BL+PVg==
@@ -13760,17 +13546,12 @@ url@^0.11.3:
     punycode "^1.4.1"
     qs "^6.11.2"
 
-use-callback-ref@^1.3.0, use-callback-ref@^1.3.2:
+use-callback-ref@^1.3.0:
   version "1.3.2"
   resolved "https://registry.npmmirror.com/use-callback-ref/-/use-callback-ref-1.3.2.tgz#6134c7f6ff76e2be0b56c809b17a650c942b1693"
   integrity sha512-elOQwe6Q8gqZgDA8mrh44qRTQqpIHDcZ3hXTLjBe1i4ph8XpNJnO+aQf3NaG+lriLopI4HMx9VjQLfPQ6vhnoA==
   dependencies:
     tslib "^2.0.0"
-
-use-memo-one@^1.1.1:
-  version "1.1.3"
-  resolved "https://registry.npmmirror.com/use-memo-one/-/use-memo-one-1.1.3.tgz#2fd2e43a2169eabc7496960ace8c79efef975e99"
-  integrity sha512-g66/K7ZQGYrI6dy8GLpVcMsBp4s17xNkYJVSMvTEevGy3nDxHOfE6z8BVE22+5G5x7t3+bhzrlTDB7ObrEE0cQ==
 
 use-sidecar@^1.1.2:
   version "1.1.2"

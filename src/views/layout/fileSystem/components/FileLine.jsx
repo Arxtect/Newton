@@ -1,5 +1,10 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Icon, Menu, MenuItem } from "@mui/material";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useMemo,
+  useCallback,
+} from "react";
 import fs from "fs";
 import path from "path";
 import pify from "pify";
@@ -11,6 +16,8 @@ import { useFileStore } from "store";
 
 import HoverMenu from "./HoverMenu";
 import ArIcon from "@/components/arIcon";
+
+import ContextMenu from "@/components/contextMenu";
 
 const Container = ({ selected, children }) => {
   // Define the base classes for the component
@@ -74,12 +81,6 @@ const FileLine = ({
   const [value, setValue] = useState(basename);
   const inputRef = useRef(null);
 
-  useEffect(() => {
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [inputRef.current]);
-
   const handleChange = (event) => {
     setValue(event.target.value);
   };
@@ -88,9 +89,14 @@ const FileLine = ({
     // endRenaming();
     handleRenameConfirm(value);
   };
-  const handleRename = () => {
+  const handleRename = useCallback(() => {
     startRenaming({ pathname: filepath });
-  };
+    setTimeout(() => {
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
+    }, [0]);
+  }, [filepath, inputRef, startRenaming]);
 
   const handleKeyDown = (ev) => {
     if (ev.key === "Escape") {
@@ -100,6 +106,25 @@ const FileLine = ({
       handleRenameConfirm(value);
     }
   };
+
+  const menuItems = useMemo(() => {
+    return [
+      {
+        label: "Rename",
+        command: () => {
+          handleRename();
+        },
+        icon: "FileRename",
+      },
+      {
+        label: "Delete",
+        command: () => {
+          deleteFile({ filename: filepath });
+        },
+        icon: "FileDelete",
+      },
+    ];
+  }, [filepath, deleteFile, handleRename]);
 
   if (renamingPathname === filepath) {
     return (
@@ -148,64 +173,68 @@ const FileLine = ({
       </Box>
     );
   }
+
   return (
-    <div id="file" className="block p-[0px] w-full h-full">
-      <Draggable
-        pathname={filepath}
-        type="file"
-        onDrop={async (result) => {
-          if (result) {
-            fileMoved(result);
-          }
-        }}
-        isEnabled={isDropFileSystem}
-        onDropByOther={() => {
-          // Do nothing yet
-        }}
-      >
-        <Container
-          selected={editingFilepath === filepath && currentSelectDir == ""}
+    <ContextMenu items={menuItems}>
+      {" "}
+      <div id="file" className="block p-[0px] w-full h-full">
+        <Draggable
+          pathname={filepath}
+          type="file"
+          onDrop={async (result) => {
+            if (result) {
+              fileMoved(result);
+            }
+          }}
+          isEnabled={isDropFileSystem}
+          onDropByOther={() => {
+            // Do nothing yet
+          }}
         >
-          <div
-            onClick={async () => {
-              await loadFile({ filepath });
-              if (isMobile) {
-                pushScene({ nextScene: "edit" });
-              }
-            }}
-            className="flex items-center cursor-pointer" // Tailwind classes for styling
-            style={{
-              padding: "0px",
-              paddingLeft: `${depth * 8 + 24}px`,
-            }}
-            onMouseOver={handleMouseOver}
-            onMouseLeave={handleMouseLeave}
+          <Container
+            selected={editingFilepath === filepath && currentSelectDir == ""}
           >
-            <ListItemIcon
-              style={{
-                minWidth: "unset",
+            <div
+              onClick={async () => {
+                await loadFile({ filepath });
+                if (isMobile) {
+                  pushScene({ nextScene: "edit" });
+                }
               }}
+              className="flex items-center cursor-pointer" // Tailwind classes for styling
+              style={{
+                padding: "0px",
+                paddingLeft: `${depth * 8 + 24}px`,
+              }}
+              onMouseOver={handleMouseOver}
+              onMouseLeave={handleMouseLeave}
             >
-              <ArIcon name={"File"} className="text-black w-[1.5rem]" />
-            </ListItemIcon>
-            <Pathname ignoreGit={ignoreGit}>{basename}</Pathname>
-            {hovered && (
-              <HoverMenu
-                dirpath={filepath}
-                onDelete={(e) => {
-                  e.stopPropagation();
-                  deleteFile({ filename: filepath });
+              <ListItemIcon
+                style={{
+                  minWidth: "unset",
                 }}
-                onRename={(e) => {
-                  e.stopPropagation();
-                  handleRename();
-                }}
-              />
-            )}
-          </div>
-        </Container>
-      </Draggable>
-    </div>
+              >
+                <ArIcon name={"File"} className="text-black w-[1.5rem]" />
+              </ListItemIcon>
+              <Pathname ignoreGit={ignoreGit}>{basename}</Pathname>
+              {hovered && (
+                <HoverMenu
+                  dirpath={filepath}
+                  onDelete={(e) => {
+                    e.stopPropagation();
+                    deleteFile({ filename: filepath });
+                  }}
+                  onRename={(e) => {
+                    e.stopPropagation();
+                    handleRename();
+                  }}
+                />
+              )}
+            </div>
+          </Container>
+        </Draggable>
+      </div>
+    </ContextMenu>
   );
 };
 
