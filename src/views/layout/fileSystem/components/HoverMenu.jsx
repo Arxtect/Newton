@@ -43,7 +43,17 @@ const HoverMenu = ({
         {/* <div className="absolute inset-0 flex items-center justify-end space-x-1"> */}
         <ClickContextMenu items={menuItems} onOpenChange={onOpenChange}>
           {(hovered || menuVisible) && (
-            <ArIcon name="Menu" className="text-black h-4 w-4 cursor-pointer" />
+            <IconButton
+              size="small"
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+            >
+              <ArIcon
+                name="Menu"
+                className="text-black h-full w-4 cursor-pointer"
+              />
+            </IconButton>
           )}
         </ClickContextMenu>
 

@@ -141,6 +141,7 @@ const FileLine = ({
         sx={{
           display: "flex",
           alignItems: "center",
+          padding: "1px 0px",
           paddingLeft: `${depth * 8 + 24}px`,
         }}
       >
@@ -209,7 +210,7 @@ const FileLine = ({
               <div
                 className="flex items-center w-full"
                 style={{
-                  padding: "0px",
+                  padding: "1px 0px",
                   paddingLeft: `${depth * 8 + 24}px`,
                 }}
                 onClick={async (e) => {
