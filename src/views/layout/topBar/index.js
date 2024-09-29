@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import download from "@/assets/download.svg";
 import ellipsis from "@/assets/ellipsis.svg";
 import logoIcon from "@/assets/logo-icon.svg";
+import historyIcon from '@/assets/history.svg';
 import Share from "../share";
 import LinkGithub from "../linkGithub";
 import PublishDocument from "../publishDocument";
@@ -58,7 +59,7 @@ const TopBar = (props) => {
   const buttonData = [
     // { key: "Review", src: review, label: "Review", click: handleClick },
     { key: "Sync", src: "", label: "Sync", click: handleClick },
-    { key: "History", src: history, label: "History", click: handleClick },
+    { key: "History", src: historyIcon, label: "History", click: handleClick },
     { key: "Publish", src: "", label: "Publish", click: handleClick },
     { key: "Share", src: "", label: "Share", click: handleClick },
     { key: "Download", src: download, label: "", click: handleClick },
