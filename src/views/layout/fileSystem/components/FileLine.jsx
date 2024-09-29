@@ -74,9 +74,6 @@ const FileLine = ({
     setValue(value);
     fileMoved({ fromPath: filepath, destPath });
   };
-  const handleMouseOver = () => setHovered(true);
-
-  const handleMouseLeave = () => setHovered(false);
 
   const [value, setValue] = useState(basename);
   const inputRef = useRef(null);
@@ -113,6 +110,7 @@ const FileLine = ({
         label: "Rename",
         command: (e) => {
           e.stopPropagation();
+          setHovered(false);
           handleRename();
         },
         icon: "FileRename",
@@ -120,12 +118,21 @@ const FileLine = ({
       {
         label: "Delete",
         command: () => {
+          setHovered(false);
           deleteFile({ filename: filepath });
         },
         icon: "FileDelete",
       },
     ];
   }, [filepath, deleteFile, handleRename]);
+
+  const handleMouseEnter = (e) => {
+    setHovered(true);
+  };
+
+  const handleMouseLeave = (e) => {
+    setHovered(false);
+  };
 
   if (renamingPathname === filepath) {
     return (
@@ -196,7 +203,7 @@ const FileLine = ({
           >
             <div
               className="flex items-center"
-              onMouseOver={handleMouseOver}
+              onMouseEnter={handleMouseEnter}
               onMouseLeave={handleMouseLeave}
             >
               <div

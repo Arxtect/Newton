@@ -275,6 +275,7 @@ const DirectoryLineContent = ({
       {
         label: "Add File",
         command: (e) => {
+          setHovered(false);
           onAddFile(e);
         },
         icon: "NewFile",
@@ -282,6 +283,7 @@ const DirectoryLineContent = ({
       {
         label: "Add Folder",
         command: (e) => {
+          setHovered(false);
           onAddFolder(e);
         },
         icon: "NewFolder",
@@ -289,6 +291,7 @@ const DirectoryLineContent = ({
       {
         label: "Rename",
         command: () => {
+          setHovered(false);
           handleRename();
         },
         icon: "FileRename",
@@ -296,6 +299,7 @@ const DirectoryLineContent = ({
       depth != 0 && {
         label: "Delete",
         command: (event) => {
+          setHovered(false);
           handleDeleteDirectory(event, dirpath);
         },
         icon: "FileDelete",

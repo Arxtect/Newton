@@ -37,13 +37,9 @@ const HoverMenu = ({
     };
   }, []);
 
-  useEffect(() => {
-    console.log("menuVisible", hovered, menuVisible);
-  }, [menuVisible, hovered]);
-
   return (
     <Tooltip content="Menu" position="bottom">
-      <div className="relative ml-auto group mr-2">
+      <div className="relative ml-auto group mr-2" id="hover-menu">
         {/* <div className="absolute inset-0 flex items-center justify-end space-x-1"> */}
         <ClickContextMenu items={menuItems} onOpenChange={onOpenChange}>
           {(hovered || menuVisible) && (
