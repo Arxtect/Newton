@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useMemo,
+  useCallback,
+} from "react";
 import fs from "fs";
 import path from "path";
 import pify from "pify";
@@ -22,6 +28,7 @@ import { Box, TextField } from "@mui/material";
 import { readFileStats } from "domain/filesystem";
 import { useFileStore } from "store";
 import ArIcon from "@/components/arIcon";
+import ContextMenu from "@/components/contextMenu";
 
 const LinkedLines = ({
   dirpath,
@@ -149,12 +156,15 @@ const DirectoryLineContent = ({
     }
   };
 
-  const handleDeleteDirectory = (event, dirpath) => {
-    event.stopPropagation();
-    if (window.confirm(`Confirm: delete ${dirpath}`)) {
-      deleteDirectory({ dirpath });
-    }
-  };
+  const handleDeleteDirectory = useCallback(
+    (event, dirpath) => {
+      event.stopPropagation();
+      if (window.confirm(`Confirm: delete ${dirpath}`)) {
+        deleteDirectory({ dirpath });
+      }
+    },
+    [deleteDirectory]
+  );
 
   const relpath = path.relative(root, dirpath);
   const basename = path.basename(relpath);
@@ -177,9 +187,14 @@ const DirectoryLineContent = ({
     // endRenaming();
     handleDirRenameConfirm(value);
   };
-  const handleRename = () => {
+  const handleRename = useCallback(() => {
     startRenaming({ pathname: dirpath });
-  };
+    setTimeout(() => {
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
+    }, [0]);
+  }, [startRenaming, dirpath]);
 
   const handleKeyDown = (ev) => {
     if (ev.key === "Escape") {
@@ -227,98 +242,167 @@ const DirectoryLineContent = ({
     }
   }, [dirOpen]);
 
+  const onAddFile = useCallback(
+    (e) => {
+      e.stopPropagation();
+      setOpened(true);
+      startFileCreating(dirpath);
+      setTimeout(() => {
+        if (inputRef.current) {
+          inputRef.current.focus();
+        }
+      }, [0]);
+    },
+    [startFileCreating, dirpath]
+  );
+
+  const onAddFolder = useCallback(
+    (e) => {
+      e.stopPropagation();
+      setOpened(true);
+      startDirCreating(dirpath);
+      setTimeout(() => {
+        if (inputRef.current) {
+          inputRef.current.focus();
+        }
+      }, [0]);
+    },
+    [startDirCreating, dirpath]
+  );
+
+  const menuItems = useMemo(() => {
+    return [
+      {
+        label: "Add File",
+        command: (e) => {
+          onAddFile(e);
+        },
+        icon: "NewFile",
+      },
+      {
+        label: "Add Folder",
+        command: (e) => {
+          onAddFolder(e);
+        },
+        icon: "NewFolder",
+      },
+      {
+        label: "Rename",
+        command: () => {
+          handleRename();
+        },
+        icon: "FileRename",
+      },
+      depth != 0 && {
+        label: "Delete",
+        command: (event) => {
+          handleDeleteDirectory(event, dirpath);
+        },
+        icon: "FileDelete",
+      },
+    ].filter((item) => item?.label);
+  }, [
+    depth,
+    dirpath,
+    handleDeleteDirectory,
+    handleRename,
+    onAddFile,
+    onAddFolder,
+  ]);
+
   return (
     <List className="p-0">
-      <div onMouseOver={handleMouseOver} onMouseLeave={handleMouseLeave}>
-        <Draggable
-          pathname={dirpath}
-          type="dir"
-          onDrop={handleFileMove}
-          onDropByOther={() => setOpened(true)}
-          isEnabled={isDropFileSystem}
-          setHover={() => {
-            console.log("setHover");
-          }}
-        >
-          <ListItem
-            onMouseOver={handleMouseOver}
-            onMouseLeave={handleMouseLeave}
-            onClick={(e) => handleClick(e, dirpath)}
-            className={`hover:bg-[#bae6bc5c] transition duration-300 ${
-              currentSelectDir == dirpath ? "bg-[#81c784]" : ""
-            }`}
-            style={{
-              padding: "3px 0px 3px 0px",
-              paddingLeft: `${depth * 8}px`,
+      <ContextMenu items={menuItems}>
+        <div onMouseOver={handleMouseOver} onMouseLeave={handleMouseLeave}>
+          <Draggable
+            pathname={dirpath}
+            type="dir"
+            onDrop={handleFileMove}
+            onDropByOther={() => setOpened(true)}
+            isEnabled={isDropFileSystem}
+            setHover={() => {
+              console.log("setHover");
             }}
           >
-            <ListItemIcon
+            <ListItem
+              onMouseOver={handleMouseOver}
+              onMouseLeave={handleMouseLeave}
+              className={`hover:bg-[#bae6bc5c] transition duration-300 ${
+                currentSelectDir == dirpath ? "bg-[#81c784]" : ""
+              }`}
               style={{
-                minWidth: "unset",
-                // visibility:
-                //   fileList && fileList.length > 0 ? 'visible' : 'hidden' ,
+                padding: "3px 0px 3px 0px",
+                paddingLeft: `${depth * 8}px`,
               }}
             >
-              {opened ? <ExpandMoreIcon /> : <ChevronRightIcon />}
-            </ListItemIcon>
-            <ListItemIcon style={{ minWidth: "unset" }}>
-              {/* {opened ? <FolderOpenIcon /> : <FolderIcon />} */}
-              {opened ? (
-                <ArIcon name={"FolderOpen"} className="text-black w-[1.5rem]" />
-              ) : (
-                <ArIcon
-                  name={"FolderClose"}
-                  className="text-black w-[1.5rem]"
-                />
-              )}
-            </ListItemIcon>
-            {renamingPathname === dirpath ? (
-              <TextField
-                className="tailwind-classes-for-input"
-                variant="outlined"
-                size="small"
-                value={value}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                onKeyDown={handleKeyDown}
-                onClick={(e) => e.stopPropagation()}
-                inputRef={inputRef}
-                sx={{
-                  "& .MuiInputBase-input": {
-                    height: "24px",
-                    padding: "0 6px",
-                  },
-                  "& .MuiOutlinedInput-root": {
-                    "& fieldset": {
-                      borderColor: "#81C784",
-                    },
-                    "&:hover fieldset": {
-                      borderColor: "#81C784",
-                    },
-                    "&.Mui-focused fieldset": {
-                      borderColor: "#81C784",
-                    },
-                  },
+              <ListItemIcon
+                style={{
+                  minWidth: "unset",
+                  // visibility:
+                  //   fileList && fileList.length > 0 ? 'visible' : 'hidden' ,
                 }}
-              />
-            ) : (
-              <React.Fragment>
-                <Pathname ignoreGit={ignoreGit}>
-                  {basename || `${dirpath}`}
-                </Pathname>
-                {hovered && (
+              >
+                {opened ? <ExpandMoreIcon /> : <ChevronRightIcon />}
+              </ListItemIcon>
+              <ListItemIcon style={{ minWidth: "unset" }}>
+                {opened ? (
+                  <ArIcon
+                    name={"FolderOpen"}
+                    className="text-black w-[1.5rem]"
+                  />
+                ) : (
+                  <ArIcon
+                    name={"FolderClose"}
+                    className="text-black w-[1.5rem]"
+                  />
+                )}
+              </ListItemIcon>
+              {renamingPathname === dirpath ? (
+                <TextField
+                  className="tailwind-classes-for-input"
+                  variant="outlined"
+                  size="small"
+                  value={value}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  onKeyDown={handleKeyDown}
+                  onClick={(e) => e.stopPropagation()}
+                  inputRef={inputRef}
+                  sx={{
+                    "& .MuiInputBase-input": {
+                      height: "24px",
+                      padding: "0 6px",
+                    },
+                    "& .MuiOutlinedInput-root": {
+                      "& fieldset": {
+                        borderColor: "#81C784",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#81C784",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#81C784",
+                      },
+                    },
+                  }}
+                />
+              ) : (
+                <React.Fragment>
+                  <div
+                    onClick={(e) => handleClick(e, dirpath)}
+                    className="w-full"
+                  >
+                    <Pathname ignoreGit={ignoreGit}>
+                      {basename || `${dirpath}`}
+                    </Pathname>
+                  </div>
+
                   <HoverMenu
                     basename={basename}
                     dirpath={basename}
                     root={basename}
-                    onAddFile={(event) => {
-                      setOpened(true);
-                      startFileCreating(dirpath);
-                    }}
-                    onAddFolder={(event) => {
-                      setOpened(true);
-                      startDirCreating(dirpath);
-                    }}
+                    onAddFile={onAddFile}
+                    onAddFolder={onAddFolder}
                     onDelete={(event) => {
                       handleDeleteDirectory(event, dirpath);
                     }}
@@ -326,23 +410,25 @@ const DirectoryLineContent = ({
                       handleRename(event);
                     }}
                     depth={depth}
+                    menuItems={menuItems}
+                    hovered={hovered}
                   />
-                )}
-              </React.Fragment>
-            )}
-          </ListItem>
-        </Draggable>
-      </div>
+                </React.Fragment>
+              )}
+            </ListItem>
+          </Draggable>
+        </div>
+      </ContextMenu>
       {opened && (
         <>
           {isFileCreating == dirpath && (
             <div>
-              <AddFile parentDir={dirpath} depth={depth} />
+              <AddFile parentDir={dirpath} depth={depth} inputRef={inputRef} />
             </div>
           )}
           {isDirCreating == dirpath && (
             <div>
-              <AddDir parentDir={dirpath} depth={depth} />
+              <AddDir parentDir={dirpath} depth={depth} inputRef={inputRef} />
             </div>
           )}
         </>

@@ -1,5 +1,5 @@
 /*
- * @Description: 
+ * @Description:
  * @Author: Devin
  * @Date: 2024-01-26 10:17:19
  */
@@ -11,7 +11,7 @@ const Pathname = ({ ignoreGit, children }) => {
   }`;
 
   const style = {
-    maxWidth: "80%",
+    maxWidth: "100%",
     overflow: "hidden",
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",

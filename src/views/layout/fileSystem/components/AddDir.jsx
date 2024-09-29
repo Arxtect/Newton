@@ -11,7 +11,7 @@ import path from "path";
 import { ListItemIcon } from "@mui/material";
 import ArIcon from "@/components/arIcon";
 
-const AddDir = ({ parentDir, depth }) => {
+const AddDir = ({ parentDir, depth, inputRef }) => {
   const { createFile, createDirectory, finishDirCreating, cancelDirCreating } =
     useFileStore((state) => ({
       createFile: state.createFile,
@@ -20,7 +20,6 @@ const AddDir = ({ parentDir, depth }) => {
       cancelDirCreating: state.cancelDirCreating,
     }));
   const [value, setValue] = useState("");
-  const inputRef = useRef(null);
 
   useEffect(() => {
     if (inputRef.current) {

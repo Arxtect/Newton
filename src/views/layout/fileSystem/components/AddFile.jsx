@@ -5,7 +5,7 @@ import { useFileStore } from "store";
 import { ListItemIcon } from "@mui/material";
 import ArIcon from "@/components/arIcon";
 
-const AddFile = ({ parentDir, depth }) => {
+const AddFile = ({ parentDir, depth, inputRef }) => {
   const {
     createFile,
     createDirectory,
@@ -19,8 +19,6 @@ const AddFile = ({ parentDir, depth }) => {
   }));
 
   const [value, setValue] = useState("");
-  const inputRef = useRef(null);
-
   useEffect(() => {
     if (inputRef.current) {
       inputRef.current.focus();

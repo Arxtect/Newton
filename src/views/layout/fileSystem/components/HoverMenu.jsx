@@ -3,13 +3,15 @@
  * @Author: Devin
  * @Date: 2024-01-30 20:24:29
  */
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import AddBoxIcon from "@mui/icons-material/AddBox"; // For creating files
 import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder"; // For creating directories
 import DeleteIcon from "@mui/icons-material/Delete"; // For deleting
 import EditIcon from "@mui/icons-material/Edit"; // For renaming
 import IconButton from "@mui/material/IconButton";
-import Tooltip from "@mui/material/Tooltip";
+import Tooltip from "@/components/tooltip";
+import ClickContextMenu from "@/components/contextMenu/ClickContextMenu";
+import ArIcon from "@/components/arIcon";
 
 const HoverMenu = ({
   basename,
@@ -20,11 +22,36 @@ const HoverMenu = ({
   onDelete,
   onRename,
   depth,
+  menuItems,
+  hovered,
 }) => {
+  const [menuVisible, setMenuVisible] = useState(false);
+
+  const onOpenChange = (open) => {
+    setMenuVisible(open);
+  };
+
+  useEffect(() => {
+    return () => {
+      setMenuVisible(false);
+    };
+  }, []);
+
+  useEffect(() => {
+    console.log("menuVisible", hovered, menuVisible);
+  }, [menuVisible, hovered]);
+
   return (
-    <div className="relative ml-auto group">
-      <div className="absolute inset-0 flex items-center justify-end space-x-1 ">
-        {onAddFile && (
+    <Tooltip content="Menu" position="bottom">
+      <div className="relative ml-auto group mr-2">
+        {/* <div className="absolute inset-0 flex items-center justify-end space-x-1"> */}
+        <ClickContextMenu items={menuItems} onOpenChange={onOpenChange}>
+          {(hovered || menuVisible) && (
+            <ArIcon name="Menu" className="text-black h-4 w-4 cursor-pointer" />
+          )}
+        </ClickContextMenu>
+
+        {/* {onAddFile && (
           <Tooltip title="add file">
             <IconButton
               size="small"
@@ -49,16 +76,15 @@ const HoverMenu = ({
               <CreateNewFolderIcon fontSize="inherit" />
             </IconButton>
           </Tooltip>
-        )}
+        )} */}
         {/* basename !== ".git" && dirpath !== root && */}
-        {onDelete && depth != 0 && (
+        {/* {onDelete && depth != 0 && (
           <Tooltip title="delete">
             <IconButton
               size="small"
               onClick={(e) => {
                 e.stopPropagation();
                 onDelete(e);
-               
               }}
             >
               <DeleteIcon fontSize="inherit" />
@@ -77,9 +103,9 @@ const HoverMenu = ({
               <EditIcon fontSize="inherit" />
             </IconButton>
           </Tooltip>
-        )}
+        )} */}
       </div>
-    </div>
+    </Tooltip>
   );
 };
 
