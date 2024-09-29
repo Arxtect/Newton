@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useEditor, useFileStore } from "@/store";
 import ArIcon from "@/components/arIcon";
-
+import path from "path";
 
 const CollapsibleText = ({ content }) => {
   const [isCollapsed, setIsCollapsed] = useState(true);
@@ -25,9 +25,7 @@ const CollapsibleText = ({ content }) => {
     <div className="mt-2 bg-gray-200 border rounded">
       <div
         ref={contentRef}
-        className={` ${
-          isCollapsed ? "collapsed" : "expanded"
-        }`}
+        className={` ${isCollapsed ? "collapsed" : "expanded"}`}
         style={{
           overflow: "hidden",
           height: isCollapsed ? "150px" : "auto",
@@ -37,18 +35,22 @@ const CollapsibleText = ({ content }) => {
         <pre className={`text-xs px-2 py-2 whitespace-pre-wrap`}>{content}</pre>
       </div>
       {showCollapseButton && (
-        <div 
-        className="h-10 relative text-center flex items-center justify-center"
-        style={{
-          marginTop: isCollapsed ? "-40px" : "0px",
-          backgroundImage: 'linear-gradient(0, #e7e9ee, transparent)',
-        }}> 
+        <div
+          className="h-10 relative text-center flex items-center justify-center"
+          style={{
+            marginTop: isCollapsed ? "-40px" : "0px",
+            backgroundImage: "linear-gradient(0, #e7e9ee, transparent)",
+          }}
+        >
           <button
-            className="flex text-black cursor-pointer items-center hover:bg-green-500 rounded-full bg-white px-2 border border-black text-sm"
+            className="flex text-black cursor-pointer items-center hover:bg-arxTheme rounded-full bg-white px-2 border border-black text-sm font-serif py-[2px]"
             onClick={() => setIsCollapsed(!isCollapsed)}
           >
-            {isCollapsed ? <ArIcon name="ExpandMore" className="w-3 h-3"/> : <ArIcon name="ExpandLess" className="w-3 h-3"/>}
-            &nbsp;
+            {isCollapsed ? (
+              <ArIcon name="ExpandMore" className="w-3 h-3 mr-1" />
+            ) : (
+              <ArIcon name="ExpandLess" className="w-3 h-3 mr-1" />
+            )}
             {isCollapsed ? "Expand" : "Collapse"}
           </button>
         </div>
@@ -58,16 +60,33 @@ const CollapsibleText = ({ content }) => {
 };
 
 const typeColors = {
-  error: 'red',
-  warning: 'yellow',
-  typesetting: 'blue',
-  default: 'gray'
+  error: {
+    header: "#F36D6D",
+    button: "#9c312b",
+    buttonHover: "hover:bg-[#7c2722]",
+  },
+  warning: {
+    header: "#FBBA49",
+    button: "#8c5f2b",
+    buttonHover: "hover:bg-[#724510]",
+  },
+  typesetting: {
+    header: "#81C784",
+    button: "#2e4d2f",
+    buttonHover: "hover:bg-[#4c624c]",
+  },
+  default: {
+    header: "#bdbdbd",
+    button: "#bdbdbd",
+    buttonHover: "hover:bg-[#bdbdbd]",
+  },
 };
 
 const Message = ({ type, title, file, line, details, content }) => {
-  let headerColor = `bg-${typeColors[type] || typeColors.default}-600`;
-  let buttonColor = `bg-${typeColors[type] || typeColors.default}-700`;
-  let buttonHoverColor = `bg-${typeColors[type] || typeColors.default}-800`;
+  const colors = typeColors[type] || typeColors.default;
+  const headerColor = colors["header"];
+  const buttonColor = colors["button"];
+  const buttonHoverColor = colors["buttonHover"];
 
   const { editor } = useEditor();
   const { fileList, currentProjectRoot, loadFile } = useFileStore((state) => ({
@@ -75,40 +94,46 @@ const Message = ({ type, title, file, line, details, content }) => {
     loadFile: state.loadFile,
     fileList: state.currentProjectFileList,
   }));
-  const handleLocate = async(file, line) => {
-    if(editor) {
-      const filePath = `${currentProjectRoot}/${file}`;
+  const handleLocate = async (file, line) => {
+    const filePath = path.join(currentProjectRoot, file);
+    if (!fileList.includes(filePath)) {
+      return null;
+    }
+    console.log(file, "file");
+    if (editor) {
       await loadFile({ filepath: filePath });
       const lineInt = parseInt(line, 10);
-      if(!isNaN(lineInt)) {
+      if (!isNaN(lineInt)) {
         editor.focus();
         editor.gotoLine(lineInt);
       }
     }
-  }
+  };
 
   return (
-    <div className={`mb-4 border overflow-hidden rounded`}>
-      <header className={`flex justify-between items-center font-bold px-3 py-1 text-white ${headerColor}`}>
-        <h3>{title}</h3>
+    <div className={`mb-4 border overflow-hidden rounded-lg`}>
+      <header
+        className={`flex justify-between items-start font-bold px-3 py-1 text-white`}
+        style={{ backgroundColor: headerColor, fontFamily: "Lato,sans-serif" }}
+      >
+        <h3 className="line-clamp-3 flex-grow leading-[1.7]">{title}</h3>
         {file && (
           <button
-            style={{ maxWidth: "33%" }}
-            className={`relative flex text-sm items-center cursor-pointer px-1 rounded-full ${buttonColor} text-white hover:${buttonHoverColor}`}
-            onClick={fileList.includes(file) ? () => handleLocate(file, line) : null}
-            title={line ? file + ', ' + line : file}
+            style={{
+              backgroundColor: buttonColor,
+            }}
+            className={`relative flex text-sm items-center cursor-pointer px-2 py-1 rounded-full text-white max-w-[33%] ml-2 ${buttonHoverColor}`}
+            onClick={() => handleLocate(file, line)}
+            title={line ? file + ", " + line : file}
           >
-            <ArIcon 
-              name={"LinkBold"} 
-              style={{ top: "10px", left: "15px" }}
-              className="absolute transform -translate-x-1/2 -translate-y-1/2" 
-            />
-            &nbsp;
-            <div className="1rem pl-5 pr-1 overflow-hidden whitespace-nowrap text-ellipsis">
-              {line ? file + ', ' + line : file}
-            </div>
+            <ArIcon name={"LinkBold"} className="w-3 h-3" />
+            <span
+              className="pl-2 pr-1 overflow-hidden whitespace-nowrap text-ellipsis"
+              style={{ direction: "rtl" }}
+            >
+              &#x202A;{line ? file + ", " + line : file}&#x202C;
+            </span>
           </button>
-
         )}
       </header>
       <div className="px-3 py-3 text-black whitespace-pre-wrap">
@@ -120,7 +145,6 @@ const Message = ({ type, title, file, line, details, content }) => {
 };
 
 const FormattedCompilerLog = ({ messages, log }) => {
-  
   console.log(messages, "messages");
   return (
     <div className="p-3 bg-white">
