@@ -43,7 +43,7 @@ const CollapsibleText = ({ content }) => {
           }}
         >
           <button
-            className="flex text-black cursor-pointer items-center hover:bg-arxTheme rounded-full bg-white px-2 border border-black text-sm font-serif py-[2px]"
+            className="flex text-black cursor-pointer items-center rounded-md  px-2 border border-[arxTheme] text-sm font-[Inter] py-[2px] bg-arxTheme hover:bg-arx-theme-hover"
             onClick={() => setIsCollapsed(!isCollapsed)}
           >
             {isCollapsed ? (
