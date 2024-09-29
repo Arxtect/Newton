@@ -62,18 +62,18 @@ const CollapsibleText = ({ content }) => {
 const typeColors = {
   error: {
     header: "#F36D6D",
-    button: "#9c312b",
-    buttonHover: "hover:bg-[#7c2722]",
+    button: "#DC2626",
+    buttonHover: "hover:bg-[#B11B1B]",
   },
   warning: {
-    header: "#FBBA49",
-    button: "#8c5f2b",
-    buttonHover: "hover:bg-[#724510]",
+    header: "rgb(243 197 117)",
+    button: "#F59E0B",
+    buttonHover: "hover:bg-[#D97706]",
   },
   typesetting: {
     header: "#81C784",
-    button: "#2e4d2f",
-    buttonHover: "hover:bg-[#4c624c]",
+    button: "#10B981",
+    buttonHover: "hover:bg-[#047857]",
   },
   default: {
     header: "#bdbdbd",
