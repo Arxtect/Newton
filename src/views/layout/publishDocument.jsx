@@ -158,8 +158,11 @@ const ProductDialog = () => {
             handleOpenPublish();
           }}
         >
-          <ArIcon name={"Publish"}  className="text-black w-4 h-4"/>
-          <span>Publish</span> {/* 使用空格字符 */}
+          <ArIcon
+            name={"Publish"}
+            className="text-black w-[1.1rem] h-[1.1rem]"
+          />
+          <span className="font-arx">Publish</span> {/* 使用空格字符 */}
         </button>
       </Tooltip>
       <ArDialog

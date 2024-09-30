@@ -14,13 +14,14 @@ module.exports = {
       fontFamily: {
         sans: ["Lato", "sans-serif"],
         inter: ["Inter", "sans-serif"],
+        arx: ["ui-monospace", "sans-serif"],
       },
       colors: {
         link: "#13678a",
         primary: "#e7f8ff",
         "g-color-87": "var(--g-color-87)",
-        arxTheme: "#81c784 ",
-        "arx-theme-hover": "#2aa92fa8",
+        arxTheme: "#4caf4f ",
+        "arx-theme-hover": "#5daf4fde",
         arxThemeDark: "#18191F",
         arxTextGray: "#000000f5",
         arxOdd: "#f5f7fa",

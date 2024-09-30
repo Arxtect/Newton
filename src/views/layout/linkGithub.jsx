@@ -195,8 +195,11 @@ const LinkGithub = (props) => {
             className={`flex items-center text-gray-700 px-2 py-1 hover:bg-gray-200 active:bg-[#9fd5a2] space-x-1 `}
             onClick={() => toggleDrawer(true)}
           >
-            <ArIcon name={"GitCloud"}  className="text-black w-4 h-4"/>
-            <span>Sync</span>
+            <ArIcon
+              name={"GitCloud"}
+              className="text-black w-[1.1rem] h-[1.1rem]"
+            />
+            <span className="font-arx">Sync</span>
           </button>
         </Tooltip>
       ) : (
@@ -205,8 +208,11 @@ const LinkGithub = (props) => {
             className={`flex items-center text-gray-700 px-2 py-1 hover:bg-gray-200 active:bg-[#9fd5a2] space-x-1 `}
             onClick={() => setDialogOpen(true)}
           >
-            <ArIcon name={"GitCloud"}  className="text-black w-4 h-4"/>
-            <span>Sync</span>
+            <ArIcon
+              name={"GitCloud"}
+              className="text-black w-[1.1rem] h-[1.1rem]"
+            />
+            <span className="font-arx">Sync</span>
           </button>
         </Tooltip>
       )}

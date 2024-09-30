@@ -8,7 +8,6 @@ import { useUserStore, useFileStore } from "@/store";
 import { downloadDirectoryAsZip } from "domain/filesystem";
 import { useNavigate } from "react-router-dom";
 
-
 import ArIcon from "@/components/arIcon";
 
 import { getColors, getFirstNUpperCaseChars } from "@/util";
@@ -136,7 +135,10 @@ const TopBar = (props) => {
                   }}
                 >
                   {!button.label && <span>{"\u00A0"}</span>}
-                  <ArIcon name={button.src}  className="text-black w-4"/>
+                  <ArIcon
+                    name={button.src}
+                    className="text-black w-[1.1rem] h-[1.1rem]"
+                  />
                   <span>{button.label || "\u00A0"}</span> {/* 使用空格字符 */}
                 </button>
               </Tooltip>

@@ -3,7 +3,7 @@
  * @Author: Devin
  * @Date: 2024-05-28 12:37:50
  */
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { usePdfPreviewStore, useEngineStatusStore } from "store";
 import * as constant from "@/constant";
 import RotatingIcon from "./RotatingIconButton";
@@ -14,46 +14,35 @@ import ArIcon from "@/components/arIcon";
 export const EngineStatus = ({ className }) => {
   const { engineStatus, selectFormattedEngineStatus } = useEngineStatusStore();
 
-  const [showTooltip, setShowTooltip] = useState(true);
   const { color, tooltip } = selectFormattedEngineStatus();
-  const { toggleCompilerLog, setShowCompilerLog } = usePdfPreviewStore(
-    (state) => ({
-      toggleCompilerLog: state.toggleCompilerLog,
-      setShowCompilerLog: state.setShowCompilerLog,
-    })
-  );
 
-  const handleClick = () => {
-    if (engineStatus === constant.readyEngineStatus) {
-      toggleCompilerLog();
-    }
-  };
-
-  const selector = useRef(`status-tooltip-${randomString(4)}`);
+  useEffect(() => {
+    console.log(color, tooltip, "selectFormattedEngineStatus");
+  }, [color, tooltip]);
 
   return (
     <div className={`flex justify-center items-center ${className}`}>
-      <Tooltip selector={selector.current} content={tooltip} position="bottom">
-        {[constant.notReadyEngineStatus, constant.busyEngineStatus].includes(
-          engineStatus
-        ) ? (
-          <div>
+      <Tooltip content={tooltip} position="bottom">
+        <div>
+          {[constant.notReadyEngineStatus, constant.busyEngineStatus].includes(
+            engineStatus
+          ) ? (
             <RotatingIcon isRotating={true} />
-          </div>
-        ) : engineStatus == constant.readyEngineStatus ? (
-          <RotatingIcon isRotating={false} />
-        ) : (
-          <ArIcon
-            name={
-              // engineStatus == constant.readyEngineStatus
-              //   ? "StatusSuccess"
-              //   :
-              engineStatus == constant.errorEngineStatus ? "Error" : ""
-            }
-            alt="engineStatus"
-            className={`text-center ${color} hover:cursor-pointer h-4 `}
-          />
-        )}
+          ) : engineStatus == constant.readyEngineStatus ? (
+            <RotatingIcon isRotating={false} />
+          ) : (
+            <ArIcon
+              name={
+                // engineStatus == constant.readyEngineStatus
+                //   ? "StatusSuccess"
+                //   :
+                engineStatus == constant.errorEngineStatus ? "Error" : ""
+              }
+              alt="engineStatus"
+              className={`text-center ${color} hover:cursor-pointer h-4 `}
+            />
+          )}
+        </div>
       </Tooltip>
     </div>
   );
