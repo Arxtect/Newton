@@ -75,6 +75,7 @@ const CommandPopover = ({
               setCurrentApp={setCurrentApp}
               incomeCommandOptions={incomeCommandOptions}
               triggerType={triggerType}
+              {...res}
             />
           </div>
         </Popover.Content>

@@ -13,8 +13,9 @@ import Button from "@/features/aiTools/button";
 import ArIcon from "@/components/arIcon";
 
 const IconList = {
+  "Newton General": "Text",
+  "Newton Selection Writing": "Text",
   "Image Equation": "Equation",
-  "Query Equation": "Equation",
   "Section Polisher": "Explain",
 };
 
@@ -83,6 +84,7 @@ const CommandInput = forwardRef(
       incomeCommandOptions = [],
       triggerType,
       showPanel = null,
+      isSelection = false,
     },
     ref
   ) => {
@@ -122,12 +124,16 @@ const CommandInput = forwardRef(
       if (incomeCommandOptions.length > 0) {
         newCommandOptions = incomeCommandOptions;
       }
-      console.log(query, "handleSelect");
+
+      if (!isSelection) {
+        newCommandOptions = newCommandOptions.filter((item) => !item.selection);
+      }
+
       if (!query || !query.trim()) return newCommandOptions;
       return newCommandOptions.filter((option) =>
         option.text.toLowerCase().includes(query.toLowerCase())
       );
-    }, [query, commandOptions, incomeCommandOptions]);
+    }, [query, commandOptions, incomeCommandOptions, isSelection]);
 
     const handleKeyDown = (event) => {
       if (focusedIndex !== -1 || filteredCommandOptions.length === 0) {

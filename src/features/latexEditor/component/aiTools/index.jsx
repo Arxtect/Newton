@@ -26,6 +26,8 @@ const AiTools = ({ editor, completer }) => {
   const [markerRange, setMarkerRange] = useState(null);
   const [showTooltip, setShowTooltip] = useState(false);
 
+  const [isSelection, setIsSelection] = useState(false);
+
   const [incomeCommandOptions, setIncomeCommandOptions] = useState([]);
 
   const { showPromptMessage, saveHandleAccept, saveHandleReject } =
@@ -194,7 +196,7 @@ const AiTools = ({ editor, completer }) => {
     handleShowDropdown(cursorPosition, session);
   };
 
-  const handleSelectViaName = (name = "Section Polisher") => {
+  const handleSelectViaName = (name = "Newton Selection Writing") => {
     //Section Polisher
     if (commandInputRef.current) {
       commandInputRef.current.handleSelectViaName(name);
@@ -209,8 +211,9 @@ const AiTools = ({ editor, completer }) => {
         const selectedText = editor.getSelectedText();
         setShowTooltip(false);
         if (!selectedText) return;
+        setIsSelection(true);
         console.log(selectedText, "selectedText");
-        handleSelectViaName("Section Polisher");
+        handleSelectViaName("Newton Selection Writing");
         setShowDropdown(true);
       },
     });
@@ -321,6 +324,7 @@ const AiTools = ({ editor, completer }) => {
           setIsResponding={setIsResponding}
           showPanel={showDropdown}
           commandInputRef={commandInputRef}
+          isSelection={isSelection}
         />
       </div>
       {showTooltip && (
