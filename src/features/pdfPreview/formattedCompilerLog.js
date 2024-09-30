@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useEditor, useFileStore } from "@/store";
 import ArIcon from "@/components/arIcon";
-import Tooltip from '@mui/material/Tooltip';
 import path from "path";
 import Tooltip from "@/components/tooltip";
 
@@ -97,20 +96,12 @@ const Message = ({ type, title, file, line, details, content }) => {
     fileList: state.currentProjectFileList,
   }));
   const handleLocate = async (file, line) => {
-<<<<<<< HEAD
     const filePath = path.join(currentProjectRoot, file);
 
     if (!fileList.includes(file) && !fileList.includes(filePath)) {
       return null;
     }
 
-=======
-    if (!fileList.includes(file)) {
-      return null;
-    }
-    const filePath = path.join(currentProjectRoot, file);
-    console.log(filePath, "filePath");
->>>>>>> f8263e47aa38f751cc5404b2423249b7ca3b4423
     if (editor) {
       await loadFile({ filepath: filePath });
       const lineInt = parseInt(line, 10);
