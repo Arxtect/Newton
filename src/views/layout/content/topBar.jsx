@@ -311,12 +311,11 @@ const ContentTopBar = (props) => {
           <ArButtonGroup className="bg-[#81C784] text-black rounded-md ">
             <button
               className={` text-black px-2 py-[2px] flex items-center space-x-4`}
+              onClick={() =>
+                compileLatex(sourceCode, currentProjectRoot, compileSetting)
+              }
             >
-              <span
-                onClick={() =>
-                  compileLatex(sourceCode, currentProjectRoot, compileSetting)
-                }
-              >
+              <span>
                 {engineStatus == constant.notReadyEngineStatus ||
                 engineStatus == constant.busyEngineStatus
                   ? "Compiling"
@@ -402,7 +401,7 @@ const ContentTopBar = (props) => {
                 color={badgeColor}
               >
                 <ArIcon
-                  name={"Log"}
+                  name={"CompileLog"}
                   className="text-black w-6 h-6 cursor-pointer hover:opacity-75"
                 />
               </Badge>

@@ -1,0 +1,48 @@
+{
+  "icon": {
+    "type": "element",
+    "isRootNode": true,
+    "name": "svg",
+    "attributes": {
+      "xmlns": "http://www.w3.org/2000/svg",
+      "width": "20",
+      "height": "20",
+      "fill": "none",
+      "viewBox": "2.5 0 20 20",
+      "style": "padding: 0; margin: 0; text-align: center;"
+    },
+    "children": [
+      {
+        "type": "element",
+        "name": "g",
+        "attributes": {
+          "filter": "url(#filter0_d_673_906)"
+        },
+        "children": [
+          {
+            "type": "element",
+            "name": "path",
+            "attributes": {
+              "d": "M7.57495 4.5752H19.5914V19.1666H7.57495V4.5752Z",
+              "stroke": "currentColor",
+              "stroke-linejoin": "round"
+            },
+            "children": []
+          },
+          {
+            "type": "element",
+            "name": "path",
+            "attributes": {
+              "d": "M17.0164 4.57495V2H5.42916C5.31534 2 5.20618 2.04521 5.1257 2.1257C5.04521 2.20618 5 2.31534 5 2.42916V16.5914H7.57495M11.0082 9.72485H16.1581M11.0082 13.1581H16.1581",
+              "stroke": "currentColor",
+              "stroke-linecap": "round",
+              "stroke-linejoin": "round"
+            },
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  "name": "CompileLog"
+}
