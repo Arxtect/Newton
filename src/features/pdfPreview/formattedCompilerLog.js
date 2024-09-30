@@ -1,5 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useEditor } from "@/store";
+import { useEditor, useFileStore } from "@/store";
+import ArIcon from "@/components/arIcon";
+import Tooltip from '@mui/material/Tooltip';
+import path from "path";
 
 const CollapsibleText = ({ content }) => {
   const [isCollapsed, setIsCollapsed] = useState(true);
@@ -13,79 +16,130 @@ const CollapsibleText = ({ content }) => {
         getComputedStyle(contentRef.current).lineHeight
       );
       const lines = contentRef.current.scrollHeight / lineHeight;
-      setShowCollapseButton(lines > 3);
+      console.log(lines, "lines");
+      setShowCollapseButton(lines > 9);
+      setIsCollapsed(lines > 9);
     }
   }, [content]);
 
   return (
-    <div className="mt-2 p-2 bg-gray-100 border rounded">
+    <div className="mt-2 bg-gray-200 border rounded">
       <div
         ref={contentRef}
-        className={`whitespace-pre-wrap ${
-          isCollapsed ? "collapsed" : "expanded"
-        }`}
+        className={` ${isCollapsed ? "collapsed" : "expanded"}`}
         style={{
           overflow: "hidden",
-          height: isCollapsed ? "70px" : "auto",
+          height: isCollapsed ? "150px" : "auto",
           transition: "height 0.3s ease",
         }}
       >
-        {content}
+        <pre className={`text-xs px-2 py-2 whitespace-pre-wrap`}>{content}</pre>
       </div>
       {showCollapseButton && (
-        <button
-          className="text-blue-500 hover:underline mx-auto block mt-2"
-          onClick={() => setIsCollapsed(!isCollapsed)}
+        <div
+          className="h-10 relative text-center flex items-center justify-center"
+          style={{
+            marginTop: isCollapsed ? "-40px" : "0px",
+            backgroundImage: "linear-gradient(0, #e7e9ee, transparent)",
+          }}
         >
-          {isCollapsed ? "Expand" : "Collapse"}
-        </button>
+          <button
+            className="flex text-black cursor-pointer items-center rounded-md  px-2 border border-[arxTheme] text-sm font-[Inter] py-[2px] bg-arxTheme hover:bg-arx-theme-hover"
+            onClick={() => setIsCollapsed(!isCollapsed)}
+          >
+            {isCollapsed ? (
+              <ArIcon name="ExpandMore" className="w-3 h-3 mr-1" />
+            ) : (
+              <ArIcon name="ExpandLess" className="w-3 h-3 mr-1" />
+            )}
+            {isCollapsed ? "Expand" : "Collapse"}
+          </button>
+        </div>
       )}
     </div>
   );
 };
 
+const typeColors = {
+  error: {
+    header: "#F36D6D",
+    button: "#DC2626",
+    buttonHover: "hover:bg-[#B11B1B]",
+  },
+  warning: {
+    header: "rgb(243 197 117)",
+    button: "#F59E0B",
+    buttonHover: "hover:bg-[#D97706]",
+  },
+  typesetting: {
+    header: "#81C784",
+    button: "#10B981",
+    buttonHover: "hover:bg-[#047857]",
+  },
+  default: {
+    header: "#bdbdbd",
+    button: "#bdbdbd",
+    buttonHover: "hover:bg-[#bdbdbd]",
+  },
+};
+
 const Message = ({ type, title, file, line, details, content }) => {
-  let headerColor;
-  switch (type) {
-    case "error":
-      headerColor = "bg-red-500 text-white";
-      break;
-    case "warning":
-      headerColor = "bg-yellow-500 text-white";
-      break;
-    case "typesetting":
-      headerColor = "bg-blue-500 text-white";
-      break;
-    default:
-      headerColor = "bg-gray-500 text-white";
-  }
+  const colors = typeColors[type] || typeColors.default;
+  const headerColor = colors["header"];
+  const buttonColor = colors["button"];
+  const buttonHoverColor = colors["buttonHover"];
 
   const { editor } = useEditor();
-
-  const handleLocate = (lineNumber) => {
-    if(editor) {
-      const lineNumberInt = parseInt(lineNumber, 10);
-      if(!isNaN(lineNumberInt)) {
+  const { fileList, currentProjectRoot, loadFile } = useFileStore((state) => ({
+    currentProjectRoot: state.currentProjectRoot,
+    loadFile: state.loadFile,
+    fileList: state.currentProjectFileList,
+  }));
+  const handleLocate = async (file, line) => {
+    if (!fileList.includes(file)) {
+      return null;
+    }
+    const filePath = path.join(currentProjectRoot, file);
+    console.log(filePath, "filePath");
+    if (editor) {
+      await loadFile({ filepath: filePath });
+      const lineInt = parseInt(line, 10);
+      if (!isNaN(lineInt)) {
         editor.focus();
-        editor.gotoLine(lineNumberInt);
+        editor.gotoLine(lineInt);
       }
     }
-  }
+  };
 
   return (
-    <div className={`mb-4 border`}>
-      <div className={`flex justify-between items-center p-2 ${headerColor}`}>
-        <div className="font-bold">{title}</div>
-        <div
-          className={`text-sm cursor-pointer text-blue-500 hover:underline`}
-          onClick={() => handleLocate(line)}
-        >
-          {file && file}
-          {file && ","} {line && line}
-        </div>
-      </div>
-      <div className="p-4 whitespace-pre-wrap">
-        <div>{details}</div>
+    <div className={`mb-4 border overflow-hidden rounded-lg`}>
+      <header
+        className={`flex justify-between items-start font-bold px-3 py-1 text-white`}
+        style={{ backgroundColor: headerColor, fontFamily: "Lato,sans-serif" }}
+      >
+        <h3 className="line-clamp-3 flex-grow leading-[1.7]">{title}</h3>
+        {file && (
+          <Tooltip title={line ? file + ", " + line : file} arrow >
+            <button
+              style={{
+                backgroundColor: buttonColor,
+              }}
+              className={`relative flex text-sm items-center cursor-pointer px-2 py-1 rounded-full text-white max-w-[33%] ml-2 ${buttonHoverColor}`}
+              onClick={() => handleLocate(file, line)}
+            >
+              <ArIcon name={"LinkBold"} className="w-3 h-3" />
+              <span
+                className="pl-2 pr-1 overflow-hidden whitespace-nowrap text-ellipsis"
+                style={{ direction: "rtl" }}
+              >
+                &#x202A;{line ? file + ", " + line : file}&#x202C;
+              </span>
+            </button>
+          </Tooltip>
+        )}
+      </header>
+      <div className="px-3 py-3 text-black whitespace-pre-wrap">
+        {details && <div className="text-sm">{details.trim()}</div>}
         {content && <CollapsibleText content={content} />}
       </div>
     </div>
@@ -93,8 +147,9 @@ const Message = ({ type, title, file, line, details, content }) => {
 };
 
 const FormattedCompilerLog = ({ messages, log }) => {
+  console.log(messages, "messages");
   return (
-    <div className="p-6">
+    <div className="p-3 bg-white">
       {messages.map((msg, index) => (
         <Message
           key={index}
