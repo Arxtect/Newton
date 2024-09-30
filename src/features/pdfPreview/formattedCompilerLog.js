@@ -67,7 +67,7 @@ const typeColors = {
     buttonHover: "hover:bg-[#B11B1B]",
   },
   warning: {
-    header: "rgb(243 197 117)",
+    header: "#FBBA49",
     button: "#F59E0B",
     buttonHover: "hover:bg-[#D97706]",
   },
@@ -77,7 +77,7 @@ const typeColors = {
     buttonHover: "hover:bg-[#047857]",
   },
   default: {
-    header: "#bdbdbd",
+    header: "#BDBDBD",
     button: "#bdbdbd",
     buttonHover: "hover:bg-[#bdbdbd]",
   },

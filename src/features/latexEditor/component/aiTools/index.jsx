@@ -30,6 +30,8 @@ const AiTools = ({ editor, completer }) => {
 
   const [incomeCommandOptions, setIncomeCommandOptions] = useState([]);
 
+  const [selectedContent, setSelectedContent] = useState("");
+
   const { showPromptMessage, saveHandleAccept, saveHandleReject } =
     useChatStore();
 
@@ -72,6 +74,7 @@ const AiTools = ({ editor, completer }) => {
   const handleCommand = useCallback(
     (content) => {
       if (content.length === 0) return;
+
       try {
         const cursorPosition = editor.getCursorPosition();
         const session = editor.getSession();
@@ -95,9 +98,35 @@ const AiTools = ({ editor, completer }) => {
           );
         }
 
-        const range = editor.getSelectionRange();
-        editor.session.replace(range, content);
+        let range = editor.getSelectionRange();
 
+        if (isSelection && !markerRange) {
+          let insertPosition = {
+            row: range.end.row,
+            column: range.end.column,
+          };
+          editor.moveCursorToPosition(insertPosition);
+          editor.session.replace(
+            {
+              start: insertPosition,
+              end: insertPosition,
+            },
+            "\n"
+          );
+          range = editor.getSelectionRange();
+          insertPosition = {
+            row: range.end.row,
+            column: range.end.column,
+          };
+
+          range = {
+            start: insertPosition,
+            end: insertPosition,
+          };
+          editor.moveCursorToPosition(insertPosition);
+        }
+
+        editor.session.replace(range, content);
         // 计算新内容的行数和列数
         const lines = content.split("\n");
         const newEndRow = range.start.row + lines.length - 1;
@@ -133,7 +162,7 @@ const AiTools = ({ editor, completer }) => {
         console.error("Error handling command:", error);
       }
     },
-    [editor, markerRange]
+    [editor, markerRange, isSelection]
   );
 
   const setCurrentPosition = (cursorPosition, session) => {
@@ -212,9 +241,9 @@ const AiTools = ({ editor, completer }) => {
         setShowTooltip(false);
         if (!selectedText) return;
         setIsSelection(true);
-        console.log(selectedText, "selectedText");
         handleSelectViaName("Newton Selection Writing");
         setShowDropdown(true);
+        setSelectedContent(selectedText);
       },
     });
   };
@@ -266,6 +295,7 @@ const AiTools = ({ editor, completer }) => {
       setIncomeCommandOptions([]);
       editor.focus();
       completer && completer.enable();
+      setIsSelection(false);
     } else {
       completer && completer.disable();
     }
@@ -325,6 +355,7 @@ const AiTools = ({ editor, completer }) => {
           showPanel={showDropdown}
           commandInputRef={commandInputRef}
           isSelection={isSelection}
+          selectedContent={selectedContent}
         />
       </div>
       {showTooltip && (

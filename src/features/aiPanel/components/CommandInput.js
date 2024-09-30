@@ -13,10 +13,10 @@ import Button from "@/features/aiTools/button";
 import ArIcon from "@/components/arIcon";
 
 const IconList = {
-  "Newton General": "Text",
-  "Newton Selection Writing": "Text",
-  "Image Equation": "Equation",
-  "Section Polisher": "Explain",
+  "9a1686f4-e641-474a-96c5-c6812908e046": "Text", // Newton General
+  "22930441-0b94-4252-9db9-c05256550002": "Text", // Newton Selection Writing
+  "23f33933-67f5-4a8c-9f94-be3265c7ffd9": "Equation", //Newton LaTex Equation
+  "cc3378c3-dd99-4c9a-8a12-8f81e2e71acd": "Explain", //Section Polisher
 };
 
 export function getChatApiUrl() {
@@ -85,6 +85,7 @@ const CommandInput = forwardRef(
       triggerType,
       showPanel = null,
       isSelection = false,
+      selectedContent,
     },
     ref
   ) => {
@@ -113,7 +114,7 @@ const CommandInput = forwardRef(
           return {
             ...item,
             text: item.name,
-            icon: IconList[item.name],
+            icon: IconList[item.id],
           };
         })
       );
@@ -191,15 +192,31 @@ const CommandInput = forwardRef(
       handleSelectViaName,
     }));
 
+    const getUserInputsKeys = (currentApp) => {
+      let user_input_form = currentApp?.user_input_form;
+      if (!user_input_form) return;
+      let input = user_input_form[0];
+      let keys = input["text-input"] || input["paragraph"];
+      if (!keys) return;
+      let variable = keys.variable;
+      return variable;
+    };
+
     const onSend = useCallback(
       (message, files) => {
         handleRestart();
         // setSelectedCommand(null);
         setFocusedIndex(-1);
         setHoveredIndex(0);
+        let key = getUserInputsKeys(currentApp);
+        let inputs = key
+          ? {
+              [key]: selectedContent,
+            }
+          : {};
         const data = {
           query: message,
-          inputs: {},
+          inputs: inputs,
           conversation_id: "",
           response_mode: "streaming",
         };
@@ -210,7 +227,7 @@ const CommandInput = forwardRef(
           currentAppToken,
         });
       },
-      [currentAppToken]
+      [currentAppToken, selectedContent]
     );
 
     const onHandleRestart = () => {
