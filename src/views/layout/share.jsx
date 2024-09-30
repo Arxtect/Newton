@@ -217,7 +217,7 @@ const Share = forwardRef(({ rootPath, user }, ref) => {
     <React.Fragment>
       <Tooltip content="Share Your Project" position="bottom">
         <button
-          className={`flex items-center text-gray-700 px-2 py-1 hover:bg-gray-200 active:bg-[#9fd5a2] space-x-1 `}
+          className={`flex items-center justify-end text-gray-700 px-2 py-1 hover:bg-gray-200 active:bg-arx-theme-hover space-x-1`}
           onClick={() => {
             controlShare();
           }}
@@ -225,9 +225,9 @@ const Share = forwardRef(({ rootPath, user }, ref) => {
           <ArIcon
             name={"Share"}
             loading="lazy"
-            className="w-4 h-4 text-black"
+            className="w-[1.1rem] h-[1.1rem] text-black"
           />
-          <span>Share</span> {/* 使用空格字符 */}
+          <span className="font-arx">Share</span>
         </button>
       </Tooltip>
       <ArDialog

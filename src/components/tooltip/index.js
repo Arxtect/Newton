@@ -16,18 +16,19 @@ const Tooltip = ({
   children,
   htmlContent,
   className,
-  clickable,
-  noArrow,
+  clickable = false,
+  noArrow = false,
 }) => {
   // Generate a unique ID for the tooltip if selector is not provided
   const uniqueId = useRef(`${content.slice(0, 10)}-tooltip-${randomString(4)}`);
   const tooltipId = selector || uniqueId.current;
 
   return (
-    <div className="tooltip-container">
+    <>
       {React.cloneElement(children, {
         "data-tooltip-id": tooltipId,
       })}
+      {/* <div data-tooltip-id={tooltipId}>{children}</div> */}
       <ReactTooltip
         id={tooltipId}
         content={content}
@@ -39,7 +40,7 @@ const Tooltip = ({
       >
         {htmlContent && htmlContent}
       </ReactTooltip>
-    </div>
+    </>
   );
 };
 

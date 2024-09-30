@@ -19,6 +19,7 @@ export const useEngineStatusStore = create((set) => ({
     set(() => ({ engineStatus: constant.errorEngineStatus })),
   selectFormattedEngineStatus: () => {
     const { engineStatus } = useEngineStatusStore.getState();
+    console.log(engineStatus, "engineStatus");
     switch (engineStatus) {
       case 1:
         return {

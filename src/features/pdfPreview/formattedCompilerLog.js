@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useEditor, useFileStore } from "@/store";
 import ArIcon from "@/components/arIcon";
-import Tooltip from '@mui/material/Tooltip';
 import path from "path";
+import Tooltip from "@/components/tooltip";
 
 const CollapsibleText = ({ content }) => {
   const [isCollapsed, setIsCollapsed] = useState(true);
@@ -96,11 +96,12 @@ const Message = ({ type, title, file, line, details, content }) => {
     fileList: state.currentProjectFileList,
   }));
   const handleLocate = async (file, line) => {
-    if (!fileList.includes(file)) {
+    const filePath = path.join(currentProjectRoot, file);
+
+    if (!fileList.includes(file) && !fileList.includes(filePath)) {
       return null;
     }
-    const filePath = path.join(currentProjectRoot, file);
-    console.log(filePath, "filePath");
+
     if (editor) {
       await loadFile({ filepath: filePath });
       const lineInt = parseInt(line, 10);
@@ -117,15 +118,18 @@ const Message = ({ type, title, file, line, details, content }) => {
         className={`flex justify-between items-start font-bold px-3 py-1 text-white`}
         style={{ backgroundColor: headerColor, fontFamily: "Lato,sans-serif" }}
       >
-        <h3 className="line-clamp-3 flex-grow leading-[1.7]">{title}</h3>
+        <h3 className="line-clamp-3 flex-grow leading-[1.7]" title={title}>
+          {title}
+        </h3>
         {file && (
-          <Tooltip title={line ? file + ", " + line : file} arrow >
+          <Tooltip content={line ? file + ", " + line : file} position="bottom">
             <button
               style={{
                 backgroundColor: buttonColor,
               }}
               className={`relative flex text-sm items-center cursor-pointer px-2 py-1 rounded-full text-white max-w-[33%] ml-2 ${buttonHoverColor}`}
               onClick={() => handleLocate(file, line)}
+              title={line ? file + ", " + line : file}
             >
               <ArIcon name={"LinkBold"} className="w-3 h-3" />
               <span
