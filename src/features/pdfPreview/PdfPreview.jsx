@@ -11,6 +11,8 @@ import { readFile } from "domain/filesystem";
 import FormattedCompilerLog from "./formattedCompilerLog";
 import PdfPreViewer from "./PdfPreViewer";
 
+import { PdfPreviewProvider, PdfJsViewer } from "../pdfCore/pdf-js-viewer";
+
 export const PdfPreview = () => {
   const {
     pdfUrl,
@@ -49,22 +51,25 @@ export const PdfPreview = () => {
   }, [assetsFilePath]);
 
   return (
-    <div
-      className={`h-full relative  ${willResizing ? "z-10" : ""}`}
-      style={{ overflow: "auto" }} // 添加这一行以允许滚动
-    >
-      {!!assetsFilePath && !!fileContent ? (
-        <AssetPreview filename={assetsFilePath} content={fileContent} />
-      ) : showCompilerLog ? (
-        <FormattedCompilerLog messages={compileMessages} log={compilerLog} />
-      ) : (
-        pdfUrl !== "" && <PdfPreViewer pdfUrl={pdfUrl} />
-        // <Viewer url={pdfU/rl}></Viewer>
-      )}
+    <PdfPreviewProvider>
+      <div
+        className={`h-full relative  ${willResizing ? "z-10" : ""}`}
+        style={{ overflow: "auto" }} // 添加这一行以允许滚动
+      >
+        <PdfJsViewer url={pdfUrl} pdfFile={null} />
 
-      {willResizing && (
-        <div className="absolute top-0 left-0 w-full h-full z-20"></div>
-      )}
-    </div>
+        {/* {!!assetsFilePath && !!fileContent ? (
+          <AssetPreview filename={assetsFilePath} content={fileContent} />
+        ) : showCompilerLog ? (
+          <FormattedCompilerLog messages={compileMessages} log={compilerLog} />
+        ) : (
+          pdfUrl !== "" && <PdfPreViewer pdfUrl={pdfUrl} />
+          // <Viewer url={pdfU/rl}></Viewer>
+        )}
+        {willResizing && (
+          <div className="absolute top-0 left-0 w-full h-full z-20"></div>
+        )} */}
+      </div>
+    </PdfPreviewProvider>
   );
 };
