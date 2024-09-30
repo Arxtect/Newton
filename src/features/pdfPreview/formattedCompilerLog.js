@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useEditor, useFileStore } from "@/store";
 import ArIcon from "@/components/arIcon";
+import Tooltip from '@mui/material/Tooltip';
 import path from "path";
 import Tooltip from "@/components/tooltip";
 
@@ -63,18 +64,18 @@ const CollapsibleText = ({ content }) => {
 const typeColors = {
   error: {
     header: "#F36D6D",
-    button: "#9c312b",
-    buttonHover: "hover:bg-[#7c2722]",
+    button: "#DC2626",
+    buttonHover: "hover:bg-[#B11B1B]",
   },
   warning: {
-    header: "#FBBA49",
-    button: "#8c5f2b",
-    buttonHover: "hover:bg-[#724510]",
+    header: "rgb(243 197 117)",
+    button: "#F59E0B",
+    buttonHover: "hover:bg-[#D97706]",
   },
   typesetting: {
     header: "#81C784",
-    button: "#2e4d2f",
-    buttonHover: "hover:bg-[#4c624c]",
+    button: "#10B981",
+    buttonHover: "hover:bg-[#047857]",
   },
   default: {
     header: "#bdbdbd",
@@ -96,12 +97,20 @@ const Message = ({ type, title, file, line, details, content }) => {
     fileList: state.currentProjectFileList,
   }));
   const handleLocate = async (file, line) => {
+<<<<<<< HEAD
     const filePath = path.join(currentProjectRoot, file);
 
     if (!fileList.includes(file) && !fileList.includes(filePath)) {
       return null;
     }
 
+=======
+    if (!fileList.includes(file)) {
+      return null;
+    }
+    const filePath = path.join(currentProjectRoot, file);
+    console.log(filePath, "filePath");
+>>>>>>> f8263e47aa38f751cc5404b2423249b7ca3b4423
     if (editor) {
       await loadFile({ filepath: filePath });
       const lineInt = parseInt(line, 10);
