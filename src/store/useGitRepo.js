@@ -8,6 +8,7 @@ import { useFileStore, startUpdate } from "./useFileStore";
 import { useUserStore } from "./useUserStore";
 import { toast } from "react-toastify";
 import fs from "fs";
+import { removeDirectory } from "domain/filesystem";
 
 export const GIT_STORE = "git_store";
 
@@ -139,7 +140,15 @@ export const useGitRepo = create()(
           statusMatrix,
         });
       },
-
+      deleteGitFolder: async ({ projectRoot }) => {
+        let gitFolder = path.join(projectRoot, ".git");
+        let isExists = await existsPath(path.join(projectRoot, ".git"));
+        if (!isExists) {
+          return;
+        }
+        console.log(gitFolder, isExists);
+        await removeDirectory(gitFolder);
+      },
       mergeBranches: async ({ projectRoot, ref1, ref2 }) => {
         await Git.merge({
           fs,

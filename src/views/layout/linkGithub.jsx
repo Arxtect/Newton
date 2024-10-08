@@ -22,7 +22,7 @@ import { existsPath } from "domain/filesystem";
 import BottomDrawer from "@/features/bottomDrawer/bottomDrawer";
 import ArIcon from "@/components/arIcon";
 
-import { getGitToken, createGitRepo } from "@/services";
+import { getGitToken, createGitRepo, deleteGitRepo } from "@/services";
 import { getGiteaFullUrl, formatRepoName } from "@/util";
 
 const GithubProgressBar = ({ progress, messages }) => {
@@ -68,7 +68,7 @@ const LinkGithub = (props) => {
   const { currentProjectRoot } = useFileStore((state) => ({
     currentProjectRoot: state.currentProjectRoot,
   }));
-  const { initializeGitStatus } = useGitRepo();
+  const { initializeGitStatus, deleteGitFolder } = useGitRepo();
 
   const getIsExistGit = async () => {
     const isExistsGit = await existsPath(path.join(currentProjectRoot, ".git"));
@@ -113,18 +113,20 @@ const LinkGithub = (props) => {
       }
 
       const res = await createGitRepo(projectName, projectName);
-      console.log(res, "res"); // Debug information
 
-      if (!res || res.error) {
-        console.log(res.error, "res.error"); // Debug information
-        throw new Error(res.error || "Failed to create Git repository");
+      if (!res || res?.error) {
+        setLoading(false);
+        setDialogOpen(false);
+        console.log(res?.error, "res.error"); // Debug information
+        // throw new Error(res?.error || "Failed to create Git repository");
+        return;
       }
 
       let userName = user?.name;
       let remoteUrl = getGiteaFullUrl(userName, projectName);
       console.log(remoteUrl);
 
-      await setupAndPushToRepo(currentProjectRoot, remoteUrl, {
+      let result = await setupAndPushToRepo(currentProjectRoot, remoteUrl, {
         singleBranch: false,
         token: gitConfig.githubApiToken,
         onProgress,
@@ -132,17 +134,26 @@ const LinkGithub = (props) => {
         committerName: userName,
         committerEmail: user?.email,
       });
+      console.log(result, "result");
 
-      setDialogOpen(false);
-      toast.success("Successfully linked repository from GitHub");
-      setIsExistsGit(true);
-      initializeGitStatus({ projectRoot: currentProjectRoot });
-      setLoading(false);
+      if (result) {
+        setDialogOpen(false);
+        toast.success("Successfully linked repository from GitHub");
+        setIsExistsGit(true);
+        initializeGitStatus({ projectRoot: currentProjectRoot });
+        setLoading(false);
+      }
     } catch (err) {
       console.error(err); // Debug information
       toast.warning(err.message || err);
       setLoading(false);
+      await deleteGitFolder({ projectRoot: currentProjectRoot });
+      await handleDeleteGitRepo(projectName);
     }
+  };
+
+  const handleDeleteGitRepo = async (deleteProjectName) => {
+    await deleteGitRepo(deleteProjectName);
   };
 
   const onProgress = (progress) => {

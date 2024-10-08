@@ -1,3 +1,8 @@
+/*
+ * @Description:
+ * @Author: Devin
+ * @Date: 2024-05-28 13:48:03
+ */
 import * as git from "isomorphic-git";
 import fs from "fs";
 import pify from "pify";
@@ -6,14 +11,13 @@ import { createBranch } from "./createBranch";
 import { checkoutBranch } from "./checkoutBranch";
 import http from "isomorphic-git/http/web";
 import { gitAuth, getAuthor } from "./gitAuth";
-import {getInfoProjectName} from "domain/filesystem"
+import { getInfoProjectName } from "domain/filesystem";
 
 const fsPify = {
   mkdir: pify(fs.mkdir),
   readdir: pify(fs.readdir),
   stat: pify(fs.stat),
 };
-
 
 export async function addAllFilesToGit(dir) {
   async function addFilesFromDirectory(currentPath) {
@@ -41,54 +45,58 @@ export async function addAllFilesToGit(dir) {
   await addFilesFromDirectory(dir);
 }
 
-
 export async function setupAndPushToRepo(projectRoot, remoteUrl, options) {
   try {
     // 初始化仓库并设置默认分支为 main
-    await git.init({ fs, dir: projectRoot, defaultBranch: 'main' });
-     // 添加远程仓库
+    await git.init({ fs, dir: projectRoot, defaultBranch: "main" });
+    // 添加远程仓库
     await git.addRemote({
       fs,
       dir: projectRoot,
-      remote: 'origin',
+      remote: "origin",
       url: remoteUrl,
     });
 
     // 添加所有文件到暂存区
     await addAllFilesToGit(projectRoot);
- 
+
     // 提交文件
     await git.commit({
       fs,
       ...getAuthor({
         name: options?.committerName,
-        email: options?.committerEmail 
+        email: options?.committerEmail,
       }),
       dir: projectRoot,
       message: "arxtect initial commit",
     });
 
-  
-    await checkoutBranch(projectRoot, "main")
-
-    console.log("push")
+    await checkoutBranch(projectRoot, "main");
 
     // 推送到远程仓库
-     await git.push({
+    let pushResult = await git.push({
       fs,
       dir: projectRoot,
       remote: "origin",
       ref: "main",
       http,
       ...options,
-      ...gitAuth( options.token)
+      ...gitAuth(options.token),
     });
-
-    console.log('Repository setup complete and pushed to remote.');
+    if (pushResult.ok) {
+      console.log(
+        "Repository setup complete and pushed to remote.",
+        pushResult
+      );
+      return true;
+    } else {
+      console.log("Repository push failed", pushResult);
+      throw new Error(pushResult.error || "git server error.");
+    }
   } catch (e) {
     console.log(e.message);
-    if (e.message.includes('force: true')) {
-      throw new Error('Repository is not empty, please try clone.');
+    if (e.message.includes("force: true")) {
+      throw new Error("Repository is not empty, please try clone.");
     }
     throw new Error(e.message);
   }
