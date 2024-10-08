@@ -436,7 +436,7 @@ function PdfJsViewer({ url, pdfFile }) {
       tabIndex={-1}
     >
       <div
-        className="absolute w-full h-full overflow-y-scroll"
+        className="absolute w-full h-full overflow-y-scroll flex justify-center"
         tabIndex={0}
         role="tabpanel"
       >
