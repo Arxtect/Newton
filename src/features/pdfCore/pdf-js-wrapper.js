@@ -66,18 +66,18 @@ export default class PDFJSWrapper {
     }
 
     return new Promise((resolve, reject) => {
-      const rangeTransport = this.genPdfCachingTransport({
-        url,
-        pdfFile,
-        abortController,
-        handleFetchError,
-      });
+      // const rangeTransport = this.genPdfCachingTransport({
+      //   url,
+      //   pdfFile,
+      //   abortController,
+      //   handleFetchError,
+      // });
       let rangeChunkSize = DEFAULT_RANGE_CHUNK_SIZE;
-      if (rangeTransport && pdfFile.size < 2 * DEFAULT_RANGE_CHUNK_SIZE) {
-        // pdf.js disables the "bulk" download optimization when providing a
-        // custom range transport. Restore it by bumping the chunk size.
-        rangeChunkSize = pdfFile.size;
-      }
+      // if (rangeTransport && pdfFile.size < 2 * DEFAULT_RANGE_CHUNK_SIZE) {
+      //   // pdf.js disables the "bulk" download optimization when providing a
+      //   // custom range transport. Restore it by bumping the chunk size.
+      //   rangeChunkSize = pdfFile.size;
+      // }
       this.loadDocumentTask = this.PDFJS.getDocument({
         url,
         cMapUrl: this.cMapUrl,
@@ -89,7 +89,7 @@ export default class PDFJSWrapper {
         disableStream,
         isEvalSupported: false,
         textLayerMode: 2, // PDFJSViewer.TextLayerMode.ENABLE,
-        range: rangeTransport,
+        // range: rangeTransport,
       });
 
       this.loadDocumentTask.promise

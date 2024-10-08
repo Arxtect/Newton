@@ -50,12 +50,14 @@ function PdfJsViewer({ url, pdfFile }) {
     (parent) => {
       if (parent) {
         const wrapper = new PDFJSWrapper(parent.firstChild);
+        console.log(wrapper, "wrapper");
         wrapper
           .init()
           .then(() => {
             setPdfJsWrapper(wrapper);
           })
           .catch((error) => {
+            console.error(error, "error");
             setLoadingError(true);
           });
 
@@ -72,6 +74,7 @@ function PdfJsViewer({ url, pdfFile }) {
 
   useEffect(() => {
     // if (!pdfJsWrapper || !firstRenderDone) return;
+    console.log(pdfJsWrapper, "pdfJsWrapper");
     if (!pdfJsWrapper) return;
     let timePDFFetched;
     let timePDFRendered;
@@ -134,6 +137,7 @@ function PdfJsViewer({ url, pdfFile }) {
   }, [pdfJsWrapper, startFetch]); //firstRenderDone
 
   useEffect(() => {
+    console.log(url, pdfFile, pdfJsWrapper, "url, pdfFile");
     if (pdfJsWrapper && url) {
       setInitialised(false);
       setStartFetch(performance.now());
@@ -426,13 +430,17 @@ function PdfJsViewer({ url, pdfFile }) {
 
   return (
     <div
-      className="pdfjs-viewer pdfjs-viewer-outer"
+      className="relative w-full h-full overflow-y-scroll focus:outline-none overflow-hidden"
       ref={handleContainer}
       onKeyDown={handleKeyDown}
       tabIndex={-1}
     >
-      <div className="pdfjs-viewer-inner" tabIndex={0} role="tabpanel">
-        <div className="pdfViewer" />
+      <div
+        className="absolute w-full h-full overflow-y-scroll"
+        tabIndex={0}
+        role="tabpanel"
+      >
+        <div className="min-h-full" />
       </div>
       {/* {toolbarInfoLoaded && (
         <PdfViewerControlsToolbar
