@@ -3,7 +3,7 @@
  * @Author: Devin
  * @Date: 2024-09-14 10:36:38
  */
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { Tooltip as ReactTooltip } from "react-tooltip";
 import { randomString } from "@/util";
 import "react-tooltip/dist/react-tooltip.css";
@@ -18,15 +18,33 @@ const Tooltip = ({
   className,
   clickable = false,
   noArrow = false,
+  isHasChildren = false,
 }) => {
   // Generate a unique ID for the tooltip if selector is not provided
   const uniqueId = useRef(`${content.slice(0, 10)}-tooltip-${randomString(4)}`);
   const tooltipId = selector || uniqueId.current;
 
+  const [isOpen, setIsOpen] = useState(disabled);
+
+  const handleMouseEnter = (event) => {
+    if (!disabled) {
+      setIsOpen(true);
+    }
+    if (event.currentTarget != event.target && isHasChildren) {
+      setIsOpen(false);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setIsOpen(false);
+  };
+
   return (
     <>
       {React.cloneElement(children, {
         "data-tooltip-id": tooltipId,
+        onMouseEnter: handleMouseEnter,
+        onMouseLeave: handleMouseLeave,
       })}
       {/* <div data-tooltip-id={tooltipId}>{children}</div> */}
       <ReactTooltip
@@ -35,7 +53,8 @@ const Tooltip = ({
         className={`!z-[999] !bg-white !text-xs !font-normal !text-gray-700 !shadow-lg !opacity-100 ${className}`}
         place={position}
         clickable={clickable}
-        isOpen={disabled ? false : undefined}
+        // isOpen={disabled ? false : undefined}
+        isOpen={isOpen}
         noArrow={noArrow}
       >
         {htmlContent && htmlContent}
