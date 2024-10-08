@@ -702,4 +702,16 @@ export default [
     meta: "cmd",
     score: 0.09490387997853639,
   },
+  {
+    caption: "\\bf",
+    snippet: "bf",
+    meta: "cmd",
+    score: 0.09490387997853639,
+  },
+  {
+    caption: "\\def",
+    snippet: "def",
+    meta: "cmd",
+    score: 0.09490387997853639,
+  },
 ];
