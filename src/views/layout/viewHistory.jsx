@@ -60,7 +60,12 @@ const ViewHistory = () => {
                 open={showHistory}
                 onClose={handleCloseHistory}
                 PaperProps={{ sx: dialogStyle }}
-                BackdropProps={{ sx: { backgroundColor: 'transparent' } }}>
+                slotProps={{
+                    backdrop: {
+                        sx: { backgroundColor: 'transparent' }
+                    }
+                }}
+            >
                 <HistoryVersions />
             </Dialog>
         </React.Fragment>
