@@ -10,6 +10,7 @@ import React, { useState, useEffect } from 'react';
 import { getHistoryWithChanges, getDiff } from "domain/git";
 import { useGitRepo, useFileStore } from "store";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { downloadSpecificVersion } from "domain/filesystem";
 
 const HistoryVersions = () => {
     const { projectRoot } = useFileStore((state) => ({
@@ -86,7 +87,7 @@ const HistoryVersions = () => {
     const handleSelect = (index) => {
         setSelectedIndex(index);
     }
-
+    console.log(historyVersions, "historyVersions");
     // 渲染逻辑
     return (
         <React.Fragment>
@@ -147,8 +148,8 @@ const HistoryVersions = () => {
                                 open={Boolean(anchorEl)}
                                 onClose={handleMenuClose}
                             >
-                                <MenuItem onClick={handleMenuClose}>Label this version</MenuItem>
-                                <MenuItem onClick={handleMenuClose}>Download this version</MenuItem>
+                                <MenuItem onClick={handleMenuClose}>Display diffLines</MenuItem>
+                                <MenuItem onClick={() => { handleMenuClose(); console.log(projectRoot, version.commitOid); downloadSpecificVersion(projectRoot, version.commitOid) }}>Download this version</MenuItem>
                             </Menu>
                             <div style={{ fontWeight: 'bold' }}>{formatDate(version?.timestamp * 1000)}</div>
                             <ul>
@@ -160,6 +161,22 @@ const HistoryVersions = () => {
                                 ))}
                             </ul>
                             <p>{version.committerName}</p>
+                            <p>{version.commitOid}</p>
+                            <p>{version.commitParent}</p>
+                            {selectedIndex === index &&
+                                <pre className="overflow-auto p-2 mt-2 border-black bg-white">
+                                    <p className='mb-2 font-bold'>{version.fileWithChange[0]?.path}: </p>
+                                    {currentDiff
+                                        .filter((d) => d.added || d.removed)
+                                        .map((d) =>
+                                            d.added
+                                                ? `+ : ${d.value}`
+                                                : d.removed
+                                                    ? `- : ${d.value}`
+                                                    : d.value).join("\n")
+                                    }
+                                </pre>
+                            }
                         </Box>
                     ))
                 ) : (

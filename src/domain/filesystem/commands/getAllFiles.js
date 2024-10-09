@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import pify from "pify";
 import JSZip from "jszip";
+import * as git from "isomorphic-git";
 import { saveAs } from "file-saver";
 import { projectInfoExists } from "./projectInfo";
 
@@ -105,6 +106,7 @@ function addFilesToZip(
   });
 }
 export async function downloadDirectoryAsZip(rootpath) {
+  console.log(rootpath, "downloadDirectoryAsZip");
   const directoryTree = await readDirectoryTree(rootpath);
   console.log(directoryTree, "directoryTree");
   const zip = new JSZip();
@@ -173,4 +175,38 @@ export async function getAllFileNames(rootpath) {
   }
 
   return getAllFileNamesRecursive(rootpath);
+}
+
+// 检出特定版本到临时目录
+export async function checkoutCommit(commitOid, currentProjectRoot, checkoutDir) {
+  console.log("Checking out commit:", commitOid);
+  // 检出特定的 commit 到临时目录
+  await git.checkout({
+    fs,
+    dir: checkoutDir,
+    url: currentProjectRoot,
+    ref: commitOid,
+    });
+}
+
+// 下载特定版本的项目
+export async function downloadSpecificVersion(rootpath, commitOid) {
+  // 生成临时目录路径
+  const tempCheckoutDir = path.join(rootpath, `checkout-${commitOid.slice(0,7)}`);
+  // 确保临时目录存在
+  await fsPify.mkdir(tempCheckoutDir, { recursive: true });
+  console.log("Temporary checkout directory:", tempCheckoutDir);
+
+  try {
+    // 检出特定版本到临时目录
+    await checkoutCommit(commitOid, rootpath, tempCheckoutDir);
+
+    // 下载临时目录为 ZIP 文件
+    await downloadDirectoryAsZip(tempCheckoutDir);
+
+    // 清理临时目录
+    fs.rmdirSync(tempCheckoutDir, { recursive: true });
+  } catch (error) {
+    console.error("Error downloading specific version:", error);
+  }
 }
