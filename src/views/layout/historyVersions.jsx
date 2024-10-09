@@ -87,6 +87,10 @@ const HistoryVersions = () => {
     const handleSelect = (index) => {
         setSelectedIndex(index);
     }
+    const handleDownloadSpecificVersion = () => {
+        handleMenuClose();
+        downloadSpecificVersion(projectRoot, historyVersions[selectedIndex]?.commitOid);
+    }
     console.log(historyVersions, "historyVersions");
     // 渲染逻辑
     return (
@@ -149,7 +153,7 @@ const HistoryVersions = () => {
                                 onClose={handleMenuClose}
                             >
                                 <MenuItem onClick={handleMenuClose}>Display diffLines</MenuItem>
-                                <MenuItem onClick={() => { handleMenuClose(); console.log(projectRoot, version.commitOid); downloadSpecificVersion(projectRoot, version.commitOid) }}>Download this version</MenuItem>
+                                <MenuItem onClick={handleDownloadSpecificVersion}>Download this version</MenuItem>
                             </Menu>
                             <div style={{ fontWeight: 'bold' }}>{formatDate(version?.timestamp * 1000)}</div>
                             <ul>
