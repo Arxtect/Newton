@@ -23,7 +23,6 @@ import {
 } from "store";
 import { compileLatex } from "@/features/latexCompilation/latexCompilation";
 import { EngineStatus } from "@/features/engineStatus/EngineStatus";
-import { FileUploader, FolderUploader } from "../upload.jsx";
 import UploadFiles from "./uploadFiles";
 import * as constant from "@/constant";
 import path from "path";
@@ -32,31 +31,15 @@ import ArMenuRadix from "@/components/arMenuRadix";
 import AiPanel from "@/features/aiPanel";
 
 const ContentTopBar = (props) => {
-  const {
-    showView,
-    showXterm,
-    showSide,
-    showEditor,
-    presentation,
-    showHeader,
+  const { showSide, toggleSide, toggleView, sideWidth } = useLayout();
 
-    toggleSide,
-    toggleXterm,
-    toggleEditor,
-    toggleView,
-    emitResize,
-    showFooter,
-    sideWidth,
-  } = useLayout();
-
-  const { engineStatus, selectFormattedEngineStatus } = useEngineStatusStore();
+  const { engineStatus } = useEngineStatusStore();
 
   const {
     projectSync,
     sourceCode,
     currentProjectRoot,
     filepath,
-    loadFile,
     startFileCreating,
     startDirCreating,
     currentSelectDir,
@@ -68,7 +51,6 @@ const ContentTopBar = (props) => {
     sourceCode: state.value,
     currentProjectRoot: state.currentProjectRoot,
     filepath: state.filepath,
-    loadFile: state.loadFile,
     startFileCreating: state.startFileCreating,
     startDirCreating: state.startDirCreating,
     currentSelectDir: state.currentSelectDir,
@@ -77,13 +59,13 @@ const ContentTopBar = (props) => {
     changeMainFile: state.changeMainFile,
   }));
 
-  const { updateSetting, getSetting, compileSetting, initializeDefaults } =
-    useCompileSetting((state) => ({
+  const { updateSetting, getSetting, compileSetting } = useCompileSetting(
+    (state) => ({
       updateSetting: state.updateSetting,
       getSetting: state.getSetting,
       compileSetting: state.compileSetting,
-      initializeDefaults: state.initializeDefaults,
-    }));
+    })
+  );
 
   const { showCompilerLog, toggleCompilerLog, logInfo } = usePdfPreviewStore(
     (state) => ({
@@ -100,35 +82,14 @@ const ContentTopBar = (props) => {
     user: state.user,
   }));
 
-  const [isAutoCompile, setIsAutoCompile] = useState(false);
-
-  useEffect(() => {
-    compileSetting["autoCompile"] &&
-      autoCompileFirst(() =>
-        compileLatex(sourceCode, currentProjectRoot, compileSetting)
-      );
-  }, [sourceCode, engineStatus, currentProjectRoot, compileSetting]);
-
   // TODO: delete
-  useEffect(() => {
-    initializeDefaults(compileSetting);
-  }, []);
+  // useEffect(() => {
+  //   initializeDefaults(compileSetting);
+  // }, []);
 
   useEffect(() => {
     changeMainFile(currentProjectRoot);
   }, [currentProjectRoot]);
-
-  const autoCompileFirst = (compileCallback) => {
-    if (
-      engineStatus === constant.readyEngineStatus &&
-      !isAutoCompile &&
-      sourceCode &&
-      currentProjectRoot
-    ) {
-      setIsAutoCompile(true);
-      compileCallback && compileCallback();
-    }
-  };
 
   const handleActionClick = (key) => {
     switch (key) {
@@ -311,9 +272,14 @@ const ContentTopBar = (props) => {
           <ArButtonGroup className="bg-[#81C784] text-black rounded-md ">
             <button
               className={` text-black px-2 py-[2px] flex items-center space-x-4`}
-              onClick={() =>
-                compileLatex(sourceCode, currentProjectRoot, compileSetting)
-              }
+              onClick={() => {
+                compileLatex(
+                  sourceCode,
+                  currentProjectRoot,
+                  filepath,
+                  compileSetting
+                );
+              }}
             >
               <span>
                 {engineStatus == constant.notReadyEngineStatus ||

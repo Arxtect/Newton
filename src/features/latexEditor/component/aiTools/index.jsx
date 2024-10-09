@@ -360,7 +360,7 @@ const AiTools = ({ editor, completer }) => {
       </div>
       {showTooltip && (
         <SelectionTooltip
-          message={"Ctrl+I  AI Command"}
+          message={"Ctrl/Command + I  AI Command"}
           position={toolbarPosition}
         />
       )}

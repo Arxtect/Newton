@@ -9,6 +9,7 @@ import AutoCompleteManager from "@/features/autoComplete/AutoCompleteManager";
 
 import EditorStateManager from "./component/editorStateManager"; // Import the class
 import AiTools from "./component/aiTools";
+import useAutoCompile from "./hook";
 
 const LatexEditor = ({
   handleChange,
@@ -24,8 +25,9 @@ const LatexEditor = ({
     updateEditor: state.updateEditor,
   }));
 
-  const { loadFile } = useFileStore((state) => ({
+  const { loadFile, currentProjectRoot } = useFileStore((state) => ({
     loadFile: state.loadFile,
+    currentProjectRoot: state.currentProjectRoot,
   }));
 
   useEffect(() => {
@@ -99,6 +101,9 @@ const LatexEditor = ({
       updateEditor(null);
     };
   }, [latexRef, filepath]);
+
+  // auto compile
+  useAutoCompile(sourceCode, currentProjectRoot, filepath);
 
   return (
     <div className="h-full relative" id="editor">

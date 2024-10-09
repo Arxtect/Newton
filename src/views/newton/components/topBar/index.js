@@ -1,9 +1,9 @@
 import React, { useEffect } from "react";
 import ellipsis from "@/assets/ellipsis.svg";
 import logoIcon from "@/assets/logo-icon.svg";
-import Share from "../share";
-import LinkGithub from "../linkGithub";
-import PublishDocument from "../publishDocument";
+import Share from "../dialog/share";
+import LinkGithub from "../dialog/linkGithub";
+import PublishDocument from "../dialog/publishDocument";
 import { useUserStore, useFileStore } from "@/store";
 import { downloadDirectoryAsZip } from "domain/filesystem";
 import { useNavigate } from "react-router-dom";

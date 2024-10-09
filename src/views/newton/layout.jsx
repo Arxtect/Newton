@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
-import "./index.scss";
+import "./layout.scss";
 import { useLayout } from "store";
 import { useReactive } from "ahooks";
 import { useFileStore, revokeCompiledPdfUrl, setCompilerLog } from "store";

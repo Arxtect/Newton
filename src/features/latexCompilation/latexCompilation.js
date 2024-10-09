@@ -139,10 +139,14 @@ export const ensureFileExists = async (list, currentProject, usePdfTeX) => {
 export const compileLatex = async (
   latexCode,
   currentProject,
+  filepath = "main.tex",
   options,
   compileCount = 1
 ) => {
   const { isPdfLatex: usePdfTeX, nonstop } = options; // 在函数内部解构 options 参数
+  let currentFileName = path.basename(filepath);
+  console.log(currentFileName, "currentFileName");
+
   // Make sure the engines are ready for compilation
   if (usePdfTeX) {
     if (!pdftexEngine.isReady()) {
@@ -162,9 +166,9 @@ export const compileLatex = async (
   // Create a temporary main.tex file
   if (usePdfTeX) {
     console.log(latexCode, "latexCode");
-    pdftexEngine.writeMemFSFile("main.tex", latexCode);
+    pdftexEngine.writeMemFSFile(currentFileName, latexCode);
   } else {
-    xetexEngine.writeMemFSFile("main.tex", latexCode);
+    xetexEngine.writeMemFSFile(currentFileName, latexCode);
   }
   let list = await getAllFileNames(currentProject);
 
@@ -175,7 +179,7 @@ export const compileLatex = async (
 
   if (usePdfTeX) {
     // Associate the PDFTeX engine with this main.tex file
-    pdftexEngine.setEngineMainFile("main.tex");
+    pdftexEngine.setEngineMainFile(currentFileName);
     // Compile the main.tex file
     let pdftexCompilation = await pdftexEngine.compileLaTeX();
     // Print the compilation log
@@ -211,6 +215,7 @@ export const compileLatex = async (
         await compileLatex(
           latexCode,
           currentProject,
+          currentFileName,
           options,
           compileCount + 1
         );
@@ -226,7 +231,7 @@ export const compileLatex = async (
     }
   } else {
     // Associate the XeTeX engine with this main.tex file
-    xetexEngine.setEngineMainFile("main.tex");
+    xetexEngine.setEngineMainFile(currentFileName);
     // Compile the main.tex file
     let xetexCompilation = await xetexEngine.compileLaTeX();
     // Print the compilation log
@@ -264,6 +269,7 @@ export const compileLatex = async (
         await compileLatex(
           latexCode,
           currentProject,
+          currentFileName,
           options,
           compileCount + 1
         );
