@@ -52,9 +52,7 @@ export const useChat = (prevChatList, stopChat) => {
   }, []);
 
   const handleGetAccessToken = useCallback(async (token) => {
-    console.log(token, "token");
     let res = await getAccessTokenAndStore(token);
-    console.log(res, "token");
     setCurrentAppToken(res);
   }, []);
 
@@ -394,6 +392,6 @@ export const useChat = (prevChatList, stopChat) => {
     appList,
     handleUpdateChatList,
     currentAppToken,
-    lastMessage, 
+    lastMessage,
   };
 };
