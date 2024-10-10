@@ -338,6 +338,7 @@ const DirectoryLineContent = ({
                 padding: "3px 0px 3px 0px",
                 paddingLeft: `${depth * 8}px`,
               }}
+              onClick={(e) => handleClick(e, dirpath)}
             >
               <ListItemIcon
                 style={{
@@ -392,10 +393,7 @@ const DirectoryLineContent = ({
                 />
               ) : (
                 <React.Fragment>
-                  <div
-                    onClick={(e) => handleClick(e, dirpath)}
-                    className="w-full"
-                  >
+                  <div className="w-full">
                     <Pathname ignoreGit={ignoreGit}>
                       {basename || `${dirpath}`}
                     </Pathname>

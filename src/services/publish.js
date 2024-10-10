@@ -7,7 +7,7 @@ import { toast } from "react-toastify"; // 假设你已经安装了react-toastif
 import { refreshAuth } from "./auth";
 import { setCookie, deleteCookie, pdfToImageFirst } from "@/util";
 import { updateAccessToken } from "store";
-import {apiFetch} from "./apiFetch.js"
+import { apiFetch } from "./apiFetch.js";
 
 // 辅助函数：生成带有统一前缀的URL
 function getApiUrl(endpoint) {
@@ -24,37 +24,35 @@ export async function getAllTags() {
   }
 }
 
-
 export async function documentSearch(search) {
-   await refreshAuth();
+  await refreshAuth();
   try {
-  // Initialize the query parameters as an array of strings
-  let queryParams = [];
+    // Initialize the query parameters as an array of strings
+    let queryParams = [];
 
-  // Add pageIndex and pageSize with default values if they are not provided
-  queryParams.push(`page_index=${search.pageIndex ?? 1}`);
-  queryParams.push(`page_size=${search.pageSize ?? 10}`);
+    // Add pageIndex and pageSize with default values if they are not provided
+    queryParams.push(`page_index=${search.pageIndex ?? 1}`);
+    queryParams.push(`page_size=${search.pageSize ?? 10}`);
 
-  // Add keyword if it exists and is not an empty string
-  if (search?.keyword && search.keyword !== "") {
-    queryParams.push(`keyword=${encodeURIComponent(search.keyword)}`);
-  }
+    // Add keyword if it exists and is not an empty string
+    if (search?.keyword && search.keyword !== "") {
+      queryParams.push(`keyword=${encodeURIComponent(search.keyword)}`);
+    }
 
-  // Add tags if it exists and is not an empty array
-  if (search?.tags?.length > 0) {
-    search?.tags.map((tag) => queryParams.push(`tags=${tag}`));
-  }
+    // Add tags if it exists and is not an empty array
+    if (search?.tags?.length > 0) {
+      search?.tags.map((tag) => queryParams.push(`tags=${tag}`));
+    }
 
-  // Construct the full URL with the query parameters
-  const url = `${getApiUrl("/list/search")}?${queryParams.join("&")}`;
+    // Construct the full URL with the query parameters
+    const url = `${getApiUrl("/list/search")}?${queryParams.join("&")}`;
 
-  // Perform the GET request using the constructed URL
-   const response = await apiFetch(url, "GET");
-return response
+    // Perform the GET request using the constructed URL
+    const response = await apiFetch(url, "GET");
+    return response;
   } catch (error) {
     throw error;
   }
-
 }
 
 export async function getDocumentById(documentId) {
@@ -69,20 +67,20 @@ export async function getDocumentById(documentId) {
 
     // Perform the GET request using the constructed URL
     const response = await apiFetch(url, "GET");
-   return response
+    return response;
   } catch (error) {
     toast.error(` ${error}`);
   }
 }
 
 export async function getPreviewPdfUrl(storageKey) {
-  try{
-  await refreshAuth();
-   const response = await apiFetch(getApiUrl("/pre/download"), "POST",{
+  try {
+    await refreshAuth();
+    const response = await apiFetch(getApiUrl("/pre/download"), "POST", {
       file_storage_id: storageKey,
     });
-  return response}
-  catch (error) {
+    return response;
+  } catch (error) {
     toast.error(` ${error}`);
   }
 }
@@ -164,7 +162,7 @@ export async function uploadToS3({ filePath, blob, type }) {
     method: "PUT",
     body: file,
   });
-
+  console.log(uploadResponse, "uploadResponse");
   // Check the response status and return the response or throw an error
   if (uploadResponse.ok) {
     return fileKey;

@@ -340,7 +340,7 @@ class ProjectSync {
                 // 如果是资产文件类型，则将 Base64 编码的字符串转换回文件数据
                 const fileData = await downloadFile(content, key);
                 console.log(content, "content");
-                // await FS.writeFile(key, Buffer.from(fileData));
+                await FS.writeFile(key, Buffer.from(fileData));
               } else {
                 if (this.isCurrentFile(editor, key)) {
                   this.setEditorContent(content);
