@@ -5,22 +5,19 @@ import { useCompileSetting, useEngineStatusStore } from "@/store";
 
 function useAutoCompile(sourceCode, currentProjectRoot, filepath) {
   const timerRef = useRef();
-  const previousSourceCodeRef = useRef(sourceCode);
 
-  const { engineStatus } = useEngineStatusStore();
+  const { engineStatus, isTriggerCompile, setIsTriggerCompile } =
+    useEngineStatusStore();
   const { compileSetting } = useCompileSetting();
 
   const [isFirstCompile, setIsFirstCompile] = useState(true);
 
   useEffect(() => {
-    if (!compileSetting["autoCompile"] || !currentProjectRoot) return;
+    if (!compileSetting["autoCompile"] || !currentProjectRoot || !filepath)
+      return;
 
-    if (
-      isFirstCompile &&
-      engineStatus === constant.readyEngineStatus &&
-      sourceCode
-    ) {
-      compileLatex(sourceCode, currentProjectRoot, filepath, compileSetting);
+    if (isFirstCompile && engineStatus === constant.readyEngineStatus) {
+      compileLatex(currentProjectRoot, filepath, compileSetting);
       setIsFirstCompile(false);
       return;
     }
@@ -29,24 +26,27 @@ function useAutoCompile(sourceCode, currentProjectRoot, filepath) {
       return;
     }
 
-    if (sourceCode === previousSourceCodeRef.current) return;
-
-    previousSourceCodeRef.current = sourceCode;
+    if (!isTriggerCompile) return;
 
     if (timerRef.current) {
       clearTimeout(timerRef.current);
     }
 
     timerRef.current = setTimeout(() => {
-      if (sourceCode) {
-        compileLatex(sourceCode, currentProjectRoot, filepath, compileSetting);
-      }
+      compileLatex(currentProjectRoot, filepath, compileSetting);
+      setIsTriggerCompile(false);
     }, 3000);
 
     return () => {
       clearTimeout(timerRef.current);
     };
-  }, [sourceCode, engineStatus, currentProjectRoot, compileSetting]);
+  }, [
+    filepath,
+    engineStatus,
+    currentProjectRoot,
+    compileSetting,
+    isTriggerCompile,
+  ]);
 }
 
 export default useAutoCompile;

@@ -40,6 +40,7 @@ const ContentTopBar = (props) => {
     sourceCode,
     currentProjectRoot,
     filepath,
+    mainFilepath,
     startFileCreating,
     startDirCreating,
     currentSelectDir,
@@ -51,6 +52,7 @@ const ContentTopBar = (props) => {
     sourceCode: state.value,
     currentProjectRoot: state.currentProjectRoot,
     filepath: state.filepath,
+    mainFilepath: state.mainFilepath,
     startFileCreating: state.startFileCreating,
     startDirCreating: state.startDirCreating,
     currentSelectDir: state.currentSelectDir,
@@ -273,12 +275,7 @@ const ContentTopBar = (props) => {
             <button
               className={` text-black px-2 py-[2px] flex items-center space-x-4`}
               onClick={() => {
-                compileLatex(
-                  sourceCode,
-                  currentProjectRoot,
-                  filepath,
-                  compileSetting
-                );
+                compileLatex(currentProjectRoot, mainFilepath, compileSetting);
               }}
             >
               <span>

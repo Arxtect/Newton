@@ -10,6 +10,7 @@ import AutoCompleteManager from "@/features/autoComplete/AutoCompleteManager";
 import EditorStateManager from "./component/editorStateManager"; // Import the class
 import AiTools from "./component/aiTools";
 import useAutoCompile from "./hook";
+import { useEngineStatusStore } from "@/store";
 
 const LatexEditor = ({
   handleChange,
@@ -103,7 +104,13 @@ const LatexEditor = ({
   }, [latexRef, filepath]);
 
   // auto compile
+  const { setIsTriggerCompile } = useEngineStatusStore();
   useAutoCompile(sourceCode, currentProjectRoot, filepath);
+
+  const handleChangeAutoCompile = (editorValue) => {
+    handleChange(editorValue);
+    setIsTriggerCompile(true);
+  };
 
   return (
     <div className="h-full relative" id="editor">
@@ -115,7 +122,7 @@ const LatexEditor = ({
         wrapEnabled={true}
         fontSize="16px"
         editorProps={{ $blockScrolling: true }}
-        onChange={handleChange}
+        onChange={handleChangeAutoCompile}
         value={sourceCode}
         showPrintMargin={false}
         lineHeight={24}

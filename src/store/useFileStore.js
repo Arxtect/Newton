@@ -28,6 +28,7 @@ export const useFileStore = create()(
     (set, get) => ({
       autosave: true,
       filepath: "",
+      mainFilepath: "",
       assetsFilePath: "",
       filetype: "text",
       changed: false,
@@ -85,6 +86,7 @@ export const useFileStore = create()(
         let newFiles = await FS.getFilesRecursively(currentProjectRoot);
 
         let mainFile = await FS.findMainFile(newFiles);
+        set({ mainFilepath: mainFile });
         await get().loadFile({ filepath: mainFile });
       },
       changeSingleBibFilepath: (bibFilepath, isAdd = true) => {

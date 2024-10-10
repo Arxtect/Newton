@@ -8,6 +8,9 @@ import * as constant from "@/constant";
 
 export const useEngineStatusStore = create((set) => ({
   engineStatus: 1,
+  isTriggerCompile: false,
+  setIsTriggerCompile: (isTriggerCompile) =>
+    set(() => ({ isTriggerCompile: isTriggerCompile })),
   setCustomEngineStatus: (engineStatus) => set(() => ({ engineStatus })),
   setNotReadyEngineStatus: () =>
     set(() => ({ engineStatus: constant.notReadyEngineStatus })),

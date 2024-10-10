@@ -137,15 +137,14 @@ export const ensureFileExists = async (list, currentProject, usePdfTeX) => {
 };
 
 export const compileLatex = async (
-  latexCode,
   currentProject,
-  filepath = "main.tex",
+  mainFilepath = "main.tex",
   options,
   compileCount = 1
 ) => {
   const { isPdfLatex: usePdfTeX, nonstop } = options; // 在函数内部解构 options 参数
-  let currentFileName = path.basename(filepath);
-  console.log(currentFileName, "currentFileName");
+  let currentFileName = path.basename(mainFilepath);
+  console.log(currentFileName, mainFilepath, "currentFileName");
 
   // Make sure the engines are ready for compilation
   if (usePdfTeX) {
@@ -164,12 +163,12 @@ export const compileLatex = async (
   setBusyEngineStatus();
 
   // Create a temporary main.tex file
-  if (usePdfTeX) {
-    console.log(latexCode, "latexCode");
-    pdftexEngine.writeMemFSFile(currentFileName, latexCode);
-  } else {
-    xetexEngine.writeMemFSFile(currentFileName, latexCode);
-  }
+  // if (usePdfTeX) {
+  //   console.log(latexCode, "latexCode");
+  //   pdftexEngine.writeMemFSFile(currentFileName, latexCode);
+  // } else {
+  //   xetexEngine.writeMemFSFile(currentFileName, latexCode);
+  // }
   let list = await getAllFileNames(currentProject);
 
   if (compileCount == 1) {
@@ -213,9 +212,8 @@ export const compileLatex = async (
       });
       if (compileCount < 3) {
         await compileLatex(
-          latexCode,
           currentProject,
-          currentFileName,
+          mainFilepath,
           options,
           compileCount + 1
         );
@@ -267,9 +265,8 @@ export const compileLatex = async (
       });
       if (compileCount < 3) {
         await compileLatex(
-          latexCode,
           currentProject,
-          currentFileName,
+          mainFilepath,
           options,
           compileCount + 1
         );

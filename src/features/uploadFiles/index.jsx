@@ -87,7 +87,7 @@ function FileUploader({
           >
             <DropZone handleUpload={handleUpload} type={type} />
           </Box>
-          <ActionButtons handleUpload={handleUpload} type={type} />
+          {/* <ActionButtons handleUpload={handleUpload} type={type} /> */}
         </div>
       </div>
       {uploadProgress > 0 && <UploadProgressBar progress={uploadProgress} />}

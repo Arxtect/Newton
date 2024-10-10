@@ -53,7 +53,7 @@ const LinkedLines = ({
             />
           );
         } else if (f.type === "dir") {
-          // if (f.name === ".git") return null;
+          if (f.name === ".git") return null;
           return (
             <DirectoryLine
               {...res}

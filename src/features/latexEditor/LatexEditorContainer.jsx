@@ -15,12 +15,14 @@ export const LatexEditorContainer = () => {
     contents,
     changeValue,
     filepath,
+    mainFilepath,
     currentProjectFileList,
     currentProjectBibFilepathList,
   } = useFileStore((state) => ({
     contents: state.value,
     changeValue: state.changeValue,
     filepath: state.filepath,
+    mainFilepath: state.mainFilepath,
     currentProjectFileList: state.currentProjectFileList,
     currentProjectBibFilepathList: state.currentProjectBibFilepathList,
   }));
@@ -33,7 +35,7 @@ export const LatexEditorContainer = () => {
     <LatexEditor
       handleChange={handleChange}
       sourceCode={contents}
-      filepath={filepath}
+      filepath={mainFilepath}
       fileList={currentProjectFileList}
       bibFilepathList={currentProjectBibFilepathList}
     />
