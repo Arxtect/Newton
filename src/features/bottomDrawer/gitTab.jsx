@@ -46,7 +46,7 @@ const GitTab = () => {
           }}
         >
           <Tab label="Sync" value="git" />
-          <Tab label="History" value="history" />
+          {/* <Tab label="History" value="history" /> */}
           {/* <Tab label="Help" value="help" /> */}
           {/* <Tab label="Config" value="config" /> */}
         </Tabs>
