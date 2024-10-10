@@ -45,7 +45,7 @@ export default class PDFJSWrapper {
       enableScripting: false, // default is false, but set explicitly to be sure
       enableXfa: false, // default is false (2021-10-12), but set explicitly to be sure
       renderInteractiveForms: false,
-      maxCanvasPixels: 8192 * 8192, // default is 4096 * 4096, increased for better resolution at high zoom levels
+      maxCanvasPixels: 4096 * 4096, // default is 4096 * 4096, increased for better resolution at high zoom levels
       annotationMode: PDFJS.AnnotationMode?.ENABLE, // enable annotations but not forms
       annotationEditorMode: PDFJS.AnnotationEditorType?.DISABLE, // disable annotation editing
     });

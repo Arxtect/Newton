@@ -2,7 +2,6 @@ import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { debounce, throttle } from "@/util";
 // import PdfViewerControlsToolbar from "./pdf-viewer-controls-toolbar";
 // import { useProjectContext } from "../../../shared/context/project-context";
-// import usePersistedState from "../../../shared/hooks/use-persisted-state";
 // import { buildHighlightElement } from "../util/highlights";
 import PDFJSWrapper from "./pdf-js-wrapper";
 
@@ -15,18 +14,18 @@ import {
 } from "./hooks/pdf-preview-provider";
 import usePresentationMode from "./hooks/use-presentation-mode";
 import useMouseWheelZoom from "./hooks/use-mouse-wheel-zoom";
+import usePersistedState from "./hooks/use-persisted-state";
 
-function PdfJsViewer({ url, pdfFile }) {
+function PdfJsViewer({ url, pdfFile, currentProject = "arxtect" }) {
   //   const { _id: projectId } = useProjectContext();
   //   const { setError, firstRenderDone, highlights, position, setPosition } =
   //     useCompileContext();
   const { setLoadingError } = usePdfPreviewContext();
 
-  //   const [scale, setScale] = usePersistedState(
-  //     `pdf-viewer-scale:${projectId}`,
-  //     "page-width"
-  //   );
-  const [scale, setScale] = useState(null);
+  const [scale, setScale] = usePersistedState(
+    `pdf-viewer-scale:${currentProject}`,
+    "page-width"
+  );
   const [rawScale, setRawScale] = useState(null);
   const [page, setPage] = useState(null);
   const [totalPages, setTotalPages] = useState(null);
@@ -117,6 +116,7 @@ function PdfJsViewer({ url, pdfFile }) {
     };
 
     const handleScaleChanged = (scale) => {
+      console.log(scale, "scale");
       setRawScale(scale.scale);
     };
 
@@ -190,7 +190,7 @@ function PdfJsViewer({ url, pdfFile }) {
         if (storePositionTimer) {
           window.clearTimeout(storePositionTimer);
         }
-        storePosition.cancel();
+        // storePosition.cancel();
       };
     }
   }, [pdfJsWrapper, initialised]); //setPosition
@@ -210,6 +210,8 @@ function PdfJsViewer({ url, pdfFile }) {
               textLayerDiv.closest(".page").querySelector("canvas"),
               textLayer.pageNumber - 1
             );
+
+            console.log(clickPosition, "clickPosition");
 
             if (clickPosition) {
               //   eventTracking.sendMB("jump-to-location", {
@@ -430,7 +432,7 @@ function PdfJsViewer({ url, pdfFile }) {
 
   return (
     <div
-      className="relative w-full h-full overflow-y-scroll focus:outline-none overflow-hidden"
+      className="absolute w-full h-full focus:outline-none bg-transparent bottom-0 left-0  right-0 top-0 overflow-hidden"
       ref={handleContainer}
       onKeyDown={handleKeyDown}
       tabIndex={-1}
