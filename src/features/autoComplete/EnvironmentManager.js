@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import _ from "lodash";
 /* eslint-disable
     max-len,
 */
@@ -10,30 +10,30 @@ import _ from 'lodash'
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-import Environments from './snippets/Environments'
-let staticSnippets = Array.from(Environments.withoutSnippets).map(env => ({
+import Environments from "./snippets/Environments";
+let staticSnippets = Array.from(Environments.withoutSnippets).map((env) => ({
   caption: `\\begin{${env}}...`,
   snippet: `\
 ${env}}
 \t$1
 \\end{${env}\
 `,
-  meta: 'env',
-}))
+  meta: "env",
+}));
 
 staticSnippets = staticSnippets.concat([
   {
-    caption: '\\begin{array}...',
+    caption: "\\begin{array}...",
     snippet: `\
 array}{\${1:cc}}
 \t$2 & $3 \\\\\\\\
 \t$4 & $5
 \\end{array\
 `,
-    meta: 'env',
+    meta: "env",
   },
   {
-    caption: '\\begin{figure}...',
+    caption: "\\begin{figure}...",
     snippet: `\
 figure}
 \t\\centering
@@ -42,20 +42,20 @@ figure}
 \t\\label{\${3:fig:my_label}}
 \\end{figure\
 `,
-    meta: 'env',
+    meta: "env",
   },
   {
-    caption: '\\begin{tabular}...',
+    caption: "\\begin{tabular}...",
     snippet: `\
 tabular}{\${1:c|c}}
 \t$2 & $3 \\\\\\\\
 \t$4 & $5
 \\end{tabular\
 `,
-    meta: 'env',
+    meta: "env",
   },
   {
-    caption: '\\begin{table}...',
+    caption: "\\begin{table}...",
     snippet: `\
 table}[$1]
 \t\\centering
@@ -67,171 +67,171 @@ table}[$1]
 \t\\label{\${8:tab:my_label}}
 \\end{table\
 `,
-    meta: 'env',
+    meta: "env",
   },
   {
-    caption: '\\begin{list}...',
+    caption: "\\begin{list}...",
     snippet: `\
 list}
 \t\\item $1
 \\end{list\
 `,
-    meta: 'env',
+    meta: "env",
   },
   {
-    caption: '\\begin{enumerate}...',
+    caption: "\\begin{enumerate}...",
     snippet: `\
 enumerate}
 \t\\item $1
 \\end{enumerate\
 `,
-    meta: 'env',
+    meta: "env",
   },
   {
-    caption: '\\begin{itemize}...',
+    caption: "\\begin{itemize}...",
     snippet: `\
 itemize}
 \t\\item $1
 \\end{itemize\
 `,
-    meta: 'env',
+    meta: "env",
   },
   {
-    caption: '\\begin{frame}...',
+    caption: "\\begin{frame}...",
     snippet: `\
 frame}{\${1:Frame Title}}
 \t$2
 \\end{frame\
 `,
-    meta: 'env',
+    meta: "env",
   },
-])
+]);
 
 const documentSnippet = {
-  caption: '\\begin{document}...',
+  caption: "\\begin{document}...",
   snippet: `\
 document}
 $1
 \\end{document\
 `,
-  meta: 'env',
-}
+  meta: "env",
+};
 
 const bibliographySnippet = {
-  caption: '\\begin{thebibliography}...',
+  caption: "\\begin{thebibliography}...",
   snippet: `\
 thebibliography}{$1}
 \\bibitem{$2}
 $3
 \\end{thebibliography\
 `,
-  meta: 'env',
-}
-staticSnippets.push(documentSnippet)
+  meta: "env",
+};
+staticSnippets.push(documentSnippet);
 
 const parseCustomEnvironments = function (text) {
-  let match
-  const re = /^\\newenvironment{(\w+)}.*$/gm
-  const result = []
-  let iterations = 0
+  let match;
+  const re = /^\\newenvironment{(\w+)}.*$/gm;
+  const result = [];
+  let iterations = 0;
   while ((match = re.exec(text))) {
-    result.push({ name: match[1], whitespace: null })
-    iterations += 1
+    result.push({ name: match[1], whitespace: null });
+    iterations += 1;
     if (iterations >= 1000) {
-      return result
+      return result;
     }
   }
-  return result
-}
+  return result;
+};
 
 const parseBeginCommands = function (text) {
-  let match
-  const re = /^([\t ]*)\\begin{(\w+)}.*\n([\t ]*)/gm
-  const result = []
-  let iterations = 0
+  let match;
+  const re = /^([\t ]*)\\begin{(\w+)}.*\n([\t ]*)/gm;
+  const result = [];
+  let iterations = 0;
   while ((match = re.exec(text))) {
-    const whitespaceAlignment = match[3].replace(match[1] || '', '')
+    const whitespaceAlignment = match[3].replace(match[1] || "", "");
     if (
       !Array.from(Environments.all).includes(match[2]) &&
-      match[2] !== 'document'
+      match[2] !== "document"
     ) {
-      result.push({ name: match[2], whitespace: whitespaceAlignment })
-      iterations += 1
+      result.push({ name: match[2], whitespace: whitespaceAlignment });
+      iterations += 1;
       if (iterations >= 1000) {
-        return result
+        return result;
       }
     }
-    re.lastIndex = match.index + 1
+    re.lastIndex = match.index + 1;
   }
-  return result
-}
+  return result;
+};
 
 const hasDocumentEnvironment = function (text) {
-  const re = /^\\begin{document}/m
-  return re.exec(text) !== null
-}
+  const re = /^\\begin{document}/m;
+  return re.exec(text) !== null;
+};
 
 const hasBibliographyEnvironment = function (text) {
-  const re = /^\\begin{thebibliography}/m
-  return re.exec(text) !== null
-}
+  const re = /^\\begin{thebibliography}/m;
+  return re.exec(text) !== null;
+};
 
 class EnvironmentManager {
   getCompletions(editor, session, pos, prefix, callback) {
-    let ind
-    const docText = session.getValue()
-    const customEnvironments = parseCustomEnvironments(docText)
-    const beginCommands = parseBeginCommands(docText)
+    let ind;
+    const docText = session.getValue();
+    const customEnvironments = parseCustomEnvironments(docText);
+    const beginCommands = parseBeginCommands(docText);
     if (hasDocumentEnvironment(docText)) {
-      ind = staticSnippets.indexOf(documentSnippet)
+      ind = staticSnippets.indexOf(documentSnippet);
       if (ind !== -1) {
-        staticSnippets.splice(ind, 1)
+        staticSnippets.splice(ind, 1);
       }
     } else {
-      staticSnippets.push(documentSnippet)
+      staticSnippets.push(documentSnippet);
     }
 
     if (hasBibliographyEnvironment(docText)) {
-      ind = staticSnippets.indexOf(bibliographySnippet)
+      ind = staticSnippets.indexOf(bibliographySnippet);
       if (ind !== -1) {
-        staticSnippets.splice(ind, 1)
+        staticSnippets.splice(ind, 1);
       }
     } else {
-      staticSnippets.push(bibliographySnippet)
+      staticSnippets.push(bibliographySnippet);
     }
 
-    const parsedItemsMap = {}
+    const parsedItemsMap = {};
     for (const environment of Array.from(customEnvironments)) {
-      parsedItemsMap[environment.name] = environment
+      parsedItemsMap[environment.name] = environment;
     }
     for (const command of Array.from(beginCommands)) {
-      parsedItemsMap[command.name] = command
+      parsedItemsMap[command.name] = command;
     }
-    const parsedItems = _.values(parsedItemsMap)
+    const parsedItems = _.values(parsedItemsMap);
     const snippets = staticSnippets
       .concat(
-        parsedItems.map(item => ({
+        parsedItems.map((item) => ({
           caption: `\\begin{${item.name}}...`,
           snippet: `\
 ${item.name}}
-${item.whitespace || ''}$0
+${item.whitespace || ""}$0
 \\end{${item.name}\
 `,
-          meta: 'env',
+          meta: "env",
         }))
       )
       .concat(
         // arguably these `end` commands shouldn't be here, as they're not snippets
         // but this is where we have access to the `begin` environment names
         // *shrug*
-        parsedItems.map(item => ({
+        parsedItems.map((item) => ({
           caption: `\\end{${item.name}}`,
           value: `\\end{${item.name}}`,
-          meta: 'env',
+          meta: "env",
         }))
-      )
-    return callback(null, snippets)
+      );
+    return callback(null, snippets);
   }
 }
 
-export default EnvironmentManager
+export default EnvironmentManager;

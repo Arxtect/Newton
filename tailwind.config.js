@@ -15,6 +15,7 @@ module.exports = {
         sans: ["Lato", "sans-serif"],
         inter: ["Inter", "sans-serif"],
         arx: ["ui-monospace", "sans-serif"],
+        math: ["Math", "sans-serif"], // Add your desired fallback fonts
       },
       colors: {
         link: "#13678a",

@@ -8,24 +8,15 @@ import { useEffect, useState } from "react";
 // Components
 import LatexEditor from "./LatexEditor";
 import { useFileStore } from "store";
-import { getFilesRecursively } from "domain/filesystem";
-
 export const LatexEditorContainer = () => {
-  const {
-    contents,
-    changeValue,
-    filepath,
-    mainFilepath,
-    currentProjectFileList,
-    currentProjectBibFilepathList,
-  } = useFileStore((state) => ({
-    contents: state.value,
-    changeValue: state.changeValue,
-    filepath: state.filepath,
-    mainFilepath: state.mainFilepath,
-    currentProjectFileList: state.currentProjectFileList,
-    currentProjectBibFilepathList: state.currentProjectBibFilepathList,
-  }));
+  const { contents, changeValue, filepath, mainFilepath } = useFileStore(
+    (state) => ({
+      contents: state.value,
+      changeValue: state.changeValue,
+      filepath: state.filepath,
+      mainFilepath: state.mainFilepath,
+    })
+  );
 
   const handleChange = (editorValue) => {
     changeValue(editorValue);
@@ -36,8 +27,6 @@ export const LatexEditorContainer = () => {
       handleChange={handleChange}
       sourceCode={contents}
       filepath={mainFilepath}
-      fileList={currentProjectFileList}
-      bibFilepathList={currentProjectBibFilepathList}
     />
   );
 };

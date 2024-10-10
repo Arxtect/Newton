@@ -35,7 +35,7 @@ function useAutoCompile(sourceCode, currentProjectRoot, filepath) {
     timerRef.current = setTimeout(() => {
       compileLatex(currentProjectRoot, filepath, compileSetting);
       setIsTriggerCompile(false);
-    }, 3000);
+    }, 5000);
 
     return () => {
       clearTimeout(timerRef.current);

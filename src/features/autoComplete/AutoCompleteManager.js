@@ -3,8 +3,9 @@ import { readFile } from "domain/filesystem";
 import EnvironmentManager from "./EnvironmentManager";
 import CommandManager from "./CommandManager";
 import PackageManager from "./PackageManager";
-import * as files from "./utils/files"
-import  path from "path"
+import * as files from "./utils/files";
+import path from "path";
+import { removeTexExtension } from "./snippets/buildIncludeCompletions";
 
 const CHUNK_SIZE = 1000; // 每次处理1000行
 
@@ -14,6 +15,7 @@ class CustomCompleter {
     fileList,
     bibFilePathList,
     filepath,
+    currentProjectRoot,
     autoComplete = true
   ) {
     this.currentFilePath = filepath;
@@ -22,17 +24,20 @@ class CustomCompleter {
     this.bibFilePathList = bibFilePathList;
     this.langTools = ace.require("ace/ext/language_tools");
     this.textCompleter = this.langTools.textCompleter;
+    this.currentProjectRoot = currentProjectRoot;
     this.inputCustomCompleter = this.createInputCustomCompleter(
       fileList,
       filepath
     );
+    this.includeGraphicsCustomCompleter =
+      this.createIncludeGraphicsCompleter(fileList);
+
     this.citeCustomCompleter = null;
     this.environmentManager = new EnvironmentManager();
-    this.commandManager = new CommandManager();
+    this.commandManager = new CommandManager(fileList);
     this.packageManager = new PackageManager(this.fileList);
     this.isInit = false;
     this.autoComplete = autoComplete;
-
 
     if (this.autoComplete) {
       this.enable();
@@ -47,7 +52,7 @@ class CustomCompleter {
       enableSnippets: true,
       enableLiveAutocompletion: false,
     });
-        this.init();
+    this.init();
   }
 
   disable() {
@@ -59,13 +64,15 @@ class CustomCompleter {
 
   async init() {
     const citations = await this.parseBibFile(this.bibFilePathList);
+    this.labelCustomCompleter = await this.createLabelCompleter(this.fileList);
     this.citeCustomCompleter = this.createCiteCompleter(citations);
     this.langTools.addCompleter(this.inputCustomCompleter);
     this.langTools.addCompleter(this.citeCustomCompleter);
+    this.langTools.addCompleter(this.labelCustomCompleter);
     this.setupTrigger();
     this.isInit = true;
   }
-  
+
   async changeCitationCompleter(bibFilePathList) {
     this.bibFilePathList = bibFilePathList;
     const citations = await this.parseBibFile(this.bibFilePathList);
@@ -108,15 +115,59 @@ class CustomCompleter {
     return {
       getCompletions: (editor, session, pos, prefix, callback) => {
         const line = session.getLine(pos.row);
-        const match = /\\(input|include)\{.*?\}/.test(line);
+        const match = /\\(input|include)\{[^}]*\}/.test(line);
+
         const fileExt = path.extname(currentFilePath);
         const isTex = fileExt === ".tex";
         console.log("isTex", isTex);
         if (match && isTex) {
           const completions = files.getTeXFiles(fileList)?.map((file) => ({
             caption: file.path,
+            value: removeTexExtension(file.path),
+            meta: "file",
+          }));
+          callback(null, completions);
+        } else {
+          callback(null, []);
+        }
+      },
+    };
+  }
+
+  createIncludeGraphicsCompleter(fileList) {
+    return {
+      getCompletions: (editor, session, pos, prefix, callback) => {
+        const line = session.getLine(pos.row);
+        const match = /\\includegraphics(\[[^\]]*\])?\{[^}]*\}/.test(line);
+
+        if (match) {
+          const completions = files.getImageFiles(fileList)?.map((file) => ({
+            caption: file.path,
             value: file.path,
             meta: "file",
+          }));
+          callback(null, completions);
+        } else {
+          callback(null, []);
+        }
+      },
+    };
+  }
+
+  async createLabelCompleter(fileList) {
+    let labels = await files.extractLabelsFromTexFiles(
+      fileList,
+      this.currentProjectRoot
+    );
+    return {
+      getCompletions: (editor, session, pos, prefix, callback) => {
+        const line = session.getLine(pos.row);
+        const match = /\\ref\{[^}]*\}/.test(line);
+        if (match) {
+          const completions = labels.map((label) => ({
+            caption: label,
+            value: label,
+            meta: "label",
           }));
           callback(null, completions);
         } else {
@@ -161,6 +212,19 @@ class CustomCompleter {
         completer: this.inputCustomCompleter,
       },
       {
+        match: /\\includegraphics(\[[^\]]*\])?\{.*?\}/,
+        insideBraces:
+          /\\includegraphics(\[[^\]]*\])?\{[^}]*$/.test(beforeCursor) &&
+          /^[^}]*\}/.test(afterCursor),
+        completer: this.includeGraphicsCustomCompleter,
+      },
+      {
+        match: /\\ref\{.*?\}/,
+        insideBraces:
+          /\\ref\{[^}]*$/.test(beforeCursor) && /^[^}]*\}/.test(afterCursor),
+        completer: this.labelCustomCompleter,
+      },
+      {
         match: /\\cite\{.*?\}/,
         insideBraces:
           /\\cite\{[^}]*$/.test(beforeCursor) && /^[^}]*\}/.test(afterCursor),
@@ -200,8 +264,8 @@ class CustomCompleter {
         },
       },
       {
-        match: /^\\$/,
-        insideBraces: /^\\$/.test(beforeCursor),
+        match: /^\\[a-zA-Z]*$/,
+        insideBraces: /^\\[a-zA-Z]*$/.test(beforeCursor),
         completer: {
           getCompletions: (editor, session, pos, prefix, callback) => {
             this.commandManager.getCompletions(
@@ -228,9 +292,7 @@ class CustomCompleter {
     }
 
     setTimeout(() => {
-      this.editor.completers = [
-        this.textCompleter
-      ];
+      this.editor.completers = [this.textCompleter];
     }, 0);
   }
 

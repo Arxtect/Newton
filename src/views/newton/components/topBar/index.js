@@ -69,7 +69,7 @@ const TopBar = (props) => {
 
   return (
     <div className="flex items-center justify-between p-2 bg-[#f9fdfd]">
-      <div className="flex items-center pl-4 space-x-4">
+      <div className="flex items-center pl-4 space-x-4 w-1/5">
         <ArIcon
           name="ReturnArrowLeft"
           onClick={() => {
@@ -80,7 +80,10 @@ const TopBar = (props) => {
         <img src={logoIcon} alt="icon" className="mx-2" />
         <span className="ml-2 text-black font-bold">Project</span>
       </div>
-      <div className="flex items-center space-x-20 mr-4">
+      <div className="flex justify-center overflow-hidden text-center text-ellipsis w-2/5 text-[0.9rem] font-math">
+        {currentProjectRoot}
+      </div>
+      <div className="flex items-center space-x-20 mr-4 w-2/5 justify-end">
         {!!projectSync && (
           <div className="flex items-center">
             {shareUserList.slice(0, maxDisplayCount).map((user, index) => (

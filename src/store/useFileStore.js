@@ -14,6 +14,23 @@ import { isAssetExtension } from "@/util";
 
 export const FILE_STORE = "FILE_STORE";
 
+function removeRootPath(filePath, rootPath) {
+  // 标准化路径
+  const normalizedFilePath = path.normalize(filePath);
+  const normalizedRootPath = path.basename(path.normalize(rootPath));
+
+  // 分割路径
+  const pathParts = normalizedFilePath.split(path.sep);
+
+  // 如果第一个部分与 rootPath 的文件夹名相同，则移除
+  if (pathParts[0] === normalizedRootPath) {
+    pathParts.shift();
+  }
+
+  // 重新组合路径
+  return pathParts.join(path.sep);
+}
+
 function debounce(func, wait) {
   let timeout;
   return function (...args) {
@@ -64,15 +81,18 @@ export const useFileStore = create()(
           ) {
             return null;
           }
-          return file.replace(new RegExp(`^${relativePathPrefix}`), "");
+          // return file.replace(new RegExp(`^${relativePathPrefix}`), "");
+          return removeRootPath(file, relativePathPrefix);
         });
 
-        await get().updateCurrentProjectBibFilepathList(files);
+        let bibFilepathList = await get().updateCurrentProjectBibFilepathList(
+          files
+        );
 
         let fileList = modifiedFiles.filter((i) => !!i);
 
         set({ currentProjectFileList: fileList });
-
+        return [fileList, bibFilepathList];
         // await get().changeMainFile(files);
       },
       updateCurrentProjectBibFilepathList: async (files) => {
@@ -81,6 +101,7 @@ export const useFileStore = create()(
           return fileExt === ".bib";
         });
         set({ currentProjectBibFilepathList: list });
+        return list;
       },
       changeMainFile: async (currentProjectRoot) => {
         let newFiles = await FS.getFilesRecursively(currentProjectRoot);
@@ -383,7 +404,6 @@ export const useFileStore = create()(
         get().initFile();
         set({ currentProjectRoot: projectRoot, currentSelectDir: projectRoot });
         initializeGitStatus({ projectRoot });
-        get().updateCurrentProjectFileList(projectRoot);
       },
       createProject: async (newProjectRoot) => {
         let isExists = await FS.existsPath(newProjectRoot);

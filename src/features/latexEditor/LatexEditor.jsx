@@ -12,13 +12,7 @@ import AiTools from "./component/aiTools";
 import useAutoCompile from "./hook";
 import { useEngineStatusStore } from "@/store";
 
-const LatexEditor = ({
-  handleChange,
-  sourceCode,
-  filepath,
-  fileList,
-  bibFilepathList,
-}) => {
+const LatexEditor = ({ handleChange, sourceCode, filepath }) => {
   const latexRef = useRef(null);
 
   const { editor, updateEditor } = useEditor((state) => ({
@@ -26,10 +20,12 @@ const LatexEditor = ({
     updateEditor: state.updateEditor,
   }));
 
-  const { loadFile, currentProjectRoot } = useFileStore((state) => ({
-    loadFile: state.loadFile,
-    currentProjectRoot: state.currentProjectRoot,
-  }));
+  const { loadFile, currentProjectRoot, updateCurrentProjectFileList } =
+    useFileStore((state) => ({
+      loadFile: state.loadFile,
+      currentProjectRoot: state.currentProjectRoot,
+      updateCurrentProjectFileList: state.updateCurrentProjectFileList,
+    }));
 
   useEffect(() => {
     console.log(latexRef.current, "latexRef.current");
@@ -52,27 +48,27 @@ const LatexEditor = ({
 
   // auto completer
   useEffect(() => {
-    if (
-      latexRef.current &&
-      latexRef.current.editor &&
-      fileList?.length > 0 &&
-      !!filepath
-    ) {
-      setIsSetupCompleter(true);
-      if (isSetupCompleter) {
-        completer && completer.changeCurrentFilePath(filepath);
-        completer && completer.changeCitationCompleter(bibFilepathList);
-        return;
-      }
-      let newCompleter = new AutoCompleteManager(
-        latexRef.current.editor,
-        fileList,
-        bibFilepathList,
-        filepath
+    if (latexRef.current && latexRef.current.editor && !!filepath) {
+      updateCurrentProjectFileList(currentProjectRoot).then(
+        ([fileList, bibFilepathList]) => {
+          setIsSetupCompleter(true);
+          if (isSetupCompleter) {
+            completer && completer.changeCurrentFilePath(filepath);
+            completer && completer.changeCitationCompleter(bibFilepathList);
+            return;
+          }
+          let newCompleter = new AutoCompleteManager(
+            latexRef.current.editor,
+            fileList,
+            bibFilepathList,
+            filepath,
+            currentProjectRoot
+          );
+          setCompleter(newCompleter);
+        }
       );
-      setCompleter(newCompleter);
     }
-  }, [fileList, bibFilepathList, filepath]);
+  }, [filepath, currentProjectRoot]);
 
   useEffect(() => {
     return () => {
