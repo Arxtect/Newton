@@ -136,7 +136,6 @@ class ProjectSync {
       this.aceBinding.init(editor, filePath); // 初始化 AceBinding 实例
     }
   }
-
   getVal() {
     // 实现获取当前文本内容的方法
     return this.yText.toString();
@@ -247,7 +246,8 @@ class ProjectSync {
 
       console.log(files, "files");
 
-      for (const file of files) {
+      // Create an array of promises for each file and directory
+      const syncPromises = files.map(async (file) => {
         const filePath = path.join(folderPath, file.name); // 使用 path.join 进行路径拼接
 
         if (file.type == "file") {
@@ -256,7 +256,10 @@ class ProjectSync {
         } else if (file.type == "dir") {
           await this.syncFolderToYMap(filePath); // 递归同步子文件夹
         }
-      }
+      });
+
+      // Wait for all promises to resolve
+      await Promise.all(syncPromises);
     } catch (err) {
       console.error(`Error syncing folder ${folderPath}:`, err);
       throw err;
@@ -268,10 +271,9 @@ class ProjectSync {
   }, 200);
 
   async syncFolderToYMapRootPath(callback) {
-    this.saveProjectSyncInfoToJson(this.rootPath).then((res) => {
-      this.syncFolderToYMap(this.rootPath); // 保存项目信息
-      callback && callback();
-    });
+    await this.saveProjectSyncInfoToJson(this.rootPath);
+    await this.syncFolderToYMap(this.rootPath); // 保存项目信息
+    callback && callback();
   }
 
   async handleFolderInfo(folderPath, key, content) {

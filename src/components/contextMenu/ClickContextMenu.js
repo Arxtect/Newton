@@ -1,3 +1,8 @@
+/*
+ * @Description:
+ * @Author: Devin
+ * @Date: 2024-10-08 12:50:58
+ */
 // src/components/ClickDropdownMenu.js
 import React, { useState } from "react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
@@ -22,9 +27,12 @@ const ClickDropdownMenu = ({ items, children, tip, ...res }) => {
           {items.map((item, index) => (
             <DropdownMenu.Item
               key={index}
-              onSelect={(e) => {
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 item.command(e);
               }}
+              onSelect={(e) => {}}
               className="flex items-center p-[0.35rem] hover:bg-gray-200 cursor-pointer text-[13px]"
             >
               {item.icon && (

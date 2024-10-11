@@ -46,6 +46,7 @@ const HoverMenu = ({
             <IconButton
               size="small"
               onClick={(e) => {
+                e.preventDefault();
                 e.stopPropagation();
               }}
             >

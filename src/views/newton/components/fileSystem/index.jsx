@@ -11,15 +11,16 @@ import { useFileStore, useUserStore } from "store";
 import { ProjectSync } from "@/convergence";
 import { getYDocToken } from "services";
 import { gitCloneGitea } from "./gitclone";
-import {getRoomUserAccess} from "@/services"
+import { getRoomUserAccess } from "@/services";
 import { toast } from "react-toastify";
 
 import { useNavigate } from "react-router-dom";
 
 const FileSystem = () => {
-        const navigate = useNavigate();
+  const navigate = useNavigate();
   const {
     filepath,
+    setMainFile,
     currentProjectRoot,
     changeCurrentProjectRoot,
     createProject,
@@ -48,6 +49,7 @@ const FileSystem = () => {
     updateShareIsRead,
   } = useFileStore((state) => ({
     filepath: state.filepath,
+    setMainFile: state.setMainFile,
     currentProjectRoot: state.currentProjectRoot,
     changeCurrentProjectRoot: state.changeCurrentProjectRoot,
     createProject: state.createProject,
@@ -113,7 +115,7 @@ const FileSystem = () => {
 
     if (!isSync || !project || !roomId) return;
     const res = await getRoomUserAccess({
-      project_name: project+roomId,
+      project_name: project + roomId,
     });
     if (res?.status != "success") {
       toast.error("Get room user access failed.");
@@ -132,21 +134,24 @@ const FileSystem = () => {
         "The project is not shared for you, please contact your project manager to modify it."
       );
       navigate("/project");
-      return
+      return;
     }
 
     const token = await getYDocTokenReq();
     const projectSync = await new ProjectSync(project, user, roomId, token);
+    await projectSync.setObserveHandler();
     updateProjectSync(projectSync);
   };
 
   useEffect(() => {
     initShareProject();
+    return () => {
+      setMainFile("");
+    };
   }, []);
 
   return (
     <main className="max-w-[100%] h-full">
-
       <div className="overflow-auto h-full mr-3">
         <RootDirectory
           key={currentProjectRoot}

@@ -18,6 +18,7 @@ import TopBar from "./components/topBar";
 import ContentTopBar from "./components/content/topBar";
 import Layout from "./layout";
 import FileSystem from "./components/fileSystem";
+import { refreshAuth } from "@/services";
 
 const Index = () => {
   useLayoutEffect(() => {
@@ -29,6 +30,7 @@ const Index = () => {
   }));
 
   useEffect(() => {
+    refreshAuth();
     return () => {
       leaveProjectSyncRoom();
     };

@@ -110,6 +110,9 @@ export const useFileStore = create()(
         set({ mainFilepath: mainFile });
         await get().loadFile({ filepath: mainFile });
       },
+      setMainFile: (mainFile) => {
+        set({ mainFilepath: mainFile });
+      },
       changeSingleBibFilepath: (bibFilepath, isAdd = true) => {
         let fileExt = path.extname(bibFilepath);
         if (fileExt !== ".bib") return;
@@ -136,7 +139,6 @@ export const useFileStore = create()(
       updateIsDropFileSystem: (isDropFileSystem) => set({ isDropFileSystem }),
       updateDirOpen: (dirOpen) => set({ dirOpen }),
       updateProjectSync: async (projectSync) => {
-        await (projectSync && projectSync.setObserveHandler());
         set({ projectSync });
       },
       leaveProjectSyncRoom: () => {
@@ -182,7 +184,6 @@ export const useFileStore = create()(
         }
         const projectSync = get().projectSync;
 
-        console.log(projectSync, "projectSync");
         if (projectSync && editor != null && filepath) {
           editor.blur && editor.blur();
           projectSync?.updateEditorAndCurrentFilePath(filepath, editor);
@@ -400,6 +401,7 @@ export const useFileStore = create()(
         set({ preRenamingDirpath: dirpath });
       },
       changeCurrentProjectRoot: async ({ projectRoot }) => {
+        get().changeMainFile(projectRoot);
         set({ projectSync: null });
         get().initFile();
         set({ currentProjectRoot: projectRoot, currentSelectDir: projectRoot });

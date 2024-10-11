@@ -145,7 +145,7 @@ const DirectoryLineContent = ({
     e.preventDefault();
     e.stopPropagation();
     if (!loading) {
-      // setOpened(!opened);
+      setOpened(!opened);
       changeCurrentSelectDir(dirpath);
     }
   };
@@ -341,6 +341,9 @@ const DirectoryLineContent = ({
               }}
               onClick={(e) => handleClick(e, dirpath)}
             >
+              <span>
+                
+              </span>
               <ListItemIcon
                 style={{
                   minWidth: "unset",

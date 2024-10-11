@@ -93,7 +93,7 @@ const RegisterPage = () => {
               label="Username"
               type="input"
               name="name"
-              placeholder="Email"
+              placeholder="Username"
               register={register}
               errors={errors}
               icon={<ArIcon name="Username" className="h-5 w-5" />}

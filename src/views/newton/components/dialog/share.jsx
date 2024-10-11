@@ -88,6 +88,7 @@ const Share = forwardRef(({ rootPath, user }, ref) => {
     const projectSync = new ProjectSync(rootPath, user, user.id, token);
     updateProjectSync(projectSync);
     await projectSync.syncFolderToYMapRootPath();
+    // await projectSync.setObserveHandler();
     setTimeout(() => {
       filepath && loadFile({ filepath: filepath });
     }, [500]);
@@ -100,7 +101,7 @@ const Share = forwardRef(({ rootPath, user }, ref) => {
       "success",
       document.getElementById("ar-dialog")
     );
-    // handleSaveProject();
+    handleSaveProject();
   };
 
   const handleSaveProject = async () => {
