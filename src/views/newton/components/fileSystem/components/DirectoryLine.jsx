@@ -341,9 +341,6 @@ const DirectoryLineContent = ({
               }}
               onClick={(e) => handleClick(e, dirpath)}
             >
-              <span>
-                
-              </span>
               <ListItemIcon
                 style={{
                   minWidth: "unset",
