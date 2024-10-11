@@ -250,6 +250,7 @@ const CommandInput = forwardRef(
             needNewChat={true}
             placeholder={selectedCommand?.text}
             inputRef={inputRef}
+            currentApp={currentApp}
           />
         </div>
         {chatList.length > 1 && triggerType == "click" ? (

@@ -142,9 +142,10 @@ const DirectoryLineContent = ({
   const handleMouseLeave = () => setHovered(false);
 
   const handleClick = (e, dirpath) => {
+    e.preventDefault();
     e.stopPropagation();
     if (!loading) {
-      setOpened(!opened);
+      // setOpened(!opened);
       changeCurrentSelectDir(dirpath);
     }
   };

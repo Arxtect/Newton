@@ -195,6 +195,7 @@ const Chat = ({
             // speechToTextConfig={config?.speech_to_text}
             onSend={onSend}
             currentAppToken={currentAppToken}
+            currentApp={currentApp}
           />
         </div>
       </div>

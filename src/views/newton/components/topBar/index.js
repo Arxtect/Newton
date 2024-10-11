@@ -80,8 +80,13 @@ const TopBar = (props) => {
         <img src={logoIcon} alt="icon" className="mx-2" />
         <span className="ml-2 text-black font-bold">Project</span>
       </div>
-      <div className="flex justify-center overflow-hidden text-center text-ellipsis w-2/5 text-[0.9rem] font-math">
-        {currentProjectRoot}
+      <div
+        className="flex justify-center text-center w-2/5 text-[0.9rem] font-math"
+        title={currentProjectRoot}
+      >
+        <span className="w-4/5 text-ellipsis whitespace-nowrap overflow-hidden">
+          {currentProjectRoot}
+        </span>
       </div>
       <div className="flex items-center space-x-20 mr-4 w-2/5 justify-end">
         {!!projectSync && (

@@ -4,6 +4,7 @@ import React, {
   useState,
   useContext,
   forwardRef,
+  useEffect,
   useImperativeHandle,
 } from "react";
 import Textarea from "rc-textarea";
@@ -25,6 +26,7 @@ const ChatInput = forwardRef(
       onSend,
       theme,
       currentAppToken,
+      currentApp,
       onChangeQuery,
       onKeyDown: handleKeyDownProps,
       StopButton,
@@ -70,11 +72,11 @@ const ChatInput = forwardRef(
 
     const handleSend = () => {
       if (onSend) {
-        if (!query || !query.trim()) {
+        if ((!query || !query.trim()) && !currentApp?.upload_prompt) {
           return;
         }
         onSend(
-          query,
+          query || currentApp?.upload_prompt,
           files
             .filter((file) => file.progress !== -1)
             .map((fileItem) => ({
@@ -114,7 +116,12 @@ const ChatInput = forwardRef(
     };
 
     const sendIconThemeStyle = {
-      color: query || query.trim() !== "" ? "" : "#d1d5db",
+      color:
+        query ||
+        query.trim() !== "" ||
+        (currentApp?.upload_prompt && files.length > 0)
+          ? "#155eef"
+          : "#d1d5db",
     };
 
     const sendBtn = (
@@ -125,10 +132,7 @@ const ChatInput = forwardRef(
         <ArIcon
           name="Send"
           alt="Send"
-          className={`
-          w-5 h-5 group-hover:text-primary-600 
-          ${!!query.trim() ? "text-[#155eef]" : "text-primary-600"}
-        `}
+          className={`w-5 h-5 group-hover:text-primary-600`}
           style={sendIconThemeStyle}
         />
       </div>
