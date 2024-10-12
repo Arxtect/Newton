@@ -19,13 +19,13 @@ const BottomDrawer = ({ isOpen, toggleDrawer }) => {
       onClose={() => toggleDrawer(false)}
       ModalProps={{
         BackdropProps: {
-          invisible: true
-        }
+          invisible: true,
+        },
       }}
       sx={{
         "& .MuiDrawer-paper": {
           top: "82px",
-        }
+        },
       }}
     >
       <Box sx={{ height: "100%", overflowY: "auto" }}>

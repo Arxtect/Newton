@@ -184,6 +184,7 @@ const LinkGithub = (props) => {
       changeConfig({ githubApiToken: "" });
     }
   };
+
   useEffect(() => {
     if (!dialogOpen) {
       setMessages("");
@@ -197,6 +198,12 @@ const LinkGithub = (props) => {
     setProjectName(formatRepoName(currentProjectRoot));
     getGiteaToekn(githubApiToken);
   }, [dialogOpen]);
+
+  useEffect(() => {
+    if (isOpen) {
+      getGiteaToekn(githubApiToken);
+    }
+  }, [isOpen]);
 
   return (
     <React.Fragment>
