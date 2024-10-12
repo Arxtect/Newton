@@ -159,14 +159,14 @@ const GitEasy = () => {
               >
                 Sync All
               </ArLoadingButton>
-              <ArLoadingButton
+              {/* <ArLoadingButton
                 variant="contained"
                 size="small"
                 onClick={handleRemoveGitFolder}
                 data-testid="remove-git-folder-button"
               >
                 Unlink
-              </ArLoadingButton>
+              </ArLoadingButton> */}
               {/* <Button
                 variant="contained"
                 size="small"
