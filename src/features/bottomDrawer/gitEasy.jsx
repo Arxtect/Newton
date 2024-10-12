@@ -15,10 +15,15 @@ import {
 } from "domain/git/queries/parseStatusMatrix";
 import { toast } from "react-toastify";
 import ArLoadingButton from "@/components/arLoadingButton";
+import { existsPath, removeDirectory, getAllFileNames } from "domain/filesystem";
+import path from "path";
 
 const GitEasy = () => {
   const [commitMessage, setCommitMessage] = useState("");
   const [loading, setLoading] = useState(false)
+  const { projectRoot } = useFileStore((state) => ({
+    projectRoot: state.currentProjectRoot,
+  }));
   const {
     githubApiToken,
     currentBranch,
@@ -61,9 +66,9 @@ const GitEasy = () => {
   }
 
   const commitAndPush = async (commitMessage) => {
-    if(!commitMessage){
-     toast.error("Please enter message");
-     return
+    if (!commitMessage) {
+      toast.error("Please enter message");
+      return
     }
     setLoading(true)
     commitAll({ message: commitMessage })
@@ -77,6 +82,26 @@ const GitEasy = () => {
         toast.error(e.message);
       });
   };
+
+  const gitFolderPath = path.join(projectRoot, ".git");
+  const handleRemoveGitFolder = async () => {
+    console.log(`gitFolderPath: ${gitFolderPath}`);
+    console.log(`Type of gitFolderPath: ${typeof gitFolderPath}`);
+    if (!(await existsPath(gitFolderPath))) {
+      console.log(`Directory ${gitFolderPath} does not exist.`);
+      return;
+    }
+    if (typeof gitFolderPath !== 'string') {
+      console.error('Error: gitFolderPath is not a string');
+      return;
+    }
+
+    console.log(`Attempting to remove git folder at: ${gitFolderPath}`);
+    await removeDirectory(gitFolderPath);
+    console.log(`Removal attempt completed. Now listing remaining files.`);
+    let list = await getAllFileNames(projectRoot);
+    console.log(list, "Remaining files after removal:");
+  }
 
   return (
     <React.Fragment>
@@ -133,6 +158,14 @@ const GitEasy = () => {
                 loading={loading}
               >
                 Sync All
+              </ArLoadingButton>
+              <ArLoadingButton
+                variant="contained"
+                size="small"
+                onClick={handleRemoveGitFolder}
+                data-testid="remove-git-folder-button"
+              >
+                Unlink
               </ArLoadingButton>
               {/* <Button
                 variant="contained"
