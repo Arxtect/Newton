@@ -14,12 +14,21 @@ import GitHubIcon from "@mui/icons-material/GitHub";
 const BottomDrawer = ({ isOpen, toggleDrawer }) => {
   return (
     <Drawer
-      anchor="bottom"
+      anchor="right"
       open={isOpen}
       onClose={() => toggleDrawer(false)}
-      sx={{ height: "40vh", "& .MuiDrawer-paper": { height: "40vh" } }}
+      ModalProps={{
+        BackdropProps: {
+          invisible: true
+        }
+      }}
+      sx={{
+        "& .MuiDrawer-paper": {
+          top: "82px",
+        }
+      }}
     >
-      <Box sx={{ maxHeight: "40vh", overflowY: "auto" }}>
+      <Box sx={{ height: "100%", overflowY: "auto" }}>
         <GitTab />
       </Box>
     </Drawer>

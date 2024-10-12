@@ -24,7 +24,7 @@ const GitTab = () => {
       className="overflow-hidden rounded-none"
       sx={{ height: "100%", display: "flex", flexDirection: "column" }}
     >
-      <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+      {/* <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Tabs
           value={activeTab}
           onChange={handleChange}
@@ -45,18 +45,19 @@ const GitTab = () => {
             },
           }}
         >
-          <Tab label="Sync" value="git" />
+          <Tab label="Sync" value="git" /> 
           <Tab label="History" value="history" />
-          {/* <Tab label="Help" value="help" /> */}
-          {/* <Tab label="Config" value="config" /> */}
+          <Tab label="Help" value="help" />
+          <Tab label="Config" value="config" />
         </Tabs>
-      </Box>
+      </Box> */}
       {/* 为内容区设置固定的高度并允许滚动 */}
       <Box sx={{ flexGrow: 1, overflowY: "auto", padding: "14px 20px" }}>
-        {activeTab === "git" && <GitController />}
-        {activeTab === "history" && <FileHistory />}
+        <GitController />
+        {/* {activeTab === "git" && <GitController />} */}
+        {/* {activeTab === "history" && <FileHistory />}
         {activeTab === "help" && <Help />}
-        {activeTab === "config" && <Config />}
+        {activeTab === "config" && <Config />} */}
       </Box>
     </Card>
   );

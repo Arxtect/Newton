@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import pify from "pify";
 import JSZip from "jszip";
+import * as git from "isomorphic-git";
 import { saveAs } from "file-saver";
 import { projectInfoExists } from "./projectInfo";
 
@@ -105,6 +106,7 @@ function addFilesToZip(
   });
 }
 export async function downloadDirectoryAsZip(rootpath) {
+  console.log(rootpath, "downloadDirectoryAsZip");
   const directoryTree = await readDirectoryTree(rootpath);
   console.log(directoryTree, "directoryTree");
   const zip = new JSZip();
@@ -173,4 +175,48 @@ export async function getAllFileNames(rootpath) {
   }
 
   return getAllFileNamesRecursive(rootpath);
+}
+
+// 下载特定版本的项目
+export async function downloadSpecificVersion(repoPath, commitSHA) {
+  const zip = new JSZip();
+
+  // 获取指定提交的文件树
+  const { tree } = await git.readTree({
+    fs,
+    dir: repoPath,
+    oid: commitSHA
+  });
+
+  // 递归函数，用于遍历文件树并添加文件到 ZIP
+  async function addToZip(tree, currentPath = '') {
+    for (const entry of tree) {
+      if (entry.type === 'tree') {
+        // 如果是目录，递归处理
+        const subtree = await git.readTree({
+          fs,
+          dir: repoPath,
+          oid: entry.oid
+        });
+        await addToZip(subtree.tree, path.join(currentPath, entry.path));
+      } else if (entry.type === 'blob') {
+        // 如果是文件，读取内容并添加到 ZIP
+        const { blob } = await git.readBlob({
+          fs,
+          dir: repoPath,
+          oid: entry.oid
+        });
+        zip.file(path.join(currentPath, entry.path), blob);
+      }
+    }
+  }
+
+  // 开始添加文件到 ZIP
+  await addToZip(tree);
+
+  // 生成 ZIP 文件
+  const zipBlob = await zip.generateAsync({ type: 'blob' });
+
+  // 将 ZIP 内容写入文件
+  saveAs(zipBlob, `${repoPath}-${commitSHA.slice(0, 7)}.zip`);
 }
