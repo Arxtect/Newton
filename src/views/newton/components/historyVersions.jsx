@@ -20,6 +20,7 @@ const HistoryVersions = () => {
         anchorEl: null,
         openMenuIndex: null,
     });
+    const [showDiffLines, setShowDiffLines] = useState({});
     const menuClickedRef = useRef(false);
 
     const { projectRoot } = useFileStore((state) => ({
@@ -110,6 +111,13 @@ const HistoryVersions = () => {
         handleMenuClose();
         downloadSpecificVersion(projectRoot, historyVersions[selectedIndex]?.commitOid);
     };
+    const handleDisplayDiffLines = (index) => {
+        setShowDiffLines(prev => ({
+            ...prev,
+            [index]: !prev[index]
+        }));
+        handleMenuClose();
+    };
     // const handleCheckout = () => {
     //     moveToBranch(projectRoot, historyVersions[selectedIndex]?.commitOid);
     // };
@@ -173,7 +181,9 @@ const HistoryVersions = () => {
                                     open={menuState.openMenuIndex === index}
                                     onClose={handleMenuClose}
                                 >
-                                    <MenuItem onClick={handleMenuClose}>Display diffLines</MenuItem>
+                                    <MenuItem onClick={() => handleDisplayDiffLines(index)}>
+                                        {showDiffLines[index] ? "Hide diffLines" : "Display diffLines"}
+                                    </MenuItem>
                                     <MenuItem onClick={handleDownloadSpecificVersion}>Download this version</MenuItem>
                                     {/* <MenuItem onClick={handleCheckout}>Checkout to this version</MenuItem> */}
                                 </Menu>
@@ -190,17 +200,17 @@ const HistoryVersions = () => {
                             <p>{version.committerName}</p>
                             {/* <p>{version.commitOid}</p>
                             <p>{version.commitParent}</p> */}
-                            {selectedIndex === index &&
+                            {showDiffLines[index] &&
                                 <pre className="overflow-auto p-2 mt-2 border-black bg-white">
                                     <p className='mb-2 font-bold'>{version.fileWithChange[0]?.path}: </p>
                                     {currentDiff
                                         .filter((d) => d.added || d.removed)
-                                        .map((d) =>
-                                            d.added
-                                                ? `+ : ${d.value}`
-                                                : d.removed
-                                                    ? `- : ${d.value}`
-                                                    : d.value).join("\n")
+                                        .map((d, i) => (
+                                            <div key={i} style={{ color: d.added ? 'green' : d.removed ? 'red' : 'black' }}>
+                                                {d.added ? '+ ' : d.removed ? '- ' : '  '}
+                                                {d.value}
+                                            </div>
+                                        ))
                                     }
                                 </pre>
                             }
