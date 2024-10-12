@@ -27,12 +27,9 @@ const ClickDropdownMenu = ({ items, children, tip, ...res }) => {
           {items.map((item, index) => (
             <DropdownMenu.Item
               key={index}
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
+              onSelect={(e) => {
                 item.command(e);
               }}
-              onSelect={(e) => {}}
               className="flex items-center p-[0.35rem] hover:bg-gray-200 cursor-pointer text-[13px]"
             >
               {item.icon && (

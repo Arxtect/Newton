@@ -30,4 +30,5 @@ export * from "./queries/updateStatusMatrix";
 
 export * from "./commands/setupAndPushToRepo";
 export * from "./queries/getFileHistory";
+export * from "./queries/getFileStateChanges";
 export * from "./queries/isCanPush";

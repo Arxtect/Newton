@@ -324,7 +324,7 @@ const DirectoryLineContent = ({
             type="dir"
             onDrop={handleFileMove}
             onDropByOther={() => setOpened(true)}
-            isEnabled={isDropFileSystem}
+            isEnabled={isDropFileSystem && renamingPathname !== dirpath}
             setHover={() => {
               console.log("setHover");
             }}
@@ -339,7 +339,6 @@ const DirectoryLineContent = ({
                 padding: "3px 0px 3px 0px",
                 paddingLeft: `${depth * 8}px`,
               }}
-              onClick={(e) => handleClick(e, dirpath)}
             >
               <ListItemIcon
                 style={{
@@ -347,10 +346,14 @@ const DirectoryLineContent = ({
                   // visibility:
                   //   fileList && fileList.length > 0 ? 'visible' : 'hidden' ,
                 }}
+                onClick={(e) => handleClick(e, dirpath)}
               >
                 {opened ? <ExpandMoreIcon /> : <ChevronRightIcon />}
               </ListItemIcon>
-              <ListItemIcon style={{ minWidth: "unset" }}>
+              <ListItemIcon
+                style={{ minWidth: "unset" }}
+                onClick={(e) => handleClick(e, dirpath)}
+              >
                 {opened ? (
                   <ArIcon
                     name={"FolderOpen"}
@@ -394,7 +397,10 @@ const DirectoryLineContent = ({
                 />
               ) : (
                 <React.Fragment>
-                  <div className="w-full">
+                  <div
+                    className="w-full"
+                    onClick={(e) => handleClick(e, dirpath)}
+                  >
                     <Pathname ignoreGit={ignoreGit}>
                       {basename || `${dirpath}`}
                     </Pathname>

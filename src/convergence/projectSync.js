@@ -156,7 +156,7 @@ class ProjectSync {
       try {
         contentToStore = await uploadFile(filePath, content);
       } catch (err) {
-        contentToStore = content.toString();
+        // contentToStore = content.toString();
         console.log(err.message, "err.message");
         toast.error(err.message);
       }
