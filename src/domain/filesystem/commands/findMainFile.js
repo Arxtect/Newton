@@ -28,8 +28,11 @@ async function findMainFile(fileList) {
       // 检查文件中的 % !TEX root 注释
       const rootMatch = constr.match(/% !TEX root = (.*\.tex)/);
       if (rootMatch) {
-        mainFile = rootMatch[1];
-        break;
+        const foundFile = texFiles.find(file => path.basename(file) === rootMatch[1]);
+        if (foundFile) {
+          mainFile = foundFile;
+          break;
+        }
       }
 
       // 检查文件中是否包含 \documentclass 命令
