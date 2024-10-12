@@ -11,7 +11,6 @@ import { getHistoryWithChanges, getDiff } from "domain/git";
 import { useGitRepo, useFileStore } from "store";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { downloadSpecificVersion } from "domain/filesystem";
-// import { gitCheckout } from '../../domain/filesystem/commands/gitCheckout';
 
 const HistoryVersions = () => {
     const [historyVersions, setHistoryVersions] = useState([]);
@@ -111,9 +110,9 @@ const HistoryVersions = () => {
         handleMenuClose();
         downloadSpecificVersion(projectRoot, historyVersions[selectedIndex]?.commitOid);
     };
-    const handleCheckout = () => {
-        moveToBranch(projectRoot, historyVersions[selectedIndex]?.commitOid);
-    };
+    // const handleCheckout = () => {
+    //     moveToBranch(projectRoot, historyVersions[selectedIndex]?.commitOid);
+    // };
     console.log(historyVersions, "historyVersions");
     // 渲染逻辑
     return (
@@ -176,7 +175,7 @@ const HistoryVersions = () => {
                                 >
                                     <MenuItem onClick={handleMenuClose}>Display diffLines</MenuItem>
                                     <MenuItem onClick={handleDownloadSpecificVersion}>Download this version</MenuItem>
-                                    <MenuItem onClick={handleCheckout}>Checkout to this version</MenuItem>
+                                    {/* <MenuItem onClick={handleCheckout}>Checkout to this version</MenuItem> */}
                                 </Menu>
                             </div>
                             <div style={{ fontWeight: 'bold' }}>{formatDate(version?.timestamp * 1000)}</div>
