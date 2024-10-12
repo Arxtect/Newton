@@ -211,10 +211,22 @@ const ChatInput = forwardRef(
               onDragLeave={onDragLeave}
               onDragOver={onDragOver}
               onDrop={onDrop}
-              placeholder={currentApp?.name || ""}
+              placeholder={!isResponding ? currentApp?.name || "" : ""}
               autoSize
               ref={inputRef}
             />
+            {isResponding && (
+              <div
+                className={`absolute pl-1 top-0 bottom-0 flex items-center ${
+                  visionConfig?.enabled ? "left-20" : "left-12"
+                }`}
+              >
+                <span className="mr-1 font-math">Thinking</span>
+                <span className="dot ml-1 bg-red-500 rounded-full w-1 h-1 animate-bounce animation-delay-0"></span>
+                <span className="dot ml-1 bg-yellow-500 rounded-full w-1 h-1 animate-bounce animation-delay-200"></span>
+                <span className="dot ml-1 bg-blue-500 rounded-full w-1 h-1 animate-bounce animation-delay-400"></span>
+              </div>
+            )}
             <div className="absolute bottom-[7px] right-2 flex items-center h-8">
               <div className="flex items-center px-1 h-5 rounded-md bg-gray-100 text-xs font-medium text-gray-500">
                 {query.trim().length}

@@ -215,3 +215,15 @@ body {
 :focus {
     outline: none;
 }
+
+.animation-delay-0 {
+  animation-delay: 0ms !important;
+}
+
+.animation-delay-200 {
+  animation-delay: 200ms !important;
+}
+
+.animation-delay-400 {
+  animation-delay: 400ms !important;
+}

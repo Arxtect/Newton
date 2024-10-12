@@ -11,17 +11,16 @@ async function findMainFile(fileList) {
   // 过滤出所有的 .tex 文件
   const texFiles = fileList.filter((file) => path.extname(file) === ".tex");
 
-  console.log(texFiles, "filePath");
   // 检查每个 .tex 文件的内容
   let mainFile = null;
   const successfullyReadFiles = []; // 用于记录成功读取的文件
 
   for (const filePath of texFiles) {
-    const content = await readFile(filePath).catch(err => {
+    const content = await readFile(filePath).catch((err) => {
       console.error(`Error reading file ${filePath}:`, err);
       return null; // 读取失败时返回 null
     });
-    
+
     if (content) {
       successfullyReadFiles.push(filePath); // 记录成功读取的文件
       const constr = content.toString();
@@ -34,7 +33,11 @@ async function findMainFile(fileList) {
       }
 
       // 检查文件中是否包含 \documentclass 命令
-      if (constr.split('\n').some(line => line.trimStart().startsWith("\\documentclass["))) {
+      if (
+        constr
+          .split("\n")
+          .some((line) => line.trimStart().startsWith("\\documentclass["))
+      ) {
         mainFile = filePath;
         break;
       }
@@ -43,7 +46,10 @@ async function findMainFile(fileList) {
 
   // 如果没有找到 % !TEX root 注释和 \documentclass 命令，则默认使用第一个成功读取的 .tex 文件
   if (texFiles.length > 0 && !mainFile) {
-    mainFile = successfullyReadFiles.find(file => path.basename(file) === 'main.tex') || successfullyReadFiles[0];
+    mainFile =
+      successfullyReadFiles.find(
+        (file) => path.basename(file) === "main.tex"
+      ) || successfullyReadFiles[0];
   }
 
   return mainFile;

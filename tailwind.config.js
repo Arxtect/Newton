@@ -40,6 +40,18 @@ module.exports = {
       },
       animation: {
         "spin-slow": "spin 2s linear infinite", // 修改这里的3s为你想要的速度
+        bounce: "bounce 1s infinite",
+      },
+      keyframes: {
+        bounce: {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-2px)" },
+        },
+      },
+      animationDelay: {
+        0: "0ms",
+        200: "200ms",
+        400: "400ms",
       },
     },
   },
