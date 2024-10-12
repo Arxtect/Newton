@@ -3,16 +3,12 @@
  * @Author: Devin
  * @Date: 2024-09-14 10:46:18
  */
-/*
- * @Description:
- * @Author: Devin
- * @Date: 2024-09-14 10:46:18
- */
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import * as Popover from "@radix-ui/react-popover";
 import Command from "./components/command";
 import { stopChat as stopChatApi } from "@/services";
 import { useChat } from "@/features/aiTools/hook";
+import { useFileStore, useEditor } from "@/store";
 
 const CommandPopover = ({
   children,
@@ -110,8 +106,17 @@ const AiPanel = ({
     currentApp,
     appList,
     setCurrentApp,
+    setDefaultApp,
     lastMessage,
   } = useChat(null, stopChat);
+
+  const { filepath } = useFileStore((state) => ({
+    filepath: state.filepath,
+  }));
+
+  const { editor } = useEditor((state) => ({
+    editor: state.editor,
+  }));
 
   useEffect(() => {
     setAnswerContent && setAnswerContent(lastMessage);
@@ -121,6 +126,28 @@ const AiPanel = ({
     console.log(isResponding, "isResponding2");
     handleSetIsResponding && handleSetIsResponding(isResponding);
   }, [isResponding]);
+
+  const insertToEditor = useCallback(
+    (text) => {
+      console.log(text, filepath, "text");
+
+      if (!filepath || !text || !editor) return;
+
+      const cursorPositionData = JSON.parse(
+        sessionStorage.getItem("cursorPosition")
+      );
+      const cursorPosition = cursorPositionData[filepath];
+
+      if (!cursorPosition) return;
+
+      // 设置光标位置
+      editor.gotoLine(cursorPosition.row + 1, cursorPosition.column);
+
+      // 插入文本
+      editor.insert(text);
+    },
+    [editor, filepath]
+  );
 
   return (
     <CommandPopover
@@ -134,8 +161,10 @@ const AiPanel = ({
       currentApp={currentApp}
       appList={appList}
       setCurrentApp={setCurrentApp}
+      setDefaultApp={setDefaultApp}
       triggerType={triggerType}
       incomeCommandOptions={incomeCommandOptions}
+      insertToEditor={insertToEditor}
       {...res}
     >
       {memoizedChildren}

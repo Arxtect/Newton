@@ -12,7 +12,7 @@ import AiTools from "./component/aiTools";
 import useAutoCompile from "./hook";
 import { useEngineStatusStore } from "@/store";
 
-const LatexEditor = ({ handleChange, sourceCode, filepath }) => {
+const LatexEditor = ({ handleChange, sourceCode, filepath, mainFilepath }) => {
   const latexRef = useRef(null);
 
   const { editor, updateEditor } = useEditor((state) => ({
@@ -39,8 +39,8 @@ const LatexEditor = ({ handleChange, sourceCode, filepath }) => {
   }, [latexRef]);
 
   useEffect(() => {
-    if (!editor && !filepath) return;
-    loadFile({ filepath: filepath });
+    if (!editor && !mainFilepath) return;
+    loadFile({ filepath: mainFilepath });
   }, [editor]);
 
   const [isSetupCompleter, setIsSetupCompleter] = useState(false);
@@ -101,7 +101,7 @@ const LatexEditor = ({ handleChange, sourceCode, filepath }) => {
 
   // auto compile
   const { setIsTriggerCompile } = useEngineStatusStore();
-  useAutoCompile(sourceCode, currentProjectRoot, filepath);
+  useAutoCompile(sourceCode, currentProjectRoot, mainFilepath);
 
   const handleChangeAutoCompile = (editorValue) => {
     handleChange(editorValue);

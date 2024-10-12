@@ -51,6 +51,10 @@ export const useChat = (prevChatList, stopChat) => {
     });
   }, []);
 
+  const setDefaultApp = useCallback(() => {
+    setCurrentApp(appList.find((item) => item.default) || appList[0]);
+  }, [appList]);
+
   const handleGetAccessToken = useCallback(async (token) => {
     let res = await getAccessTokenAndStore(token);
     setCurrentAppToken(res);
@@ -393,5 +397,6 @@ export const useChat = (prevChatList, stopChat) => {
     handleUpdateChatList,
     currentAppToken,
     lastMessage,
+    setDefaultApp,
   };
 };

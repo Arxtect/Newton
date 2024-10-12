@@ -7,6 +7,7 @@ import { memo, useEffect, useRef, useState } from "react";
 // import More from './more'
 import { Markdown } from "@/features/aiTools/markdown";
 import CopyBtn from "@/components/copy-btn";
+import InsertBtn from "@/components/insert-btn";
 import LoadingAnim from "@/components/loading-anim";
 
 const BasicContent = ({ item }) => {
@@ -20,7 +21,13 @@ const BasicContent = ({ item }) => {
   );
 };
 
-const Answer = ({ item, answerIcon, responding, chatAnswerContainerInner }) => {
+const Answer = ({
+  item,
+  answerIcon,
+  responding,
+  chatAnswerContainerInner,
+  insertToEditor,
+}) => {
   const { content, more } = item;
 
   const containerRef = useRef(null);
@@ -36,12 +43,19 @@ const Answer = ({ item, answerIcon, responding, chatAnswerContainerInner }) => {
               relative inline-block px-4 py-3 max-w-full bg-gray-100 rounded-b-2xl rounded-2xl text-sm text-gray-900
             `}
           >
-            <div
-              className={"absolute flex justify-end gap-1 -top-4 right-6"}
-              // style={(!hasWorkflowProcess && positionRight) ? { left: contentWidth + 8 } : {}}
-            >
-              <CopyBtn value={content} className="hidden group-hover:block" />
-            </div>
+            {content && (
+              <div
+                className={"absolute flex justify-end gap-1 -top-4 right-6"}
+                // style={(!hasWorkflowProcess && positionRight) ? { left: contentWidth + 8 } : {}}
+              >
+                <CopyBtn value={content} className="hidden group-hover:block" />
+                <InsertBtn
+                  value={content}
+                  className="hidden group-hover:block"
+                  insert={insertToEditor}
+                />
+              </div>
+            )}
             {responding && !content && (
               <div className="flex items-center justify-center w-6 h-5">
                 <LoadingAnim type="text" />

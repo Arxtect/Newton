@@ -23,7 +23,7 @@ export function getChatApiUrl() {
   return `/api/v1/chat/chat-messages`;
 }
 
-export function ShowLastChat({ chatList, isResponding }) {
+export function ShowLastChat({ chatList, isResponding,...res }) {
   console.log(chatList, "chatList");
   return (
     <Paper
@@ -44,6 +44,7 @@ export function ShowLastChat({ chatList, isResponding }) {
               question={chatList[index - 1]?.content}
               index={index}
               responding={isLast && isResponding}
+              {...res}
             />
           );
         }
@@ -80,12 +81,14 @@ const CommandInput = forwardRef(
       currentAppToken,
       currentApp,
       setCurrentApp,
+      setDefaultApp,
       appList,
       incomeCommandOptions = [],
       triggerType,
       showPanel = null,
       isSelection = false,
       selectedContent,
+      insertToEditor,
     },
     ref
   ) => {
@@ -110,13 +113,18 @@ const CommandInput = forwardRef(
 
     useEffect(() => {
       setCommandOptions(
-        appList.map((item) => {
-          return {
-            ...item,
-            text: item.name,
-            icon: IconList[item.id],
-          };
-        })
+        appList
+          .map((item) => {
+            if (item.default) {
+              return null;
+            }
+            return {
+              ...item,
+              text: item.name,
+              icon: IconList[item.id],
+            };
+          })
+          .filter((item) => !!item)
       );
     }, [appList]);
 
@@ -158,6 +166,13 @@ const CommandInput = forwardRef(
         return true;
       }
     };
+
+    useEffect(() => {
+      return () => {
+        setDefaultApp();
+        setSelectedCommand(null);
+      };
+    }, []);
 
     const handleSelect = (index) => {
       const option = filteredCommandOptions[index];
@@ -233,6 +248,7 @@ const CommandInput = forwardRef(
     const onHandleRestart = () => {
       handleSelect(-1);
       handleRestart();
+      setDefaultApp();
     };
 
     return (
@@ -257,6 +273,7 @@ const CommandInput = forwardRef(
           <ShowLastChat
             chatList={chatList}
             isResponding={isResponding}
+            insertToEditor={insertToEditor}
           ></ShowLastChat>
         ) : (filteredCommandOptions?.length &&
             !selectedCommand?.text &&

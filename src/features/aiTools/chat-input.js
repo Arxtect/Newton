@@ -211,7 +211,7 @@ const ChatInput = forwardRef(
               onDragLeave={onDragLeave}
               onDragOver={onDragOver}
               onDrop={onDrop}
-              placeholder={placeholder || ""}
+              placeholder={currentApp?.name || ""}
               autoSize
               ref={inputRef}
             />

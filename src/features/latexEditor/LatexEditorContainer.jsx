@@ -26,7 +26,8 @@ export const LatexEditorContainer = () => {
     <LatexEditor
       handleChange={handleChange}
       sourceCode={contents}
-      filepath={mainFilepath}
+      mainFilepath={mainFilepath}
+      filepath={filepath}
     />
   );
 };
