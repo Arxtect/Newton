@@ -6,23 +6,31 @@ import {
     DialogTitle,
     DialogContent,
 } from '@mui/material';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { getHistoryWithChanges, getDiff } from "domain/git";
 import { useGitRepo, useFileStore } from "store";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { downloadSpecificVersion } from "domain/filesystem";
+// import { gitCheckout } from '../../domain/filesystem/commands/gitCheckout';
 
 const HistoryVersions = () => {
+    const [historyVersions, setHistoryVersions] = useState([]);
+    const [currentDiff, setCurrentDiff] = useState([]);
+    const [selectedIndex, setSelectedIndex] = useState(0);
+    const [menuState, setMenuState] = useState({
+        anchorEl: null,
+        openMenuIndex: null,
+    });
+    const menuClickedRef = useRef(false);
+
     const { projectRoot } = useFileStore((state) => ({
         projectRoot: state.currentProjectRoot,
     }));
-    const { currentBranch } = useGitRepo((state) => ({
+    const { currentBranch, moveToBranch } = useGitRepo((state) => ({
         currentBranch: state.currentBranch,
+        moveToBranch: state.moveToBranch,
     }));
-    const [historyVersions, setHistoryVersions] = useState([])
-    const [currentDiff, setCurrentDiff] = useState([]);
-    const [anchorEl, setAnchorEl] = useState(null);
-    const [selectedIndex, setSelectedIndex] = useState(0);
+
     useEffect(() => {
         const fetchHistory = async () => {
             const changeHistory = await getHistoryWithChanges(
@@ -78,19 +86,34 @@ const HistoryVersions = () => {
     };
 
     // Menu state
-    const handleMenuClick = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
-    const handleMenuClose = () => {
-        setAnchorEl(null);
-    };
-    const handleSelect = (index) => {
-        setSelectedIndex(index);
-    }
+    const handleMenuClick = useCallback((event, index) => {
+        event.stopPropagation();
+        menuClickedRef.current = true;
+        setMenuState({
+            anchorEl: event.currentTarget,
+            openMenuIndex: index,
+        });
+    }, []);
+    const handleMenuClose = useCallback(() => {
+        menuClickedRef.current = true;
+        setMenuState({
+            anchorEl: null,
+            openMenuIndex: null,
+        });
+    }, []);
+    const handleSelectBox = useCallback((index, event) => {
+        if (!menuClickedRef.current) {
+            setSelectedIndex(index);
+        }
+        menuClickedRef.current = false;
+    }, []);
     const handleDownloadSpecificVersion = () => {
         handleMenuClose();
         downloadSpecificVersion(projectRoot, historyVersions[selectedIndex]?.commitOid);
-    }
+    };
+    const handleCheckout = () => {
+        moveToBranch(projectRoot, historyVersions[selectedIndex]?.commitOid);
+    };
     console.log(historyVersions, "historyVersions");
     // 渲染逻辑
     return (
@@ -104,14 +127,9 @@ const HistoryVersions = () => {
             }}>
                 <div aria-label='datetime' title={`Viewing ${historyVersions.length > 0 ? formatDate(historyVersions[selectedIndex]?.timestamp * 1000) : ''}`}>
                     datetime
-                    {/* Viewing&nbsp;
-                    {historyVersions.length > 0 && formatDate(historyVersions[selectedIndex]?.timestamp * 1000)} */}
                 </div>
                 <div aria-label='file-info' style={{ flex: 1, textAlign: 'right' }} title={`${currentDiff.filter((d) => d.added || d.removed).length} changes in ${historyVersions[selectedIndex]?.fileWithChange[0]?.path}`}>
                     changes
-                    {/* {currentDiff.filter((d) => d.added || d.removed).length}
-                    &nbsp;changes in&nbsp;
-                    {historyVersions[selectedIndex]?.fileWithChange[0]?.path} */}
                 </div>
             </DialogTitle>
             <DialogContent sx={{ padding: 0, fontSize: '14px', }}>
@@ -131,30 +149,36 @@ const HistoryVersions = () => {
                                     backgroundColor: (selectedIndex === index ? '#eaf6ef' : '#f0f0f0'),
                                 },
                             }}
-                            onClick={() => handleSelect(index)}
+                            onClick={(event) => handleSelectBox(index, event)}
                         >
-                            <IconButton
-                                aria-label="more"
-                                id={`history-button-${index}`}
-                                aria-controls={`history-menu-${index}`}
-                                aria-haspopup="true"
-                                aria-hidden="true"
-                                aria-expanded={Boolean(anchorEl)}
-                                onClick={handleMenuClick}
-                                sx={{ position: 'absolute', top: 0, right: 0 }}
-                            >
-                                <MoreVertIcon sx={{ fontWeight: 'bold', color: 'black' }} />
-                            </IconButton>
-                            <Menu
-                                id={`history-menu-${index}`}
-                                anchorEl={anchorEl}
-                                keepMounted
-                                open={Boolean(anchorEl)}
-                                onClose={handleMenuClose}
-                            >
-                                <MenuItem onClick={handleMenuClose}>Display diffLines</MenuItem>
-                                <MenuItem onClick={handleDownloadSpecificVersion}>Download this version</MenuItem>
-                            </Menu>
+                            <div style={{
+                                position: 'absolute',
+                                top: '8px',
+                                right: '16px',
+                            }}>
+                                <IconButton
+                                    aria-label="more"
+                                    id={`history-button-${index}`}
+                                    aria-controls={`history-menu-${index}`}
+                                    aria-haspopup="true"
+                                    aria-expanded={menuState.openMenuIndex === index}
+                                    onClick={(event) => handleMenuClick(event, index)}
+                                    sx={{ padding: '4px' }}
+                                >
+                                    <MoreVertIcon sx={{ fontWeight: 'bold', color: 'black' }} />
+                                </IconButton>
+                                <Menu
+                                    id={`history-menu-${index}`}
+                                    anchorEl={menuState.anchorEl}
+                                    keepMounted
+                                    open={menuState.openMenuIndex === index}
+                                    onClose={handleMenuClose}
+                                >
+                                    <MenuItem onClick={handleMenuClose}>Display diffLines</MenuItem>
+                                    <MenuItem onClick={handleDownloadSpecificVersion}>Download this version</MenuItem>
+                                    <MenuItem onClick={handleCheckout}>Checkout to this version</MenuItem>
+                                </Menu>
+                            </div>
                             <div style={{ fontWeight: 'bold' }}>{formatDate(version?.timestamp * 1000)}</div>
                             <ul>
                                 {version.fileWithChange.map((change, changeIndex) => (
@@ -165,8 +189,8 @@ const HistoryVersions = () => {
                                 ))}
                             </ul>
                             <p>{version.committerName}</p>
-                            <p>{version.commitOid}</p>
-                            <p>{version.commitParent}</p>
+                            {/* <p>{version.commitOid}</p>
+                            <p>{version.commitParent}</p> */}
                             {selectedIndex === index &&
                                 <pre className="overflow-auto p-2 mt-2 border-black bg-white">
                                     <p className='mb-2 font-bold'>{version.fileWithChange[0]?.path}: </p>
