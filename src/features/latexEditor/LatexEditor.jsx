@@ -82,6 +82,7 @@ const LatexEditor = ({ handleChange, sourceCode, filepath, mainFilepath }) => {
 
   useEffect(() => {
     if (editorStateManager) {
+      console.log("Cleaning up editor state manager");
       editorStateManager.destroy();
     }
     if (latexRef.current && latexRef.current.editor) {

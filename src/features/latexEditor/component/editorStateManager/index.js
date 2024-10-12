@@ -37,6 +37,7 @@ class EditorStateManager {
 
   applyState() {
     const { scrollPosition, cursorPosition } = this.loadState();
+    console.log(cursorPosition, "scrollPosition");
 
     if (this.editor) {
       const session = this.editor.getSession();
@@ -81,6 +82,7 @@ class EditorStateManager {
 
   handleFocus() {
     this.isFocused = true;
+    this.handleCursorChange();
   }
 
   handleBlur() {

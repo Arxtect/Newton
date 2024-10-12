@@ -136,7 +136,9 @@ const AiPanel = ({
       const cursorPositionData = JSON.parse(
         sessionStorage.getItem("cursorPosition")
       );
-      const cursorPosition = cursorPositionData[filepath];
+      const cursorPosition = cursorPositionData?.[filepath];
+
+      console.log(cursorPosition, "cursorPosition");
 
       if (!cursorPosition) return;
 
