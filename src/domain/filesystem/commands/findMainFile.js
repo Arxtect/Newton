@@ -28,7 +28,9 @@ async function findMainFile(fileList) {
       // 检查文件中的 % !TEX root 注释
       const rootMatch = constr.match(/% !TEX root = (.*\.tex)/);
       if (rootMatch) {
-        const foundFile = texFiles.find(file => path.basename(file) === rootMatch[1]);
+        const foundFile = texFiles.find(
+          (file) => path.basename(file) === rootMatch[1]
+        );
         if (foundFile) {
           mainFile = foundFile;
           break;
@@ -39,7 +41,7 @@ async function findMainFile(fileList) {
       if (
         constr
           .split("\n")
-          .some((line) => line.trimStart().startsWith("\\documentclass["))
+          .some((line) => line.trimStart().startsWith("\\documentclass"))
       ) {
         mainFile = filePath;
         break;
