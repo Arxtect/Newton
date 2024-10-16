@@ -199,7 +199,7 @@ const ChatInput = forwardRef(
             )}
             <Textarea
               className={`
-              block w-full px-2 pr-[118px] py-[7px] leading-5 max-h-none text-sm text-gray-700 outline-none appearance-none resize-none
+              flex-1 block w-full px-2 pr-[118px] py-[7px] leading-5 max-h-none text-sm text-gray-700 font-[auto]
               ${visionConfig?.enabled ? "pl-20" : "pl-12"}
             `}
               value={query}

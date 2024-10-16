@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import ellipsis from "@/assets/ellipsis.svg";
 import logoIcon from "@/assets/logo-icon.svg";
 import Share from "../dialog/share";
@@ -9,13 +9,56 @@ import ViewHistory from "../viewHistory";
 import { useUserStore, useFileStore } from "@/store";
 import { downloadDirectoryAsZip } from "domain/filesystem";
 import { useNavigate } from "react-router-dom";
+import { TextField } from "@mui/material";
 
 import ArIcon from "@/components/arIcon";
 
 import { getColors, getFirstNUpperCaseChars } from "@/util";
 import Tooltip from "@/components/tooltip";
+import fs from "fs";
+import path from "path";
+import pify from "pify";
 
 const maxDisplayCount = 3; // 最大显示的名字数量
+
+const RenameTextInput = ({
+  value,
+  handleChange,
+  handleBlur,
+  handleKeyDown,
+  inputRef,
+}) => (
+  <TextField
+    className="tailwind-classes-for-input"
+    variant="outlined"
+    size="small"
+    value={value}
+    onChange={handleChange}
+    onBlur={handleBlur}
+    onKeyDown={handleKeyDown}
+    inputRef={inputRef}
+    sx={{
+      width: "100%",
+      "& .MuiInputBase-input": {
+        padding: "0 6px",
+        width: "100%",
+
+        textAlign: "center",
+      },
+      "& .MuiOutlinedInput-root": {
+        "& fieldset": {
+          borderColor: "#81C784",
+        },
+        "&:hover fieldset": {
+          borderColor: "#81C784",
+        },
+        "&.Mui-focused fieldset": {
+          borderColor: "#81C784",
+        },
+      },
+    }}
+  />
+);
 
 const TopBar = (props) => {
   const { user } = useUserStore((state) => ({
@@ -29,6 +72,8 @@ const TopBar = (props) => {
     currentProjectRoot,
     filepath,
     loadFile,
+    changeCurrentProjectRoot,
+    fileMoved,
   } = useFileStore((state) => ({
     shareUserList: state.shareUserList,
     projectSync: state.projectSync,
@@ -36,6 +81,8 @@ const TopBar = (props) => {
     currentProjectRoot: state.currentProjectRoot,
     filepath: state.filepath,
     loadFile: state.loadFile,
+    changeCurrentProjectRoot: state.changeCurrentProjectRoot,
+    fileMoved: state.fileMoved,
   }));
 
   const handleClick = (type) => {
@@ -65,9 +112,63 @@ const TopBar = (props) => {
     // { key: "More", src: down, label: "", click: handleClick },
   ];
 
-  useEffect(() => {
-    console.log(shareUserList, "projectSync");
-  }, [shareUserList]);
+  // rename
+  const [isEditing, setIsEditing] = useState(false);
+
+  const [value, setValue] = useState(currentProjectRoot);
+  const inputRef = useRef(null);
+
+  const handleChange = (event) => {
+    console.log(event.target.value, "event.target.value");
+    setValue(event.target.value);
+  };
+
+  const handleBlur = () => {
+    setIsEditing(false);
+    handleDirRenameConfirm(value);
+  };
+
+  const handleDirRenameConfirm = async (value) => {
+    if (!value || value == "") {
+      return;
+    }
+    try {
+      // Rename the directory
+      await pify(fs.rename)(currentProjectRoot, value);
+
+      setValue(value);
+      fileMoved({ fromPath: currentProjectRoot, destPath: value });
+      changeCurrentProjectRoot({ projectRoot: value });
+    } catch (error) {
+      console.error("Error renaming directory:", error);
+    }
+  };
+  const handleKeyDown = (ev) => {
+    if (ev.key === "Escape") {
+      setValue(changeCurrentProjectRoot);
+      setIsEditing(false);
+    } else if (ev.key === "Enter") {
+      handleDirRenameConfirm(value);
+      setIsEditing(false);
+    }
+  };
+
+  const handleEditClick = () => {
+    setIsEditing(true);
+    setTimeout(() => {
+      if (inputRef.current) {
+        inputRef.current.focus();
+        renameSection(currentProjectRoot);
+      }
+    }, 0);
+  };
+
+  const renameSection = (filepath) => {
+    setTimeout(() => {
+      inputRef.current.focus();
+      inputRef.current.setSelectionRange(0, filepath.length);
+    }, 0);
+  };
 
   return (
     <div className="flex items-center justify-between p-2 bg-[#f9fdfd]">
@@ -80,15 +181,35 @@ const TopBar = (props) => {
           className="cursor-pointer hover:opacity-50"
         />
         <img src={logoIcon} alt="icon" className="mx-2" />
-        <span className="ml-2 text-black font-bold">Project</span>
+        <span className="ml-2 text-black font-bold font-arx">Project</span>
       </div>
       <div
-        className="flex justify-center text-center w-2/5 text-[0.9rem] font-math"
+        className="h-full group flex justify-center items-center text-center w-2/5 text-[0.9rem]"
         title={currentProjectRoot}
+        onDoubleClick={handleEditClick}
       >
-        <span className="w-4/5 text-ellipsis whitespace-nowrap overflow-hidden">
-          {currentProjectRoot}
-        </span>
+        <div className="flex items-center justify-center w-4/5 text-ellipsis whitespace-nowrap overflow-hidden relative">
+          {isEditing ? (
+            <RenameTextInput
+              value={value}
+              handleChange={handleChange}
+              handleBlur={handleBlur}
+              handleKeyDown={handleKeyDown}
+              inputRef={inputRef}
+            />
+          ) : (
+            <React.Fragment>
+              <span className="h-full text-[1rem]  text-center font-arx">
+                {currentProjectRoot}
+              </span>
+              <ArIcon
+                name="Edit"
+                className="ml-2 w-4 h-4 opacity-0 group-hover:opacity-100 cursor-pointer"
+                onClick={handleEditClick}
+              />
+            </React.Fragment>
+          )}
+        </div>
       </div>
       <div className="flex items-center space-x-20 mr-4 w-2/5 justify-end">
         {!!projectSync && (

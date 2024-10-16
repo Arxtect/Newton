@@ -19,11 +19,6 @@ const AddFile = ({ parentDir, depth, inputRef }) => {
   }));
 
   const [value, setValue] = useState("");
-  useEffect(() => {
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, []);
 
   const handleChange = (event) => {
     setValue(event.target.value);

@@ -62,6 +62,22 @@ class CustomCompleter {
     });
   }
 
+  async changeCurrentFileListAndBibFilePathList(fileList, bibFilePathList) {
+    this.fileList = fileList;
+    this.bibFilePathList = bibFilePathList;
+    this.inputCustomCompleter = this.createInputCustomCompleter(
+      fileList,
+      this.autoCompletefilepath
+    );
+    this.includeGraphicsCustomCompleter =
+      this.createIncludeGraphicsCompleter(fileList);
+    this.commandManager = new CommandManager(fileList);
+    this.packageManager = new PackageManager(this.fileList);
+    this.labelCustomCompleter = await this.createLabelCompleter(this.fileList);
+    const citations = await this.parseBibFile(this.bibFilePathList);
+    this.citeCustomCompleter = this.createCiteCompleter(citations);
+  }
+
   async init() {
     const citations = await this.parseBibFile(this.bibFilePathList);
     this.labelCustomCompleter = await this.createLabelCompleter(this.fileList);
@@ -202,6 +218,12 @@ class CustomCompleter {
     const line = session.getLine(pos.row);
     const beforeCursor = line.slice(0, pos.column);
     const afterCursor = line.slice(pos.column);
+
+      const selection = this.editor.getSelectionRange();
+      if (!selection.isEmpty()) {
+        return; // 如果有选区，则不触发自动补全
+      }
+
 
     const completersList = [
       {

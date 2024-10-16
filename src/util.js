@@ -25,6 +25,7 @@ import ini from "ini";
 import { format } from "date-fns";
 import { pdfjs } from "react-pdf";
 import path from "path";
+import { textExtensions, editableFilenames } from "@/constant";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
@@ -214,22 +215,14 @@ export async function pdfToImageFirst(pdfUrl) {
   return blob;
 }
 
-export const assetExtensions = [
-  "jpg",
-  "jpeg",
-  "png",
-  "gif",
-  "bmp",
-  "pdf",
-  "mp4",
-  "mp3",
-  "wav",
-  "svg",
-];
-
 export function isAssetExtension(filename) {
-  const ext = path.extname(filename).slice(1).toLowerCase();
-  if (assetExtensions.includes(ext)) {
+  const extension = path.extname(filename).slice(1).toLowerCase();
+  const basename = path.basename(filename);
+  const isEditableTextFile =
+    textExtensions.includes(extension) ||
+    editableFilenames.includes(basename.toLowerCase());
+
+  if (!isEditableTextFile) {
     return true;
   }
   return false;

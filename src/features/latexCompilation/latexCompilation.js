@@ -18,41 +18,7 @@ import { getAllFileNames } from "@/domain/filesystem";
 import HumanReadableLogs from "./human-readable-logs/HumanReadableLogs";
 import { pdftexEngine, xetexEngine, dviEngine } from "./loadEngines";
 
-const LATEX_FILE_EXTENSIONS = [
-  ".tex",
-  ".cls",
-  ".sty",
-  ".bib",
-  ".aux",
-  ".log",
-  ".toc",
-  ".lof",
-  ".lot",
-  ".idx",
-  ".ind",
-  ".ilg",
-  ".glo",
-  ".gls",
-  ".ist",
-  ".acn",
-  ".acr",
-  ".alg",
-  ".glg",
-  ".glsdefs",
-  ".xdy",
-  ".bst",
-  ".eps",
-  ".pdf",
-  ".png",
-  ".jpg",
-  ".jpeg",
-  ".gif",
-  ".bmp",
-  ".svg",
-  ".py",
-  ".txt",
-  ".sh",
-];
+
 
 const IgnoreFile = [".DS_Store", ".gitignore", ".git"];
 

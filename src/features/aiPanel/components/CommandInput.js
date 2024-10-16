@@ -15,15 +15,16 @@ import ArIcon from "@/components/arIcon";
 const IconList = {
   "9a1686f4-e641-474a-96c5-c6812908e046": "Text", // Newton General
   "22930441-0b94-4252-9db9-c05256550002": "Text", // Newton Selection Writing
-  "23f33933-67f5-4a8c-9f94-be3265c7ffd9": "Equation", //Newton LaTex Equation
+  "23f33933-67f5-4a8c-9f94-be3265c7ffd9": "Equation", //Add An Equation
   "cc3378c3-dd99-4c9a-8a12-8f81e2e71acd": "Explain", //Section Polisher
+  "3fe91c2b-0924-4080-82fb-47c4f6ee8929": "ChatTable", // Add An Table
 };
 
 export function getChatApiUrl() {
   return `/api/v1/chat/chat-messages`;
 }
 
-export function ShowLastChat({ chatList, isResponding,...res }) {
+export function ShowLastChat({ chatList, isResponding, ...res }) {
   console.log(chatList, "chatList");
   return (
     <Paper
@@ -302,14 +303,14 @@ const CommandInput = forwardRef(
                       index === hoveredIndex ? "#f0f0f0" : "inherit",
                   }}
                 >
-                  <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-3 h-5">
                     <ArIcon
                       loading="lazy"
                       name={option.icon}
                       alt={option.text}
                       className="object-contain shrink-0 w-6 h-5 aspect-square"
                     />
-                    <span className="font-medium text-gray-900">
+                    <span className="font-medium text-gray-900 h-full leading-6">
                       {option.text}
                     </span>
                   </div>

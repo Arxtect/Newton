@@ -50,6 +50,7 @@ const FileLine = ({
     currentSelectDir,
     renamingPathname,
     isDropFileSystem,
+    assetsFilePath,
   } = useFileStore((state) => ({
     editorValue: state.value,
     saveFile: state.saveFile,
@@ -58,6 +59,7 @@ const FileLine = ({
     deleteFile: state.deleteFile,
     renamingPathname: state.renamingPathname,
     isDropFileSystem: state.isDropFileSystem,
+    assetsFilePath: state.assetsFilePath,
   }));
   const basename = path.basename(filepath);
 
@@ -87,13 +89,19 @@ const FileLine = ({
     handleRenameConfirm(value);
   };
   const handleRename = useCallback(() => {
+    if (!inputRef.current && !filepath) return;
     startRenaming({ pathname: filepath });
-    setTimeout(() => {
-      if (inputRef.current) {
-        inputRef.current.focus();
-      }
-    }, [0]);
+    renameSection(filepath);
   }, [filepath, inputRef, startRenaming]);
+
+  const renameSection = (filepath) => {
+    setTimeout(() => {
+      const basename = path.basename(filepath);
+      const filenameNoExt = path.parse(basename).name;
+      inputRef.current.focus();
+      inputRef.current.setSelectionRange(0, filenameNoExt?.length);
+    }, 0);
+  };
 
   const handleKeyDown = (ev) => {
     if (ev.key === "Escape") {
@@ -200,7 +208,12 @@ const FileLine = ({
           }}
         >
           <Container
-            selected={editingFilepath === filepath && currentSelectDir == ""}
+            selected={
+              (assetsFilePath && assetsFilePath === filepath) ||
+              (!assetsFilePath &&
+                editingFilepath === filepath &&
+                currentSelectDir === "")
+            }
           >
             <div
               className="flex items-center"

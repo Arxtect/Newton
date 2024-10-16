@@ -5,7 +5,7 @@ import path from "path";
 import * as FS from "domain/filesystem";
 import { AceBinding } from "./ace-binding"; // 导入AceBinding
 import { uploadFile, downloadFile } from "./minio";
-import { assetExtensions } from "@/util";
+import { assetExtensions } from "@/constant";
 import { debounce } from "@/util";
 import { Awareness } from "y-protocols/awareness.js"; // eslint-disable-line
 import { getColors } from "@/util";

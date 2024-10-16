@@ -21,11 +21,6 @@ const AddDir = ({ parentDir, depth, inputRef }) => {
     }));
   const [value, setValue] = useState("");
 
-  // useEffect(() => {
-  //   if (inputRef.current) {
-  //     inputRef.current.focus();
-  //   }
-  // }, []);
 
   const handleInputChange = (event) => {
     setValue(event.target.value);

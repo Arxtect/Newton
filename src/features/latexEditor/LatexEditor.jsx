@@ -11,6 +11,7 @@ import EditorStateManager from "./component/editorStateManager"; // Import the c
 import AiTools from "./component/aiTools";
 import useAutoCompile from "./hook";
 import { useEngineStatusStore } from "@/store";
+import FileView from "@/features/fileView";
 
 const LatexEditor = ({ handleChange, sourceCode, filepath, mainFilepath }) => {
   const latexRef = useRef(null);
@@ -20,12 +21,19 @@ const LatexEditor = ({ handleChange, sourceCode, filepath, mainFilepath }) => {
     updateEditor: state.updateEditor,
   }));
 
-  const { loadFile, currentProjectRoot, updateCurrentProjectFileList } =
-    useFileStore((state) => ({
-      loadFile: state.loadFile,
-      currentProjectRoot: state.currentProjectRoot,
-      updateCurrentProjectFileList: state.updateCurrentProjectFileList,
-    }));
+  const {
+    loadFile,
+    currentProjectRoot,
+    updateCurrentProjectFileList,
+    touchCounter,
+    assetsFilePath,
+  } = useFileStore((state) => ({
+    loadFile: state.loadFile,
+    currentProjectRoot: state.currentProjectRoot,
+    updateCurrentProjectFileList: state.updateCurrentProjectFileList,
+    touchCounter: state.touchCounter,
+    assetsFilePath: state.assetsFilePath,
+  }));
 
   useEffect(() => {
     console.log(latexRef.current, "latexRef.current");
@@ -52,11 +60,18 @@ const LatexEditor = ({ handleChange, sourceCode, filepath, mainFilepath }) => {
       updateCurrentProjectFileList(currentProjectRoot).then(
         ([fileList, bibFilepathList]) => {
           setIsSetupCompleter(true);
+          if (completer) {
+            completer.changeCurrentFileListAndBibFilePathList(
+              fileList,
+              bibFilepathList
+            );
+          }
           if (isSetupCompleter) {
             completer && completer.changeCurrentFilePath(filepath);
             completer && completer.changeCitationCompleter(bibFilepathList);
             return;
           }
+          console.log(fileList, bibFilepathList, "fileList, bibFilepathList");
           let newCompleter = new AutoCompleteManager(
             latexRef.current.editor,
             fileList,
@@ -68,7 +83,7 @@ const LatexEditor = ({ handleChange, sourceCode, filepath, mainFilepath }) => {
         }
       );
     }
-  }, [filepath, currentProjectRoot]);
+  }, [filepath, currentProjectRoot, touchCounter]);
 
   useEffect(() => {
     return () => {
@@ -134,7 +149,7 @@ const LatexEditor = ({ handleChange, sourceCode, filepath, mainFilepath }) => {
       {latexRef?.current?.editor && (
         <AiTools editor={latexRef.current.editor} completer={completer} />
       )}
-      <div id="users"></div>
+      {!!assetsFilePath && <FileView filename={assetsFilePath} />}
     </div>
   );
 };

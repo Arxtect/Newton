@@ -645,7 +645,7 @@ module.exports = function (webpackEnv) {
       ].filter(Boolean),
     },
     plugins: [
-      !isEnvProduction && new BundleAnalyzerPlugin(),
+      // !isEnvProduction && new BundleAnalyzerPlugin(),
       isEnvProduction &&
         sentryWebpackPlugin({
           org: "arxtect",

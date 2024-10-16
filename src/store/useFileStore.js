@@ -174,8 +174,8 @@ export const useFileStore = create()(
           set({
             assetsFilePath: filepath,
             // assetValue: fileContent,
-            value: "",
-            filepath: "",
+            // value: "",
+            // filepath: "",
             lastSavedValue: "",
             changed: false,
             // currentSelectDir: "",

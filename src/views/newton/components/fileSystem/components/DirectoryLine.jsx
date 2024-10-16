@@ -175,10 +175,17 @@ const DirectoryLineContent = ({
   const inputRef = useRef(null);
 
   useEffect(() => {
-    if (inputRef.current) {
-      inputRef.current.focus();
+    if (inputRef.current && renamingPathname) {
+      renameSection(renamingPathname);
     }
   }, [inputRef.current, renamingPathname]);
+
+  const renameSection = (filepath) => {
+    setTimeout(() => {
+      inputRef.current.focus();
+      inputRef.current.setSelectionRange(0, filepath.length);
+    }, 0);
+  };
 
   const handleChange = (event) => {
     setValue(event.target.value);
@@ -190,11 +197,6 @@ const DirectoryLineContent = ({
   };
   const handleRename = useCallback(() => {
     startRenaming({ pathname: dirpath });
-    setTimeout(() => {
-      if (inputRef.current) {
-        inputRef.current.focus();
-      }
-    }, [0]);
   }, [startRenaming, dirpath]);
 
   const handleKeyDown = (ev) => {
