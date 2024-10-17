@@ -142,6 +142,10 @@ const FileLine = ({
     setHovered(false);
   };
 
+  const onRename = (e) => {
+    e.stopPropagation();
+    handleRename();
+  };
   if (renamingPathname === filepath) {
     return (
       <Box
@@ -233,6 +237,15 @@ const FileLine = ({
                     pushScene({ nextScene: "edit" });
                   }
                 }}
+                onDoubleClick={(e) => {
+                  if (
+                    filepath !== editingFilepath &&
+                    filepath !== assetsFilePath
+                  ) {
+                    return;
+                  }
+                  onRename(e);
+                }}
               >
                 <ListItemIcon
                   style={{
@@ -249,10 +262,7 @@ const FileLine = ({
                   e.stopPropagation();
                   deleteFile({ filename: filepath });
                 }}
-                onRename={(e) => {
-                  e.stopPropagation();
-                  handleRename();
-                }}
+                onRename={onRename}
                 menuItems={menuItems}
                 hovered={hovered}
               />

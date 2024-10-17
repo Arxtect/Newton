@@ -141,6 +141,7 @@ class Parser {
 Parser.initClass();
 
 class CommandManager {
+
   constructor(fileList) {
     this.fileList = fileList;
     // this.metadataManager = metadataManager

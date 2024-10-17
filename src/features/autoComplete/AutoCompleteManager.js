@@ -9,7 +9,44 @@ import { removeTexExtension } from "./snippets/buildIncludeCompletions";
 
 const CHUNK_SIZE = 1000; // 每次处理1000行
 
-class CustomCompleter {
+const REGEX_PATTERNS = {
+  inputInclude: {
+    line: /\\(input|include)\{\s*\}/,
+    beforeCursor: /\\(input|include)\{\s*$/,
+    afterCursor: /^[^}]*\}/,
+  },
+  includeGraphics: {
+    line: /\\includegraphics(\[[^\]]*\])?\{\s*\}/,
+    beforeCursor: /\\includegraphics(\[[^\]]*\])?\{\s*$/,
+    afterCursor: /^[^}]*\}/,
+  },
+  ref: {
+    line: /\\ref\{\s*\}/,
+    beforeCursor: /\\ref\{\s*$/,
+    afterCursor: /^[^}]*\}/,
+  },
+  cite: {
+    line: /\\cite\{\s*\}/,
+    beforeCursor: /\\cite\{\s*$/,
+    afterCursor: /^[^}]*\}/,
+  },
+  begin: {
+    line: /\\begin\{[^}]*\}/,
+    beforeCursor: /\\begin\{[^}]*$/,
+    afterCursor: /^[^}]*\}/,
+  },
+  usepackage: {
+    line: /\\usepackage(\[[^\]]*\])?\{\s*\}|\s*\\usepackage\s*\{\s*\}/,
+    beforeCursor: /\\usepackage(\[[^\]]*\])?\{\s*$|\s*\\usepackage\s*\{\s*$/,
+    afterCursor: /^[^}]*\}/,
+  },
+  command: {
+    beforeCursor: /\\[a-zA-Z]*$/,
+    line: /\\[a-zA-Z]*$/,
+  },
+};
+
+class AutoCompleteManager {
   constructor(
     editor,
     fileList,
@@ -131,11 +168,10 @@ class CustomCompleter {
     return {
       getCompletions: (editor, session, pos, prefix, callback) => {
         const line = session.getLine(pos.row);
-        const match = /\\(input|include)\{[^}]*\}/.test(line);
+        const match = REGEX_PATTERNS.inputInclude.line.test(line);
 
         const fileExt = path.extname(currentFilePath);
         const isTex = fileExt === ".tex";
-        console.log("isTex", isTex);
         if (match && isTex) {
           const completions = files.getTeXFiles(fileList)?.map((file) => ({
             caption: file.path,
@@ -154,7 +190,7 @@ class CustomCompleter {
     return {
       getCompletions: (editor, session, pos, prefix, callback) => {
         const line = session.getLine(pos.row);
-        const match = /\\includegraphics(\[[^\]]*\])?\{[^}]*\}/.test(line);
+        const match = REGEX_PATTERNS.includeGraphics.line.test(line);
 
         if (match) {
           const completions = files.getImageFiles(fileList)?.map((file) => ({
@@ -178,7 +214,7 @@ class CustomCompleter {
     return {
       getCompletions: (editor, session, pos, prefix, callback) => {
         const line = session.getLine(pos.row);
-        const match = /\\ref\{[^}]*\}/.test(line);
+        const match = REGEX_PATTERNS.ref.line.test(line);
         if (match) {
           const completions = labels.map((label) => ({
             caption: label,
@@ -197,7 +233,13 @@ class CustomCompleter {
     return {
       getCompletions: (editor, session, pos, prefix, callback) => {
         const line = session.getLine(pos.row);
-        const match = /\\cite\{.*?\}/.test(line);
+        const beforeCursor = line.slice(0, pos.column);
+        const afterCursor = line.slice(pos.column);
+
+        const match =
+          REGEX_PATTERNS.cite.line.test(line) &&
+          REGEX_PATTERNS.cite.beforeCursor.test(beforeCursor) &&
+          REGEX_PATTERNS.cite.afterCursor.test(afterCursor);
         if (match) {
           const completions = citations.map((citation) => ({
             caption: citation,
@@ -219,43 +261,45 @@ class CustomCompleter {
     const beforeCursor = line.slice(0, pos.column);
     const afterCursor = line.slice(pos.column);
 
-      const selection = this.editor.getSelectionRange();
-      if (!selection.isEmpty()) {
-        return; // 如果有选区，则不触发自动补全
-      }
-
+    const selection = this.editor.getSelectionRange();
+    if (!selection.isEmpty()) {
+      return; // 如果有选区，则不触发自动补全
+    }
 
     const completersList = [
       {
-        match: /\\(input|include)\{.*?\}/,
+        match: REGEX_PATTERNS.inputInclude.line,
         insideBraces:
-          /\\(input|include)\{[^}]*$/.test(beforeCursor) &&
-          /^[^}]*\}/.test(afterCursor),
+          REGEX_PATTERNS.inputInclude.beforeCursor.test(beforeCursor) &&
+          REGEX_PATTERNS.inputInclude.afterCursor.test(afterCursor),
         completer: this.inputCustomCompleter,
       },
       {
-        match: /\\includegraphics(\[[^\]]*\])?\{.*?\}/,
+        match: REGEX_PATTERNS.includeGraphics.line,
         insideBraces:
-          /\\includegraphics(\[[^\]]*\])?\{[^}]*$/.test(beforeCursor) &&
-          /^[^}]*\}/.test(afterCursor),
+          REGEX_PATTERNS.includeGraphics.beforeCursor.test(beforeCursor) &&
+          REGEX_PATTERNS.includeGraphics.afterCursor.test(afterCursor),
         completer: this.includeGraphicsCustomCompleter,
       },
       {
-        match: /\\ref\{.*?\}/,
+        match: REGEX_PATTERNS.ref.line,
         insideBraces:
-          /\\ref\{[^}]*$/.test(beforeCursor) && /^[^}]*\}/.test(afterCursor),
+          REGEX_PATTERNS.ref.beforeCursor.test(beforeCursor) &&
+          REGEX_PATTERNS.ref.afterCursor.test(afterCursor),
         completer: this.labelCustomCompleter,
       },
       {
-        match: /\\cite\{.*?\}/,
+        match: REGEX_PATTERNS.cite.line,
         insideBraces:
-          /\\cite\{[^}]*$/.test(beforeCursor) && /^[^}]*\}/.test(afterCursor),
+          REGEX_PATTERNS.cite.beforeCursor.test(beforeCursor) &&
+          REGEX_PATTERNS.cite.afterCursor.test(afterCursor),
         completer: this.citeCustomCompleter,
       },
       {
-        match: /\\begin\{.*?\}/,
+        match: REGEX_PATTERNS.begin.line,
         insideBraces:
-          /\\begin\{[^}]*$/.test(beforeCursor) && /^[^}]*\}/.test(afterCursor),
+          REGEX_PATTERNS.begin.beforeCursor.test(beforeCursor) &&
+          REGEX_PATTERNS.begin.afterCursor.test(afterCursor),
         completer: {
           getCompletions: (editor, session, pos, prefix, callback) => {
             this.environmentManager.getCompletions(
@@ -269,10 +313,10 @@ class CustomCompleter {
         },
       },
       {
-        match: /\\usepackage\{.*?\}/,
+        match: REGEX_PATTERNS.usepackage.line,
         insideBraces:
-          /\\usepackage\{[^}]*$/.test(beforeCursor) &&
-          /^[^}]*\}/.test(afterCursor),
+          REGEX_PATTERNS.usepackage.beforeCursor.test(beforeCursor) &&
+          REGEX_PATTERNS.usepackage.afterCursor.test(afterCursor),
         completer: {
           getCompletions: (editor, session, pos, prefix, callback) => {
             this.packageManager.getCompletions(
@@ -286,10 +330,12 @@ class CustomCompleter {
         },
       },
       {
-        match: /^\\[a-zA-Z]*$/,
-        insideBraces: /^\\[a-zA-Z]*$/.test(beforeCursor),
+        match: REGEX_PATTERNS.command.line,
+        insideBraces: REGEX_PATTERNS.command.beforeCursor.test(beforeCursor),
         completer: {
           getCompletions: (editor, session, pos, prefix, callback) => {
+            console.log("Prefix:", prefix);
+
             this.commandManager.getCompletions(
               editor,
               session,
@@ -301,12 +347,10 @@ class CustomCompleter {
         },
       },
     ];
-
-    console.log(line, beforeCursor, /\\/.test(beforeCursor), "123");
-
     const matchedCompleter = completersList.find(
       (item) => item.match.test(line) && item.insideBraces
     );
+    console.log("Prefix:1", line);
 
     if (matchedCompleter) {
       this.editor.completers = [matchedCompleter.completer];
@@ -322,9 +366,12 @@ class CustomCompleter {
     if (e.command.name === "insertstring" && /[{}]/.test(e.args)) {
       this.triggerAutocomplete();
     }
+    if (e.command.name === "backspace" || e.command.name === "del") {
+      this.triggerAutocomplete();
+    }
   };
+
   onTriggerAutocompleteChangeCursor = () => {
-    console.log("onTriggerAutocompleteChangeCursor");
     this.triggerAutocomplete();
   };
 
@@ -351,4 +398,4 @@ class CustomCompleter {
   }
 }
 
-export default CustomCompleter;
+export default AutoCompleteManager;
