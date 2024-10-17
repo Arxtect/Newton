@@ -368,12 +368,12 @@ const AiTools = ({ editor, completer }) => {
           selectedContent={selectedContent}
         />
       </div>
-      {showTooltip && (
+      {/* {showTooltip && (
         <SelectionTooltip
           message={"Ctrl/Command + I  AI Command"}
           position={toolbarPosition}
         />
-      )}
+      )} */}
        <FloatingButton
           showAiTools={showDropdown}
           setShowAiTools={setShowDropdown}
