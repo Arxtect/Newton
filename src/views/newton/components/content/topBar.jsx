@@ -254,11 +254,12 @@ const ContentTopBar = (props) => {
                   color="#inherit"
                   aria-label="toggleView"
                   size="small"
+                  
                   // onClick={() => icon.click(icon.key)}
                 >
                   <ArIcon
                     name={icon.src}
-                    className="text-[#41DE07] w-6 h-6 cursor-pointer hover:opacity-75"
+                    className="text-black w-6 h-6 cursor-pointer hover:opacity-75"
                   />
                 </IconButton>
               </AiPanel>

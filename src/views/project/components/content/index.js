@@ -212,7 +212,11 @@ const Content = React.forwardRef(
           }
           break;
         case "all":
-          if (user?.email && !item.isClosed) {
+          if (
+            user?.email &&
+            !item.isClosed &&
+            (item?.email == user?.email || item?.isSync)
+          ) {
             return {
               id: index + 1,
               ...item,
