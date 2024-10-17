@@ -334,7 +334,7 @@ class AutoCompleteManager {
         insideBraces: REGEX_PATTERNS.command.beforeCursor.test(beforeCursor),
         completer: {
           getCompletions: (editor, session, pos, prefix, callback) => {
-            console.log("Prefix:", prefix);
+            console.log("Prefix:", pos, prefix);
 
             this.commandManager.getCompletions(
               editor,
@@ -363,10 +363,10 @@ class AutoCompleteManager {
 
   onTriggerAutocompleteAfterExec = (e) => {
     if (e.command.name === "insertstring" && /[{}]/.test(e.args)) {
-      // this.triggerAutocomplete();
+      this.triggerAutocomplete();
     }
     if (e.command.name === "backspace" || e.command.name === "del") {
-      // this.triggerAutocomplete();
+      this.triggerAutocomplete();
     }
   };
 
