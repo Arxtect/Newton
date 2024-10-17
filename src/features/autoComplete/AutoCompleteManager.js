@@ -350,7 +350,6 @@ class AutoCompleteManager {
     const matchedCompleter = completersList.find(
       (item) => item.match.test(line) && item.insideBraces
     );
-    console.log("Prefix:1", line);
 
     if (matchedCompleter) {
       this.editor.completers = [matchedCompleter.completer];
@@ -364,10 +363,10 @@ class AutoCompleteManager {
 
   onTriggerAutocompleteAfterExec = (e) => {
     if (e.command.name === "insertstring" && /[{}]/.test(e.args)) {
-      this.triggerAutocomplete();
+      // this.triggerAutocomplete();
     }
     if (e.command.name === "backspace" || e.command.name === "del") {
-      this.triggerAutocomplete();
+      // this.triggerAutocomplete();
     }
   };
 
