@@ -1,15 +1,22 @@
+/*
+ * @Description:
+ * @Author: Devin
+ * @Date: 2024-10-18 15:40:34
+ */
 import React, { useEffect } from "react";
 import ArIcon from "@/components/arIcon";
 
-const FloatingButton = ({ showAiTools, setShowAiTools, isSelection, floatingPosition }) => {
-
+const FloatingButton = ({
+  showAiTools,
+  setShowAiTools,
+  isSelection,
+  floatingPosition,
+  selectHandler,
+}) => {
   const handleButtonClick = () => {
     setShowAiTools(true);
+    selectHandler();
   };
-
-  useEffect(() => {
-    console.log(isSelection, showAiTools, 'showAiTools');
-  }, [isSelection, showAiTools]);
 
   return (
     <div>
@@ -20,7 +27,8 @@ const FloatingButton = ({ showAiTools, setShowAiTools, isSelection, floatingPosi
             top: floatingPosition.top,
             left: floatingPosition.left,
             transform: "translateX(-150%)",
-            boxShadow: "rgba(15, 15, 15, 0.1) 0px 0px 0px 1px, rgba(15, 15, 15, 0.1) 0px 2px 4px",
+            boxShadow:
+              "rgba(15, 15, 15, 0.1) 0px 0px 0px 1px, rgba(15, 15, 15, 0.1) 0px 2px 4px",
           }}
           onClick={handleButtonClick}
         >

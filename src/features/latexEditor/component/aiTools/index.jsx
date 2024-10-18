@@ -12,7 +12,7 @@ import "./index.css"; // 引入样式文件
 import SelectionTooltip from "./SelectionTooltip";
 import AiConfirm from "../aiConfirm";
 import { useChatStore } from "@/store";
-import FloatingButton from "../floatingButton"
+import FloatingButton from "../floatingButton";
 
 const Range = Ace.require("ace/range").Range;
 
@@ -175,7 +175,7 @@ const AiTools = ({ editor, completer }) => {
     const visualLineCount = session.getRowLength(cursorPosition.row);
 
     const editorElement = editor.container;
-    const rect = editorElement.getBoundingClientRect();//视口的位置和尺寸信息。
+    const rect = editorElement.getBoundingClientRect(); //视口的位置和尺寸信息。
     const lineNumberWidth = editor.renderer.gutterWidth; //显示行占用宽度
 
     const toolbarTop =
@@ -186,10 +186,12 @@ const AiTools = ({ editor, completer }) => {
     const toolbarLeft = screenCoordinates.pageX - sideWidthRef.current;
     setToolbarPosition({ top: toolbarTop, left: toolbarLeft });
 
-    const floatingTop =  screenCoordinates.pageY -rect.top +3
-    const floatingLeft =  screenCoordinates.pageX + rect.width - sideWidthRef.current  -lineNumberWidth ;
-    ;
-
+    const floatingTop = screenCoordinates.pageY - rect.top + 3;
+    const floatingLeft =
+      screenCoordinates.pageX +
+      rect.width -
+      sideWidthRef.current -
+      lineNumberWidth;
     setFloatingPosition({ top: floatingTop, left: floatingLeft });
   };
 
@@ -235,25 +237,29 @@ const AiTools = ({ editor, completer }) => {
     handleShowDropdown(cursorPosition, session);
   };
 
-  const handleSelectViaName = (name = "Continuous Writing") => {
+  const handleSelectViaName = (name = "Continue Writing") => {
     //Section Polisher
     if (commandInputRef.current) {
       commandInputRef.current.handleSelectViaName(name);
     }
   };
 
+  const selectHandler = () => { 
+      const selectedText = editor.getSelectedText();
+      setShowTooltip(false);
+      if (!selectedText) return;
+      setIsSelection(true);
+      handleSelectViaName();
+      setShowDropdown(true);
+      setSelectedContent(selectedText);
+  }
+
   const addCustomCommand = (editor) => {
     editor.commands.addCommand({
       name: "showCustomComponent",
       bindKey: { win: "Ctrl-I", mac: "Cmd-I" },
       exec: () => {
-        const selectedText = editor.getSelectedText();
-        setShowTooltip(false);
-        if (!selectedText) return;
-        setIsSelection(true);
-        handleSelectViaName("Newton Selection Writing");
-        setShowDropdown(true);
-        setSelectedContent(selectedText);
+        selectHandler()
       },
     });
   };
@@ -374,12 +380,13 @@ const AiTools = ({ editor, completer }) => {
           position={toolbarPosition}
         />
       )} */}
-       <FloatingButton
-          showAiTools={showDropdown}
-          setShowAiTools={setShowDropdown}
-          isSelection={showTooltip}
-          floatingPosition={floatingPosition}
-        />
+      <FloatingButton
+        showAiTools={showDropdown}
+        setShowAiTools={setShowDropdown}
+        isSelection={showTooltip}
+        floatingPosition={floatingPosition}
+        selectHandler={selectHandler}
+      />
       <AiConfirm />
     </React.Fragment>
   );
