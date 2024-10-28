@@ -53,7 +53,7 @@ const NoRouteLogin = ({ handleClose }) => {
         handleClose();
 
         otherOperation && otherOperation();
-        updateOtherOperation(null)
+        updateOtherOperation(null);
       }, [0]);
     } catch (error) {
       const errorMessage =
@@ -112,7 +112,7 @@ const NoRouteLogin = ({ handleClose }) => {
 
             <div className="flex justify-end mb-4">
               <a
-                href="/project/#/forgotpassword"
+                href="/forgotpassword"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-arxTheme hover:underline"
@@ -131,7 +131,7 @@ const NoRouteLogin = ({ handleClose }) => {
             <div className="mt-4">
               Need an account?{" "}
               <a
-                href="/project/#/register"
+                href="/register"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-arxTheme hover:underline"

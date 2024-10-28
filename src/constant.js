@@ -100,3 +100,5 @@ const LATEX_FILE_EXTENSIONS = [
   ".txt",
   ".sh",
 ];
+
+export const ArxtectrURL = "https://arxtect.com";

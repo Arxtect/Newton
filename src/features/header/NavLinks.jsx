@@ -2,6 +2,7 @@ import React from "react";
 import { HashLink } from "react-router-hash-link";
 import { Link } from "react-router-dom";
 import UserMenu from "./UserMenu";
+import { ArxtectrURL } from "@/constant";
 
 const NavLinksLg = () => {
   return (
@@ -9,40 +10,37 @@ const NavLinksLg = () => {
       <div className="flex items-center space-x-7">
         <a
           className="px-4 flex justify-center text-[1.1rem] font-[600] text-dark hover:text-blue-900 "
-          
-          href="/#home"
+          href={`${ArxtectrURL}/#home`}
         >
           Home
         </a>
         <a
           className="px-4 flex justify-center text-[1.1rem] font-[600] text-gray-900 hover:text-blue-900 "
-          
-          href="/#about"
+          href={`${ArxtectrURL}/#about`}
         >
           About
         </a>
         <a
           className="px-4 flex justify-center text-[1.1rem] font-[600] text-gray-900 hover:text-blue-900"
-          
-          href="/project"
+          href="/#/project"
         >
           Editor
         </a>
         <a
           className="px-4 flex justify-center text-[1.1rem] font-[600] text-gray-900 hover:text-blue-900"
-          href="/project/#einstein"
+          href="/#/einstein"
         >
           Publishing
         </a>
         <a
           className="px-4 flex justify-center text-[1.1rem] font-[600] text-gray-900 hover:text-blue-900"
-          href="/#social"
+          href={`${ArxtectrURL}/#social`}
         >
           Social
         </a>
         <a
           className="px-4 flex justify-center text-[1.1rem] font-[600] text-gray-900 hover:text-blue-900 whitespace-nowrap overflow-hidden text-ellipsis"
-          href="/contact/#contact"
+          href={`${ArxtectrURL}/contact/#contact`}
         >
           Join us
         </a>
@@ -57,40 +55,37 @@ const NavLinksSm = () => {
     <>
       <a
         className="px-4 flex justify-center text-[1.1rem] font-[600] text-dark hover:text-blue-900"
-        
-        href="/#home"
+        href={`${ArxtectrURL}/#home`}
       >
         Home
       </a>
       <a
         className="px-4 flex justify-center text-[1.1rem] font-[600] text-gray-900 hover:text-blue-900"
-        
-        href="/#about"
+        href={`${ArxtectrURL}/#about`}
       >
         About
       </a>
       <a
         className="px-4 flex justify-center text-[1.1rem] font-[600] text-gray-900 hover:text-blue-900"
-        
-        href="/project"
+        href="/#/project"
       >
         Editor
       </a>
       <a
         className="px-4 flex justify-center text-[1.1rem] font-[600] text-gray-900 hover:text-blue-900"
-        href="/project/#einstein"
+        href="/#/einstein"
       >
         Publishing
       </a>
       <a
         className="px-4 flex justify-center text-[1.1rem] font-[600] text-gray-900 hover:text-blue-900"
-        href="/#social"
+        href={`${ArxtectrURL}/#social`}
       >
         Social
       </a>
       <a
         className="px-4 flex justify-center text-[1.1rem] font-[600] text-gray-900 hover:text-blue-900"
-        href="/contact/#contact"
+        href={`${ArxtectrURL}/contact/#contact`}
       >
         Join us
       </a>

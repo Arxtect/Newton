@@ -35,7 +35,7 @@ const Share = ({
 
   useEffect(() => {
     if (!rootPath || !user || JSON.stringify(user) === "{}") return;
-    const generatedLink = `${window.location.origin}/project#/project?project=${rootPath}&&roomId=${user.id}`;
+    const generatedLink = `${window.location.origin}/#/project?project=${rootPath}&&roomId=${user.id}`;
     setLink(generatedLink);
   }, [user, rootPath]);
 
