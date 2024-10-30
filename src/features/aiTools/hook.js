@@ -8,7 +8,7 @@ import { produce, setAutoFreeze } from "immer";
 import { ssePost } from "./ssePost";
 import { useTimestamp } from "@/useHooks";
 import { getChatAccessToken, getChatApp } from "@/services";
-import { chatAccessToken, updateChatAccessToken } from "@/store";
+import { chatAccessToken, updateChatAccessToken, useUserStore } from "@/store";
 export const TransferMethod = {
   all: "all",
   local_file: "local_file",
@@ -28,6 +28,9 @@ const getAccessTokenAndStore = async (token) => {
 };
 
 export const useChat = (prevChatList, stopChat) => {
+  const { accessToken } = useUserStore((state) => ({
+    accessToken: state.accessToken,
+  }));
   const { formatTime } = useTimestamp();
   const connversationId = useRef("");
   const hasStopResponded = useRef(false);
@@ -45,9 +48,10 @@ export const useChat = (prevChatList, stopChat) => {
   const [lastMessage, setLastMessage] = useState("");
 
   const handleGetAppList = useCallback(() => {
+    if (!accessToken) return;
     getAppList().then((res) => {
       setAppList(res);
-      setCurrentApp(res.find((item) => item.default) || res[0]);
+      setCurrentApp(res?.find((item) => item.default) || res?.[0]);
     });
   }, []);
 

@@ -113,6 +113,7 @@ const CommandInput = forwardRef(
     }, [showPanel]);
 
     useEffect(() => {
+      if (!appList || appList.length === 0) return;
       setCommandOptions(
         appList
           .map((item) => {

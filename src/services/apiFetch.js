@@ -1,12 +1,12 @@
 /*
- * @Description: 
+ * @Description:
  * @Author: Devin
  * @Date: 2024-08-06 11:37:31
  */
 import { toast } from "react-toastify"; // 假设你已经安装了react-toastify
 import { updateAccessToken, updateUser } from "store";
 
-export async function apiFetch(url, method, body = null, options={}) {
+export async function apiFetch(url, method, body = null, options = {}) {
   try {
     const response = await fetch(url, {
       method,
@@ -27,7 +27,7 @@ export async function apiFetch(url, method, body = null, options={}) {
         position: "top-right",
       });
       // throw new Error("Unauthorized");
-      toast.warning("Unauthorized");
+      // toast.warning("Unauthorized");
     } else {
       const errorDetail = await response.json();
       toast.warning(errorDetail.message || "Failed to complete the request");
@@ -38,4 +38,3 @@ export async function apiFetch(url, method, body = null, options={}) {
     // throw new Error(error.message || "Unknown error");
   }
 }
-

@@ -119,7 +119,10 @@ const ChatInput = forwardRef(
       color:
         query ||
         query.trim() !== "" ||
-        (currentApp?.upload_prompt && files.length > 0)
+        (currentApp?.upload_prompt &&
+          currentApp?.visionConfig?.enabled &&
+          files.length > 0) ||
+        (currentApp?.upload_prompt && !currentApp?.visionConfig?.enabled)
           ? "#155eef"
           : "#d1d5db",
     };
