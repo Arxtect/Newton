@@ -18,6 +18,7 @@ import HoverMenu from "./HoverMenu";
 import ArIcon from "@/components/arIcon";
 
 import ContextMenu from "@/components/contextMenu";
+import { toast } from "react-toastify";
 
 const Container = ({ selected, children }) => {
   // Define the base classes for the component
@@ -51,6 +52,8 @@ const FileLine = ({
     renamingPathname,
     isDropFileSystem,
     assetsFilePath,
+    setMainFile,
+    mainFilepath,
   } = useFileStore((state) => ({
     editorValue: state.value,
     saveFile: state.saveFile,
@@ -60,6 +63,8 @@ const FileLine = ({
     renamingPathname: state.renamingPathname,
     isDropFileSystem: state.isDropFileSystem,
     assetsFilePath: state.assetsFilePath,
+    setMainFile: state.setMainFile,
+    mainFilepath:state.mainFilepath
   }));
   const basename = path.basename(filepath);
 
@@ -94,6 +99,11 @@ const FileLine = ({
     renameSection(filepath);
   }, [filepath, inputRef, startRenaming]);
 
+  const handleSetMainFile = useCallback(() => {
+    if (!inputRef.current && !filepath) return;
+    setMainFile(filepath);
+  }, [filepath, inputRef]);
+
   const renameSection = (filepath) => {
     setTimeout(() => {
       const basename = path.basename(filepath);
@@ -113,7 +123,17 @@ const FileLine = ({
   };
 
   const menuItems = useMemo(() => {
+    let isTex = path.extname(filepath) == '.tex'
     return [
+      isTex&&{
+        label: "Set as Main",
+        command: (e) => {
+          e.stopPropagation();
+          setHovered(false);
+          handleSetMainFile();
+        },
+        icon: "TextFile",
+      },
       {
         label: "Rename",
         command: (e) => {
@@ -131,8 +151,8 @@ const FileLine = ({
         },
         icon: "FileDelete",
       },
-    ];
-  }, [filepath, deleteFile, handleRename]);
+    ].filter(item=> item?.label);
+  }, [filepath, deleteFile, handleRename, handleSetMainFile]);
 
   const handleMouseEnter = (e) => {
     setHovered(true);
@@ -254,7 +274,11 @@ const FileLine = ({
                 >
                   <ArIcon name={"File"} className="text-black w-[1.5rem]" />
                 </ListItemIcon>
-                <Pathname ignoreGit={ignoreGit}>{basename}</Pathname>
+                <Pathname ignoreGit={ignoreGit}>{basename}
+                  {
+                    path.basename(mainFilepath) == basename && <span style={{ marginLeft: '4px', fontSize: '0.8em', color: 'lightgray' }}>main</span>
+                  }
+                 </Pathname>
               </div>
               <HoverMenu
                 dirpath={filepath}

@@ -138,8 +138,9 @@ export const compileLatex = async (
   let list = await getAllFileNames(currentProject);
 
   if (compileCount == 1) {
-    await ensureFolderExists(list, currentProject, usePdfTeX);
-    await ensureFileExists(list, currentProject, usePdfTeX);
+    let mainDirectory = path.dirname(mainFilepath);
+    await ensureFolderExists(list, mainDirectory, usePdfTeX);
+    await ensureFileExists(list, mainDirectory, usePdfTeX);
   }
 
   if (usePdfTeX) {
