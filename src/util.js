@@ -272,7 +272,6 @@ export function getColors(i) {
     "#33FFA1",
     "#FF5733",
     "#FFC300",
-    "#FF5733",
     "#DAF7A6",
   ];
 

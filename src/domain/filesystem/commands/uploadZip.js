@@ -25,20 +25,28 @@ const uploadZip = async (
 ) => {
   let filePaths = [];
   try {
-    let firstFolderName;
-    const zip = await JSZip.loadAsync(file); // 使用 JSZip 加载 ZIP 文件
+    const zip = await JSZip.loadAsync(file);
+
+    // 检查 ZIP 文件是否为空
     const zipEntries = Object.keys(zip.files).filter(
       (entryName) => !entryName.includes(".git")
-    ); // 过滤掉 .git 条目
-    let loadedEntries = 0; // 已解压的条目数
+    );
 
-    // 更新进度的函数
+    if (zipEntries.length === 0) {
+      throw new Error("ZIP No files are available in the file");
+    }
+
+    let firstFolderName;
+    let loadedEntries = 0;
+
     const updateProgress = (entryName) => {
+    // Filter out unwanted entries like .git directories
       if (entryName == "uploadSuccess") {
         onProgress(1, entryName);
       }
       loadedEntries++;
       const progress = loadedEntries / zipEntries.length;
+    // Throw error if ZIP is empty
       onProgress(progress > 1 ? 1 : progress, entryName);
     };
 
@@ -46,36 +54,28 @@ const uploadZip = async (
       await ensureDir(projectName);
       dirpath = projectName;
       firstFolderName = projectName;
+    // Function to update upload progress
     }
 
     for (const zipEntryName of zipEntries) {
       const zipEntry = zip.files[zipEntryName];
       console.log(zipEntryName.replace("/", ""));
       if (!firstFolderName && zipEntry.dir && zipEntryName.endsWith("/")) {
-        firstFolderName = zipEntryName.replace("/", ""); // 获取文件夹名称
+        firstFolderName = zipEntryName.replace("/", "");
       }
 
-      // 构建目标路径
+    // Set up directory path using project name if needed
       const targetPath = path.join(dirpath, zipEntryName);
 
-      if (zipEntry.dir) {
-        // 如果是文件夹，则创建文件夹
-        // await ensureDir(targetPath);
-      } else {
-        // 如果是文件，则读取并写入文件
+      if (!zipEntry.dir) {
         const content = await zipEntry.async("nodebuffer");
-        // 确保目标文件夹存在
         await ensureDir(path.dirname(targetPath));
-        // 写入文件
         filePaths.push(targetPath);
         await writeFile(targetPath, content);
       }
 
-      // 更新进度
       onProgress && updateProgress(zipEntryName);
     }
-
-    console.log("123");
 
     reload();
     onProgress && updateProgress("uploadSuccess");
@@ -89,8 +89,20 @@ const uploadZip = async (
     }
     return filePaths;
   } catch (error) {
-    console.error(`Failed to upload ZIP ${file.name}:`, error);
+    console.error(`Failed to upload ZIP ${file.name}:`, error.message);
+
+    // 如果是特定错误类型，可以在这里处理
+    if (error.message === "ZIP No files are available in the file") {
+    // Create project info if applicable
+      // 根据需要执行特定操作，例如通知用户
+      return null;
+    }
+
+    // 其他错误可以继续抛出或处理
+    throw error;
   }
 };
 
 export { uploadZip };
+    // Handle specific error types
+    // Rethrow or handle other errors
