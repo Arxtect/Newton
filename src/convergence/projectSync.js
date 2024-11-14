@@ -29,10 +29,7 @@ class ProjectSync {
       this.yDoc,
       { params: { yauth: token } }
     );
-    this.user = {
-      ...user,
-      color: getColors(),
-    };
+    this.user = user;
     this.userList = [];
     this.awareness = this.websocketProvider.awareness;
     this.currentFilePath = "";
@@ -66,7 +63,10 @@ class ProjectSync {
       if (state && state.user) {
         if (!currentUsersId.includes(state.user.id)) {
           currentUsersId.push(state.user.id);
-          uniqueUsers.push(state.user); // 使用 JSON 字符串来确保对象的唯一性
+          uniqueUsers.push({
+            ...state.user,
+            color: state.user.color || getColors(),
+          }); // 使用 JSON 字符串来确保对象的唯一性
         }
       }
     }
