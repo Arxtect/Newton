@@ -9,8 +9,7 @@ import { toast } from "react-toastify";
 import { uploadZip } from "domain/filesystem";
 import path from "path";
 import { useNavigate } from "react-router-dom";
-import FileUploader from "@/features/uploadFiles"
-
+import FileUploader from "@/features/uploadFiles";
 
 const UploadProject = ({ dialogOpen, setDialogOpen, user }) => {
   const navigate = useNavigate();
@@ -32,15 +31,14 @@ const UploadProject = ({ dialogOpen, setDialogOpen, user }) => {
         setUploadProgress(progress);
       };
       const projectName = path.parse(file.name)?.name;
-      await uploadZip(file, ".", repoChanged, projectName, onProgress, user)
-        .then(() => {
-          toast.success("Project uploaded successfully");
-          setDialogOpen(false);
-          navigate(`/newton`);
-        })
-        .catch((error) => {
-          toast.error(error.message);
-        });
+      try {
+        await uploadZip(file, ".", repoChanged, projectName, onProgress, user);
+        toast.success("Project uploaded successfully");
+        setDialogOpen(false);
+        navigate(`/newton`);
+      } catch (error) {
+        toast.error(error.message || "An error occurred during upload");
+      }
     }
   };
 
@@ -64,7 +62,15 @@ const UploadProject = ({ dialogOpen, setDialogOpen, user }) => {
   };
 
   return (
-   <FileUploader dialogOpen={dialogOpen} setDialogOpen={setDialogOpen} user={user} repoChanged={repoChanged} handleUpload={handleUpload} uploadProgress={uploadProgress} handleDrop={handleDrop}></FileUploader>
+    <FileUploader
+      dialogOpen={dialogOpen}
+      setDialogOpen={setDialogOpen}
+      user={user}
+      repoChanged={repoChanged}
+      handleUpload={handleUpload}
+      uploadProgress={uploadProgress}
+      handleDrop={handleDrop}
+    ></FileUploader>
   );
 };
 
