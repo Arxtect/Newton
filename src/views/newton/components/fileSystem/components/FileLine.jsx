@@ -13,6 +13,7 @@ import Pathname from "./Pathname"; // Adjust the import path as needed
 import { ListItemIcon } from "@mui/material";
 import { Box, TextField } from "@mui/material";
 import { useFileStore } from "store";
+import { downloadFileFromPath } from "@/domain/filesystem";
 
 import HoverMenu from "./HoverMenu";
 import ArIcon from "@/components/arIcon";
@@ -64,7 +65,7 @@ const FileLine = ({
     isDropFileSystem: state.isDropFileSystem,
     assetsFilePath: state.assetsFilePath,
     setMainFile: state.setMainFile,
-    mainFilepath:state.mainFilepath
+    mainFilepath: state.mainFilepath,
   }));
   const basename = path.basename(filepath);
 
@@ -123,9 +124,9 @@ const FileLine = ({
   };
 
   const menuItems = useMemo(() => {
-    let isTex = path.extname(filepath) == '.tex'
+    let isTex = path.extname(filepath) == ".tex";
     return [
-      isTex&&{
+      isTex && {
         label: "Set as Main",
         command: (e) => {
           e.stopPropagation();
@@ -144,6 +145,15 @@ const FileLine = ({
         icon: "FileRename",
       },
       {
+        label: "Download",
+        command: (e) => {
+          e.stopPropagation();
+          setHovered(false);
+          downloadFileFromPath(filepath);
+        },
+        icon: "DownloadProject",
+      },
+      {
         label: "Delete",
         command: () => {
           setHovered(false);
@@ -151,7 +161,7 @@ const FileLine = ({
         },
         icon: "FileDelete",
       },
-    ].filter(item=> item?.label);
+    ].filter((item) => item?.label);
   }, [filepath, deleteFile, handleRename, handleSetMainFile]);
 
   const handleMouseEnter = (e) => {
@@ -274,11 +284,20 @@ const FileLine = ({
                 >
                   <ArIcon name={"File"} className="text-black w-[1.5rem]" />
                 </ListItemIcon>
-                <Pathname ignoreGit={ignoreGit}>{basename}
-                  {
-                    path.basename(mainFilepath) == basename && <span style={{ marginLeft: '4px', fontSize: '0.8em', color: 'lightgray' }}>main</span>
-                  }
-                 </Pathname>
+                <Pathname ignoreGit={ignoreGit}>
+                  {basename}
+                  {path.basename(mainFilepath) == basename && (
+                    <span
+                      style={{
+                        marginLeft: "4px",
+                        fontSize: "0.8em",
+                        color: "lightgray",
+                      }}
+                    >
+                      main
+                    </span>
+                  )}
+                </Pathname>
               </div>
               <HoverMenu
                 dirpath={filepath}

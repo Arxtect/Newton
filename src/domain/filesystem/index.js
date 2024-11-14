@@ -7,6 +7,7 @@ export * from "./commands/mkdir";
 export * from "./commands/removeDirectory";
 export * from "./commands/unlink";
 export * from "./commands/writeFile";
+export * from "./commands/downloadFile";
 export * from "./queries/existsPath";
 export * from "./queries/getFileRecursively";
 export * from "./queries/readFile";
