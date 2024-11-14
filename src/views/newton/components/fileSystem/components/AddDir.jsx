@@ -21,7 +21,6 @@ const AddDir = ({ parentDir, depth, inputRef }) => {
     }));
   const [value, setValue] = useState("");
 
-
   const handleInputChange = (event) => {
     setValue(event.target.value);
   };
@@ -48,6 +47,14 @@ const AddDir = ({ parentDir, depth, inputRef }) => {
     const dirpath = path.join(parentDir, value);
     finishDirCreating({ dirpath });
   };
+
+  useEffect(() => {
+    setTimeout(() => {
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
+    }, [0]);
+  }, []);
 
   return (
     <Box

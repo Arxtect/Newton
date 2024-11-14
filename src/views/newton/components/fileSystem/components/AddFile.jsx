@@ -24,6 +24,14 @@ const AddFile = ({ parentDir, depth, inputRef }) => {
     setValue(event.target.value);
   };
 
+  useEffect(() => {
+    setTimeout(() => {
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
+    }, [0]);
+  }, []);
+
   const handleBlur = () => {
     // cancelFileCreating();
     handleDirCreate(parentDir, value);
