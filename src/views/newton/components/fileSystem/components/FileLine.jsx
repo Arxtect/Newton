@@ -228,7 +228,7 @@ const FileLine = ({
   return (
     <ContextMenu items={menuItems}>
       <div id="file" className="block p-[0px] w-full h-full">
-        <Draggable
+        {/* <Draggable
           pathname={filepath}
           type="file"
           onDrop={async (result) => {
@@ -240,7 +240,7 @@ const FileLine = ({
           onDropByOther={() => {
             // Do nothing yet
           }}
-        >
+        > */}
           <Container
             selected={
               (assetsFilePath && assetsFilePath === filepath) ||
@@ -311,7 +311,7 @@ const FileLine = ({
               />
             </div>
           </Container>
-        </Draggable>
+        {/* </Draggable> */}
       </div>
     </ContextMenu>
   );

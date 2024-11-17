@@ -29,6 +29,7 @@ import { readFileStats } from "domain/filesystem";
 import { useFileStore } from "store";
 import ArIcon from "@/components/arIcon";
 import ContextMenu from "@/components/contextMenu";
+import FolderDropZone from "./FolderDropZone";
 
 const LinkedLines = ({
   dirpath,
@@ -99,10 +100,20 @@ const DirectoryLineContent = ({
   changePreRenamingDirpath,
   changeCurrentProjectRoot,
 }) => {
-  const { dirOpen, isDropFileSystem, filepath } = useFileStore((state) => ({
+  const {
+    dirOpen,
+    isDropFileSystem,
+    updateIsDropFileSystem,
+    filepath,
+    projectSync,
+    reload,
+  } = useFileStore((state) => ({
     dirOpen: state.dirOpen,
+    updateIsDropFileSystem: state.updateIsDropFileSystem,
     isDropFileSystem: state.isDropFileSystem,
     filepath: state.filepath,
+    projectSync: state.projectSync,
+    reload: state.repoChanged,
   }));
 
   const [opened, setOpened] = useState(open);
@@ -321,16 +332,22 @@ const DirectoryLineContent = ({
     <List className="p-0">
       <ContextMenu items={menuItems}>
         <div onMouseOver={handleMouseOver} onMouseLeave={handleMouseLeave}>
-          <Draggable
-            pathname={dirpath}
-            type="dir"
-            onDrop={handleFileMove}
-            onDropByOther={() => setOpened(true)}
-            isEnabled={isDropFileSystem && renamingPathname !== dirpath}
-            setHover={() => {
-              console.log("setHover");
-            }}
+          <FolderDropZone
+            dirpath={dirpath}
+            updateIsDropFileSystem={updateIsDropFileSystem}
+            projectSync={projectSync}
+            reload={reload}
           >
+            {/* <Draggable
+              pathname={dirpath}
+              type="dir"
+              onDrop={handleFileMove}
+              onDropByOther={() => setOpened(true)}
+              isEnabled={isDropFileSystem && renamingPathname !== dirpath}
+              setHover={() => {
+                console.log("setHover");
+              }}
+            > */}
             <ListItem
               onMouseOver={handleMouseOver}
               onMouseLeave={handleMouseLeave}
@@ -427,7 +444,8 @@ const DirectoryLineContent = ({
                 </React.Fragment>
               )}
             </ListItem>
-          </Draggable>
+            {/* </Draggable> */}
+          </FolderDropZone>
         </div>
       </ContextMenu>
       {opened && (
