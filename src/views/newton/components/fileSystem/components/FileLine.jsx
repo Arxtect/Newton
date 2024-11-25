@@ -55,6 +55,8 @@ const FileLine = ({
     assetsFilePath,
     setMainFile,
     mainFilepath,
+    projectSync,
+    reload,
   } = useFileStore((state) => ({
     editorValue: state.value,
     saveFile: state.saveFile,
@@ -66,6 +68,8 @@ const FileLine = ({
     assetsFilePath: state.assetsFilePath,
     setMainFile: state.setMainFile,
     mainFilepath: state.mainFilepath,
+    projectSync: state.projectSync,
+    reload: state.repoChanged,
   }));
   const basename = path.basename(filepath);
 
@@ -228,7 +232,7 @@ const FileLine = ({
   return (
     <ContextMenu items={menuItems}>
       <div id="file" className="block p-[0px] w-full h-full">
-        {/* <Draggable
+        <Draggable
           pathname={filepath}
           type="file"
           onDrop={async (result) => {
@@ -240,7 +244,9 @@ const FileLine = ({
           onDropByOther={() => {
             // Do nothing yet
           }}
-        > */}
+          projectSync={projectSync}
+          reload={reload}
+        >
           <Container
             selected={
               (assetsFilePath && assetsFilePath === filepath) ||
@@ -311,7 +317,7 @@ const FileLine = ({
               />
             </div>
           </Container>
-        {/* </Draggable> */}
+        </Draggable>
       </div>
     </ContextMenu>
   );

@@ -29,7 +29,6 @@ import { readFileStats } from "domain/filesystem";
 import { useFileStore } from "store";
 import ArIcon from "@/components/arIcon";
 import ContextMenu from "@/components/contextMenu";
-import FolderDropZone from "./FolderDropZone";
 
 const LinkedLines = ({
   dirpath,
@@ -332,22 +331,18 @@ const DirectoryLineContent = ({
     <List className="p-0">
       <ContextMenu items={menuItems}>
         <div onMouseOver={handleMouseOver} onMouseLeave={handleMouseLeave}>
-          <FolderDropZone
-            dirpath={dirpath}
-            updateIsDropFileSystem={updateIsDropFileSystem}
+          <Draggable
+            pathname={dirpath}
+            type="dir"
+            onDrop={handleFileMove}
+            onDropByOther={() => setOpened(true)}
+            isEnabled={isDropFileSystem && renamingPathname !== dirpath}
+            setHover={() => {
+              console.log("setHover");
+            }}
             projectSync={projectSync}
             reload={reload}
           >
-            {/* <Draggable
-              pathname={dirpath}
-              type="dir"
-              onDrop={handleFileMove}
-              onDropByOther={() => setOpened(true)}
-              isEnabled={isDropFileSystem && renamingPathname !== dirpath}
-              setHover={() => {
-                console.log("setHover");
-              }}
-            > */}
             <ListItem
               onMouseOver={handleMouseOver}
               onMouseLeave={handleMouseLeave}
@@ -444,8 +439,7 @@ const DirectoryLineContent = ({
                 </React.Fragment>
               )}
             </ListItem>
-            {/* </Draggable> */}
-          </FolderDropZone>
+          </Draggable>
         </div>
       </ContextMenu>
       {opened && (
