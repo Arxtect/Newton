@@ -18,8 +18,6 @@ import { getAllFileNames } from "@/domain/filesystem";
 import HumanReadableLogs from "./human-readable-logs/HumanReadableLogs";
 import { pdftexEngine, xetexEngine, dviEngine } from "./loadEngines";
 
-
-
 const IgnoreFile = [".DS_Store", ".gitignore", ".git"];
 
 const fsPify = {
@@ -94,11 +92,23 @@ export const ensureFileExists = async (list, currentProject, usePdfTeX) => {
     console.log(filepath, "filepath");
     if (usePdfTeX) {
       pdftexEngine.writeMemFSFile(filepath, fileBlob);
+      if (path.extname(filepath) == ".tex") {
+        const parsedPath = path.parse(filepath);
+        const filenameWithPath = path.join(parsedPath.dir, parsedPath.name);
+
+        pdftexEngine.writeMemFSFile(filenameWithPath, fileBlob);
+      }
     } else {
       dviEngine.writeMemFSFile(filepath, fileBlob);
       xetexEngine.writeMemFSFile(filepath, fileBlob);
+      if (path.extname(filepath) == ".tex") {
+        const parsedPath = path.parse(filepath);
+        const filenameWithPath = path.join(parsedPath.dir, parsedPath.name);
+
+        dviEngine.writeMemFSFile(filenameWithPath, fileBlob);
+        xetexEngine.writeMemFSFile(filenameWithPath, fileBlob);
+      }
     }
-    // }
   }
 };
 

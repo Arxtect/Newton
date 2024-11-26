@@ -77,13 +77,13 @@ class AceCursors {
           el = document.createElement("div");
           el.id = this.aceID + "_cursor_" + pos.id;
           el.className = "cursor";
-          el.style.position = "absolute";
+          el.style.position = "relative";
           el.style.height = height + "px";
           el.style.width = width + "px";
           el.style.top = top + "px";
           el.style.left = left + "px";
           el.style.borderLeft = "2px solid " + pos.color;
-          el.style.zIndex = 100;
+          el.style.zIndex = 9999;
           el.style.color = "#000";
           el.style.opacity = 1;
           el.addEventListener("mouseenter", function () {
@@ -96,7 +96,8 @@ class AceCursors {
             cursorLabel.style.display = "inline-block";
             cursorLabel.style.transform = `translateY(-${
               config.lineHeight + 4
-            }px)`;
+              }px)`;
+            cursorLabel.style.zIndex = 9999;
             cursorLabel.style.borderRadius = "5px"; // 添加圆角
             cursorLabel.style.padding = "2px 4px"; // 添加内边距以提高可读性
             cursorLabel.style.boxShadow = "0 1px 3px rgba(0,0,0,0.2)"; // 添加阴影以提高可见性
