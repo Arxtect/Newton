@@ -56,7 +56,8 @@ const FileLine = ({
     setMainFile,
     mainFilepath,
     selectedFiles,
-    toggleFileSelection
+    toggleFileSelection,
+    clearFileSelection
   } = useFileStore((state) => ({
     editorValue: state.value,
     saveFile: state.saveFile,
@@ -69,7 +70,8 @@ const FileLine = ({
     setMainFile: state.setMainFile,
     mainFilepath: state.mainFilepath,
     selectedFiles: state.selectedFiles,
-    toggleFileSelection: state.toggleFileSelection
+    toggleFileSelection: state.toggleFileSelection,
+    clearFileSelection: state.clearFileSelection
   }));
   const basename = path.basename(filepath);
   console.log(selectedFiles);
@@ -185,6 +187,7 @@ const FileLine = ({
     if (e.ctrlKey || e.metaKey) {
       toggleFileSelection(filepath); // 多选逻辑
     } else {
+      clearFileSelection();
       loadFile({ filepath }); // 加载文件
       if (isMobile) {
         pushScene({ nextScene: "edit" }); // 移动设备场景切换
