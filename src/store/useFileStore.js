@@ -178,7 +178,7 @@ export const useFileStore = create()(
             // filepath: "",
             lastSavedValue: "",
             changed: false,
-            // currentSelectDir: "",
+            currentSelectDir: "",
           });
           return;
         }

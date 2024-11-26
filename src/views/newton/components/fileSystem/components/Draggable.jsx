@@ -3,7 +3,7 @@ import { DragSource, DropTarget } from "react-dnd";
 import fs from "fs";
 import path from "path";
 import pify from "pify";
-import { uploadFile, readFile } from "@/domain/filesystem";
+import onExternalDrop from "./uploadFuntion"
 
 const DND_GROUP = "browser";
 
@@ -102,66 +102,6 @@ const DraggableDropTargetItem = React.memo(
     }))(DraggableItem)
   )
 );
-const getFileWithRelativePath = (fileEntry) => {
-  return new Promise((resolve) => {
-    fileEntry.file((file) => {
-      const fileWithRelativePath = {
-        file,
-        webkitRelativePath: fileEntry.fullPath,
-      };
-      resolve(fileWithRelativePath);
-    });
-  });
-};
-
-const handleUpload = async (files, dirpath, projectSync, reload) => {
-  if (!dirpath) {
-    return;
-  }
-  const currentPath = dirpath;
-  const fileList = files;
-  const filesArray = Array.from(fileList);
-  const filePaths = await uploadFile(filesArray, currentPath, reload);
-  if (projectSync) {
-    for (const filePath of filePaths) {
-      const content = await readFile(filePath);
-      projectSync.syncFileToYMap(filePath, content);
-    }
-  }
-};
-
-const readDirectory = (directoryEntry, fileList) => {
-  return new Promise((resolve) => {
-    const reader = directoryEntry.createReader();
-    reader.readEntries(async (entries) => {
-      for (const entry of entries) {
-        if (entry.isDirectory) {
-          await readDirectory(entry, fileList);
-        } else if (entry.isFile) {
-          fileList.push(await getFileWithRelativePath(entry));
-        }
-      }
-      resolve();
-    });
-  });
-};
-
-const onExternalDrop = async (items, dirpath, projectSync, reload) => {
-  const fileList = [];
-  for (let i = 0; i < items.length; i++) {
-    const item = items[i].webkitGetAsEntry();
-    if (item) {
-      if (item.isDirectory) {
-        await readDirectory(item, fileList);
-      } else if (item.isFile) {
-        fileList.push(await getFileWithRelativePath(item));
-      }
-    } else {
-      console.warn("Item is not a valid file or directory:", items[i]);
-    }
-  }
-  handleUpload(fileList, dirpath, projectSync, reload);
-};
 
 const DraggableAndDroppable = ({
   isEnabled = true,
