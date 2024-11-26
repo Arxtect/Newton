@@ -42,16 +42,21 @@ const UploadFiles = ({
     event.stopPropagation();
 
     const items = event.dataTransfer.items;
-    const fileList = [];
 
-    for (let i = 0; i < items.length; i++) {
-      const item = items[i].webkitGetAsEntry();
-      if (item && item.isDirectory) {
-        await readDirectory(item, fileList);
-      } else if (item && item.isFile) {
-        fileList.push(await getFileWithRelativePath(item));
+    const fileListPromises = Array.from(items).map(async (item) => {
+      const entry = await item.webkitGetAsEntry();
+      if (entry) {
+        if (entry.isDirectory) {
+          return readDirectory(entry);
+        } else if (entry.isFile) {
+          return getFileWithRelativePath(entry);
+        }
+      } else {
+        console.warn("Item is not a valid file or directory:", item);
       }
-    }
+    });
+
+    const fileList = await Promise.all(fileListPromises);
 
     handleUpload(fileList);
   }, []);

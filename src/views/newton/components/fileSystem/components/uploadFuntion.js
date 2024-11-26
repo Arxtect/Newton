@@ -69,4 +69,4 @@ const onExternalDrop = async (items, dirpath, projectSync, reload) => {
   handleUpload(fileList, dirpath, projectSync, reload);
 };
 
-export default onExternalDrop
+export default onExternalDrop;

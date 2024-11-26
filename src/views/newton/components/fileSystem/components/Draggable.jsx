@@ -3,7 +3,7 @@ import { DragSource, DropTarget } from "react-dnd";
 import fs from "fs";
 import path from "path";
 import pify from "pify";
-import onExternalDrop from "./uploadFuntion"
+import onExternalDrop from "./uploadFuntion";
 
 const DND_GROUP = "browser";
 
@@ -123,7 +123,8 @@ const DraggableAndDroppable = ({
     const handleDrop = (event) => {
       setExternalHover(false);
       const items = event.dataTransfer.items;
-      if (items.length > 0) {
+      const files = event.dataTransfer.files;
+      if (files.length > 0) {
         onExternalDrop(
           items,
           props.type == "file" ? path.dirname(props.pathname) : props.pathname,
@@ -154,6 +155,10 @@ const DraggableAndDroppable = ({
       }
     };
   }, [onExternalDrop]);
+
+  // if (!isEnabled) {
+  //   return <div>{children}</div>;
+  // }
 
   return (
     <div id={props.pathname}>
