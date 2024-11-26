@@ -3,10 +3,12 @@ import * as Y from "yjs"; // eslint-disable-line
 import { Awareness } from "y-protocols/awareness.js"; // eslint-disable-line
 import Ace from "ace-builds/src-min-noconflict/ace";
 import { isNullOrUndefined } from "@/util";
+import { useFileStore } from "@/store";
+
 const Range = Ace.require("ace/range").Range;
 
 class AceCursors {
-  constructor(ace, localUser) {
+  constructor(ace, localUser, userList) {
     this.marker = {};
     this.markerID = {};
     this.marker.cursors = [];
@@ -15,7 +17,7 @@ class AceCursors {
 
     // Bind the marker update function to this context
     this.marker.update = (html, markerLayer, session, config) => {
-      this.markerUpdate(html, markerLayer, session, config, ace);
+      this.markerUpdate(html, markerLayer, session, config, ace, userList);
     };
   }
 
@@ -30,16 +32,24 @@ class AceCursors {
     this.marker.session._signal("changeFrontMarker");
   }
 
-  markerUpdate(html, markerLayer, session, config, ace) {
+  markerUpdate(html, markerLayer, session, config, ace, userList) {
     let start = config.firstRow,
       end = config.lastRow; //视图显示区域
     let cursors = this.marker.cursors;
     console.log(cursors, "cursors");
 
     for (let i = 0; i < cursors.length; i++) {
-      console.log(cursors[i],this.localUser, "cursors[i]");
-      if(this.localUser?.id == cursors[i].userId) continue
+      console.log(cursors[i], this.localUser, "cursors[i]");
+      if (this.localUser?.id == cursors[i].userId) continue;
       let pos = cursors[i];
+      console.log("userList");
+      if (!cursors[i]?.color) {
+        pos = {
+          ...pos,
+          color: userList?.find((user) => user.id == cursors[i].userId).color,
+        };
+      }
+
       if (
         pos.row < start ||
         pos.row > end ||
@@ -67,13 +77,13 @@ class AceCursors {
           el = document.createElement("div");
           el.id = this.aceID + "_cursor_" + pos.id;
           el.className = "cursor";
-          el.style.position = "absolute";
+          el.style.position = "relative";
           el.style.height = height + "px";
           el.style.width = width + "px";
           el.style.top = top + "px";
           el.style.left = left + "px";
           el.style.borderLeft = "2px solid " + pos.color;
-          el.style.zIndex = 100;
+          el.style.zIndex = 9999;
           el.style.color = "#000";
           el.style.opacity = 1;
           el.addEventListener("mouseenter", function () {
@@ -84,7 +94,10 @@ class AceCursors {
             cursorLabel.style.whiteSpace = "nowrap";
             cursorLabel.textContent = pos.name;
             cursorLabel.style.display = "inline-block";
-            cursorLabel.style.transform = `translateY(-${config.lineHeight +4}px)`;
+            cursorLabel.style.transform = `translateY(-${
+              config.lineHeight + 4
+              }px)`;
+            cursorLabel.style.zIndex = 9999;
             cursorLabel.style.borderRadius = "5px"; // 添加圆角
             cursorLabel.style.padding = "2px 4px"; // 添加内边距以提高可读性
             cursorLabel.style.boxShadow = "0 1px 3px rgba(0,0,0,0.2)"; // 添加阴影以提高可见性
@@ -196,6 +209,7 @@ class AceCursors {
     }
   }
 }
+
 export class AceBinding {
   /**
    * @param {Awareness} [awareness]
@@ -238,7 +252,8 @@ export class AceBinding {
         ...removed.map((id) => {
           this.aceCursors.updateCursors(states.get(id), id, ace);
         }),
-      ]).then(() => {
+      ]).then((res) => {
+        this.updateShareUserList(states);
         this.aceCursors.redraw();
       });
     };
@@ -305,8 +320,31 @@ export class AceBinding {
     };
   }
 
+  updateShareUserList(states) {
+    let uniqueUsers = [];
+    let currentUsersId = [];
+
+    console.log(states, "states");
+
+    for (let [id, state] of states) {
+      console.log(state, "state"); // 输出每个 state 对象
+      if (state && state.user) {
+        if (!currentUsersId.includes(state.user.id)) {
+          currentUsersId.push(state.user.id);
+          uniqueUsers.push({
+            ...state.user,
+          });
+        }
+      }
+    }
+
+    // 将 Set 转换为数组，并解析 JSON 字符串回对象
+    this.userList = uniqueUsers;
+
+    useFileStore.getState().updateShareUserList(this.userList);
+  }
+
   init(ace, currentFilePath) {
-    console.log(this.awareness.getLocalState(), "cursors");
     this.aceCursors = new AceCursors(ace, this.awareness.getLocalState().user);
     this.aceCursors.init(ace, currentFilePath);
     ace.session.getUndoManager().reset();
@@ -346,8 +384,8 @@ export class AceBinding {
   }
 
   destroy() {
-      this.offAwarenessChange();
-      this.offChangeCursor();
+    this.offAwarenessChange();
+    this.offChangeCursor();
     if (this.awareness) {
       this.awareness.setLocalStateField("cursor", null);
     }

@@ -99,10 +99,20 @@ const DirectoryLineContent = ({
   changePreRenamingDirpath,
   changeCurrentProjectRoot,
 }) => {
-  const { dirOpen, isDropFileSystem, filepath } = useFileStore((state) => ({
+  const {
+    dirOpen,
+    isDropFileSystem,
+    updateIsDropFileSystem,
+    filepath,
+    projectSync,
+    reload,
+  } = useFileStore((state) => ({
     dirOpen: state.dirOpen,
+    updateIsDropFileSystem: state.updateIsDropFileSystem,
     isDropFileSystem: state.isDropFileSystem,
     filepath: state.filepath,
+    projectSync: state.projectSync,
+    reload: state.repoChanged,
   }));
 
   const [opened, setOpened] = useState(open);
@@ -330,6 +340,8 @@ const DirectoryLineContent = ({
             setHover={() => {
               console.log("setHover");
             }}
+            projectSync={projectSync}
+            reload={reload}
           >
             <ListItem
               onMouseOver={handleMouseOver}

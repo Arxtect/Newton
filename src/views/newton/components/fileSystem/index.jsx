@@ -99,10 +99,9 @@ const FileSystem = () => {
   const toggleDrawer = (open) => {
     setIsOpen(open);
   };
-  const getYDocTokenReq = async () => {
-    const token = await getYDocToken();
-    console.log(token, "token");
-    return token;
+  const getYDocTokenReq = async (room) => {
+    const res = await getYDocToken(room);
+    return res;
   };
   const initShareProject = async () => {
     const projectInfo = await getProjectInfo(currentProjectRoot);
@@ -136,9 +135,8 @@ const FileSystem = () => {
       navigate("/project");
       return;
     }
-
-    const token = await getYDocTokenReq();
-    const projectSync = await new ProjectSync(project, user, roomId, token);
+    const {token,position} = await getYDocTokenReq(project + roomId);
+    const projectSync = await new ProjectSync(project, user, roomId, token,position);
     await projectSync.setObserveHandler();
     updateProjectSync(projectSync);
   };

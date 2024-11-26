@@ -77,15 +77,20 @@ const Share = forwardRef(({ rootPath, user }, ref) => {
   const handleCancelProject = () => {
     setDialogOpen(false);
   };
-  const getYDocTokenReq = async () => {
-    const token = await getYDocToken();
-    console.log(token, "token");
-    return token;
+  const getYDocTokenReq = async (room) => {
+    const res = await getYDocToken(room);
+    return res;
   };
 
   const createProjectSync = async (rootPath, user) => {
-    const token = await getYDocTokenReq();
-    const projectSync = new ProjectSync(rootPath, user, user.id, token);
+    const { token, position } = await getYDocTokenReq(rootPath + user.id);
+    const projectSync = new ProjectSync(
+      rootPath,
+      user,
+      user.id,
+      token,
+      position
+    );
     updateProjectSync(projectSync);
     await projectSync.syncFolderToYMapRootPath();
     // await projectSync.setObserveHandler();

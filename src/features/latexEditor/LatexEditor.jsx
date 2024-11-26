@@ -47,7 +47,7 @@ const LatexEditor = ({ handleChange, sourceCode, filepath, mainFilepath }) => {
   }, [latexRef]);
 
   useEffect(() => {
-    if (!editor && !mainFilepath) return;
+    if (!editor || !mainFilepath) return;
     loadFile({ filepath: mainFilepath });
   }, [editor]);
 

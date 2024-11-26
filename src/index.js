@@ -37,7 +37,16 @@ async function loadBrowserFS() {
   });
 }
 
-await loadBrowserFS();
+async function initializeFileSystem() {
+  try {
+    await loadBrowserFS();
+  } catch (error) {
+    console.error("Failed to initialize BrowserFS:", error);
+  }
+}
+
+await initializeFileSystem();
+
 let projectLists = await findAllProject(".");
 if (projectLists.length == 0) {
   let rootPath = "arxtect";

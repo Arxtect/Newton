@@ -291,17 +291,18 @@ const Content = React.forwardRef(
       setSyncParams({ roomId, project: syncProjectName });
       setSyncDialogOpen(true);
     };
-    const getYDocTokenReq = async () => {
-      const token = await getYDocToken();
-      return token;
+    const getYDocTokenReq = async (room) => {
+      const res = await getYDocToken(room);
+      return res;
     };
     const handleConfirmSync = async () => {
-      const token = await getYDocTokenReq();
+      const {token,position} = await getYDocTokenReq(syncParams.project+syncParams.roomId);
       const projectSync = new ProjectSync(
         syncParams.project,
         user,
         syncParams.roomId,
         token,
+        position,
         getProjectList
       );
       await projectSync.setObserveHandler();

@@ -73,7 +73,7 @@ function FileUploader({
       handleCancel={handleCancelUpload}
       buttonList={[{ title: "Cancel", click: handleCancelUpload }]}
     >
-      <div className="flex flex-col font-medium text-center text-black rounded-none max-w-[760px]">
+      <div className="flex flex-col font-medium text-center text-black rounded-none  justify-center">
         <div className="flex flex-col px-4 w-full text-sm leading-none max-md:px-5 max-md:max-w-full">
           <Box
             onDragOver={handleDragOver}

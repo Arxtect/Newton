@@ -186,7 +186,8 @@ export const useFileStore = create()(
 
         if (projectSync && editor != null && filepath) {
           editor.blur && editor.blur();
-          projectSync?.updateEditorAndCurrentFilePath(filepath, editor);
+          projectSync?.updateEditorAndCurrentFilePath &&
+            projectSync?.updateEditorAndCurrentFilePath(filepath, editor);
         }
         set({
           filepath,
@@ -198,7 +199,6 @@ export const useFileStore = create()(
           changed: false,
           currentSelectDir: "",
         });
-        console.log(fileContent, "fileContent");
       },
       changeCurrentSelectDir: (dirpath) => {
         set({ currentSelectDir: dirpath });
@@ -355,8 +355,10 @@ export const useFileStore = create()(
         get().startUpdate({ changedPath: dirname, isDir: true });
       },
 
-      deleteFile: async ({ filename }) => {
-        set({ filepath: "", value: "" });
+      deleteFile: async ({ filename },isSync=false) => {
+        if(!isSync){
+          set({ filepath: "", value: "" });
+        }
         if (!(await FS.existsPath(filename))) return;
         await FS.unlink(filename);
         const projectSync = get().projectSync;

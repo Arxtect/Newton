@@ -71,7 +71,6 @@ const TopBar = (props) => {
     sourceCode,
     currentProjectRoot,
     filepath,
-    loadFile,
     changeCurrentProjectRoot,
     fileMoved,
   } = useFileStore((state) => ({
@@ -80,7 +79,6 @@ const TopBar = (props) => {
     sourceCode: state.value,
     currentProjectRoot: state.currentProjectRoot,
     filepath: state.filepath,
-    loadFile: state.loadFile,
     changeCurrentProjectRoot: state.changeCurrentProjectRoot,
     fileMoved: state.fileMoved,
   }));
