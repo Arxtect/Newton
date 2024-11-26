@@ -267,9 +267,7 @@ const FileLine = ({
         >
           <Container
             selected={
-              selectedFiles.includes(filepath) || // Multi-select condition
-              (assetsFilePath && assetsFilePath === filepath) || 
-              (!assetsFilePath && editingFilepath === filepath && currentSelectDir === "")
+              selectedFiles.includes(filepath)// Multi-select condition
             }
           >
             <div

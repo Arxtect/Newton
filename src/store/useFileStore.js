@@ -180,6 +180,7 @@ export const useFileStore = create()(
             lastSavedValue: "",
             changed: false,
             // currentSelectDir: "",
+            selectedFiles: [filepath],
           });
           return;
         }
@@ -198,6 +199,7 @@ export const useFileStore = create()(
           lastSavedValue: fileContent.toString(),
           changed: false,
           currentSelectDir: "",
+          selectedFiles: [filepath],
         });
         console.log(fileContent, "fileContent");
       },
