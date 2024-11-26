@@ -6,7 +6,6 @@
 import React, { useRef, useEffect, useState } from "react";
 import Slide from "./components/slide/index";
 import Content from "./components/content/index";
-import { getYDocToken } from "services";
 import { useUserStore } from "@/store";
 
 const Project = () => {

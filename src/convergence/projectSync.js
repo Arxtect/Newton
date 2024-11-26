@@ -7,7 +7,6 @@ import { AceBinding } from "./ace-binding"; // 导入AceBinding
 import { uploadFile, downloadFile } from "./minio";
 import { assetExtensions } from "@/constant";
 import { debounce } from "@/util";
-import { Awareness } from "y-protocols/awareness.js"; // eslint-disable-line
 import { getColors } from "@/util";
 import { toast } from "react-toastify";
 
@@ -18,7 +17,7 @@ const wsUrl = `wss://arxtect.com/websockets/`;
 // const wsUrl = `ws://206.190.239.91:9008/`;
 
 class ProjectSync {
-  constructor(rootPath, user, roomId, token, otherOperation) {
+  constructor(rootPath, user, roomId, token, position, otherOperation) {
     this.folderMapName = `${rootPath}_folder_map_list_${roomId}`;
     this.rootPath = rootPath;
     this.roomId = roomId;
@@ -36,7 +35,6 @@ class ProjectSync {
     this.isLocalChange = true; // 是否本地变更
 
     // 设置用户信息
-    this.setUserAwareness(this.user);
 
     // 使用 rootPath 作为命名空间
     this.yMap = this.yDoc.getMap(this.rootPath + this.roomId);
@@ -46,38 +44,7 @@ class ProjectSync {
 
     // 保存当前的观察者句柄
     this.currentObserver = null;
-    this.awareness.on("change", this.getUserList.bind(this));
-  }
-
-  getUserList({ added, removed, updated }) {
-    const states = /** @type {Awareness} */ (this.awareness).getStates();
-
-    // 初始化一个 Set 来存储唯一的用户
-    let uniqueUsers = [];
-    let currentUsersId = [];
-
-    console.log(states, "states");
-
-    for (let [id, state] of states) {
-      console.log(state, "state"); // 输出每个 state 对象
-      if (state && state.user) {
-        if (!currentUsersId.includes(state.user.id)) {
-          currentUsersId.push(state.user.id);
-          uniqueUsers.push({
-            ...state.user,
-            color: state.user.color || getColors(),
-          }); // 使用 JSON 字符串来确保对象的唯一性
-        }
-      }
-    }
-
-    // 将 Set 转换为数组，并解析 JSON 字符串回对象
-    this.userList = uniqueUsers;
-
-    useFileStore.getState().updateShareUserList(this.userList);
-
-    // 输出最终的用户列表
-    console.log("User List:", this.userList);
+    this.setUserAwareness({ ...this.user, color: getColors(position) });
   }
 
   // set observe handler
@@ -330,7 +297,8 @@ class ProjectSync {
             }
             if (content?._delete) {
               // 如果内容为空，则删除文件
-              await useFileStore.getState().deleteFile({ filename: key });
+              await useFileStore.getState().deleteFile({ filename: key },true);
+              
               console.log(`File ${key} deleted successfully.`);
               resolve();
               return;

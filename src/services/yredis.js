@@ -10,9 +10,9 @@ function getApiUrl(endpoint) {
   return `/api/v1/yredis${endpoint}`;
 }
 
-export async function getYDocToken() {
-  const response = await apiFetch(getApiUrl("/auth/token"), "GET");
-  return response?.token;
+export async function getYDocToken(room) {
+  const response = await apiFetch(getApiUrl(`/auth/token/${room}`), "GET");
+  return response;
 }
 
 //UpdateUserAccess
