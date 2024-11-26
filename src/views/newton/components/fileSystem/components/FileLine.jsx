@@ -55,6 +55,8 @@ const FileLine = ({
     assetsFilePath,
     setMainFile,
     mainFilepath,
+    selectedFiles,
+    toggleFileSelection
   } = useFileStore((state) => ({
     editorValue: state.value,
     saveFile: state.saveFile,
@@ -66,8 +68,13 @@ const FileLine = ({
     assetsFilePath: state.assetsFilePath,
     setMainFile: state.setMainFile,
     mainFilepath: state.mainFilepath,
+    selectedFiles: state.selectedFiles,
+    toggleFileSelection: state.toggleFileSelection
   }));
   const basename = path.basename(filepath);
+  console.log(selectedFiles);
+  console.log(selectedFiles.constructor.name); // 输出Set
+  console.log(selectedFiles instanceof Set);   // 输出true
 
   const handleRenameConfirm = async (value) => {
     if (!value || value == "") {
@@ -172,6 +179,20 @@ const FileLine = ({
     setHovered(false);
   };
 
+  
+  const handleFileClick = (e) => {
+    e.preventDefault(); // 防止默认行为
+    if (e.ctrlKey || e.metaKey) {
+      toggleFileSelection(filepath); // 多选逻辑
+    } else {
+      loadFile({ filepath }); // 加载文件
+      if (isMobile) {
+        pushScene({ nextScene: "edit" }); // 移动设备场景切换
+      }
+    }
+  };
+  
+
   const onRename = (e) => {
     e.stopPropagation();
     handleRename();
@@ -243,10 +264,9 @@ const FileLine = ({
         >
           <Container
             selected={
-              (assetsFilePath && assetsFilePath === filepath) ||
-              (!assetsFilePath &&
-                editingFilepath === filepath &&
-                currentSelectDir === "")
+              selectedFiles.includes(filepath) || // Multi-select condition
+              (assetsFilePath && assetsFilePath === filepath) || 
+              (!assetsFilePath && editingFilepath === filepath && currentSelectDir === "")
             }
           >
             <div
@@ -260,13 +280,7 @@ const FileLine = ({
                   padding: "1px 0px",
                   paddingLeft: `${depth * 8 + 24}px`,
                 }}
-                onClick={async (e) => {
-                  e.preventDefault();
-                  await loadFile({ filepath });
-                  if (isMobile) {
-                    pushScene({ nextScene: "edit" });
-                  }
-                }}
+                onClick={handleFileClick}
                 onDoubleClick={(e) => {
                   if (
                     filepath !== editingFilepath &&

@@ -52,7 +52,7 @@ const LoginPage = ({ isDialog = false, handleClose }) => {
     setLoginError(null);
     try {
       const data = await loginUser(values);
-      toast.success("You successfully logged in");
+      // toast.success("You successfully logged in");
       updateAccessToken(data.access_token);
 
       const { data: userData } = await getMe();
