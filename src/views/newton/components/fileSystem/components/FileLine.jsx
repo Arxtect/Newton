@@ -313,7 +313,7 @@ const FileLine = ({
                 </ListItemIcon>
                 <Pathname ignoreGit={ignoreGit}>
                   {basename}
-                  {path.basename(mainFilepath) == basename && (
+                  {mainFilepath && path.basename(mainFilepath) == basename && (
                     <span
                       style={{
                         marginLeft: "4px",
