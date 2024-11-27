@@ -179,7 +179,7 @@ export const useFileStore = create()(
             // filepath: "",
             lastSavedValue: "",
             changed: false,
-            // currentSelectDir: "",
+            currentSelectDir: "",
             selectedFiles: [filepath],
           });
           return;
