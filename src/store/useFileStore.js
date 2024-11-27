@@ -90,6 +90,9 @@ export const useFileStore = create()(
 
         set({ selectedFiles: newSelected });
       },
+      getSelectedFiles: () => {
+        return get().selectedFiles;
+      },
 
       clearFileSelection: () => {
         set({ selectedFiles: [] });
@@ -204,6 +207,7 @@ export const useFileStore = create()(
             lastSavedValue: "",
             changed: false,
             currentSelectDir: "",
+            selectedFiles: [filepath],
           });
           return;
         }
@@ -223,6 +227,7 @@ export const useFileStore = create()(
           lastSavedValue: fileContent.toString(),
           changed: false,
           currentSelectDir: "",
+          selectedFiles: [filepath],
         });
       },
       changeCurrentSelectDir: (dirpath) => {

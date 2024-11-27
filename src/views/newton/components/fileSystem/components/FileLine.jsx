@@ -59,6 +59,7 @@ const FileLine = ({
     reload,
     selectedFiles,
     toggleFileSelection,
+    getSelectedFiles,
     clearFileSelection,
   } = useFileStore((state) => ({
     editorValue: state.value,
@@ -75,6 +76,7 @@ const FileLine = ({
     reload: state.repoChanged,
     selectedFiles: state.selectedFiles,
     toggleFileSelection: state.toggleFileSelection,
+    getSelectedFiles: state.getSelectedFiles,
     clearFileSelection: state.clearFileSelection,
   }));
   const basename = path.basename(filepath);
@@ -159,7 +161,13 @@ const FileLine = ({
         command: (e) => {
           e.stopPropagation();
           setHovered(false);
-          downloadFileFromPath(filepath);
+          if (getSelectedFiles().includes(filepath)) {
+            getSelectedFiles().forEach((filepath) => {
+              downloadFileFromPath(filepath);
+            });
+          } else {
+            downloadFileFromPath(filepath);
+          }
         },
         icon: "DownloadProject",
       },
@@ -167,7 +175,15 @@ const FileLine = ({
         label: "Delete",
         command: () => {
           setHovered(false);
-          deleteFile({ filename: filepath });
+          if (getSelectedFiles().includes(filepath)) {
+              getSelectedFiles().forEach((filepath) => {
+                deleteFile({ filename: filepath });
+              }
+            );
+          }
+          else {
+            deleteFile({ filename: filepath });
+          }
         },
         icon: "FileDelete",
       },
@@ -182,29 +198,41 @@ const FileLine = ({
     setHovered(false);
   };
 
+
   const onRename = (e) => {
     e.stopPropagation();
     handleRename();
   };
 
   const handleFileClick = (e) => {
-    e.preventDefault(); // 防止默认行为
-    loadFile({ filepath }); // 加载文件
-    clearFileSelection();
-    if (isMobile) {
-      pushScene({ nextScene: "edit" }); // 移动设备场景切换
-    }
-    return;
     if (e.ctrlKey || e.metaKey) {
       toggleFileSelection(filepath); // 多选逻辑
     } else {
-      loadFile({ filepath }); // 加载文件
       clearFileSelection();
+      toggleFileSelection(filepath);
+      loadFile({ filepath }); // 加载文件
       if (isMobile) {
         pushScene({ nextScene: "edit" }); // 移动设备场景切换
       }
     }
   };
+
+  const draggableGroup = useMemo(() => 
+    selectedFiles.map((file) => ({
+      pathname: file,
+      type: "file",
+      onDrop: async (result) => {
+        if (result) {
+          fileMoved(result);
+        }
+      },
+      isEnabled: isDropFileSystem,
+      onDropByOther: () => {},
+      projectSync: projectSync,
+      reload: reload,
+    })),
+    [selectedFiles, fileMoved, isDropFileSystem, projectSync, reload]
+  );
 
   if (renamingPathname === filepath) {
     return (
@@ -260,6 +288,7 @@ const FileLine = ({
       <div id="file" className="block p-[0px] w-full h-full">
         <Draggable
           pathname={filepath}
+          group={draggableGroup}
           type="file"
           onDrop={async (result) => {
             if (result) {
@@ -275,11 +304,7 @@ const FileLine = ({
         >
           <Container
             selected={
-              selectedFiles.includes(filepath) || // Multi-select condition
-              (assetsFilePath && assetsFilePath === filepath) ||
-              (!assetsFilePath &&
-                editingFilepath === filepath &&
-                currentSelectDir === "")
+              selectedFiles.includes(filepath)// Multi-select condition
             }
           >
             <div
