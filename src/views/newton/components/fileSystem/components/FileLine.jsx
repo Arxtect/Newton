@@ -57,6 +57,9 @@ const FileLine = ({
     mainFilepath,
     projectSync,
     reload,
+    selectedFiles,
+    toggleFileSelection,
+    clearFileSelection,
   } = useFileStore((state) => ({
     editorValue: state.value,
     saveFile: state.saveFile,
@@ -70,6 +73,9 @@ const FileLine = ({
     mainFilepath: state.mainFilepath,
     projectSync: state.projectSync,
     reload: state.repoChanged,
+    selectedFiles: state.selectedFiles,
+    toggleFileSelection: state.toggleFileSelection,
+    clearFileSelection: state.clearFileSelection,
   }));
   const basename = path.basename(filepath);
 
@@ -180,6 +186,26 @@ const FileLine = ({
     e.stopPropagation();
     handleRename();
   };
+
+  const handleFileClick = (e) => {
+    e.preventDefault(); // 防止默认行为
+    loadFile({ filepath }); // 加载文件
+    clearFileSelection();
+    if (isMobile) {
+      pushScene({ nextScene: "edit" }); // 移动设备场景切换
+    }
+    return;
+    if (e.ctrlKey || e.metaKey) {
+      toggleFileSelection(filepath); // 多选逻辑
+    } else {
+      loadFile({ filepath }); // 加载文件
+      clearFileSelection();
+      if (isMobile) {
+        pushScene({ nextScene: "edit" }); // 移动设备场景切换
+      }
+    }
+  };
+
   if (renamingPathname === filepath) {
     return (
       <Box
@@ -249,6 +275,7 @@ const FileLine = ({
         >
           <Container
             selected={
+              selectedFiles.includes(filepath) || // Multi-select condition
               (assetsFilePath && assetsFilePath === filepath) ||
               (!assetsFilePath &&
                 editingFilepath === filepath &&
@@ -266,13 +293,7 @@ const FileLine = ({
                   padding: "1px 0px",
                   paddingLeft: `${depth * 8 + 24}px`,
                 }}
-                onClick={async (e) => {
-                  e.preventDefault();
-                  await loadFile({ filepath });
-                  if (isMobile) {
-                    pushScene({ nextScene: "edit" });
-                  }
-                }}
+                onClick={handleFileClick}
                 onDoubleClick={(e) => {
                   if (
                     filepath !== editingFilepath &&

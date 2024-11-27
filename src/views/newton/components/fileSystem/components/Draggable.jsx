@@ -10,7 +10,7 @@ const DND_GROUP = "browser";
 const fileSource = {
   beginDrag(props) {
     console.log("Begin drag:", props);
-    return props;
+    return { items: [props] }; // 返回一个包含多个拖动项信息的对象数组
   },
 };
 
@@ -18,12 +18,14 @@ const fileTarget = {
   drop(dropProps, monitor) {
     if (monitor) {
       const dragProps = monitor.getItem();
-      if (dropProps.pathname !== dragProps.pathname) {
-        moveItem(dragProps, dropProps).then((result) => {
-          dropProps.onDropByOther(result);
-          dragProps.onDrop(result);
-        });
-      }
+      dragProps.items.forEach((item) => {
+        if (dropProps.pathname !== item.pathname) {
+          moveItem(item, dropProps).then((result) => {
+            dropProps.onDropByOther(result);
+            item.onDrop(result);
+          });
+        }
+      });
     }
   },
   hover(props, monitor, component) {

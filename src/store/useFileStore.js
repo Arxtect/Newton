@@ -70,6 +70,31 @@ export const useFileStore = create()(
       shareUserList: [],
       isDropFileSystem: true,
       shareIsRead: false,
+      selectedFiles: [],
+      setSelectedFiles: (filepath) => {
+        // 如果传入的是数组就直接使用,否则包装成数组
+        set({ selectedFiles: [filepath] });
+      },
+
+      toggleFileSelection: (filepath) => {
+        const currentSelected = get().selectedFiles;
+        let newSelected;
+
+        if (currentSelected.includes(filepath)) {
+          // 如果已存在则移除
+          newSelected = currentSelected.filter((f) => f !== filepath);
+        } else {
+          // 如果不存在则添加
+          newSelected = [...currentSelected, filepath];
+        }
+
+        set({ selectedFiles: newSelected });
+      },
+
+      clearFileSelection: () => {
+        set({ selectedFiles: [] });
+      },
+
       updateCurrentProjectFileList: async (currentProjectRoot) => {
         const files = await FS.getFilesRecursively(currentProjectRoot);
         const relativePathPrefix = `${currentProjectRoot}/`;
@@ -201,7 +226,7 @@ export const useFileStore = create()(
         });
       },
       changeCurrentSelectDir: (dirpath) => {
-        set({ currentSelectDir: dirpath });
+        set({ currentSelectDir: dirpath, selectedFiles: [] });
       },
       saveFileState: async (value) => {
         set((state) => ({
@@ -355,8 +380,8 @@ export const useFileStore = create()(
         get().startUpdate({ changedPath: dirname, isDir: true });
       },
 
-      deleteFile: async ({ filename },isSync=false) => {
-        if(!isSync){
+      deleteFile: async ({ filename }, isSync = false) => {
+        if (!isSync) {
           set({ filepath: "", value: "" });
         }
         if (!(await FS.existsPath(filename))) return;
@@ -465,6 +490,7 @@ export function getInitialState() {
     reloadCounter: 0,
     assetsFilePath: "",
     assetValue: "",
+    selectedFiles: [],
   };
 }
 
