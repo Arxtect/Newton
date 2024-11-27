@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
 import TextField from "@mui/material/TextField";
@@ -20,7 +20,7 @@ import path from "path";
 
 const GitEasy = () => {
   const [commitMessage, setCommitMessage] = useState("");
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
   const { projectRoot } = useFileStore((state) => ({
     projectRoot: state.currentProjectRoot,
   }));
@@ -61,26 +61,30 @@ const GitEasy = () => {
     };
   }, [statusMatrix]);
 
-  if (!statusMatrix) {
-    return <CircularProgress />;
-  }
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      if (hasChanges) {
+        commitAndPush(""); // 自动提交
+      }
+    }, 30000); // 30 seconds
 
-  const commitAndPush = async (commitMessage) => {
-    if (!commitMessage) {
-      toast.error("Please enter message");
-      return
+    return () => clearInterval(intervalId); // Cleanup on unmount
+  }, [hasChanges]);
+
+  const commitAndPush = async (message) => {
+    if (!message) {
+      message = "Automated commit"; // 默认提交信息
     }
-    setLoading(true)
-    commitAll({ message: commitMessage })
-      .then(async () => {
-        await pushCurrentBranchToOrigin();
-        setLoading(false)
-        setCommitMessage("");
-      })
-      .catch((e) => {
-        setLoading(false)
-        toast.error(e.message);
-      });
+    setLoading(true);
+    try {
+      await commitAll({ message });
+      await pushCurrentBranchToOrigin();
+      setCommitMessage("");
+    } catch (e) {
+      toast.error(e.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const gitFolderPath = path.join(projectRoot, ".git");
@@ -91,8 +95,8 @@ const GitEasy = () => {
       console.log(`Directory ${gitFolderPath} does not exist.`);
       return;
     }
-    if (typeof gitFolderPath !== 'string') {
-      console.error('Error: gitFolderPath is not a string');
+    if (typeof gitFolderPath !== "string") {
+      console.error("Error: gitFolderPath is not a string");
       return;
     }
 
@@ -101,6 +105,10 @@ const GitEasy = () => {
     console.log(`Removal attempt completed. Now listing remaining files.`);
     let list = await getAllFileNames(projectRoot);
     console.log(list, "Remaining files after removal:");
+  };
+
+  if (!statusMatrix) {
+    return <CircularProgress />;
   }
 
   return (
