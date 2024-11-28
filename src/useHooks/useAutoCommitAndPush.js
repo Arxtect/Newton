@@ -10,7 +10,7 @@ export const useAutoCommitAndPush = () => {
       if (hasChanges) {
         commitAndPush();
       }
-    }, 30000); // 30 seconds
+    }, 10 * 60 * 1000); // 10 minutes
 
     return () => clearInterval(intervalId); // Cleanup on unmount
   }, [hasChanges, commitAndPush]);
