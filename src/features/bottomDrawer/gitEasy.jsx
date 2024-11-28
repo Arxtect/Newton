@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useState } from "react";
-import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
 import TextField from "@mui/material/TextField";
 import Accordion from "@mui/material/Accordion";
@@ -9,18 +8,16 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Typography from "@mui/material/Typography";
 import { useGitRepo, useFileStore } from "store";
 import GitBriefHistory from "./gitBriefHistory";
-import {
-  getRemovableFilenames,
-  getModifiedFilenames,
-} from "domain/git/queries/parseStatusMatrix";
-import { toast } from "react-toastify";
 import ArLoadingButton from "@/components/arLoadingButton";
 import { existsPath, removeDirectory, getAllFileNames } from "domain/filesystem";
 import path from "path";
+import { useGitStatus, useCommitAndPush } from "@/useHooks";
 
 const GitEasy = () => {
   const [commitMessage, setCommitMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const { hasChanges, modified, removable } = useGitStatus();
+  const commitAndPush = useCommitAndPush();
   const { projectRoot } = useFileStore((state) => ({
     projectRoot: state.currentProjectRoot,
   }));
@@ -48,40 +45,12 @@ const GitEasy = () => {
     isCanPush: state.isCanPush,
   }));
 
-  const { hasChanges, modified, removable } = useMemo(() => {
-    const removableFiles = getRemovableFilenames(statusMatrix);
-    const modifiedFiles = getModifiedFilenames(statusMatrix)?.filter(
-      (a) => !removableFiles.includes(a)
-    );
-    const changes = modifiedFiles?.length > 0 || removableFiles?.length > 0;
-    return {
-      hasChanges: changes,
-      modified: modifiedFiles,
-      removable: removableFiles,
-    };
-  }, [statusMatrix]);
-
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      if (hasChanges) {
-        commitAndPush(""); // 自动提交
-      }
-    }, 30000); // 30 seconds
-
-    return () => clearInterval(intervalId); // Cleanup on unmount
-  }, [hasChanges]);
-
-  const commitAndPush = async (message) => {
-    if (!message) {
-      message = "Automated commit"; // 默认提交信息
-    }
+  
+  const handleCommit = async () => {
     setLoading(true);
     try {
-      await commitAll({ message });
-      await pushCurrentBranchToOrigin();
+      await commitAndPush(commitMessage);
       setCommitMessage("");
-    } catch (e) {
-      toast.error(e.message);
     } finally {
       setLoading(false);
     }
@@ -161,7 +130,7 @@ const GitEasy = () => {
                 variant="contained"
                 size="small"
                 disabled={!hasChanges}
-                onClick={() => commitAndPush(commitMessage)}
+                onClick={handleCommit}
                 data-testid="commit-all-button"
                 loading={loading}
               >
