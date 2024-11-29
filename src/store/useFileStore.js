@@ -238,8 +238,12 @@ export const useFileStore = create()(
           selectedFiles: [filepath],
         });
       },
-      changeCurrentSelectDir: (dirpath) => {
-        set({ currentSelectDir: dirpath, selectedFiles: [] });
+      changeCurrentSelectDir: (dirpath, isCtrl = false) => {
+        if (!isCtrl) {
+          set({ currentSelectDir: dirpath, selectedFiles: [] });
+        } else {
+          set({ currentSelectDir: dirpath });
+        }
       },
       saveFileState: async (value) => {
         set((state) => ({

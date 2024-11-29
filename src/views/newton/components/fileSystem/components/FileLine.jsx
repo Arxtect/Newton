@@ -50,6 +50,7 @@ const FileLine = ({
     deleteFile,
     editingFilepath,
     currentSelectDir,
+    changeCurrentSelectDir,
     renamingPathname,
     isDropFileSystem,
     assetsFilePath,
@@ -67,6 +68,7 @@ const FileLine = ({
     saveFile: state.saveFile,
     editingFilepath: state.filepath,
     currentSelectDir: state.currentSelectDir,
+    changeCurrentSelectDir: state.changeCurrentSelectDir,
     deleteFile: state.deleteFile,
     renamingPathname: state.renamingPathname,
     isDropFileSystem: state.isDropFileSystem,
@@ -208,7 +210,9 @@ const FileLine = ({
 
   const handleFileClick = (e) => {
     if (e.ctrlKey || e.metaKey) {
+      changeCurrentSelectDir("", true);
       toggleFileSelection(filepath); // 多选逻辑
+      // console.log("selectedFiles", selectedFiles);
     } else {
       clearFileSelection();
       toggleFileSelection(filepath);
