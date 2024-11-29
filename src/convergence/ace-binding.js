@@ -36,7 +36,7 @@ class AceCursors {
     let start = config.firstRow,
       end = config.lastRow; //视图显示区域
     let cursors = this.markerCursors;
-    console.log(this.markerCursors, "markerCursors");
+    // console.log(this.markerCursors, "markerCursors");
 
     for (let i = 0; i < cursors.length; i++) {
       if (this.localUser?.id == cursors[i].userId) continue;
@@ -75,7 +75,7 @@ class AceCursors {
           el = document.createElement("div");
           el.id = this.aceID + "_cursor_" + pos.userId;
           el.className = "cursor";
-          el.style.position = "relative";
+          el.style.position = "absolute";
           el.style.height = height + "px";
           el.style.width = width + "px";
           el.style.top = top + "px";

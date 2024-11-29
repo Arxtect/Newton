@@ -12,10 +12,10 @@ import { toast } from "react-toastify";
 
 const host = window.location.hostname;
 const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-// const wsUrl = `wss://arxtect.com/websockets/`;
+const wsUrl = `wss://arxtect.com/websockets/`;
 // const wsUrl = `ws://3.227.9.181:8013`;
 // const wsUrl = `ws://206.190.239.91:9008/`;
-const wsUrl = `ws://10.10.99.42:8013/`;
+// const wsUrl = `ws://10.10.99.42:8013/`;
 
 class ProjectSync {
   constructor(rootPath, user, roomId, token, position, otherOperation) {
