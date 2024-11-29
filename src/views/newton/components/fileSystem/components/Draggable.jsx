@@ -10,6 +10,9 @@ const DND_GROUP = "browser";
 const fileSource = {
   beginDrag(props) {
     console.log("Begin drag:", props);
+    if (props.type === "dir") {
+      return { items: [props] };
+    }
     props.onDrag();
     const group = props.getGroup();
     console.log("current group", group);

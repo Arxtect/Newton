@@ -9,7 +9,7 @@ export const useGitStatus = () => {
   const { statusMatrix } = useGitRepo((state) => ({
     statusMatrix: state.statusMatrix,
   }));
-
+  console.log("statusMatrix", statusMatrix);
   const removable = useMemo(
     () => getRemovableFilenames(statusMatrix),
     [statusMatrix]
@@ -20,6 +20,7 @@ export const useGitStatus = () => {
   );
 
   const hasChanges = useMemo(() => {
+    console.log("modified", modified, "removable", removable);
     const nonRemovableModified = modified.filter(
       (file) => !removable.includes(file)
     );
