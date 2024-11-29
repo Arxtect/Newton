@@ -60,7 +60,6 @@ const FileLine = ({
     reload,
     selectedFiles,
     toggleFileSelection,
-    getSelectedFiles,
     clearFileSelection,
     deleteSelectedFile,
   } = useFileStore((state) => ({
@@ -79,7 +78,6 @@ const FileLine = ({
     reload: state.repoChanged,
     selectedFiles: state.selectedFiles,
     toggleFileSelection: state.toggleFileSelection,
-    getSelectedFiles: state.getSelectedFiles,
     clearFileSelection: state.clearFileSelection,
     deleteSelectedFile: state.deleteSelectedFile,
   }));
@@ -141,17 +139,19 @@ const FileLine = ({
 
   const menuItems = useMemo(() => {
     let isTex = path.extname(filepath) == ".tex";
+    let isMultiSelected = selectedFiles.length > 1;
     return [
-      isTex && {
-        label: "Set as Main",
-        command: (e) => {
-          e.stopPropagation();
-          setHovered(false);
-          handleSetMainFile();
+      isTex &&
+        !isMultiSelected && {
+          label: "Set as Main",
+          command: (e) => {
+            e.stopPropagation();
+            setHovered(false);
+            handleSetMainFile();
+          },
+          icon: "TextFile",
         },
-        icon: "TextFile",
-      },
-      {
+      !isMultiSelected && {
         label: "Rename",
         command: (e) => {
           e.stopPropagation();
@@ -165,8 +165,8 @@ const FileLine = ({
         command: (e) => {
           e.stopPropagation();
           setHovered(false);
-          if (getSelectedFiles().includes(filepath)) {
-            getSelectedFiles().forEach((filepath) => {
+          if (selectedFiles.includes(filepath)) {
+            selectedFiles.forEach((filepath) => {
               downloadFileFromPath(filepath);
             });
           } else {
@@ -179,20 +179,18 @@ const FileLine = ({
         label: "Delete",
         command: () => {
           setHovered(false);
-          if (getSelectedFiles().includes(filepath)) {
-              getSelectedFiles().forEach((filepath) => {
-                deleteFile({ filename: filepath });
-              }
-            );
-          }
-          else {
+          if (selectedFiles.includes(filepath)) {
+            selectedFiles.forEach((filepath) => {
+              deleteFile({ filename: filepath });
+            });
+          } else {
             deleteFile({ filename: filepath });
           }
         },
         icon: "FileDelete",
       },
     ].filter((item) => item?.label);
-  }, [filepath, deleteFile, handleRename, handleSetMainFile]);
+  }, [filepath, deleteFile, handleRename, handleSetMainFile, selectedFiles]);
 
   const handleMouseEnter = (e) => {
     setHovered(true);
@@ -201,7 +199,6 @@ const FileLine = ({
   const handleMouseLeave = (e) => {
     setHovered(false);
   };
-
 
   const onRename = (e) => {
     e.stopPropagation();
@@ -212,7 +209,6 @@ const FileLine = ({
     if (e.ctrlKey || e.metaKey) {
       changeCurrentSelectDir("", true);
       toggleFileSelection(filepath); // 多选逻辑
-      // console.log("selectedFiles", selectedFiles);
     } else {
       clearFileSelection();
       toggleFileSelection(filepath);
@@ -224,11 +220,6 @@ const FileLine = ({
   };
 
   const getGroup = () => {
-    // 获取选定的文件列表
-    const selectedFiles = getSelectedFiles(); // 确保即使 getSelectedFiles() 返回 undefined 或 null，selectedFiles 也是数组
-    
-    // 如果需要，可以在这里对 selectedFiles 进行额外的验证或过滤
-    
     // 对每个文件生成一个配置对象
     return selectedFiles.map((file) => ({
       pathname: file,
@@ -303,13 +294,11 @@ const FileLine = ({
           getGroup={getGroup}
           type="file"
           onDrag={() => {
-              if (!selectedFiles.includes(filepath)) {
-                clearFileSelection();
-                toggleFileSelection(filepath);
-              }
-              console.log("onDrag", getSelectedFiles());
+            if (!selectedFiles.includes(filepath)) {
+              clearFileSelection();
+              toggleFileSelection(filepath);
             }
-          }
+          }}
           onDrop={async (result) => {
             if (result) {
               fileMoved(result);
@@ -324,7 +313,7 @@ const FileLine = ({
         >
           <Container
             selected={
-              selectedFiles.includes(filepath)// Multi-select condition
+              selectedFiles.includes(filepath) // Multi-select condition
             }
           >
             <div

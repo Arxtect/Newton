@@ -73,7 +73,6 @@ async function moveItem(from, to) {
 }
 
 function DraggableItem(props) {
-  console.log("DraggableItem", props);
   const {
     connectDragSource,
     connectDropTarget,

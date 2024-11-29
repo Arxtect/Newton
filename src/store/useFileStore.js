@@ -90,9 +90,6 @@ export const useFileStore = create()(
 
         set({ selectedFiles: newSelected });
       },
-      getSelectedFiles: () => {
-        return get().selectedFiles;
-      },
 
       deleteSelectedFile: (filepath) => {
         set((state) => ({

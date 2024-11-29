@@ -10,7 +10,7 @@ export const useCommitAndPush = () => {
   const commitAndPush = async (message = "Automated commit") => {
     try {
       await commitAll({ message });
-      await pushCurrentBranchToOrigin();
+      await pushCurrentBranchToOrigin(false);
     } catch (e) {
       toast.error(e.message);
     }
