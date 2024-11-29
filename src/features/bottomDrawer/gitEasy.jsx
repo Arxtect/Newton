@@ -1,5 +1,4 @@
-import React, { useMemo, useState } from "react";
-import Button from "@mui/material/Button";
+import React, { useState } from "react";
 import CircularProgress from "@mui/material/CircularProgress";
 import TextField from "@mui/material/TextField";
 import Accordion from "@mui/material/Accordion";
@@ -9,18 +8,16 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Typography from "@mui/material/Typography";
 import { useGitRepo, useFileStore } from "store";
 import GitBriefHistory from "./gitBriefHistory";
-import {
-  getRemovableFilenames,
-  getModifiedFilenames,
-} from "domain/git/queries/parseStatusMatrix";
-import { toast } from "react-toastify";
 import ArLoadingButton from "@/components/arLoadingButton";
 import { existsPath, removeDirectory, getAllFileNames } from "domain/filesystem";
 import path from "path";
+import { useGitStatus, useCommitAndPush } from "@/useHooks";
 
 const GitEasy = () => {
   const [commitMessage, setCommitMessage] = useState("");
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
+  const { hasChanges, modified, removable } = useGitStatus();
+  const commitAndPush = useCommitAndPush();
   const { projectRoot } = useFileStore((state) => ({
     projectRoot: state.currentProjectRoot,
   }));
@@ -48,39 +45,15 @@ const GitEasy = () => {
     isCanPush: state.isCanPush,
   }));
 
-  const { hasChanges, modified, removable } = useMemo(() => {
-    const removableFiles = getRemovableFilenames(statusMatrix);
-    const modifiedFiles = getModifiedFilenames(statusMatrix)?.filter(
-      (a) => !removableFiles.includes(a)
-    );
-    const changes = modifiedFiles?.length > 0 || removableFiles?.length > 0;
-    return {
-      hasChanges: changes,
-      modified: modifiedFiles,
-      removable: removableFiles,
-    };
-  }, [statusMatrix]);
-
-  if (!statusMatrix) {
-    return <CircularProgress />;
-  }
-
-  const commitAndPush = async (commitMessage) => {
-    if (!commitMessage) {
-      toast.error("Please enter message");
-      return
+  
+  const handleCommit = async () => {
+    setLoading(true);
+    try {
+      await commitAndPush(commitMessage);
+      setCommitMessage("");
+    } finally {
+      setLoading(false);
     }
-    setLoading(true)
-    commitAll({ message: commitMessage })
-      .then(async () => {
-        await pushCurrentBranchToOrigin();
-        setLoading(false)
-        setCommitMessage("");
-      })
-      .catch((e) => {
-        setLoading(false)
-        toast.error(e.message);
-      });
   };
 
   const gitFolderPath = path.join(projectRoot, ".git");
@@ -91,8 +64,8 @@ const GitEasy = () => {
       console.log(`Directory ${gitFolderPath} does not exist.`);
       return;
     }
-    if (typeof gitFolderPath !== 'string') {
-      console.error('Error: gitFolderPath is not a string');
+    if (typeof gitFolderPath !== "string") {
+      console.error("Error: gitFolderPath is not a string");
       return;
     }
 
@@ -101,6 +74,10 @@ const GitEasy = () => {
     console.log(`Removal attempt completed. Now listing remaining files.`);
     let list = await getAllFileNames(projectRoot);
     console.log(list, "Remaining files after removal:");
+  };
+
+  if (!statusMatrix) {
+    return <CircularProgress />;
   }
 
   return (
@@ -153,7 +130,7 @@ const GitEasy = () => {
                 variant="contained"
                 size="small"
                 disabled={!hasChanges}
-                onClick={() => commitAndPush(commitMessage)}
+                onClick={handleCommit}
                 data-testid="commit-all-button"
                 loading={loading}
               >

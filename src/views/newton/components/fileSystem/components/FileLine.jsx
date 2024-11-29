@@ -50,6 +50,7 @@ const FileLine = ({
     deleteFile,
     editingFilepath,
     currentSelectDir,
+    changeCurrentSelectDir,
     renamingPathname,
     isDropFileSystem,
     assetsFilePath,
@@ -59,12 +60,15 @@ const FileLine = ({
     reload,
     selectedFiles,
     toggleFileSelection,
+    getSelectedFiles,
     clearFileSelection,
+    deleteSelectedFile,
   } = useFileStore((state) => ({
     editorValue: state.value,
     saveFile: state.saveFile,
     editingFilepath: state.filepath,
     currentSelectDir: state.currentSelectDir,
+    changeCurrentSelectDir: state.changeCurrentSelectDir,
     deleteFile: state.deleteFile,
     renamingPathname: state.renamingPathname,
     isDropFileSystem: state.isDropFileSystem,
@@ -75,7 +79,9 @@ const FileLine = ({
     reload: state.repoChanged,
     selectedFiles: state.selectedFiles,
     toggleFileSelection: state.toggleFileSelection,
+    getSelectedFiles: state.getSelectedFiles,
     clearFileSelection: state.clearFileSelection,
+    deleteSelectedFile: state.deleteSelectedFile,
   }));
   const basename = path.basename(filepath);
 
@@ -159,7 +165,13 @@ const FileLine = ({
         command: (e) => {
           e.stopPropagation();
           setHovered(false);
-          downloadFileFromPath(filepath);
+          if (getSelectedFiles().includes(filepath)) {
+            getSelectedFiles().forEach((filepath) => {
+              downloadFileFromPath(filepath);
+            });
+          } else {
+            downloadFileFromPath(filepath);
+          }
         },
         icon: "DownloadProject",
       },
@@ -167,7 +179,15 @@ const FileLine = ({
         label: "Delete",
         command: () => {
           setHovered(false);
-          deleteFile({ filename: filepath });
+          if (getSelectedFiles().includes(filepath)) {
+              getSelectedFiles().forEach((filepath) => {
+                deleteFile({ filename: filepath });
+              }
+            );
+          }
+          else {
+            deleteFile({ filename: filepath });
+          }
         },
         icon: "FileDelete",
       },
@@ -182,28 +202,48 @@ const FileLine = ({
     setHovered(false);
   };
 
+
   const onRename = (e) => {
     e.stopPropagation();
     handleRename();
   };
 
   const handleFileClick = (e) => {
-    e.preventDefault(); // 防止默认行为
-    loadFile({ filepath }); // 加载文件
-    clearFileSelection();
-    if (isMobile) {
-      pushScene({ nextScene: "edit" }); // 移动设备场景切换
-    }
-    return;
     if (e.ctrlKey || e.metaKey) {
+      changeCurrentSelectDir("", true);
       toggleFileSelection(filepath); // 多选逻辑
+      // console.log("selectedFiles", selectedFiles);
     } else {
-      loadFile({ filepath }); // 加载文件
       clearFileSelection();
+      toggleFileSelection(filepath);
+      loadFile({ filepath }); // 加载文件
       if (isMobile) {
         pushScene({ nextScene: "edit" }); // 移动设备场景切换
       }
     }
+  };
+
+  const getGroup = () => {
+    // 获取选定的文件列表
+    const selectedFiles = getSelectedFiles(); // 确保即使 getSelectedFiles() 返回 undefined 或 null，selectedFiles 也是数组
+    
+    // 如果需要，可以在这里对 selectedFiles 进行额外的验证或过滤
+    
+    // 对每个文件生成一个配置对象
+    return selectedFiles.map((file) => ({
+      pathname: file,
+      type: "file",
+      onDrop: async (result) => {
+        if (result) {
+          fileMoved(result); // 移动文件
+          deleteSelectedFile(file); // 删除已选择的文件
+        }
+      },
+      isEnabled: isDropFileSystem, // 是否启用拖放功能
+      onDropByOther: () => {}, // 其他对象拖放到此文件时的回调
+      projectSync: projectSync, // 同步项目
+      reload: reload, // 刷新
+    }));
   };
 
   if (renamingPathname === filepath) {
@@ -260,7 +300,16 @@ const FileLine = ({
       <div id="file" className="block p-[0px] w-full h-full">
         <Draggable
           pathname={filepath}
+          getGroup={getGroup}
           type="file"
+          onDrag={() => {
+              if (!selectedFiles.includes(filepath)) {
+                clearFileSelection();
+                toggleFileSelection(filepath);
+              }
+              console.log("onDrag", getSelectedFiles());
+            }
+          }
           onDrop={async (result) => {
             if (result) {
               fileMoved(result);
@@ -275,11 +324,7 @@ const FileLine = ({
         >
           <Container
             selected={
-              selectedFiles.includes(filepath) || // Multi-select condition
-              (assetsFilePath && assetsFilePath === filepath) ||
-              (!assetsFilePath &&
-                editingFilepath === filepath &&
-                currentSelectDir === "")
+              selectedFiles.includes(filepath)// Multi-select condition
             }
           >
             <div

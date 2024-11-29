@@ -90,6 +90,17 @@ export const useFileStore = create()(
 
         set({ selectedFiles: newSelected });
       },
+      getSelectedFiles: () => {
+        return get().selectedFiles;
+      },
+
+      deleteSelectedFile: (filepath) => {
+        set((state) => ({
+          selectedFiles: state.selectedFiles.filter(
+            (file) => file !== filepath
+          ),
+        }));
+      },
 
       clearFileSelection: () => {
         set({ selectedFiles: [] });
@@ -204,6 +215,7 @@ export const useFileStore = create()(
             lastSavedValue: "",
             changed: false,
             currentSelectDir: "",
+            selectedFiles: [filepath],
           });
           return;
         }
@@ -223,10 +235,15 @@ export const useFileStore = create()(
           lastSavedValue: fileContent.toString(),
           changed: false,
           currentSelectDir: "",
+          selectedFiles: [filepath],
         });
       },
-      changeCurrentSelectDir: (dirpath) => {
-        set({ currentSelectDir: dirpath, selectedFiles: [] });
+      changeCurrentSelectDir: (dirpath, isCtrl = false) => {
+        if (!isCtrl) {
+          set({ currentSelectDir: dirpath, selectedFiles: [] });
+        } else {
+          set({ currentSelectDir: dirpath });
+        }
       },
       saveFileState: async (value) => {
         set((state) => ({
