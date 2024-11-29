@@ -257,7 +257,7 @@ export const useFileStore = create()(
       },
       debouncedUpdateFileContent: debounce((filepath, value, isSync) => {
         get().updateFileContent(filepath, value, isSync);
-      }, 300),
+      }, 1500),
       changeValue: (value, isSync = true) => {
         const state = get();
         if (state.autosave && isSync) {

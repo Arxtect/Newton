@@ -117,8 +117,8 @@ module.exports = function (proxy, allowedHost) {
         // target: "http://3.227.9.181:8012",
         // target: "http://172.17.15.200:8012",
         // target: "http://127.0.0.1:8012",
-        // target: "http://172.17.15.200:8012",
-        target: "https://arxtect.com",
+        target: "http://172.17.15.200:8012",
+        // target: "https://arxtect.com",
         changeOrigin: true,
         onProxyReq: function (proxyReq, req, res) {
           // 设置 Connection 头为 keep-alive
@@ -127,8 +127,8 @@ module.exports = function (proxy, allowedHost) {
         // pathRewrite: { "^/api/v1": "" }
       },
       "/minio": {
-        // target: "http://network.jancsitech.net:9000",
-        target: "http://arxtect.s3.dualstack.us-east-1.amazonaws.com/",
+        target: "http://network.jancsitech.net:9000",
+        // target: "http://arxtect.s3.dualstack.us-east-1.amazonaws.com/",
         changeOrigin: true,
         pathRewrite: { "^/minio": "" },
       },

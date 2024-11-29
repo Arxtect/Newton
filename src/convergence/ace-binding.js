@@ -11,7 +11,7 @@ class AceCursors {
   constructor(ace, localUser, userList) {
     this.marker = {};
     this.markerID = {};
-    this.marker.cursors = [];
+    this.markerCursors = [];
     this.aceID = null; // Ace container ID will be set dynamically
     this.localUser = localUser;
 
@@ -35,14 +35,12 @@ class AceCursors {
   markerUpdate(html, markerLayer, session, config, ace, userList) {
     let start = config.firstRow,
       end = config.lastRow; //视图显示区域
-    let cursors = this.marker.cursors;
-    console.log(cursors, "cursors");
+    let cursors = this.markerCursors;
+    console.log(this.markerCursors, "markerCursors");
 
     for (let i = 0; i < cursors.length; i++) {
-      console.log(cursors[i], this.localUser, "cursors[i]");
       if (this.localUser?.id == cursors[i].userId) continue;
       let pos = cursors[i];
-      console.log("userList");
       if (!cursors[i]?.color) {
         pos = {
           ...pos,
@@ -57,7 +55,7 @@ class AceCursors {
         isNullOrUndefined(pos.row) ||
         isNullOrUndefined(pos.column)
       ) {
-        let el = document.getElementById(this.aceID + "_cursor_" + pos.id);
+        let el = document.getElementById(this.aceID + "_cursor_" + pos.userId);
 
         if (el) {
           el.style.opacity = 0;
@@ -72,10 +70,10 @@ class AceCursors {
         let top = markerLayer.$getTop(screenPos.row, config) - config.offset;
         let left = markerLayer.$padding + aceGutter + screenPos.column * width;
 
-        let el = document.getElementById(this.aceID + "_cursor_" + pos.id);
+        let el = document.getElementById(this.aceID + "_cursor_" + pos.userId);
         if (el == undefined) {
           el = document.createElement("div");
-          el.id = this.aceID + "_cursor_" + pos.id;
+          el.id = this.aceID + "_cursor_" + pos.userId;
           el.className = "cursor";
           el.style.position = "relative";
           el.style.height = height + "px";
@@ -96,7 +94,7 @@ class AceCursors {
             cursorLabel.style.display = "inline-block";
             cursorLabel.style.transform = `translateY(-${
               config.lineHeight + 4
-              }px)`;
+            }px)`;
             cursorLabel.style.zIndex = 9999;
             cursorLabel.style.borderRadius = "5px"; // 添加圆角
             cursorLabel.style.padding = "2px 4px"; // 添加内边距以提高可读性
@@ -133,16 +131,7 @@ class AceCursors {
     if (cur !== undefined && cur.hasOwnProperty("cursor") && !!cur?.cursor) {
       let c = cur.cursor;
 
-      // let pos = ace.getSession().doc.indexToPosition(c.pos);
-
       let curCursor = cur.cursor;
-      // {
-      //   row: pos.row,
-      //   column: pos.column,
-      //   color: c.color,
-      //   id: c.id,
-      //   name: c.name,
-      // };
 
       if (c.sel) {
         if (
@@ -191,7 +180,17 @@ class AceCursors {
         }
       }
 
-      this.marker.cursors.push(curCursor);
+      const index = this.markerCursors.findIndex(
+        (item) => item.userId === curCursor.userId
+      );
+
+      if (index !== -1) {
+        // 如果存在，替换原有元素
+        this.markerCursors[index] = curCursor;
+      } else {
+        // 如果不存在，添加新元素
+        this.markerCursors.push(curCursor);
+      }
     } else {
       let el = document.getElementById(this.aceID + "_cursor_" + cid);
 
@@ -324,10 +323,7 @@ export class AceBinding {
     let uniqueUsers = [];
     let currentUsersId = [];
 
-    console.log(states, "states");
-
     for (let [id, state] of states) {
-      console.log(state, "state"); // 输出每个 state 对象
       if (state && state.user) {
         if (!currentUsersId.includes(state.user.id)) {
           currentUsersId.push(state.user.id);
