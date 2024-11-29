@@ -5,3 +5,6 @@ export * from "./useClipboard";
 export * from "./useCopyToClipboard";
 export * from "./useTimestamp";
 export * from "./useAuthCallback";
+export * from "./useGitStatus";
+export * from "./useCommitAndPush";
+export * from "./useAutoCommitAndPush";

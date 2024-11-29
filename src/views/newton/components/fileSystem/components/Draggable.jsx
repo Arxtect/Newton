@@ -10,7 +10,13 @@ const DND_GROUP = "browser";
 const fileSource = {
   beginDrag(props) {
     console.log("Begin drag:", props);
-    return { items: [...props.group] }; // 返回一个包含多个拖动项信息的对象数组
+    if (props.type === "dir") {
+      return { items: [props] };
+    }
+    props.onDrag();
+    const group = props.getGroup();
+    console.log("current group", group);
+    return { items: [...group] }; // 返回一个包含多个拖动项信息的对象数组
   },
 };
 

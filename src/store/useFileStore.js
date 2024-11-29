@@ -94,6 +94,14 @@ export const useFileStore = create()(
         return get().selectedFiles;
       },
 
+      deleteSelectedFile: (filepath) => {
+        set((state) => ({
+          selectedFiles: state.selectedFiles.filter(
+            (file) => file !== filepath
+          ),
+        }));
+      },
+
       clearFileSelection: () => {
         set({ selectedFiles: [] });
       },
