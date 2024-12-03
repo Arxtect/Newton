@@ -13,6 +13,8 @@ import useAutoCompile from "./hook";
 import { useEngineStatusStore } from "@/store";
 import FileView from "@/features/fileView";
 
+import { typeset, loadExtensions } from "./texMathjax";
+
 const LatexEditor = ({ handleChange, sourceCode, filepath, mainFilepath }) => {
   const latexRef = useRef(null);
 
@@ -36,6 +38,7 @@ const LatexEditor = ({ handleChange, sourceCode, filepath, mainFilepath }) => {
   }));
 
   useEffect(() => {
+    loadExtensions();
     console.log(latexRef.current, "latexRef.current");
     if (latexRef.current && latexRef.current.editor) {
       console.log("Updating editor reference", latexRef.current.editor);
@@ -124,6 +127,63 @@ const LatexEditor = ({ handleChange, sourceCode, filepath, mainFilepath }) => {
     setIsTriggerCompile(true);
   };
 
+  // math preview
+  const [svgOutput, setSvgOutput] = useState("");
+  const [hoveredLine, setHoveredLine] = useState(null);
+
+  const renderMath = (latex) => {
+    try {
+      const svg = typeset(latex, { scale: 1, color: "black" });
+      setSvgOutput(svg);
+    } catch (error) {
+      console.error("Error rendering LaTeX:", error);
+    }
+  };
+
+  const handleMouseMove = (e) => {
+    const editor = latexRef.current.editor;
+    const { row } = editor.renderer.screenToTextCoordinates(
+      e.clientX,
+      e.clientY
+    );
+    const lineCount = editor.session.getLength();
+    let lineContent = editor.session.getLine(row);
+
+    if (lineContent.includes("\\begin{equation}")) {
+      let equationContent = lineContent;
+      let currentRow = row + 1;
+
+      while (currentRow < lineCount) {
+        const nextLine = editor.session.getLine(currentRow);
+        equationContent += "\n" + nextLine;
+        if (nextLine.includes("\\end{equation}")) {
+          break;
+        }
+        currentRow++;
+      }
+
+      if (equationContent.includes("\\end{equation}")) {
+        setHoveredLine(row);
+        renderMath(equationContent);
+      } else {
+        setHoveredLine(null);
+        setSvgOutput("");
+      }
+    } else {
+      setHoveredLine(null);
+      setSvgOutput("");
+    }
+  };
+
+  useEffect(() => {
+    if (!latexRef.current || !latexRef.current.editor) return;
+    const editor = latexRef.current.editor;
+    editor.on("mousemove", handleMouseMove);
+    return () => {
+      editor.off("mousemove", handleMouseMove);
+    };
+  }, [latexRef.current]);
+
   return (
     <div className="h-full relative" id="editor">
       <AceEditor
@@ -150,6 +210,22 @@ const LatexEditor = ({ handleChange, sourceCode, filepath, mainFilepath }) => {
         <AiTools editor={latexRef.current.editor} completer={completer} />
       )}
       {!!assetsFilePath && <FileView filename={assetsFilePath} />}
+      {hoveredLine !== null && (
+        <div
+          className="absolute bg-[#fafafa] px-5 py-2 text-black z-50"
+          style={{
+            border: "1px solid #ccc",
+            borderRadius: "5px",
+            top: `${
+              hoveredLine < 5
+                ? (hoveredLine + 1) * 24
+                : (hoveredLine - 2.5) * 24
+            }px`,
+            left: `${latexRef.current.editor.renderer.gutterWidth + 5}px`,
+          }}
+          dangerouslySetInnerHTML={{ __html: svgOutput }}
+        />
+      )}
     </div>
   );
 };
