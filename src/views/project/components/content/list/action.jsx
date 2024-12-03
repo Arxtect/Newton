@@ -173,6 +173,7 @@ const HoverAction = forwardRef(
                 size="small"
                 onClick={(e) => {
                   e.stopPropagation();
+                  console.log(item,user, "item");
                   if (item.userId && item.userId != user?.id) {
                     toast.warning(
                       "this project is shared, You didn't have permission to share"

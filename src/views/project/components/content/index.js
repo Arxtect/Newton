@@ -467,6 +467,7 @@ const Content = React.forwardRef(
                 sortedRows={sortedRows}
                 currentSelectMenu={currentSelectMenu}
                 auth={auth}
+                user={user}
                 handleGithub={handleGithub}
                 handleCopy={handleCopy}
                 handleRename={handleRename}

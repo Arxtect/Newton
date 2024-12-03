@@ -172,12 +172,11 @@ const Table = forwardRef(
           }))
         );
       };
-
       updateColumns();
       window.addEventListener("resize", updateColumns);
 
       return () => window.removeEventListener("resize", updateColumns);
-    }, [columns]);
+    }, [columns, user]);
 
     return (
       <div>
