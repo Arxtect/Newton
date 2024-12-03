@@ -1,65 +1,102 @@
-import { mathjax } from "mathjax-full/js/mathjax.js";
-import { TeX } from "mathjax-full/js/input/tex.js";
-import { SVG } from "mathjax-full/js/output/svg.js";
-import { liteAdaptor } from "mathjax-full/js/adaptors/liteAdaptor.js";
-import { RegisterHTMLHandler } from "mathjax-full/js/handlers/html.js";
-import "mathjax-full/js/input/tex/AllPackages.js";
+import { typeset, loadExtensions } from "./math";
+import React, { useEffect, useState } from "react";
 
-const adaptor = liteAdaptor();
-RegisterHTMLHandler(adaptor);
+const TexMathJax = ({ latexRef }) => {
+  const [svgOutput, setSvgOutput] = useState("");
+  const [hoveredLine, setHoveredLine] = useState(null);
 
-const baseExtensions = [
-  "ams",
-  "base",
-  "boldsymbol",
-  "color",
-  "configmacros",
-  "mathtools",
-  "newcommand",
-  "noerrors",
-  "noundefined",
-];
-
-function createHtmlConverter(extensions) {
-  // https://github.com/mathjax/MathJax/issues/1219
-  const macrosOption = {
-    bm: ["\\boldsymbol{#1}", 1],
+  const renderMath = (latex) => {
+    try {
+      const svg = typeset(latex, { scale: 1, color: "black" });
+      setSvgOutput(svg);
+    } catch (error) {
+      console.error("Error rendering LaTeX:", error);
+    }
   };
-  const baseTexOption = {
-    packages: extensions,
-    macros: macrosOption,
-    formatError: (_jax, error) => {
-      throw new Error(error.message);
-    },
+
+  const handleMouseMove = (e) => {
+    const editor = latexRef.current.editor;
+    const { row } = editor.renderer.screenToTextCoordinates(
+      e.clientX,
+      e.clientY
+    );
+    const lineCount = editor.session.getLength();
+    let lineContent = editor.session.getLine(row);
+
+    if (lineContent.includes("\\begin{equation}")) {
+      let equationContent = lineContent;
+      let currentRow = row + 1;
+
+      while (currentRow < lineCount) {
+        const nextLine = editor.session.getLine(currentRow);
+        equationContent += "\n" + nextLine;
+        if (nextLine.includes("\\end{equation}")) {
+          break;
+        }
+        currentRow++;
+      }
+
+      if (equationContent.includes("\\end{equation}")) {
+        setHoveredLine(row);
+        renderMath(equationContent);
+      } else {
+        setHoveredLine(null);
+        setSvgOutput("");
+      }
+    } else {
+      setHoveredLine(null);
+      setSvgOutput("");
+    }
   };
-  const texInput = new TeX(baseTexOption);
-  const svgOption = { fontCache: "local" };
-  const svgOutput = new SVG(svgOption);
-  return mathjax.document("", { InputJax: texInput, OutputJax: svgOutput });
-}
 
-let html = createHtmlConverter(baseExtensions);
+  useEffect(() => {
+    if (!latexRef.current || !latexRef.current.editor) return;
+    const editor = latexRef.current.editor;
+    editor.on("mousemove", handleMouseMove);
+    return () => {
+      editor.off("mousemove", handleMouseMove);
+    };
+  }, [latexRef]);
 
-function loadExtensions(extensions = []) {
-  const extensionsToLoad = baseExtensions.concat(extensions);
-  html = createHtmlConverter(extensionsToLoad);
-}
-
-function typeset(arg, opts) {
-  const convertOption = {
-    display: true,
-    em: 18,
-    ex: 9,
-    containerWidth: 80 * 18,
+  const calculateTopPosition = (latexRef, hoveredLine) => {
+    const editor = latexRef.current.editor;
+    const lineHeight = editor.renderer.lineHeight;
+    const scrollTop = editor.renderer.scrollTop;
+    let screenPos = editor.session.documentToScreenPosition(hoveredLine, 0);
+    return screenPos.row * lineHeight - scrollTop;
   };
-  const node = html.convert(arg, convertOption);
 
-  const css = `svg {font-size: ${100 * opts.scale}%;} * { color: ${
-    opts.color
-  } }`;
-  let svgHtml = adaptor.innerHTML(node);
-  svgHtml = svgHtml.replace(/<defs>/, `<defs><style>${css}</style>`);
-  return svgHtml;
-}
+  const calculateLeftPosition = (latexRef) => {
+    const editor = latexRef.current.editor;
+    const gutterWidth = editor.renderer.gutterWidth;
+    return gutterWidth + 5;
+  };
 
-export { typeset, loadExtensions };
+  const shouldPositionAbove = (latexRef, hoveredLine) => {
+    const editor = latexRef.current.editor;
+    const firstVisibleLine = Math.floor(
+      editor.renderer.scrollTop / editor.renderer.lineHeight
+    );
+    return hoveredLine - firstVisibleLine > 5;
+  };
+
+  return (
+    hoveredLine !== null && (
+      <div
+        className="absolute bg-[#fafafa] px-5 py-2 text-black z-50"
+        style={{
+          border: "1px solid #ccc",
+          borderRadius: "5px",
+          top: `${calculateTopPosition(latexRef, hoveredLine)}px`,
+          left: `${calculateLeftPosition(latexRef)}px`,
+          transform: shouldPositionAbove(latexRef, hoveredLine)
+            ? "translateY(-100%)"
+            : `translateY(${latexRef?.current?.editor.renderer.lineHeight}px)`,
+        }}
+        dangerouslySetInnerHTML={{ __html: svgOutput }}
+      />
+    )
+  );
+};
+
+export { TexMathJax, loadExtensions };
