@@ -33,6 +33,7 @@ function FileUploader({
   ...props
 }) {
   const handleDragOver = (event) => {
+    event.stopPropagation();
     event.preventDefault(); // 阻止默认行为
     setIsDragOver(true);
   };
@@ -44,6 +45,7 @@ function FileUploader({
 
   // 处理文件放置的事件
   const handleDrop = (event) => {
+    event.stopPropagation();
     event.preventDefault();
     setIsDragOver(false);
     props.handleDrop(event);
@@ -52,16 +54,19 @@ function FileUploader({
 
   // 拖拽进入时的处理函数
   const handleDragEnter = (event) => {
+    event.stopPropagation();
     event.preventDefault();
     setIsDragOver(true); // 设置拖拽状态为true
   };
 
   // 拖拽离开时的处理函数
   const handleDragLeave = (event) => {
+    event.stopPropagation();
     event.preventDefault();
     setIsDragOver(false); // 设置拖拽状态为false
   };
   const handleDragEnd = (event) => {
+    event.stopPropagation();
     event.preventDefault();
     console.log("Drag end event", event);
     setIsDragOver(false);

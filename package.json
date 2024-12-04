@@ -76,6 +76,7 @@
     "katex": "^0.16.10",
     "lib0": "^0.2.78",
     "lodash": "4.17.11",
+    "mathjax-full": "^3.2.2",
     "mini-css-extract-plugin": "^2.4.5",
     "pdfjs-dist": "^4.6.82",
     "pify": "4.0.0",

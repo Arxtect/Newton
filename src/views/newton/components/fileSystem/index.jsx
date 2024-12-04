@@ -7,7 +7,7 @@
 import React, { useLayoutEffect, useEffect, useState } from "react";
 import RootDirectory from "./components/RootDirectory";
 import { findAllProject, getProjectInfo } from "domain/filesystem";
-import { useFileStore, useUserStore } from "store";
+import { useFileStore, useUserStore, useEditor } from "store";
 import { ProjectSync } from "@/convergence";
 import { getYDocToken } from "services";
 import { gitCloneGitea } from "./gitclone";
@@ -89,6 +89,9 @@ const FileSystem = () => {
   const { user } = useUserStore((state) => ({
     user: state.user,
   }));
+  const { editor } = useEditor((state) => ({
+    editor: state.editor,
+  }));
 
   useEffect(() => {
     getAllProject();
@@ -103,6 +106,7 @@ const FileSystem = () => {
     const res = await getYDocToken(room);
     return res;
   };
+
   const initShareProject = async () => {
     const projectInfo = await getProjectInfo(currentProjectRoot);
 
@@ -135,11 +139,27 @@ const FileSystem = () => {
       navigate("/project");
       return;
     }
-    const {token,position} = await getYDocTokenReq(project + roomId);
-    const projectSync = await new ProjectSync(project, user, roomId, token,position);
+    const { token, position } = await getYDocTokenReq(project + roomId);
+    const projectSync = await new ProjectSync(
+      project,
+      user,
+      roomId,
+      token,
+      position
+    );
     await projectSync.setObserveHandler();
     updateProjectSync(projectSync);
+
+    console.log(filepath, "filepath");
   };
+
+  useEffect(() => {
+    if (projectSync && editor != null && filepath) {
+      editor.blur && editor.blur();
+      projectSync?.updateEditorAndCurrentFilePath &&
+        projectSync?.updateEditorAndCurrentFilePath(filepath, editor);
+    }
+  }, [filepath, projectSync, editor]);
 
   useEffect(() => {
     initShareProject();

@@ -37,7 +37,8 @@ const Share = forwardRef(({ rootPath, user }, ref) => {
 
   const controlShare = async () => {
     const info = await getProjectInfo(rootPath);
-    if (info.userId && info.userId != user.id) {
+    console.log(info, "info");
+    if (info.userId && info.userId != user.id && user.role != "admin") {
       await copyToClipboard(
         link,
         "You didn't have permission to share, link copied to clipboard",
@@ -126,17 +127,20 @@ const Share = forwardRef(({ rootPath, user }, ref) => {
   };
 
   const handleInvite = async (searchInput, access) => {
-    console.log(searchInput, access, "searchInput");
+    let projectInfo = await getProjectInfo(rootPath);
+    let roomId = projectInfo?.userId ? projectInfo?.userId : user.id;
+    let roomLink = `${window.location.origin}/#/project?project=${rootPath}&&roomId=${roomId}`;
+
     let res = await inviteUser({
       email: searchInput,
-      share_link: link,
-      project_name: rootPath + user.id,
+      share_link: roomLink,
+      project_name: rootPath + roomId,
       access: access,
     });
     if (res?.status == "success") {
       toast.success(`Invite ${searchInput} success`);
       getRoomInfo();
-      handleSaveProject();
+      !projectInfo?.userId&&handleSaveProject();
     }
     return res?.status;
   };
@@ -165,10 +169,12 @@ const Share = forwardRef(({ rootPath, user }, ref) => {
   };
 
   const handleUpdateUser = async (searchInput, access) => {
+    let projectInfo = await getProjectInfo(rootPath);
+    let roomId = projectInfo?.userId ? projectInfo?.userId : user.id;
     let res = await inviteUser({
       email: searchInput,
       share_link: link,
-      project_name: rootPath + user.id,
+      project_name: rootPath + roomId,
       access: access,
     });
     if (res?.status == "success") {
@@ -193,8 +199,9 @@ const Share = forwardRef(({ rootPath, user }, ref) => {
 
   const getRoomInfo = async () => {
     let projectInfo = await getProjectInfo(rootPath);
+    let roomId = projectInfo?.userId ? projectInfo?.userId : user.id;
     let res = await getRoomInfoList({
-      project_name: rootPath + user.id,
+      project_name: rootPath + roomId,
     });
     const roomInfo = res?.data?.room;
     if (roomInfo?.is_closed) {
@@ -211,8 +218,6 @@ const Share = forwardRef(({ rootPath, user }, ref) => {
       });
     }
     setRoomInfo(roomInfo);
-    const info = await getProjectInfo(rootPath);
-    console.log(info, "info");
   };
 
   useEffect(() => {

@@ -259,7 +259,7 @@ export const useGitRepo = create()(
           console.log(e, "updateStatusMatrixOnSaveFile");
         }
       },
-      pushCurrentBranchToOrigin: async () => {
+      pushCurrentBranchToOrigin: async (isPrompt = true) => {
         const state = get();
         const githubToken = state.githubApiToken;
         const { currentProjectRoot: projectRoot } = useFileStore.getState();
@@ -283,17 +283,17 @@ export const useGitRepo = create()(
               onMessage,
             });
             if (pushResult) {
-              toast.success("Push successful");
+              isPrompt && toast.success("Push successful");
               startUpdate({});
             } else {
-              toast.warning("no commits to push");
+              isPrompt && toast.warning("no commits to push");
             }
           } catch (e) {
-            toast.error(`Push failed: ${e.message}`);
+            isPrompt && toast.error(`Push failed: ${e.message}`);
           }
         } else {
           console.error("push failed, no github token");
-          toast.error("Push failed, no github token");
+          isPrompt && toast.error("Push failed, no github token");
         }
       },
       moveToBranch: async ({ projectRoot, branch }) => {

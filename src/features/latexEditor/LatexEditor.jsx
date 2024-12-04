@@ -13,6 +13,9 @@ import useAutoCompile from "./hook";
 import { useEngineStatusStore } from "@/store";
 import FileView from "@/features/fileView";
 
+import {TexMathJax, loadExtensions } from "./texMathjax";
+
+
 const LatexEditor = ({ handleChange, sourceCode, filepath, mainFilepath }) => {
   const latexRef = useRef(null);
 
@@ -36,6 +39,7 @@ const LatexEditor = ({ handleChange, sourceCode, filepath, mainFilepath }) => {
   }));
 
   useEffect(() => {
+    loadExtensions();
     console.log(latexRef.current, "latexRef.current");
     if (latexRef.current && latexRef.current.editor) {
       console.log("Updating editor reference", latexRef.current.editor);
@@ -124,6 +128,9 @@ const LatexEditor = ({ handleChange, sourceCode, filepath, mainFilepath }) => {
     setIsTriggerCompile(true);
   };
 
+
+
+
   return (
     <div className="h-full relative" id="editor">
       <AceEditor
@@ -150,6 +157,7 @@ const LatexEditor = ({ handleChange, sourceCode, filepath, mainFilepath }) => {
         <AiTools editor={latexRef.current.editor} completer={completer} />
       )}
       {!!assetsFilePath && <FileView filename={assetsFilePath} />}
+      <TexMathJax latexRef={latexRef}/>
     </div>
   );
 };

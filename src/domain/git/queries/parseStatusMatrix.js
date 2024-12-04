@@ -26,35 +26,45 @@ const STAGE_IDENTICAL_TO_WORKDIR = 2;
 const STAGE_DIFFERENT_TO_WORKDIR = 3;
 
 export function getModifiedFilenames(matrix) {
-  return matrix
-    ?.filter((row) => row[HEAD] !== row[WORKDIR])
-    .map((row) => row[FILE]);
+  return (
+    matrix
+      ?.filter((row) => row[HEAD] !== row[WORKDIR])
+      .map((row) => row[FILE]) || []
+  );
 }
 
 export function getUnstagedFilenames(matrix) {
-  return matrix
-    .filter((row) => row[WORKDIR] !== row[STAGE])
-    .map((row) => row[FILE]);
+  return (
+    matrix
+      .filter((row) => row[WORKDIR] !== row[STAGE])
+      .map((row) => row[FILE]) || []
+  );
 }
 
 export function getStagedFilenames(matrix) {
-  return matrix
-    .filter((row) => row[STAGE] >= STAGE_IDENTICAL_TO_WORKDIR)
-    .map((row) => row[FILE]);
+  return (
+    matrix
+      .filter((row) => row[STAGE] >= STAGE_IDENTICAL_TO_WORKDIR)
+      .map((row) => row[FILE]) || []
+  );
 }
 
 export function getRemovableFilenames(matrix) {
-  return matrix
-    ?.filter(
-      (row) => row[WORKDIR] === HEAD_ABSENT && row[STAGE] !== STAGE_ABSENT
-    )
-    .map((row) => row[FILE]);
+  return (
+    matrix
+      ?.filter(
+        (row) => row[WORKDIR] === HEAD_ABSENT && row[STAGE] !== STAGE_ABSENT
+      )
+      .map((row) => row[FILE]) || []
+  );
 }
 
 export function getRemovedFilenames(matrix) {
-  return matrix
-    .filter(
-      (row) => row[WORKDIR] === HEAD_ABSENT && row[STAGE] === STAGE_ABSENT
-    )
-    .map((row) => row[FILE]);
+  return (
+    matrix
+      .filter(
+        (row) => row[WORKDIR] === HEAD_ABSENT && row[STAGE] === STAGE_ABSENT
+      )
+      .map((row) => row[FILE]) || []
+  );
 }

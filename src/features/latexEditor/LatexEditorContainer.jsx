@@ -8,6 +8,8 @@ import { useEffect, useState } from "react";
 // Components
 import LatexEditor from "./LatexEditor";
 import { useFileStore } from "store";
+import { useAutoCommitAndPush } from "@/useHooks";
+
 export const LatexEditorContainer = () => {
   const { contents, changeValue, filepath, mainFilepath } = useFileStore(
     (state) => ({
@@ -21,7 +23,7 @@ export const LatexEditorContainer = () => {
   const handleChange = (editorValue) => {
     changeValue(editorValue);
   };
-
+  useAutoCommitAndPush();
   return (
     <LatexEditor
       handleChange={handleChange}

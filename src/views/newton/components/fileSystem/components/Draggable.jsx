@@ -3,14 +3,20 @@ import { DragSource, DropTarget } from "react-dnd";
 import fs from "fs";
 import path from "path";
 import pify from "pify";
-import { uploadFile, readFile } from "@/domain/filesystem";
+import onExternalDrop from "./uploadFuntion";
 
 const DND_GROUP = "browser";
 
 const fileSource = {
   beginDrag(props) {
     console.log("Begin drag:", props);
-    return props;
+    if (props.type === "dir") {
+      return { items: [props] };
+    }
+    props.onDrag();
+    const group = props.getGroup();
+    console.log("current group", group);
+    return { items: [...group] }; // 返回一个包含多个拖动项信息的对象数组
   },
 };
 
@@ -18,12 +24,15 @@ const fileTarget = {
   drop(dropProps, monitor) {
     if (monitor) {
       const dragProps = monitor.getItem();
-      if (dropProps.pathname !== dragProps.pathname) {
-        moveItem(dragProps, dropProps).then((result) => {
-          dropProps.onDropByOther(result);
-          dragProps.onDrop(result);
-        });
-      }
+      console.log("dragProps", dragProps);
+      dragProps.items.forEach((item) => {
+        if (dropProps.pathname !== item.pathname) {
+          moveItem(item, dropProps).then((result) => {
+            dropProps.onDropByOther(result);
+            item.onDrop(result);
+          });
+        }
+      });
     }
   },
   hover(props, monitor, component) {
@@ -102,66 +111,6 @@ const DraggableDropTargetItem = React.memo(
     }))(DraggableItem)
   )
 );
-const getFileWithRelativePath = (fileEntry) => {
-  return new Promise((resolve) => {
-    fileEntry.file((file) => {
-      const fileWithRelativePath = {
-        file,
-        webkitRelativePath: fileEntry.fullPath,
-      };
-      resolve(fileWithRelativePath);
-    });
-  });
-};
-
-const handleUpload = async (files, dirpath, projectSync, reload) => {
-  if (!dirpath) {
-    return;
-  }
-  const currentPath = dirpath;
-  const fileList = files;
-  const filesArray = Array.from(fileList);
-  const filePaths = await uploadFile(filesArray, currentPath, reload);
-  if (projectSync) {
-    for (const filePath of filePaths) {
-      const content = await readFile(filePath);
-      projectSync.syncFileToYMap(filePath, content);
-    }
-  }
-};
-
-const readDirectory = (directoryEntry, fileList) => {
-  return new Promise((resolve) => {
-    const reader = directoryEntry.createReader();
-    reader.readEntries(async (entries) => {
-      for (const entry of entries) {
-        if (entry.isDirectory) {
-          await readDirectory(entry, fileList);
-        } else if (entry.isFile) {
-          fileList.push(await getFileWithRelativePath(entry));
-        }
-      }
-      resolve();
-    });
-  });
-};
-
-const onExternalDrop = async (items, dirpath, projectSync, reload) => {
-  const fileList = [];
-  for (let i = 0; i < items.length; i++) {
-    const item = items[i].webkitGetAsEntry();
-    if (item) {
-      if (item.isDirectory) {
-        await readDirectory(item, fileList);
-      } else if (item.isFile) {
-        fileList.push(await getFileWithRelativePath(item));
-      }
-    } else {
-      console.warn("Item is not a valid file or directory:", items[i]);
-    }
-  }
-  handleUpload(fileList, dirpath, projectSync, reload);
-};
 
 const DraggableAndDroppable = ({
   isEnabled = true,
@@ -183,7 +132,8 @@ const DraggableAndDroppable = ({
     const handleDrop = (event) => {
       setExternalHover(false);
       const items = event.dataTransfer.items;
-      if (items.length > 0) {
+      const files = event.dataTransfer.files;
+      if (files.length > 0) {
         onExternalDrop(
           items,
           props.type == "file" ? path.dirname(props.pathname) : props.pathname,
@@ -214,6 +164,10 @@ const DraggableAndDroppable = ({
       }
     };
   }, [onExternalDrop]);
+
+  // if (!isEnabled) {
+  //   return <div>{children}</div>;
+  // }
 
   return (
     <div id={props.pathname}>
