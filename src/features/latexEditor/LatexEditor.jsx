@@ -13,8 +13,7 @@ import useAutoCompile from "./hook";
 import { useEngineStatusStore } from "@/store";
 import FileView from "@/features/fileView";
 
-import {TexMathJax, loadExtensions } from "./texMathjax";
-
+import { TexMathJax, loadExtensions } from "./texMathjax";
 
 const LatexEditor = ({ handleChange, sourceCode, filepath, mainFilepath }) => {
   const latexRef = useRef(null);
@@ -129,8 +128,6 @@ const LatexEditor = ({ handleChange, sourceCode, filepath, mainFilepath }) => {
   };
 
 
-
-
   return (
     <div className="h-full relative" id="editor">
       <AceEditor
@@ -157,7 +154,7 @@ const LatexEditor = ({ handleChange, sourceCode, filepath, mainFilepath }) => {
         <AiTools editor={latexRef.current.editor} completer={completer} />
       )}
       {!!assetsFilePath && <FileView filename={assetsFilePath} />}
-      <TexMathJax latexRef={latexRef}/>
+      <TexMathJax latexRef={latexRef} />
     </div>
   );
 };

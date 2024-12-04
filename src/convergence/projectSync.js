@@ -6,9 +6,10 @@ import * as FS from "domain/filesystem";
 import { AceBinding } from "./ace-binding"; // 导入AceBinding
 import { uploadFile, downloadFile } from "./minio";
 import { assetExtensions } from "@/constant";
-import { debounce } from "@/util";
-import { getColors } from "@/util";
+import { debounce, getColors } from "@/util";
 import { toast } from "react-toastify";
+import { latexSyncToYText } from "./latexSyncToYText";
+import { EditorChangeManager } from "./InsertionTracker";
 
 const host = window.location.hostname;
 const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
@@ -34,6 +35,8 @@ class ProjectSync {
     this.awareness = this.websocketProvider.awareness;
     this.currentFilePath = "";
     this.isLocalChange = true; // 是否本地变更
+    this.latexSyncToYText = null;
+    this.offChange = null;
 
     // 设置用户信息
 
@@ -90,13 +93,38 @@ class ProjectSync {
     );
   }
 
+  handleStateManager(filePath, editor) {
+    console.log(this.user, "filePath");
+    let editorChangeManager = new EditorChangeManager(
+      editor,
+      this.yDoc,
+      this.yMap,
+      filePath,
+      this.user.id
+    );
+    this.offChange = editorChangeManager.offChange.bind(editorChangeManager);
+  }
+
   updateEditorAndCurrentFilePath(filePath, editor) {
+    console.log(this.latexSyncToYText, "handleInput");
+    // if (this.latexSyncToYText) {
+    //   this.latexSyncToYText(); // 取消之前的监听
+    // }
+    if (this.offChange != null) {
+      this.offChange();
+    }
     this.currentFilePath = filePath;
     this.yText = this.yDoc.getText(filePath);
     console.log(this.yText, "this.yText");
     this.undoManager = new Y.UndoManager(this.yText);
-    this.setObserveHandler(editor);
+    // this.latexSyncToYText = latexSyncToYText(
+    //   this.yText,
+    //   editor,
+    //   this.undoManager,
+    //   this.setEditorContent
+    // );
 
+    this.setObserveHandler(editor);
     if (this.aceBinding) {
       this.aceBinding.updateCurrentFilePath(filePath, editor);
     } else {
@@ -296,31 +324,38 @@ class ProjectSync {
               resolve();
               return;
             }
-            if (content?._delete) {
-              // 如果内容为空，则删除文件
-              await useFileStore.getState().deleteFile({ filename: key }, true);
+            if (key == "state-manage-file") { 
+              console.log(content, "state-manage-file");
+              return 
+            }
+              if (content?._delete) {
+                // 如果内容为空，则删除文件
+                await useFileStore
+                  .getState()
+                  .deleteFile({ filename: key }, true);
 
-              console.log(`File ${key} deleted successfully.`);
-              resolve();
-              return;
-            } else {
-              const dirpath = path.dirname(key);
-              await FS.ensureDir(dirpath);
-              const ext = path.extname(key).slice(1).toLowerCase();
-              if (assetExtensions.includes(ext)) {
-                // 如果是资产文件类型，则将 Base64 编码的字符串转换回文件数据
-                const fileData = await downloadFile(content, key);
-                console.log(content, "content");
-                await FS.writeFile(key, Buffer.from(fileData));
+                console.log(`File ${key} deleted successfully.`);
+                resolve();
+                return;
               } else {
-                if (this.isCurrentFile(editor, key)) {
-                  this.setEditorContent(content);
+                const dirpath = path.dirname(key);
+                await FS.ensureDir(dirpath);
+                const ext = path.extname(key).slice(1).toLowerCase();
+                if (assetExtensions.includes(ext)) {
+                  // 如果是资产文件类型，则将 Base64 编码的字符串转换回文件数据
+                  const fileData = await downloadFile(content, key);
+                  console.log(content, "content");
+                  await FS.writeFile(key, Buffer.from(fileData));
                 } else {
-                  const fileStore = useFileStore.getState();
-                  await fileStore.saveFile(key, content, false, false);
+                  if (this.isCurrentFile(editor, key)) {
+                    this.setEditorContent(content);
+                    // editor.session.insert({ row: 0, column: 0 }, "123121");
+                  } else {
+                    const fileStore = useFileStore.getState();
+                    await fileStore.saveFile(key, content, false, false);
+                  }
                 }
               }
-            }
           } catch (err) {
             console.error(err, key);
           } finally {
