@@ -90,6 +90,19 @@ const hasJsxRuntime = (() => {
   }
 })();
 
+function getModuleDirectory(moduleName) {
+  const entrypointPath = require.resolve(moduleName);
+  const suffix = path.join("node_modules", moduleName);
+
+  const idx = entrypointPath.indexOf(suffix);
+  if (idx === -1) {
+    throw new Error(`could not find Node module: ${moduleName}`);
+  }
+  return entrypointPath.slice(0, idx + suffix.length);
+}
+
+const pdfjsVersions = ["pdfjs-dist"];
+
 // This is the production and development configuration.
 // It is focused on developer experience, fast rebuilds, and a minimal bundle.
 module.exports = function (webpackEnv) {
@@ -684,70 +697,58 @@ module.exports = function (webpackEnv) {
             from: "src/assets",
             to: "assets",
           },
-        ],
-      }),
-      new CopyWebpackPlugin({
-        patterns: [
           {
             from: "src/features/latexCompilation/swiftlatex/swiftlatexxetex.wasm",
             to: "static/media",
           },
-        ],
-      }),
-      new CopyWebpackPlugin({
-        patterns: [
           {
             from: "src/features/latexCompilation/swiftlatex/swiftlatexdvipdfm.wasm",
             to: "static/media",
           },
-        ],
-      }),
-      new CopyWebpackPlugin({
-        patterns: [
           {
             from: "src/features/latexCompilation/swiftlatex/swiftlatexpdftex.wasm",
             to: "static/media",
           },
-        ],
-      }),
-      new CopyWebpackPlugin({
-        patterns: [
           {
             from: "node_modules/ace-builds/src-min-noconflict/mode-latex.js",
             to: "static/js",
           },
-        ],
-      }),
-      new CopyWebpackPlugin({
-        patterns: [
           {
             from: "node_modules/ace-builds/src-min-noconflict/theme-textmate.js",
             to: "static/js",
           },
-        ],
-      }),
-      new CopyWebpackPlugin({
-        patterns: [
           {
             from: "node_modules/ace-builds/src-min-noconflict/theme-github.js",
             to: "static/js",
           },
-        ],
-      }),
-      new CopyWebpackPlugin({
-        patterns: [
           {
             from: "node_modules/ace-builds/src-min-noconflict/theme-monokai.js",
             to: "static/js",
           },
-        ],
-      }),
-      new CopyWebpackPlugin({
-        patterns: [
           {
             from: "node_modules/ace-builds/src-min-noconflict/ext-language_tools.js",
             to: "static/js",
           },
+          ...pdfjsVersions.flatMap((version) => {
+            const dir = getModuleDirectory(version);
+
+            // Copy CMap files (used to provide support for non-Latin characters)
+            // and static images from pdfjs-dist package to build output.
+
+            return [
+              { from: `cmaps`, to: `static/js/${version}/cmaps`, context: dir },
+              {
+                from: `standard_fonts`,
+                to: `static/media/fonts/${version}`,
+                context: dir,
+              },
+              {
+                from: `legacy/web/images`,
+                to: `static/media/images/${version}`,
+                context: dir,
+              },
+            ];
+          }),
         ],
       }),
 

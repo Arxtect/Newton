@@ -9,6 +9,7 @@ import { usePdfPreviewStore, useFileStore, useLayout } from "store";
 import AssetPreview from "../assetPreview/assetPreview";
 import FormattedCompilerLog from "./formattedCompilerLog";
 import PdfPreViewer from "./PdfPreViewer";
+import { PdfPreviewProvider, PdfJsViewer } from "../pdfCore/pdf-js-viewer";
 
 export const PdfPreview = () => {
   const {
@@ -27,19 +28,26 @@ export const PdfPreview = () => {
 
   const { willResizing } = useLayout();
 
-
   return (
     <div
       className={`h-full relative  ${willResizing ? "z-10" : ""}`}
       style={{ overflow: "auto" }} // 添加这一行以允许滚动
     >
+       
+      {/* <PdfPreviewProvider>
+        <div
+          className={`h-full relative  ${willResizing ? "z-10" : ""}`}
+          style={{ overflow: "auto" }} // 添加这一行以允许滚动
+        >
+          <PdfJsViewer url={pdfUrl} pdfFile={null} />
+        </div>
+      </PdfPreviewProvider> */}
       {showCompilerLog ? (
         <FormattedCompilerLog messages={compileMessages} log={compilerLog} />
       ) : (
         pdfUrl !== "" && <PdfPreViewer pdfUrl={pdfUrl} />
         // <Viewer url={pdfU/rl}></Viewer>
       )}
-
       {willResizing && (
         <div className="absolute top-0 left-0 w-full h-full z-20"></div>
       )}
