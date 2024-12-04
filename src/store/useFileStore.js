@@ -201,7 +201,6 @@ export const useFileStore = create()(
       loadFile: async ({ filepath }) => {
         if (!filepath) return;
         const { editor } = useEditor.getState();
-        const fileContent = await FS.readFile(filepath);
 
         if (isAssetExtension(filepath)) {
           set({
@@ -217,12 +216,14 @@ export const useFileStore = create()(
           return;
         }
         const projectSync = get().projectSync;
-
-        if (projectSync && editor != null && filepath) {
+         if (projectSync && editor != null && filepath) {
           editor.blur && editor.blur();
           projectSync?.updateEditorAndCurrentFilePath &&
             projectSync?.updateEditorAndCurrentFilePath(filepath, editor);
         }
+
+        const fileContent = await FS.readFile(filepath);
+
         set({
           filepath,
           assetsFilePath: "",
@@ -234,6 +235,12 @@ export const useFileStore = create()(
           currentSelectDir: "",
           selectedFiles: [filepath],
         });
+       
+        if (projectSync && editor != null && filepath) { 
+          setTimeout(() => {   projectSync?.handleStateManager &&
+            projectSync?.handleStateManager(filepath, editor);}, 100);
+        }
+      
       },
       changeCurrentSelectDir: (dirpath, isCtrl = false) => {
         if (!isCtrl) {
@@ -271,7 +278,7 @@ export const useFileStore = create()(
       },
       debouncedUpdateFileContent: debounce((filepath, value, isSync) => {
         get().updateFileContent(filepath, value, isSync);
-      }, 1500),
+      }, 4000),
       changeValue: (value, isSync = true) => {
         const state = get();
         if (state.autosave && isSync) {
