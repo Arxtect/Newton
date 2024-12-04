@@ -34,20 +34,20 @@ export const PdfPreview = () => {
       style={{ overflow: "auto" }} // 添加这一行以允许滚动
     >
        
-      <PdfPreviewProvider>
+      {/* <PdfPreviewProvider>
         <div
           className={`h-full relative  ${willResizing ? "z-10" : ""}`}
           style={{ overflow: "auto" }} // 添加这一行以允许滚动
         >
           <PdfJsViewer url={pdfUrl} pdfFile={null} />
         </div>
-      </PdfPreviewProvider>
-      {/* {showCompilerLog ? (
+      </PdfPreviewProvider> */}
+      {showCompilerLog ? (
         <FormattedCompilerLog messages={compileMessages} log={compilerLog} />
       ) : (
         pdfUrl !== "" && <PdfPreViewer pdfUrl={pdfUrl} />
         // <Viewer url={pdfU/rl}></Viewer>
-      )} */}
+      )}
       {willResizing && (
         <div className="absolute top-0 left-0 w-full h-full z-20"></div>
       )}
