@@ -58,10 +58,6 @@ class ProjectSync {
     this.setUserAwareness({ ...this.user, color: getColors(position) });
   }
 
-  changeInitial() {
-    this.initialized = true;
-  }
-
   // set observe handler
   setObserveHandler() {
     // 清理旧的观察者
@@ -100,6 +96,10 @@ class ProjectSync {
 
   isCurrentFile(filePath) {
     return this.currentFilePath && filePath == this.currentFilePath;
+  }
+
+  changeInitial() {
+    this.initialized = true;
   }
 
   updateCurrentFilePathYText(filePath, editor) {
