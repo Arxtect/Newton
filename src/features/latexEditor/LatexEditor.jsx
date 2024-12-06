@@ -29,12 +29,14 @@ const LatexEditor = ({ handleChange, sourceCode, filepath, mainFilepath }) => {
     updateCurrentProjectFileList,
     touchCounter,
     assetsFilePath,
+    projectSync,
   } = useFileStore((state) => ({
     loadFile: state.loadFile,
     currentProjectRoot: state.currentProjectRoot,
     updateCurrentProjectFileList: state.updateCurrentProjectFileList,
     touchCounter: state.touchCounter,
     assetsFilePath: state.assetsFilePath,
+    projectSync: state.projectSync,
   }));
 
   useEffect(() => {
@@ -48,11 +50,6 @@ const LatexEditor = ({ handleChange, sourceCode, filepath, mainFilepath }) => {
       updateEditor(null);
     };
   }, [latexRef]);
-
-  useEffect(() => {
-    if (!editor || !mainFilepath) return;
-    loadFile({ filepath: mainFilepath });
-  }, [editor]);
 
   const [isSetupCompleter, setIsSetupCompleter] = useState(false);
   const [completer, setCompleter] = useState(null);
@@ -126,7 +123,6 @@ const LatexEditor = ({ handleChange, sourceCode, filepath, mainFilepath }) => {
     handleChange(editorValue);
     setIsTriggerCompile(true);
   };
-
 
   return (
     <div className="h-full relative" id="editor">

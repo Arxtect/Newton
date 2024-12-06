@@ -9,7 +9,6 @@ export const useGitStatus = () => {
   const { statusMatrix } = useGitRepo((state) => ({
     statusMatrix: state.statusMatrix,
   }));
-  console.log("statusMatrix", statusMatrix);
   const removable = useMemo(
     () => getRemovableFilenames(statusMatrix),
     [statusMatrix]

@@ -216,7 +216,8 @@ export const useFileStore = create()(
           return;
         }
         const projectSync = get().projectSync;
-         if (projectSync && editor != null && filepath) {
+
+        if (projectSync && editor != null && filepath) {
           editor.blur && editor.blur();
           projectSync?.updateEditorAndCurrentFilePath &&
             projectSync?.updateEditorAndCurrentFilePath(filepath, editor);
@@ -235,12 +236,13 @@ export const useFileStore = create()(
           currentSelectDir: "",
           selectedFiles: [filepath],
         });
-       
-        if (projectSync && editor != null && filepath) { 
-          setTimeout(() => {   projectSync?.handleStateManager &&
-            projectSync?.handleStateManager(filepath, editor);}, 100);
+
+        if (projectSync && editor != null && filepath) {
+          setTimeout(() => {
+            projectSync?.updateCurrentFilePathYText &&
+              projectSync?.updateCurrentFilePathYText(filepath, editor);
+          }, 0);
         }
-      
       },
       changeCurrentSelectDir: (dirpath, isCtrl = false) => {
         if (!isCtrl) {
@@ -278,7 +280,7 @@ export const useFileStore = create()(
       },
       debouncedUpdateFileContent: debounce((filepath, value, isSync) => {
         get().updateFileContent(filepath, value, isSync);
-      }, 4000),
+      }, 0),
       changeValue: (value, isSync = true) => {
         const state = get();
         if (state.autosave && isSync) {
@@ -449,7 +451,7 @@ export const useFileStore = create()(
         set({ preRenamingDirpath: dirpath });
       },
       changeCurrentProjectRoot: async ({ projectRoot }) => {
-        get().changeMainFile(projectRoot);
+        // get().changeMainFile(projectRoot);
         set({ projectSync: null });
         get().initFile();
         set({ currentProjectRoot: projectRoot, currentSelectDir: projectRoot });

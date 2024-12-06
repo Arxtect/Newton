@@ -19,6 +19,7 @@ import { useNavigate } from "react-router-dom";
 const FileSystem = () => {
   const navigate = useNavigate();
   const {
+    mainFilepath,
     filepath,
     setMainFile,
     currentProjectRoot,
@@ -47,6 +48,7 @@ const FileSystem = () => {
     projectSync,
     updateProjectSync,
     updateShareIsRead,
+    changeMainFile,
   } = useFileStore((state) => ({
     filepath: state.filepath,
     setMainFile: state.setMainFile,
@@ -76,6 +78,8 @@ const FileSystem = () => {
     projectSync: state.projectSync,
     updateProjectSync: state.updateProjectSync,
     updateShareIsRead: state.updateShareIsRead,
+    mainFilepath: state.mainFilepath,
+    changeMainFile: state.changeMainFile,
   }));
 
   const getAllProject = async () => {
@@ -162,7 +166,11 @@ const FileSystem = () => {
   }, [filepath, projectSync, editor]);
 
   useEffect(() => {
-    initShareProject();
+    initShareProject().then(() => {
+      // if (!editor || !mainFilepath) return;
+      // loadFile({ filepath: mainFilepath });
+      changeMainFile(currentProjectRoot);
+    });
     return () => {
       setMainFile("");
     };

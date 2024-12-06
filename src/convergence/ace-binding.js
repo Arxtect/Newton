@@ -139,7 +139,7 @@ class AceCursors {
           this.markerID[c.id].hasOwnProperty("sel") &&
           this.markerID[c.id].sel !== undefined
         ) {
-          ace.session.removeMarker(this.markerID[c.id].sel);
+          ace.session?.removeMarker(this.markerID[c.id].sel);
           this.markerID[c.id].sel = undefined;
         }
 
@@ -175,7 +175,7 @@ class AceCursors {
           this.markerID[c.id].hasOwnProperty("sel") &&
           this.markerID[c.id].sel !== undefined
         ) {
-          ace.session.removeMarker(this.markerID[c.id].sel);
+          ace.session?.removeMarker(this.markerID[c.id].sel);
           this.markerID[c.id].sel = undefined;
         }
       }

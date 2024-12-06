@@ -244,7 +244,6 @@ export const useGitRepo = create()(
       updateStatusMatrixOnSaveFile: async ({ projectRoot }) => {
         try {
           let isExists = await existsPath(path.join(projectRoot, ".git"));
-          console.log(isExists, "isExists");
           if (!isExists) {
             return;
           }
