@@ -4,11 +4,16 @@ import { useFileStore } from "@/store"; // 假设 Zustand 文件操作在这里�
 import path from "path";
 import * as FS from "domain/filesystem";
 import { AceBinding } from "./ace-binding"; // 导入AceBinding
-import { uploadFile, downloadFile } from "./minio";
+import {
+  uploadFile,
+  downloadFile,
+  uploadFileBinary,
+  downloadFileBinary,
+} from "./minio";
 import { assetExtensions } from "@/constant";
 import { debounce, getColors } from "@/util";
 import { toast } from "react-toastify";
-import { latexSyncToYText } from "./latexSyncToYText";
+import { LatexSyncToYText } from "./latexSyncToYText";
 import { EditorChangeManager } from "./InsertionTracker";
 
 const host = window.location.hostname;
@@ -37,6 +42,8 @@ class ProjectSync {
     this.isLocalChange = true; // 是否本地变更
     this.latexSyncToYText = null;
     this.offChange = null;
+    this.currentFileContent = null;
+    this.initialized = false;
 
     // 设置用户信息
 
@@ -51,15 +58,19 @@ class ProjectSync {
     this.setUserAwareness({ ...this.user, color: getColors(position) });
   }
 
+  changeInitial() {
+    this.initialized = true;
+  }
+
   // set observe handler
-  setObserveHandler(editor = "default-editor") {
+  setObserveHandler() {
     // 清理旧的观察者
     if (this.currentObserver) {
       this.yMap.unobserve(this.currentObserver);
     }
 
     // 设置新的观察者
-    this.currentObserver = this.yMapObserveHandler.bind(this, editor);
+    this.currentObserver = this.yMapObserveHandler.bind(this);
     this.yMap.observe(this.currentObserver);
   }
 
@@ -87,60 +98,41 @@ class ProjectSync {
     handleChange(content, false);
   }
 
-  isCurrentFile(editor, filePath) {
-    return (
-      editor != null && this.currentFilePath && filePath == this.currentFilePath
-    );
+  isCurrentFile(filePath) {
+    return this.currentFilePath && filePath == this.currentFilePath;
   }
 
-  handleStateManager(filePath, editor) {
-    console.log(this.user, "filePath");
-    let editorChangeManager = new EditorChangeManager(
-      editor,
-      this.yDoc,
-      this.yMap,
+  updateCurrentFilePathYText(filePath, editor) {
+    let latexSyncToYText = new LatexSyncToYText(
+      this.yText,
       filePath,
-      this.user.id
+      editor,
+      this.changeInitial.bind(this),
+      this.initialized
     );
-    this.offChange = editorChangeManager.offChange.bind(editorChangeManager);
+    this.latexSyncToYText = latexSyncToYText.destroy.bind(latexSyncToYText);
   }
 
   updateEditorAndCurrentFilePath(filePath, editor) {
-    console.log(this.latexSyncToYText, "handleInput");
-    // if (this.latexSyncToYText) {
-    //   this.latexSyncToYText(); // 取消之前的监听
-    // }
-    if (this.offChange != null) {
-      this.offChange();
+    if (this.latexSyncToYText != null) {
+      this.latexSyncToYText(); // 取消之前的监听
+      this.latexSyncToYText = null;
     }
+
     this.currentFilePath = filePath;
     this.yText = this.yDoc.getText(filePath);
-    console.log(this.yText, "this.yText");
+    // console.log(this.yText, "this.yText");
     this.undoManager = new Y.UndoManager(this.yText);
-    // this.latexSyncToYText = latexSyncToYText(
-    //   this.yText,
-    //   editor,
-    //   this.undoManager,
-    //   this.setEditorContent
-    // );
+    // this.latexSyncToYText = new LatexSyncToYText(this.yDoc, filePath, editor);
 
-    this.setObserveHandler(editor);
     if (this.aceBinding) {
       this.aceBinding.updateCurrentFilePath(filePath, editor);
     } else {
       this.aceBinding = new AceBinding(this.awareness);
       this.aceBinding.init(editor, filePath); // 初始化 AceBinding 实例
     }
-  }
-  getVal() {
-    // 实现获取当前文本内容的方法
-    return this.yText.toString();
-  }
-
-  getRange() {
-    // 实现获取当前选择范围的方法
-    // 这里假设返回一个默认值
-    return [0, this.yText.length];
+    this.aceBinding?.handleAwarenessChange &&
+      this.aceBinding.handleAwarenessChange(editor);
   }
 
   //同步文件内容到 Yjs Map
@@ -150,7 +142,8 @@ class ProjectSync {
     if (assetExtensions.includes(ext)) {
       // 如果是资产文件类型，则转换为 Base64 编码
       try {
-        contentToStore = await uploadFile(filePath, content);
+        // contentToStore = await uploadFile(filePath, content);
+        contentToStore = uploadFileBinary(filePath, content);
       } catch (err) {
         // contentToStore = content.toString();
         console.log(err.message, "err.message");
@@ -200,6 +193,7 @@ class ProjectSync {
     if (filePath.includes(".git")) return;
     try {
       await this.syncToYMap(filePath, content);
+      if (this.yMap.has(filePath)) return;
       const folderPath = path.dirname(filePath);
       this.syncFolderInfo(folderPath);
     } catch (err) {
@@ -264,7 +258,7 @@ class ProjectSync {
 
   debouncedRepoChanged = debounce(() => {
     useFileStore.getState().repoChanged();
-  }, 200);
+  }, 100);
 
   async syncFolderToYMapRootPath(callback) {
     await this.saveProjectSyncInfoToJson(this.rootPath);
@@ -306,17 +300,14 @@ class ProjectSync {
   }
 
   // Yjs Map 观察者处理函数
-
-  async yMapObserveHandler(editor, event) {
+  async yMapObserveHandler(event) {
     const contentSyncedPromises = [];
 
     event.keysChanged.forEach((key) => {
       contentSyncedPromises.push(
         new Promise(async (resolve) => {
           const content = this.yMap.get(key);
-
           try {
-            console.log("YMap event:", event, key); // 打印事件对象
             if (key == this.folderMapName) {
               await FS.ensureDir(this.rootPath);
               console.log(content, "content");
@@ -324,38 +315,35 @@ class ProjectSync {
               resolve();
               return;
             }
-            if (key == "state-manage-file") { 
-              console.log(content, "state-manage-file");
-              return 
-            }
-              if (content?._delete) {
-                // 如果内容为空，则删除文件
-                await useFileStore
-                  .getState()
-                  .deleteFile({ filename: key }, true);
 
-                console.log(`File ${key} deleted successfully.`);
-                resolve();
-                return;
+            if (content?._delete) {
+              // 如果内容为空，则删除文件
+              await useFileStore.getState().deleteFile({ filename: key }, true);
+
+              console.log(`File ${key} deleted successfully.`);
+              resolve();
+              return;
+            } else {
+              const dirpath = path.dirname(key);
+              await FS.ensureDir(dirpath);
+              const ext = path.extname(key).slice(1).toLowerCase();
+              if (assetExtensions.includes(ext)) {
+                // 如果是资产文件类型，则将 Base64 编码的字符串转换回文件数据
+                // const fileData = await downloadFile(content, key);
+                // console.log(content, "content");
+                // await FS.writeFile(key, Buffer.from(fileData));
+                await downloadFileBinary(key, content);
               } else {
-                const dirpath = path.dirname(key);
-                await FS.ensureDir(dirpath);
-                const ext = path.extname(key).slice(1).toLowerCase();
-                if (assetExtensions.includes(ext)) {
-                  // 如果是资产文件类型，则将 Base64 编码的字符串转换回文件数据
-                  const fileData = await downloadFile(content, key);
-                  console.log(content, "content");
-                  await FS.writeFile(key, Buffer.from(fileData));
+                if (this.isCurrentFile(key)) {
+                  // this.setEditorContent(content);
+                  // console.log(key, "content");
                 } else {
-                  if (this.isCurrentFile(editor, key)) {
-                    this.setEditorContent(content);
-                    // editor.session.insert({ row: 0, column: 0 }, "123121");
-                  } else {
-                    const fileStore = useFileStore.getState();
-                    await fileStore.saveFile(key, content, false, false);
-                  }
+                  const fileStore = useFileStore.getState();
+                  content?.length &&
+                    (await fileStore.saveFile(key, content, false));
                 }
               }
+            }
           } catch (err) {
             console.error(err, key);
           } finally {
@@ -364,8 +352,6 @@ class ProjectSync {
             // 等待所有内容同步完成后再进行光标同步
             Promise.all(contentSyncedPromises).then(() => {
               this.otherOperation && this.otherOperation();
-              this.aceBinding?.handleAwarenessChange &&
-                this.aceBinding.handleAwarenessChange(editor);
             });
             resolve(); // 同步完成后，Promise 解决
           }

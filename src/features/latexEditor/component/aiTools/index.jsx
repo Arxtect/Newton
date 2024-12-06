@@ -207,7 +207,7 @@ const AiTools = ({ editor, completer }) => {
       ? editor.getCursorPosition()
       : range.end;
 
-    console.log(selectText, "selectText");
+    // console.log(selectText, "selectText");
 
     if (selectText?.length > 1 && selectText.trim() != "") {
       setShowTooltip(true);
@@ -244,22 +244,22 @@ const AiTools = ({ editor, completer }) => {
     }
   };
 
-  const selectHandler = () => { 
-      const selectedText = editor.getSelectedText();
-      setShowTooltip(false);
-      if (!selectedText) return;
-      setIsSelection(true);
-      handleSelectViaName();
-      setShowDropdown(true);
-      setSelectedContent(selectedText);
-  }
+  const selectHandler = () => {
+    const selectedText = editor.getSelectedText();
+    setShowTooltip(false);
+    if (!selectedText) return;
+    setIsSelection(true);
+    handleSelectViaName();
+    setShowDropdown(true);
+    setSelectedContent(selectedText);
+  };
 
   const addCustomCommand = (editor) => {
     editor.commands.addCommand({
       name: "showCustomComponent",
       bindKey: { win: "Ctrl-I", mac: "Cmd-I" },
       exec: () => {
-        selectHandler()
+        selectHandler();
       },
     });
   };

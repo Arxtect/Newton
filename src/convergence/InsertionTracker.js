@@ -6,10 +6,11 @@ class EditorChangeManager {
     this.currentFilePath = currentFilePath;
     this.currentClientId = currentClientId;
     this.changes = new Map();
+    this.lastChanges = new Map();
     this.bufferedChanges = [];
     this.debouncedProcessChanges = debounce(
       () => this.processBufferedChanges(),
-      1000
+      0
     );
 
     this.recordChange = this.recordChange.bind(this);
@@ -25,6 +26,26 @@ class EditorChangeManager {
     const { action, lines, start } = delta;
     const content = lines.join("\n");
 
+    for (let [key, existingChange] of this.lastChanges) {
+      console.log(
+        content,
+        existingChange.content,
+        existingChange.content == content,
+        "content"
+      );
+      console.log(existingChange, delta, "existingChange");
+      if (
+        existingChange.action === action &&
+        existingChange.content === content &&
+        existingChange.position.row === start.row &&
+        existingChange.position.column === start.column
+      ) {
+        // 如果存在相同的变更，则删除并返回
+        // this.lastChanges.delete(key);
+        return;
+      }
+    }
+
     // Buffer the change
     this.bufferedChanges.push({ action, content, start });
 
@@ -36,7 +57,7 @@ class EditorChangeManager {
     const groupedChanges = this.groupBufferedChanges();
 
     groupedChanges.forEach(({ action, content, start }) => {
-      const key = `${this.currentFilePath}-${this.currentClientId}-${start.row}-${start.column}`;
+      const key = `${this.currentFilePath}`;
 
       if (this.changes.has(key)) {
         const existingChange = this.changes.get(key);
@@ -112,28 +133,26 @@ class EditorChangeManager {
   syncChanges() {
     console.log("Synchronizing changes:", this.changes);
 
+    // Clear changes after sync
     this.yDoc.transact(() => {
+      if (!this.currentClientId) return;
       const stateManageFile = this.yMap.get("state-manage-file") || {};
-      const key = `${this.currentFilePath}-${this.currentClientId}`;
-      stateManageFile[key] = Array.from(this.changes.entries());
+      const key = `${this.currentFilePath}~${this.currentClientId}`;
+      const keyUndefined = `${this.currentFilePath}~undefined`;
+            const keyUndefineds = `${this.currentFilePath}-${this.currentClientId}`;
+      let changesObject = Object.fromEntries(this.changes);
+
+      // Convert the object to JSON
+      const changesJSON = JSON.stringify(Object.values(changesObject));
+      stateManageFile[key] = changesJSON;
+      delete stateManageFile[keyUndefined];
+      delete stateManageFile[keyUndefineds];
+
       this.yMap.set("state-manage-file", stateManageFile);
     });
 
-    // Clear changes after sync
+    this.lastChanges = this.changes;
     this.changes.clear();
-  }
-
-  applyChangeToEditor(change) {
-    const { action, content, position } = change;
-    if (action === "insert") {
-      this.editor.session.insert(position, content);
-    } else if (action === "remove") {
-      const endPosition = {
-        row: position.row,
-        column: position.column + content.length,
-      };
-      this.editor.session.remove({ start: position, end: endPosition });
-    }
   }
 
   insertContent(editor, content, position) {

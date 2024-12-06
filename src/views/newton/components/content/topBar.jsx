@@ -46,7 +46,6 @@ const ContentTopBar = (props) => {
     currentSelectDir,
     updateDirOpen,
     reload,
-    changeMainFile,
   } = useFileStore((state) => ({
     projectSync: state.projectSync,
     sourceCode: state.value,
@@ -58,7 +57,6 @@ const ContentTopBar = (props) => {
     currentSelectDir: state.currentSelectDir,
     updateDirOpen: state.updateDirOpen,
     reload: state.repoChanged,
-    changeMainFile: state.changeMainFile,
   }));
 
   const { updateSetting, getSetting, compileSetting } = useCompileSetting(
@@ -89,9 +87,6 @@ const ContentTopBar = (props) => {
   //   initializeDefaults(compileSetting);
   // }, []);
 
-  useEffect(() => {
-    changeMainFile(currentProjectRoot);
-  }, [currentProjectRoot]);
 
   const handleActionClick = (key) => {
     switch (key) {

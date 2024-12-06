@@ -1,143 +1,87 @@
+import { createMutex } from "lib0/mutex.js";
 import * as Y from "yjs";
+import Ace from "ace-builds/src-min-noconflict/ace";
+const Range = Ace.require("ace/range").Range;
 
-function latexSyncToYText(yText, editor, undoManager, changeValue) {
-  if (!yText || !editor || !undoManager || !changeValue) {
-    console.error("Invalid arguments passed to latexSyncToYText");
-    return;
-  }
-  let range = [0, 0];
-  let relPos1 = Y.createRelativePositionFromTypeIndex(yText, range[0]);
-  let relPos2 = Y.createRelativePositionFromTypeIndex(yText, range[1]);
+export class LatexSyncToYText {
+  constructor(yText, filepath, ace, changeInitial, initialized) {
+    const mux = createMutex();
+    this.mux = mux;
+    this.type = yText;
+    this.ace = ace;
+    this.ace.session.getUndoManager().reset();
+    this.initialized = initialized;
 
-  const yDoc = yText.doc;
-  let isLocalChange = false;
-
-  function getVal() {
-    return editor?.getValue() || "";
-  }
-  function getRange() {
-    return [editor.selectionStart, editor.selectionEnd];
-  }
-
-  function setRange() {
-    range = getRange();
-    return range;
-  }
-
-  function yTextObserveHandler(event) {
-    if (isLocalChange) return;
-
-    console.log("Event changes:", event.changes);
-    isLocalChange = true;
-
-    let currentIndex = 0; // Track the current index position in the document
-
-    event.changes.delta.forEach((change) => {
-      const currentVal = editor.getValue();
-      console.log("Current Value:", currentVal);
-
-      if (change.insert) {
-        // Calculate the insert position based on the current index
-        const insertPos = currentIndex;
-        const insertText = change.insert;
-        console.log("Inserting text at position:", insertPos, insertText);
-
-        const newVal =
-          currentVal.slice(0, insertPos) +
-          insertText +
-          currentVal.slice(insertPos);
-        console.log(newVal, "newVal");
-
-        changeValue(newVal, true);
-        currentIndex += insertText.length; // Update index position
-      } else if (change.delete) {
-        const deletePos = currentIndex;
-        const deleteLength = change.delete;
-        const newVal =
-          currentVal.slice(0, deletePos) +
-          currentVal.slice(deletePos + deleteLength);
-        changeValue(newVal, true);
-        // No need to update currentIndex as we're deleting
+    this._typeObserver = (event) => {
+      console.log(this.initialized, "op.retain");
+      if (!this.initialized) {
+        // Skip initial insert
+        this.initialized = true;
+        changeInitial();
+        return;
       }
 
-      // Update currentIndex based on the length of the change
-      if (change.retain) {
-        currentIndex += change.retain;
-      }
-    });
+      const aceDocument = this.ace.getSession().getDocument();
+      mux(() => {
+        const delta = event.delta;
+        let currentPos = 0;
+        for (const op of delta) {
+          console.log(op, "op.retain");
+          if (op.retain) {
+            currentPos += op.retain;
+          } else if (op.insert) {
+            const start = aceDocument.indexToPosition(currentPos, 0);
+            console.log(start, op.insert, filepath, "op.retain1");
+            aceDocument.insert(start, op.insert);
+            // aceDocument.insert(start, "op.insert");
+            currentPos += op.insert?.length;
+          } else if (op.delete) {
+            const start = aceDocument.indexToPosition(currentPos, 0);
+            const end = aceDocument.indexToPosition(currentPos + op.delete, 0);
+            const range = new Range(
+              start.row,
+              start.column,
+              end.row,
+              end.column
+            );
+            aceDocument.remove(range);
+          }
+        }
+      });
+    };
+    this.type.observe(this._typeObserver);
 
-    isLocalChange = false;
+    this._aceObserver = (eventType, delta) => {
+      const aceDocument = this.ace.getSession().getDocument();
+      this.mux(() => {
+        if (eventType.action === "insert") {
+          const start = aceDocument.positionToIndex(eventType.start, 0);
+          console.log(eventType.lines.join("\n"), filepath, "op.retain2");
+          this.type.insert(start, eventType.lines.join("\n"));
+          // this.type.insert(start, "11");
+        } else if (eventType.action === "remove") {
+          const start = aceDocument.positionToIndex(eventType.start, 0);
+          const length = eventType.lines.join("\n")?.length;
+
+          // Debugging output
+          console.log("Attempting to delete:", { start, length });
+
+          // Ensure the range is valid
+          if (start >= 0 && start + length <= this.type.toString()?.length) {
+            this.type.delete(start, length);
+          } else {
+            console.warn("Invalid delete range:", { start, length });
+          }
+        }
+      });
+    };
+
+    this.ace.on("change", this._aceObserver);
   }
 
-  function handleInput(e) {
-    console.log(e, "e");
-    const { action, lines, start } = e;
-    const position = start.row * start.column; // 计算插入位置
-
-    console.log(action, "inputType");
-
-    if (action == "insert") {
-      yDoc.transact(() => {
-        // if (range[0] !== range[1]) {
-        //   const deleteLength = range[1] - range[0];
-        //   yText.delete(range[0], deleteLength);
-        // }
-        // yText.insert(range[0], lines[0] || "");
-        // 假设yText已经被初始化为了一个Y.Text实例
-
-        let length = yText.toString().length;
-        new Promise((resolve, reject) => {
-          yText.delete(0, length);
-          resolve();
-        }).then(() => {
-          console.log(yText.toString(), "de", getVal());
-          //在位置插入新内容
-          yText.insert(0, getVal());
-        });
-
-        //在位置插入新内容
-      }, yDoc.clientID);
-    } else if (action == "remove") {
-      yDoc.transact(() => {
-        let length = yText.toString().length;
-        yText.delete(0, length);
-        yText.insert(0, getVal());
-      }, yDoc.clientID);
-    } else if (action === "historyUndo") {
-      undoManager.undo();
-    } else if (action === "historyRedo") {
-      undoManager.redo();
-    }
-    // setVal(yText.toString());
-    // latex.setValue(yText.toString());
-    // latex.setSelectionRange(newRange[0], newRange[1]);
+  destroy() {
+    console.log("destroyed");
+    this.type && this.type.unobserve(this._typeObserver);
+    this.ace && this.ace.off("change", this._aceObserver);
   }
-
-  if (editor.session) {
-    editor.session.on("change", handleInput);
-  } else {
-    console.error("Editor session is not valid");
-  }
-
-  function beforeTransactionListener() {
-    const beforeRange = getRange();
-    relPos1 = Y.createRelativePositionFromTypeIndex(yText, beforeRange[0]);
-    relPos2 = Y.createRelativePositionFromTypeIndex(yText, beforeRange[1]);
-  }
-
-  yText.observe(yTextObserveHandler);
-  yDoc.on("beforeAllTransactions", beforeTransactionListener);
-
-  return () => {
-    if (editor) {
-      if (editor.session) {
-        editor.session.off("change", handleInput);
-      }
-    }
-    yDoc.off("beforeAllTransactions", beforeTransactionListener);
-
-    yText.unobserve(yTextObserveHandler);
-  };
 }
-
-export { latexSyncToYText };

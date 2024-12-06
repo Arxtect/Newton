@@ -16,10 +16,9 @@ export const ButtonBarContainer = () => {
     pdfUrl: state.pdfUrl,
     toggleCompilerLog: state.toggleCompilerLog,
   }));
-  const { sourceCode, changeValue, currentProjectRoot } = useFileStore(
+  const { sourceCode, currentProjectRoot } = useFileStore(
     (state) => ({
       sourceCode: state.value,
-      changeValue: state.changeValue,
       currentProjectRoot: state.currentProjectRoot,
     })
   );
