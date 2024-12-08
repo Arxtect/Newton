@@ -213,20 +213,21 @@ const TopBar = (props) => {
         {!!projectSync && (
           <div className="flex items-center">
             {shareUserList.slice(0, maxDisplayCount).map((user, index) => (
-              <div
-                key={user.id}
-                className="relative rounded-full w-8 h-8 flex items-center justify-center border-2 border-white"
-                style={{
-                  backgroundColor: user?.color || getColors(index),
-                  marginLeft: index === 0 ? "0" : "-0.5rem", // Adjust the overlap
-                  zIndex: 100 - index,
-                }}
-                title={user.name}
-              >
-                <span className="text-white text-xs">
-                  {getFirstNUpperCaseChars(user.name)}
-                </span>
-              </div>
+              <Tooltip content={user.name} position="bottom">
+                <div
+                  key={user.id}
+                  className="relative rounded-full w-8 h-8 flex items-center justify-center border-2 border-white"
+                  style={{
+                    backgroundColor: user?.color || getColors(index),
+                    marginLeft: index === 0 ? "0" : "-0.5rem", // Adjust the overlap
+                    zIndex: 100 - index,
+                  }}
+                >
+                  <span className="text-white text-xs">
+                    {getFirstNUpperCaseChars(user.name)}
+                  </span>
+                </div>
+              </Tooltip>
             ))}
             {shareUserList?.length > maxDisplayCount && (
               <div
