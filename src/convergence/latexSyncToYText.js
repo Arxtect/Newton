@@ -56,15 +56,17 @@ export class LatexSyncToYText {
       this.mux(() => {
         if (eventType.action === "insert") {
           const start = aceDocument.positionToIndex(eventType.start, 0);
-          console.log(eventType.lines.join("\n"), filepath, "op.retain2");
           this.type.insert(start, eventType.lines.join("\n"));
           // this.type.insert(start, "11");
+          console.log(
+            eventType.start,
+            start,
+            eventType.lines.join("\n"),
+            "op.retain3"
+          );
         } else if (eventType.action === "remove") {
           const start = aceDocument.positionToIndex(eventType.start, 0);
           const length = eventType.lines.join("\n")?.length;
-
-          // Debugging output
-          console.log("Attempting to delete:", { start, length });
 
           // Ensure the range is valid
           if (start >= 0 && start + length <= this.type.toString()?.length) {

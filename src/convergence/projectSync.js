@@ -14,7 +14,6 @@ import { assetExtensions } from "@/constant";
 import { debounce, getColors } from "@/util";
 import { toast } from "react-toastify";
 import { LatexSyncToYText } from "./latexSyncToYText";
-import { EditorChangeManager } from "./InsertionTracker";
 
 const host = window.location.hostname;
 const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
@@ -44,6 +43,7 @@ class ProjectSync {
     this.offChange = null;
     this.currentFileContent = null;
     this.initialized = false;
+    this.isInitialSyncComplete = false; // 初始化标志
 
     // 设置用户信息
 
@@ -124,7 +124,11 @@ class ProjectSync {
     // console.log(this.yText, "this.yText");
     this.undoManager = new Y.UndoManager(this.yText);
     // this.latexSyncToYText = new LatexSyncToYText(this.yDoc, filePath, editor);
+    const ext = path.extname(filePath).slice(1).toLowerCase(); // 获取文件扩展名并转换为小写
 
+    if (assetExtensions.includes(ext)) {
+      return;
+    }
     if (this.aceBinding) {
       this.aceBinding.updateCurrentFilePath(filePath, editor);
     } else {
@@ -258,7 +262,7 @@ class ProjectSync {
 
   debouncedRepoChanged = debounce(() => {
     useFileStore.getState().repoChanged();
-  }, 100);
+  }, 50);
 
   async syncFolderToYMapRootPath(callback) {
     await this.saveProjectSyncInfoToJson(this.rootPath);
@@ -336,11 +340,14 @@ class ProjectSync {
               } else {
                 if (this.isCurrentFile(key)) {
                   // this.setEditorContent(content);
+                  console.log(this.initialized, "initialized");
+                  // if (!this.initialized) this.setEditorContent(content);
                   // console.log(key, "content");
                 } else {
                   const fileStore = useFileStore.getState();
-                  content?.length &&
-                    (await fileStore.saveFile(key, content, false));
+                  await fileStore.saveFile(key, content, false);
+                  // content?.length &&
+                  //   (await fileStore.saveFile(key, content, false));
                 }
               }
             }
@@ -352,6 +359,10 @@ class ProjectSync {
             // 等待所有内容同步完成后再进行光标同步
             Promise.all(contentSyncedPromises).then(() => {
               this.otherOperation && this.otherOperation();
+              if (!this.isInitialSyncComplete) {
+                this.isInitialSyncComplete = true; // 标记初始同步完成
+                this.changeInitial();
+              }
             });
             resolve(); // 同步完成后，Promise 解决
           }

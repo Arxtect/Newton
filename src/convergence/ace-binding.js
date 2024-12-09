@@ -353,7 +353,6 @@ export class AceBinding {
     ace.getSession().selection.on("changeCursor", this.cursorChangeHandler);
 
     this.offChangeCursor = () => {
-      console.log("destroy cursor");
       ace.getSession().selection.off("changeCursor", this.cursorChangeHandler);
     };
 

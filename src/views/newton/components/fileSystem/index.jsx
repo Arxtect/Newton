@@ -6,25 +6,12 @@
 // Hooks
 import React, { useLayoutEffect, useEffect, useState } from "react";
 import RootDirectory from "./components/RootDirectory";
-import { findAllProject, getProjectInfo } from "domain/filesystem";
-import { useFileStore, useUserStore, useEditor } from "store";
-import { ProjectSync } from "@/convergence";
-import { getYDocToken } from "services";
-import { gitCloneGitea } from "./gitclone";
-import { getRoomUserAccess } from "@/services";
-import { toast } from "react-toastify";
-
-import { useNavigate } from "react-router-dom";
+import { useFileStore } from "store";
 
 const FileSystem = () => {
-  const navigate = useNavigate();
   const {
-    mainFilepath,
-    filepath,
-    setMainFile,
     currentProjectRoot,
     changeCurrentProjectRoot,
-    createProject,
     touchCounter,
     isFileCreating,
     isDirCreating,
@@ -41,20 +28,9 @@ const FileSystem = () => {
     endRenaming,
     preRenamingDirpath,
     changePreRenamingDirpath,
-    repoChanged,
-    deleteProject,
-    allProject,
-    updateAllProject,
-    projectSync,
-    updateProjectSync,
-    updateShareIsRead,
-    changeMainFile,
   } = useFileStore((state) => ({
-    filepath: state.filepath,
-    setMainFile: state.setMainFile,
     currentProjectRoot: state.currentProjectRoot,
     changeCurrentProjectRoot: state.changeCurrentProjectRoot,
-    createProject: state.createProject,
     touchCounter: state.touchCounter,
     isFileCreating: state.fileCreatingDir,
     isDirCreating: state.dirCreatingDir,
@@ -71,110 +47,7 @@ const FileSystem = () => {
     endRenaming: state.endRenaming,
     preRenamingDirpath: state.preRenamingDirpath,
     changePreRenamingDirpath: state.changePreRenamingDirpath,
-    repoChanged: state.repoChanged,
-    deleteProject: state.deleteProject,
-    allProject: state.allProject,
-    updateAllProject: state.updateAllProject,
-    projectSync: state.projectSync,
-    updateProjectSync: state.updateProjectSync,
-    updateShareIsRead: state.updateShareIsRead,
-    mainFilepath: state.mainFilepath,
-    changeMainFile: state.changeMainFile,
   }));
-
-  const getAllProject = async () => {
-    let projectLists = await findAllProject(".");
-    if (projectLists.length > 0) {
-      console.log(projectLists, "projectLists");
-      updateAllProject(projectLists);
-    }
-  };
-
-  const { user } = useUserStore((state) => ({
-    user: state.user,
-  }));
-  const { editor } = useEditor((state) => ({
-    editor: state.editor,
-  }));
-
-  useEffect(() => {
-    getAllProject();
-  }, [currentProjectRoot]);
-
-  const [isOpen, setIsOpen] = useState(false);
-
-  const toggleDrawer = (open) => {
-    setIsOpen(open);
-  };
-  const getYDocTokenReq = async (room) => {
-    const res = await getYDocToken(room);
-    return res;
-  };
-
-  const initShareProject = async () => {
-    const projectInfo = await getProjectInfo(currentProjectRoot);
-
-    const project = projectInfo?.["rootPath"];
-    const roomId = projectInfo?.["userId"];
-    const isSync = projectInfo?.["isSync"];
-
-    console.log(projectInfo, "projectInfo");
-
-    if (!isSync || !project || !roomId) return;
-    const res = await getRoomUserAccess({
-      project_name: project + roomId,
-    });
-    if (res?.status != "success") {
-      toast.error("Get room user access failed.");
-      return;
-    }
-
-    if (res?.access == "r") {
-      updateShareIsRead(true);
-      toast.info(
-        "The project is read-only for you, please contact your project manager to modify it."
-      );
-    }
-
-    if (res?.access == "no") {
-      toast.info(
-        "The project is not shared for you, please contact your project manager to modify it."
-      );
-      navigate("/project");
-      return;
-    }
-    const { token, position } = await getYDocTokenReq(project + roomId);
-    const projectSync = await new ProjectSync(
-      project,
-      user,
-      roomId,
-      token,
-      position
-    );
-    await projectSync.setObserveHandler();
-    updateProjectSync(projectSync);
-
-    console.log(filepath, "filepath");
-  };
-
-  useEffect(() => {
-    if (projectSync && editor != null && filepath) {
-      editor.blur && editor.blur();
-      projectSync?.updateEditorAndCurrentFilePath &&
-        projectSync?.updateEditorAndCurrentFilePath(filepath, editor);
-    }
-  }, [filepath, projectSync, editor]);
-
-  useEffect(() => {
-    initShareProject().then(() => {
-      // if (!editor || !mainFilepath) return;
-      // loadFile({ filepath: mainFilepath });
-      changeMainFile(currentProjectRoot);
-    });
-    return () => {
-      setMainFile("");
-    };
-  }, []);
 
   return (
     <main className="max-w-[100%] h-full">
