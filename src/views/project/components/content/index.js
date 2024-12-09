@@ -296,7 +296,9 @@ const Content = React.forwardRef(
       return res;
     };
     const handleConfirmSync = async () => {
-      const {token,position} = await getYDocTokenReq(syncParams.project+syncParams.roomId);
+      const { token, position } = await getYDocTokenReq(
+        syncParams.project + syncParams.roomId
+      );
       const projectSync = new ProjectSync(
         syncParams.project,
         user,
@@ -532,7 +534,12 @@ const Content = React.forwardRef(
             currentSelectMenu={currentSelectMenu}
           ></Github>
           <ArDialog
-            title="Sync Project"
+            title={
+              <span>
+                <b>{user.name}</b> would like you to join{" "}
+                <i>{syncParams.project}</i>
+              </span>
+            }
             dialogOpen={syncDialogOpen}
             handleCancel={handleCancelSync}
             buttonList={[
@@ -540,8 +547,9 @@ const Content = React.forwardRef(
               { title: "Confirm", click: handleConfirmSync },
             ]}
           >
-            Whether to enter the collaboration project:
-            <span className="text-red-500 mr-1">{syncParams.project}</span>
+            <span className="text-gray-500 mr-1 ml-2">
+              You are accepting this invite as <i>{user.email}</i>
+            </span>
           </ArDialog>
           <ArDialog
             title={
