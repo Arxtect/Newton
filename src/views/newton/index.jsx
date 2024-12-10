@@ -107,6 +107,7 @@ const Newton = () => {
       position
     );
     await projectSync.setObserveHandler();
+    console.log(projectSync, "projectSync");
 
     const waitForSync = new Promise((resolve, reject) => {
       const checkSyncComplete = () => {
@@ -122,13 +123,16 @@ const Newton = () => {
 
     // Set a timeout for 10 seconds
     const timeout = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error("Initialization timed out")), 60000)
+      setTimeout(
+        () => reject(new Error("Sync timed out, please try again")),
+        60000
+      )
     );
 
     // Wait for either the sync to complete or the timeout
     await Promise.race([waitForSync, timeout]);
 
-    updateProjectSync(projectSync);
+    updateProjectSync(projectSync.saveState);
   };
 
   useEffect(() => {
@@ -142,11 +146,13 @@ const Newton = () => {
   useEffect(() => {
     initShareProject()
       .then(() => {
+        console.log(currentProjectRoot, "currentProjectRoot");
         changeMainFile(currentProjectRoot);
         setLoading(false);
       })
       .catch((error) => {
         setLoading(false);
+        toast.error(error.message);
         console.log(error, "error");
       });
     return () => {

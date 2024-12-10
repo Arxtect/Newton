@@ -92,7 +92,8 @@ const Share = forwardRef(({ rootPath, user }, ref) => {
       token,
       position
     );
-    updateProjectSync(projectSync);
+    updateProjectSync(projectSync.saveState);
+
     await projectSync.syncFolderToYMapRootPath();
     // await projectSync.setObserveHandler();
     setTimeout(() => {
@@ -140,7 +141,7 @@ const Share = forwardRef(({ rootPath, user }, ref) => {
     if (res?.status == "success") {
       toast.success(`Invite ${searchInput} success`);
       getRoomInfo();
-      !projectInfo?.userId&&handleSaveProject();
+      !projectInfo?.userId && handleSaveProject();
     }
     return res?.status;
   };

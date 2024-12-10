@@ -6,12 +6,10 @@ import {mkdir} from "./mkdir"
 export const ensureDir = async (dirpath) => {
   const parentDir = path.dirname(dirpath);
 
-  console.log(parentDir, dirpath, 'parentDir');
   if (parentDir !== dirpath && parentDir !== ".") {
       console.log(parentDir, dirpath, 'parentDir');
     await ensureDir(parentDir);
   }
-console.log(parentDir, dirpath, 'parentDir');
   try {
     await mkdir(dirpath);
   } catch (error) {

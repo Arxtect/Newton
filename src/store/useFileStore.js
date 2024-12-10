@@ -172,7 +172,7 @@ export const useFileStore = create()(
       updateIsDropFileSystem: (isDropFileSystem) => set({ isDropFileSystem }),
       updateDirOpen: (dirOpen) => set({ dirOpen }),
       updateProjectSync: async (projectSync) => {
-        set({ projectSync });
+        set({ projectSync: projectSync });
       },
       leaveProjectSyncRoom: () => {
         let projectSync = get().projectSync;
@@ -241,7 +241,7 @@ export const useFileStore = create()(
           setTimeout(() => {
             projectSync?.updateCurrentFilePathYText &&
               projectSync?.updateCurrentFilePathYText(filepath, editor);
-          }, 0);
+          }, 300);
         }
       },
       changeCurrentSelectDir: (dirpath, isCtrl = false) => {
@@ -453,6 +453,9 @@ export const useFileStore = create()(
       changeCurrentProjectRoot: async ({ projectRoot }) => {
         // get().changeMainFile(projectRoot);
         set({ projectSync: null });
+        if (!projectRoot) {
+          return;
+        }
         get().initFile();
         set({ currentProjectRoot: projectRoot, currentSelectDir: projectRoot });
         initializeGitStatus({ projectRoot });

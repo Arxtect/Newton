@@ -12,28 +12,36 @@ export class LatexSyncToYText {
     this.ace.session.getUndoManager().reset();
     this.initialized = initialized;
 
+    const aceDocument = this.ace.getSession().getDocument();
+    const initialContent = aceDocument.getValue();
+    let typeLength = this.type?.toString().length;
+    if (typeLength === 0) {
+      this.type.insert(0, initialContent);
+    } else {
+      initialContent.length != typeLength &&
+        aceDocument.setValue(this.type.toString());
+    }
+
     this._typeObserver = (event) => {
-      console.log(this.initialized, "op.retain");
       if (!this.initialized) {
         // Skip initial insert
         this.initialized = true;
         changeInitial();
         return;
       }
-
       const aceDocument = this.ace.getSession().getDocument();
+      console.log(aceDocument, yText, "op.retain555");
+
       mux(() => {
         const delta = event.delta;
         let currentPos = 0;
         for (const op of delta) {
-          console.log(op, "op.retain");
           if (op.retain) {
             currentPos += op.retain;
           } else if (op.insert) {
+            const remoteStart = op.attributes;
             const start = aceDocument.indexToPosition(currentPos, 0);
-            console.log(start, op.insert, filepath, "op.retain1");
-            aceDocument.insert(start, op.insert);
-            // aceDocument.insert(start, "op.insert");
+            aceDocument.insert(remoteStart ?? start, op.insert);
             currentPos += op.insert?.length;
           } else if (op.delete) {
             const start = aceDocument.indexToPosition(currentPos, 0);
@@ -57,13 +65,6 @@ export class LatexSyncToYText {
         if (eventType.action === "insert") {
           const start = aceDocument.positionToIndex(eventType.start, 0);
           this.type.insert(start, eventType.lines.join("\n"));
-          // this.type.insert(start, "11");
-          console.log(
-            eventType.start,
-            start,
-            eventType.lines.join("\n"),
-            "op.retain3"
-          );
         } else if (eventType.action === "remove") {
           const start = aceDocument.positionToIndex(eventType.start, 0);
           const length = eventType.lines.join("\n")?.length;
@@ -75,6 +76,7 @@ export class LatexSyncToYText {
             console.warn("Invalid delete range:", { start, length });
           }
         }
+        this.type.applyDelta(eventType);
       });
     };
 

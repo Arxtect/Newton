@@ -1,3 +1,8 @@
+/*
+ * @Description:
+ * @Author: Devin
+ * @Date: 2024-11-14 12:44:40
+ */
 import * as Y from "yjs";
 import { WebsocketProvider } from "y-websocket";
 import { useFileStore } from "@/store"; // 假设 Zustand 文件操作在这里定义
@@ -38,10 +43,7 @@ class ProjectSync {
     this.userList = [];
     this.awareness = this.websocketProvider.awareness;
     this.currentFilePath = "";
-    this.isLocalChange = true; // 是否本地变更
     this.latexSyncToYText = null;
-    this.offChange = null;
-    this.currentFileContent = null;
     this.initialized = false;
     this.isInitialSyncComplete = false; // 初始化标志
 
@@ -56,6 +58,19 @@ class ProjectSync {
     // 保存当前的观察者句柄
     this.currentObserver = null;
     this.setUserAwareness({ ...this.user, color: getColors(position) });
+
+    this.saveState = {
+      updateEditorAndCurrentFilePath:
+        this.updateEditorAndCurrentFilePath.bind(this),
+      updateCurrentFilePathYText: this.updateCurrentFilePathYText.bind(this),
+      syncFileToYMap: this.syncFileToYMap.bind(this),
+      deleteFile: this.deleteFile.bind(this),
+      deleteFolder: this.deleteFolder.bind(this),
+      leaveCollaboration: this.leaveCollaboration.bind(this),
+      setObserveHandler: this.setObserveHandler.bind(this),
+      isInitialSyncComplete: this.isInitialSyncComplete,
+      syncFolderToYMapRootPath: this.syncFolderToYMapRootPath.bind(this),
+    };
   }
 
   // set observe handler
@@ -89,6 +104,7 @@ class ProjectSync {
   setUserAwareness(user) {
     this.awareness.setLocalStateField("user", user);
   }
+
   setEditorContent(content) {
     const handleChange = useFileStore.getState().changeValue;
     handleChange(content, false);
@@ -121,9 +137,7 @@ class ProjectSync {
 
     this.currentFilePath = filePath;
     this.yText = this.yDoc.getText(filePath);
-    // console.log(this.yText, "this.yText");
     this.undoManager = new Y.UndoManager(this.yText);
-    // this.latexSyncToYText = new LatexSyncToYText(this.yDoc, filePath, editor);
     const ext = path.extname(filePath).slice(1).toLowerCase(); // 获取文件扩展名并转换为小写
 
     if (assetExtensions.includes(ext)) {
@@ -146,8 +160,8 @@ class ProjectSync {
     if (assetExtensions.includes(ext)) {
       // 如果是资产文件类型，则转换为 Base64 编码
       try {
-        // contentToStore = await uploadFile(filePath, content);
-        contentToStore = uploadFileBinary(filePath, content);
+        contentToStore = await uploadFile(filePath, content);
+        // contentToStore = uploadFileBinary(filePath, content);
       } catch (err) {
         // contentToStore = content.toString();
         console.log(err.message, "err.message");
@@ -210,7 +224,6 @@ class ProjectSync {
   // 同步文件夹列表
   syncFolderInfo(folderPath) {
     if (folderPath.includes(".git")) return;
-    console.log(folderPath, "folderPath");
     this.yDoc.transact(() => {
       let folderMap = this.yMap.get(this.folderMapName) || [];
       folderMap = [...folderMap, folderPath];
@@ -262,7 +275,7 @@ class ProjectSync {
 
   debouncedRepoChanged = debounce(() => {
     useFileStore.getState().repoChanged();
-  }, 50);
+  }, 1000);
 
   async syncFolderToYMapRootPath(callback) {
     await this.saveProjectSyncInfoToJson(this.rootPath);
@@ -306,15 +319,15 @@ class ProjectSync {
   // Yjs Map 观察者处理函数
   async yMapObserveHandler(event) {
     const contentSyncedPromises = [];
-
     event.keysChanged.forEach((key) => {
+      if (event?.transaction?.origin == null) return;
       contentSyncedPromises.push(
         new Promise(async (resolve) => {
           const content = this.yMap.get(key);
+
           try {
             if (key == this.folderMapName) {
               await FS.ensureDir(this.rootPath);
-              console.log(content, "content");
               this.handleFolderInfo(this.rootPath, key, content);
               resolve();
               return;
@@ -324,7 +337,6 @@ class ProjectSync {
               // 如果内容为空，则删除文件
               await useFileStore.getState().deleteFile({ filename: key }, true);
 
-              console.log(`File ${key} deleted successfully.`);
               resolve();
               return;
             } else {
@@ -333,13 +345,10 @@ class ProjectSync {
               const ext = path.extname(key).slice(1).toLowerCase();
               if (assetExtensions.includes(ext)) {
                 // 如果是资产文件类型，则将 Base64 编码的字符串转换回文件数据
-                // const fileData = await downloadFile(content, key);
-                // console.log(content, "content");
-                // await FS.writeFile(key, Buffer.from(fileData));
-                await downloadFileBinary(key, content);
+                await downloadFile(content, key);
+                // await downloadFileBinary(key, content);
               } else {
                 if (this.isCurrentFile(key)) {
-                  // this.setEditorContent(content);
                   console.log(this.initialized, "initialized");
                   // if (!this.initialized) this.setEditorContent(content);
                   // console.log(key, "content");
@@ -355,10 +364,11 @@ class ProjectSync {
             console.error(err, key);
           } finally {
             // 调用需要防抖处理的函数
-            this.debouncedRepoChanged();
+
             // 等待所有内容同步完成后再进行光标同步
             Promise.all(contentSyncedPromises).then(() => {
               this.otherOperation && this.otherOperation();
+               this.debouncedRepoChanged();
               if (!this.isInitialSyncComplete) {
                 this.isInitialSyncComplete = true; // 标记初始同步完成
                 this.changeInitial();
