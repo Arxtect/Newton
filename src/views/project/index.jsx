@@ -398,8 +398,8 @@ const Project = () => {
         <ArDialog
           title={
             <span>
-              <b>{user.name}</b> would like you to join{" "}
-              <i>{syncParams.project}</i>
+              <b>{user?.name}</b> would like you to join{" "}
+              <i>{syncParams?.project}</i>
             </span>
           }
           dialogOpen={syncDialogOpen}
@@ -410,7 +410,7 @@ const Project = () => {
           ]}
         >
           <span className="text-gray-500 mr-1 ml-2">
-            You are accepting this invite as <i>{user.email}</i>
+            You are accepting this invite as <i>{user?.email}</i>
           </span>
         </ArDialog>
         <ArDialog
