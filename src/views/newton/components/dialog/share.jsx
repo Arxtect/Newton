@@ -190,7 +190,7 @@ const Share = forwardRef(({ rootPath, user }, ref) => {
     });
     if (res?.status == "success") {
       await getRoomInfo();
-      handleSaveProject();
+      await handleSaveProject();
       toast.success(`Reopen room success`);
     }
     return res?.status;
