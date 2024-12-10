@@ -17,7 +17,8 @@ class AceCursors {
 
     // Bind the marker update function to this context
     this.marker.update = (html, markerLayer, session, config) => {
-      this.markerUpdate(html, markerLayer, session, config, ace, userList);
+      setTimeout(() => {
+        this.markerUpdate(html, markerLayer, session, config, ace, userList);      }, 100);
     };
   }
 
@@ -36,7 +37,6 @@ class AceCursors {
     let start = config.firstRow,
       end = config.lastRow; //视图显示区域
     let cursors = this.markerCursors;
-    // console.log(this.markerCursors, "markerCursors");
 
     for (let i = 0; i < cursors.length; i++) {
       if (this.localUser?.id == cursors[i].userId) continue;
@@ -109,7 +109,6 @@ class AceCursors {
           });
           ace.container.appendChild(el); // Use ace to append the cursor element
         } else {
-          console.log(pos, "element");
           el.style.height = height + "px";
           el.style.width = width + "px";
           el.style.top = top + "px";
@@ -278,7 +277,6 @@ export class AceBinding {
         .doc.positionToIndex(curSel.getSelectionLead());
       cursor.anchor = indexAnchor;
       cursor.head = indexHead;
-
       if (indexAnchor > indexHead) {
         cursor.anchor = indexHead;
         cursor.head = indexAnchor;
