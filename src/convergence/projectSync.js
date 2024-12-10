@@ -28,11 +28,20 @@ const wsUrl = `wss://arxtect.com/websockets/`;
 // const wsUrl = `ws://10.10.99.42:8013/`;
 
 class ProjectSync {
-  constructor(rootPath, user, roomId, token, position, otherOperation) {
+  constructor(
+    rootPath,
+    user,
+    roomId,
+    token,
+    position,
+    otherOperation,
+    isLeave = false
+  ) {
     this.folderMapName = `${rootPath}_folder_map_list_${roomId}`;
     this.rootPath = rootPath;
     this.roomId = roomId;
     this.yDoc = new Y.Doc();
+
     this.websocketProvider = new WebsocketProvider(
       wsUrl,
       this.rootPath + this.roomId,
@@ -46,7 +55,7 @@ class ProjectSync {
     this.latexSyncToYText = null;
     this.initialized = false;
     this.isInitialSyncComplete = false; // 初始化标志
-
+    this.isLeave = isLeave;
     // 设置用户信息
 
     // 使用 rootPath 作为命名空间
@@ -58,6 +67,16 @@ class ProjectSync {
     // 保存当前的观察者句柄
     this.currentObserver = null;
     this.setUserAwareness({ ...this.user, color: getColors(position) });
+
+    this.setObserveHandler = () => {
+      // 清理旧的观察者
+      if (this.currentObserver) {
+        this.yMap.unobserve(this.yMapObserveHandler.bind(this));
+      }
+      // 设置新的观察者
+      this.currentObserver = true;
+      this.yMap.observe(this.yMapObserveHandler.bind(this));
+    };
 
     this.saveState = {
       updateEditorAndCurrentFilePath:
@@ -74,16 +93,6 @@ class ProjectSync {
   }
 
   // set observe handler
-  setObserveHandler() {
-    // 清理旧的观察者
-    if (this.currentObserver) {
-      this.yMap.unobserve(this.currentObserver);
-    }
-
-    // 设置新的观察者
-    this.currentObserver = this.yMapObserveHandler.bind(this);
-    this.yMap.observe(this.currentObserver);
-  }
 
   async saveProjectSyncInfoToJson() {
     const { id, ...otherInfo } = this.user;
@@ -318,11 +327,12 @@ class ProjectSync {
 
   // Yjs Map 观察者处理函数
   async yMapObserveHandler(event) {
-    const contentSyncedPromises = [];
+    let contentSyncedPromises = [];
+
     event.keysChanged.forEach((key) => {
       if (event?.transaction?.origin == null) return;
       contentSyncedPromises.push(
-        new Promise(async (resolve) => {
+        new Promise(async (resolve, reject) => {
           const content = this.yMap.get(key);
 
           try {
@@ -336,7 +346,6 @@ class ProjectSync {
             if (content?._delete) {
               // 如果内容为空，则删除文件
               await useFileStore.getState().deleteFile({ filename: key }, true);
-
               resolve();
               return;
             } else {
@@ -346,38 +355,43 @@ class ProjectSync {
               if (assetExtensions.includes(ext)) {
                 // 如果是资产文件类型，则将 Base64 编码的字符串转换回文件数据
                 await downloadFile(content, key);
+                resolve();
                 // await downloadFileBinary(key, content);
               } else {
                 if (this.isCurrentFile(key)) {
+                  resolve();
                   console.log(this.initialized, "initialized");
                   // if (!this.initialized) this.setEditorContent(content);
                   // console.log(key, "content");
                 } else {
                   const fileStore = useFileStore.getState();
-                  await fileStore.saveFile(key, content, false);
-                  // content?.length &&
-                  //   (await fileStore.saveFile(key, content, false));
+                  // await fileStore.saveFile(key, content, false);
+                  content?.length &&
+                    (await fileStore.saveFile(key, content, false));
+                  resolve();
                 }
               }
             }
           } catch (err) {
+            reject(err);
             console.error(err, key);
-          } finally {
-            // 调用需要防抖处理的函数
-
-            // 等待所有内容同步完成后再进行光标同步
-            Promise.all(contentSyncedPromises).then(() => {
-              this.otherOperation && this.otherOperation();
-               this.debouncedRepoChanged();
-              if (!this.isInitialSyncComplete) {
-                this.isInitialSyncComplete = true; // 标记初始同步完成
-                this.changeInitial();
-              }
-            });
-            resolve(); // 同步完成后，Promise 解决
           }
         })
       );
+      if (event.keysChanged.size == contentSyncedPromises.length) {
+        Promise.all(contentSyncedPromises).then(() => {
+          this.otherOperation && this.otherOperation();
+          contentSyncedPromises = [];
+          this.debouncedRepoChanged();
+          if (this.isLeave) {
+            this.leaveCollaboration();
+          }
+          if (!this.isInitialSyncComplete) {
+            this.isInitialSyncComplete = true; // 标记初始同步完成
+            this.changeInitial();
+          }
+        });
+      }
     });
   }
 

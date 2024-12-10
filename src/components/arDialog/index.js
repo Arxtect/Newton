@@ -1,3 +1,8 @@
+/*
+ * @Description:
+ * @Author: Devin
+ * @Date: 2024-11-14 12:44:40
+ */
 import React, { useEffect, useCallback } from "react";
 import { Dialog } from "primereact/dialog";
 import Tooltip from "@/components/tooltip";
@@ -87,4 +92,4 @@ const ArDialog = ({
   );
 };
 
-export default ArDialog;
+export default React.memo(ArDialog);

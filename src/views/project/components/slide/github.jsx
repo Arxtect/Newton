@@ -224,4 +224,4 @@ const ImportGithub = ({ dialogOpen, setDialogOpen, getProjectList,user,projectNa
   );
 };
 
-export default ImportGithub;
+export default React.memo(ImportGithub);

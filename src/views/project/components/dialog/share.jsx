@@ -207,4 +207,4 @@ const Share = ({
   );
 };
 
-export default Share;
+export default React.memo(Share);

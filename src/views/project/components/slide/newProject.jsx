@@ -62,4 +62,4 @@ const NewProject = ({ dialogOpen, setDialogOpen }) => {
   );
 };
 
-export default NewProject;
+export default React.memo(NewProject);

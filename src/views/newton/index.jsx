@@ -99,19 +99,18 @@ const Newton = () => {
       return;
     }
     const { token, position } = await getYDocTokenReq(project + roomId);
-    const projectSync = await new ProjectSync(
+    const projectSyncClass = await new ProjectSync(
       project,
       user,
       roomId,
       token,
       position
     );
-    await projectSync.setObserveHandler();
-    console.log(projectSync, "projectSync");
 
+    await projectSyncClass.setObserveHandler();
     const waitForSync = new Promise((resolve, reject) => {
       const checkSyncComplete = () => {
-        if (projectSync.isInitialSyncComplete) {
+        if (projectSyncClass.isInitialSyncComplete) {
           resolve();
           setLoading(false);
         } else {
@@ -132,7 +131,7 @@ const Newton = () => {
     // Wait for either the sync to complete or the timeout
     await Promise.race([waitForSync, timeout]);
 
-    updateProjectSync(projectSync.saveState);
+    updateProjectSync(projectSyncClass.saveState);
   };
 
   useEffect(() => {
@@ -146,7 +145,6 @@ const Newton = () => {
   useEffect(() => {
     initShareProject()
       .then(() => {
-        console.log(currentProjectRoot, "currentProjectRoot");
         changeMainFile(currentProjectRoot);
         setLoading(false);
       })
@@ -163,6 +161,7 @@ const Newton = () => {
   useEffect(() => {
     refreshAuth();
     return () => {
+      console.log("leaveProjectSyncRoom");
       leaveProjectSyncRoom();
     };
   }, []);

@@ -1,3 +1,8 @@
+/*
+ * @Description:
+ * @Author: Devin
+ * @Date: 2024-11-14 12:44:40
+ */
 import React, { useRef, useState } from "react";
 import { Tooltip as ReactTooltip } from "react-tooltip";
 import { randomString } from "@/util";
@@ -16,7 +21,9 @@ const Tooltip = ({
   isHasChildren = false,
 }) => {
   // 如果没有提供 selector，则生成一个唯一 ID
-  const uniqueId = useRef(`${content.slice(0, 10)}-tooltip-${randomString(4)}`);
+  const uniqueId = useRef(
+    `${content?.slice(0, 10)}-tooltip-${randomString(4)}`
+  );
   const tooltipId = selector || uniqueId.current;
 
   const [isOpen, setIsOpen] = useState(false);

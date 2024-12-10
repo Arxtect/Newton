@@ -74,4 +74,4 @@ const UploadProject = ({ dialogOpen, setDialogOpen, user }) => {
   );
 };
 
-export default UploadProject;
+export default React.memo(UploadProject);
