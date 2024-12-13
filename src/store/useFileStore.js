@@ -108,10 +108,7 @@ export const useFileStore = create()(
         const relativePathPrefix = `${currentProjectRoot}/`;
         const modifiedFiles = files.map((file) => {
           // 使用正则表达式匹配第一个 sync-demo/ 并替换为相对路径
-          if (
-            file.includes(".git") ||
-            file.includes("project-hasOwnProperty-arxtect-projectInfo.json")
-          ) {
+          if (file.includes(".git") || file.includes(FS.projectInfoFileName)) {
             return null;
           }
           // return file.replace(new RegExp(`^${relativePathPrefix}`), "");
@@ -447,7 +444,6 @@ export const useFileStore = create()(
         set({ renamingPathname: null });
       },
       changePreRenamingDirpath: ({ dirpath }) => {
-        console.log(dirpath, "changePreRenamingDirpath");
         set({ preRenamingDirpath: dirpath });
       },
       changeCurrentProjectRoot: async ({ projectRoot }) => {

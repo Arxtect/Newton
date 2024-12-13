@@ -44,6 +44,7 @@ export const textExtensions = [
   "rnw",
   "ltx",
   "inc",
+  "json",
 ];
 export const editableFilenames = [
   "latexmkrc",

@@ -89,20 +89,13 @@ class ProjectSync {
       setObserveHandler: this.setObserveHandler.bind(this),
       isInitialSyncComplete: this.isInitialSyncComplete,
       syncFolderToYMapRootPath: this.syncFolderToYMapRootPath.bind(this),
+      changeIsInitialSyncComplete: this.changeIsInitialSyncComplete.bind(this),
+      changeInitial: this.changeInitial.bind(this),
     };
   }
 
-  // set observe handler
-
-  async saveProjectSyncInfoToJson() {
-    const { id, ...otherInfo } = this.user;
-    await FS.createProjectInfo(this.rootPath, {
-      rootPath: this.rootPath,
-      userId: this.roomId,
-      isSync: true,
-      isClose: false,
-      ...otherInfo,
-    });
+  changeIsInitialSyncComplete() {
+    this.isInitialSyncComplete = true;
   }
 
   async removeProjectSyncInfo() {
@@ -256,25 +249,31 @@ class ProjectSync {
   // 同步整个文件夹到 Yjs Map
   async syncFolderToYMap(folderPath) {
     if (folderPath.includes(".git")) return;
-    try {
+
+    const syncPromises = [];
+
+    const handlePromise = async (folderPath) => {
       this.syncFolderInfo(folderPath);
       const files = await FS.readFileStats(folderPath, false);
 
-      console.log(files, "files");
+      for (const file of files) {
+        const filePath = path.join(folderPath, file.name);
 
-      // Create an array of promises for each file and directory
-      const syncPromises = files.map(async (file) => {
-        const filePath = path.join(folderPath, file.name); // 使用 path.join 进行路径拼接
-
-        if (file.type == "file") {
-          const content = await FS.readFile(filePath);
-          await this.syncToYMap(filePath, content); // 只同步相对路径
-        } else if (file.type == "dir") {
-          await this.syncFolderToYMap(filePath); // 递归同步子文件夹
+        if (file.type === "file") {
+          const promise = FS.readFile(filePath).then(async (content) => {
+            await this.syncToYMap(filePath, content);
+            console.log("syncPromises3");
+          });
+          syncPromises.push(promise);
+        } else if (file.type === "dir") {
+          await handlePromise(filePath);
         }
-      });
+      }
+    };
 
-      // Wait for all promises to resolve
+    try {
+      await handlePromise(folderPath);
+
       await Promise.all(syncPromises);
     } catch (err) {
       console.error(`Error syncing folder ${folderPath}:`, err);
@@ -287,8 +286,8 @@ class ProjectSync {
   }, 1000);
 
   async syncFolderToYMapRootPath(callback) {
-    await this.saveProjectSyncInfoToJson(this.rootPath);
     await this.syncFolderToYMap(this.rootPath); // 保存项目信息
+
     callback && callback();
   }
 

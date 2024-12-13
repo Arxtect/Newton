@@ -18,7 +18,7 @@ function getTeXFiles(fileList) {
 }
 
 function getOnlyTeXFiles(fileList) {
-  console.log(fileList, "fileList");
+  // console.log(fileList, "fileList");
   const texFiles = [];
   fileList.forEach((filePath) => {
     const fileName = path.basename(filePath);

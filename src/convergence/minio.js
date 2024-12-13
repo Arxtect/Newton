@@ -66,7 +66,7 @@ export function uploadFileBinary(filepath, content) {
   }
 }
 
-export async function downloadFileBinary(key,content) {
+export async function downloadFileBinary(key, content) {
   try {
     const fileData = toUint8Array(content);
     await writeFile(key, Buffer.from(fileData));

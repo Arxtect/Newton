@@ -138,6 +138,7 @@ const Newton = () => {
     if (projectSync && editor != null && filepath) {
       editor.blur && editor.blur();
       projectSync?.updateEditorAndCurrentFilePath &&
+        projectSync.changeIsInitialSyncComplete &&
         projectSync?.updateEditorAndCurrentFilePath(filepath, editor);
     }
   }, [filepath, projectSync, editor]);

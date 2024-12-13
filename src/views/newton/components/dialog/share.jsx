@@ -37,7 +37,6 @@ const Share = forwardRef(({ rootPath, user }, ref) => {
 
   const controlShare = async () => {
     const info = await getProjectInfo(rootPath);
-    console.log(info, "info");
     if (info.userId && info.userId != user.id && user.role != "admin") {
       await copyToClipboard(
         link,
@@ -92,13 +91,29 @@ const Share = forwardRef(({ rootPath, user }, ref) => {
       token,
       position
     );
-    updateProjectSync(projectSync.saveState);
 
-    await projectSync.syncFolderToYMapRootPath();
-    // await projectSync.setObserveHandler();
-    setTimeout(() => {
-      filepath && loadFile({ filepath: filepath });
-    }, [500]);
+    const callback = async () => {
+      await projectSync.setObserveHandler();
+
+      const intervalTime = 100; // Interval time in milliseconds
+      let elapsedTime = 0;
+
+      const intervalId = setInterval(() => {
+        if (projectSync.isInitialSyncComplete) {
+          clearInterval(intervalId);
+          if (projectSync.isInitialSyncComplete && filepath) {
+            loadFile({ filepath: filepath });
+            console.log("loadFile", projectSync.isInitialSyncComplete);
+          }
+        }
+        elapsedTime += intervalTime;
+      }, intervalTime);
+    };
+
+    await projectSync.syncFolderToYMapRootPath(callback);
+    updateProjectSync(projectSync.saveState);
+    projectSync.changeIsInitialSyncComplete(); // 标记初始同步完成
+    projectSync.changeInitial && projectSync.changeInitial();
   };
 
   const copyLink = async () => {
@@ -127,6 +142,17 @@ const Share = forwardRef(({ rootPath, user }, ref) => {
     }
   };
 
+  const saveProjectSyncInfoToJson = async (user, rootPath, roomId) => {
+    const { id, ...otherInfo } = user;
+    await createProjectInfo(rootPath, {
+      rootPath: rootPath,
+      userId: roomId,
+      isSync: true,
+      isClose: false,
+      ...otherInfo,
+    });
+  };
+
   const handleInvite = async (searchInput, access) => {
     let projectInfo = await getProjectInfo(rootPath);
     let roomId = projectInfo?.userId ? projectInfo?.userId : user.id;
@@ -138,11 +164,13 @@ const Share = forwardRef(({ rootPath, user }, ref) => {
       project_name: rootPath + roomId,
       access: access,
     });
+    await saveProjectSyncInfoToJson(user, rootPath, roomId);
     if (res?.status == "success") {
       toast.success(`Invite ${searchInput} success`);
       getRoomInfo();
       !projectInfo?.userId && handleSaveProject();
     }
+
     return res?.status;
   };
 
