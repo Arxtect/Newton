@@ -1,8 +1,9 @@
 /*
  * @Description:
  * @Author: Devin
- * @Date: 2024-03-06 21:26:51
+ * @Date: 2024-11-14 12:44:41
  */
+
 import React, {
   useEffect,
   useState,
@@ -15,6 +16,7 @@ import { toast } from "react-toastify";
 import { ProjectSync } from "@/convergence";
 import { getProjectInfo, createProjectInfo } from "domain/filesystem";
 import { updateDialogLoginOpen, useUserStore, useFileStore } from "@/store";
+import { ArLoadingOverlay } from "@/components/arLoading";
 
 import ArIcon from "@/components/arIcon";
 
@@ -30,6 +32,7 @@ import {
 } from "@/services";
 import { useCopyToClipboard } from "@/useHooks";
 import Tooltip from "@/components/tooltip";
+import { waitForCondition } from "@/util";
 
 const Share = forwardRef(({ rootPath, user }, ref) => {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -95,19 +98,22 @@ const Share = forwardRef(({ rootPath, user }, ref) => {
     const callback = async () => {
       await projectSync.setObserveHandler();
 
-      const intervalTime = 100; // Interval time in milliseconds
-      let elapsedTime = 0;
-
-      const intervalId = setInterval(() => {
-        if (projectSync.isInitialSyncComplete) {
-          clearInterval(intervalId);
-          if (projectSync.isInitialSyncComplete && filepath) {
+      waitForCondition({
+        condition: () => projectSync.isInitialSyncComplete,
+        onSuccess: () => {
+          if (filepath) {
             loadFile({ filepath: filepath });
+            setLoading(false);
             console.log("loadFile", projectSync.isInitialSyncComplete);
           }
-        }
-        elapsedTime += intervalTime;
-      }, intervalTime);
+        },
+        onFailure: () => {
+          setLoading(false);
+          toast.error("Sync failed, please try again.");
+        },
+        intervalTime: 100,
+        maxElapsedTime: 60000,
+      });
     };
 
     await projectSync.syncFolderToYMapRootPath(callback);
@@ -133,7 +139,6 @@ const Share = forwardRef(({ rootPath, user }, ref) => {
     try {
       // 创建 ProjectSync 实例
       await createProjectSync(rootPath, user);
-      setLoading(false);
       // handleCancelProject();
     } catch (error) {
       toast.error("Share failed!");
@@ -292,16 +297,18 @@ const Share = forwardRef(({ rootPath, user }, ref) => {
         buttonList={[{ title: "Cancel", click: handleCancelProject }]}
         width={"50vw"}
       >
-        <ShareProject
-          handleInvite={handleInvite}
-          handleUpdateUser={handleUpdateUser}
-          roomInfo={roomInfo}
-          getRoomInfo={getRoomInfo}
-          user={user}
-          handleRemoveUser={handleRemoveUser}
-          handleCloseRoom={handleCloseRoom}
-          handleReopenRoom={handleReopenRoom}
-        ></ShareProject>
+        <ArLoadingOverlay text="Synchronizing" loading={loading}>
+          <ShareProject
+            handleInvite={handleInvite}
+            handleUpdateUser={handleUpdateUser}
+            roomInfo={roomInfo}
+            getRoomInfo={getRoomInfo}
+            user={user}
+            handleRemoveUser={handleRemoveUser}
+            handleCloseRoom={handleCloseRoom}
+            handleReopenRoom={handleReopenRoom}
+          ></ShareProject>
+        </ArLoadingOverlay>
       </ArDialog>
     </React.Fragment>
   );

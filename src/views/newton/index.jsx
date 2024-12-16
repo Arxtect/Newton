@@ -20,7 +20,7 @@ import { ProjectSync } from "@/convergence";
 import { getYDocToken } from "services";
 import { getRoomUserAccess } from "@/services";
 import { toast } from "react-toastify";
-import LoadingScreen from "@/components/arLoading";
+import { ArLoadingScreen } from "@/components/arLoading";
 
 const Newton = () => {
   const navigate = useNavigate();
@@ -70,7 +70,7 @@ const Newton = () => {
     const roomId = projectInfo?.["userId"];
     const isSync = projectInfo?.["isSync"];
 
-    console.log(projectInfo, "projectInfo");
+    console.log(projectInfo, isSync, project, roomId, "projectInfo");
 
     if (!isSync || !project || !roomId) {
       setLoading(false);
@@ -180,7 +180,7 @@ const Newton = () => {
       ></Layout>
     </React.Fragment>
   ) : (
-    <LoadingScreen text="Loading" />
+    <ArLoadingScreen text="Loading" />
   );
 };
 

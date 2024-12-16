@@ -29,6 +29,8 @@ import {
 import ArDialog from "@/components/arDialog";
 import { toast } from "react-toastify";
 import { useAuthCallback } from "@/useHooks";
+import { waitForCondition } from "@/util";
+import { ArLoadingOverlay } from "@/components/arLoading";
 
 const Project = () => {
   const { user } = useUserStore((state) => ({
@@ -224,6 +226,9 @@ const Project = () => {
     const res = await getYDocToken(room);
     return res;
   };
+
+  const [loading, setLoading] = useState(false);
+
   const handleConfirmSync = async () => {
     const { token, position } = await getYDocTokenReq(
       syncParams.project + syncParams.roomId
@@ -238,9 +243,22 @@ const Project = () => {
       true
     );
     await projectSync.setObserveHandler();
-
-    // setProjectSync(projectSync);
-    setSyncDialogOpen(false);
+    setLoading(true);
+    waitForCondition({
+      condition: () => projectSync.isInitialSyncComplete,
+      onSuccess: () => {
+        setLoading(false);
+        setSyncDialogOpen(false);
+        console.log("loadFile", projectSync.isInitialSyncComplete);
+      },
+      onFailure: () => {
+        setLoading(false);
+        setSyncDialogOpen(false);
+        toast.error("Sync failed, please try again.");
+      },
+      intervalTime: 100,
+      maxElapsedTime: 60000,
+    });
   };
   const handleCancelSync = () => {
     setSyncDialogOpen(false);
@@ -409,9 +427,11 @@ const Project = () => {
             { title: "Confirm", click: () => handleConfirmSync() },
           ]}
         >
-          <span className="text-gray-500 mr-1 ml-2">
-            You are accepting this invite as <i>{user?.email}</i>
-          </span>
+          <ArLoadingOverlay text="Synchronizing" loading={loading}>
+            <div className="text-gray-500 mr-1 ml-2 h-12 flex items-center">
+              You are accepting this invite as <i>{user?.email}</i>
+            </div>
+          </ArLoadingOverlay>
         </ArDialog>
         <ArDialog
           title={

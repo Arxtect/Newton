@@ -329,7 +329,13 @@ class ProjectSync {
     let contentSyncedPromises = [];
 
     event.keysChanged.forEach((key) => {
-      if (event?.transaction?.origin == null) return;
+      if (event?.transaction?.origin == null) {
+        console.log(`Origin is null for key ${key}`, event?.transaction);
+        return;
+      }
+      const snapshot = Y.snapshot(this.yDoc);
+      console.log(snapshot, "snapshot");
+
       contentSyncedPromises.push(
         new Promise(async (resolve, reject) => {
           const content = this.yMap.get(key);

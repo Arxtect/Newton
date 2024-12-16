@@ -351,3 +351,29 @@ export function formatRepoName(input) {
 
   return formatted;
 }
+
+export function waitForCondition({
+  condition,
+  onSuccess,
+  onFailure,
+  intervalTime = 100,
+  maxElapsedTime = 60000,
+}) {
+  let elapsedTime = 0;
+
+  const intervalId = setInterval(() => {
+    if (condition()) {
+      clearInterval(intervalId);
+      if (typeof onSuccess === "function") {
+        onSuccess();
+      }
+    } else if (elapsedTime >= maxElapsedTime) {
+      clearInterval(intervalId);
+      if (typeof onFailure === "function") {
+        onFailure();
+      }
+    }
+
+    elapsedTime += intervalTime;
+  }, intervalTime);
+}
