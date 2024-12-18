@@ -186,11 +186,11 @@ const Table = forwardRef(
           disableColumnMenu
           initialState={{
             pagination: {
-              paginationModel: { page: 0, pageSize: 5 },
+              paginationModel: { page: 0, pageSize: 100 },
             },
           }}
-          pageSizeOptions={[5, 10]}
-          pageSize={10}
+          pageSizeOptions={[5, 10, 20, 50, 100]}
+          pageSize={1000}
           checkboxSelection={
             currentSelectMenu != "git" && currentSelectMenu != "trash"
               ? true
@@ -208,6 +208,7 @@ const Table = forwardRef(
             "& .MuiTablePagination-toolbar": {
               minHeight: 40,
             },
+            height: "calc(80vh - 100px)"
           }}
         />
       </div>
