@@ -9144,6 +9144,13 @@ lib0@^0.2.31, lib0@^0.2.52, lib0@^0.2.74, lib0@^0.2.78, lib0@^0.2.85, lib0@^0.2.
   dependencies:
     isomorphic.js "^0.2.4"
 
+lib0@^0.2.42:
+  version "0.2.99"
+  resolved "https://registry.npmmirror.com/lib0/-/lib0-0.2.99.tgz#80d715dbd75496dabe0a1f5061fbb4ea162d2532"
+  integrity sha512-vwztYuUf1uf/1zQxfzRfO5yzfNKhTtgOByCruuiQQxWQXnPb8Itaube5ylofcV0oM0aKal9Mv+S1s1Ky0UYP1w==
+  dependencies:
+    isomorphic.js "^0.2.4"
+
 lie@~3.3.0:
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/lie/-/lie-3.3.0.tgz#dcf82dee545f46074daf200c7c1c5a08e0f40f6a"
@@ -14379,6 +14386,13 @@ y-leveldb@^0.1.0:
   dependencies:
     level "^6.0.1"
     lib0 "^0.2.31"
+
+y-prosemirror@^1.2.15:
+  version "1.2.15"
+  resolved "https://registry.npmmirror.com/y-prosemirror/-/y-prosemirror-1.2.15.tgz#6062ce96efd7465a3404a5aa1a34fb36a2cf7994"
+  integrity sha512-XDdrytq2M5bIy3qusQvfRclLu2eWZYPA+BbGWAb9FFWEhOB5FCrnzez2vsA+gvAd0FJTAcr89mjJ5g45r0j7TQ==
+  dependencies:
+    lib0 "^0.2.42"
 
 y-protocols@^1.0.5:
   version "1.0.6"

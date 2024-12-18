@@ -3,7 +3,13 @@
  * @Author: Devin
  * @Date: 2024-05-28 13:48:03
  */
-import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useLayoutEffect,
+  useCallback,
+} from "react";
 
 import { LatexEditorContainer } from "@/features/latexEditor/LatexEditorContainer";
 import { initializeLatexEngines } from "@/features/latexCompilation/loadEngines";
@@ -14,7 +20,11 @@ import Layout from "./layout";
 import FileSystem from "./components/fileSystem";
 import { refreshAuth } from "@/services";
 import { useNavigate } from "react-router-dom";
-import { findAllProject, getProjectInfo } from "domain/filesystem";
+import {
+  findAllProject,
+  getProjectInfo,
+  getShareUserStoragePath,
+} from "domain/filesystem";
 import { useFileStore, useUserStore, useEditor } from "store";
 import { ProjectSync } from "@/convergence";
 import { getYDocToken } from "services";
@@ -63,12 +73,18 @@ const Newton = () => {
 
   const [loading, setLoading] = useState(true);
 
-  const initShareProject = async () => {
+  const initShareProject = useCallback(async () => {
+    if (!user?.id) return;
     const projectInfo = await getProjectInfo(currentProjectRoot);
 
     const project = projectInfo?.["rootPath"];
     const roomId = projectInfo?.["userId"];
     const isSync = projectInfo?.["isSync"];
+    let parentDir = getShareUserStoragePath(roomId);
+
+    if (user.id == roomId) {
+      parentDir = ".";
+    }
 
     console.log(projectInfo, isSync, project, roomId, "projectInfo");
 
@@ -104,7 +120,10 @@ const Newton = () => {
       user,
       roomId,
       token,
-      position
+      position,
+      () => {},
+      false,
+      parentDir
     );
 
     await projectSyncClass.setObserveHandler();
@@ -132,7 +151,7 @@ const Newton = () => {
     await Promise.race([waitForSync, timeout]);
 
     updateProjectSync(projectSyncClass.saveState);
-  };
+  }, [user]);
 
   useEffect(() => {
     if (projectSync && editor != null && filepath) {

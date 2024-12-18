@@ -25,10 +25,11 @@ import {
 import FileIcon from "@mui/icons-material/InsertDriveFile";
 import { Box, TextField } from "@mui/material";
 
-import { readFileStats } from "domain/filesystem";
+import { readFileStats, getProjectInfo } from "domain/filesystem";
 import { useFileStore } from "store";
 import ArIcon from "@/components/arIcon";
 import ContextMenu from "@/components/contextMenu";
+import { toast } from "react-toastify";
 
 const LinkedLines = ({
   dirpath,
@@ -205,7 +206,16 @@ const DirectoryLineContent = ({
     // endRenaming();
     handleDirRenameConfirm(value);
   };
-  const handleRename = useCallback(() => {
+  const handleRename = useCallback(async () => {
+    if (root == dirpath) {
+      const projectInfo = await getProjectInfo(root);
+      if (!!projectInfo.isSync) {
+        toast.warning(
+          "This is a shared collaboration project. Renaming is prohibited"
+        );
+        return;
+      }
+    }
     startRenaming({ pathname: dirpath });
   }, [startRenaming, dirpath]);
 
@@ -303,7 +313,7 @@ const DirectoryLineContent = ({
       },
       {
         label: "Rename",
-        command: () => {
+        command: async () => {
           setHovered(false);
           handleRename();
         },
@@ -416,7 +426,7 @@ const DirectoryLineContent = ({
                     onClick={(e) => handleClick(e, dirpath)}
                   >
                     <Pathname ignoreGit={ignoreGit}>
-                      {basename || `${dirpath}`}
+                      {basename || `${path.basename(dirpath)}`}
                     </Pathname>
                   </div>
 

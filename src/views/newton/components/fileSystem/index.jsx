@@ -28,6 +28,7 @@ const FileSystem = () => {
     endRenaming,
     preRenamingDirpath,
     changePreRenamingDirpath,
+    parentDir,
   } = useFileStore((state) => ({
     currentProjectRoot: state.currentProjectRoot,
     changeCurrentProjectRoot: state.changeCurrentProjectRoot,

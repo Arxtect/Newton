@@ -10,6 +10,7 @@ import { toast } from "react-toastify";
 import { useFileStore } from "store";
 import { downloadMultiDirectoryAsZip } from "domain/filesystem";
 import ArMenuRadix from "@/components/arMenuRadix";
+import path from "path";
 
 function ActionBar({
   handleCopy,
@@ -56,7 +57,9 @@ function ActionBar({
   const handleConfirmDelete = async () => {
     console.log(selectedRows, "selectedRows");
     for (let item of selectedRows) {
-      await deleteProject({ dirpath: item.title });
+      await deleteProject({
+        dirpath: path.join(item.parentDir, item.title),
+      });
     }
     getProjectList();
     setDeleteDialogOpen(false);
@@ -167,13 +170,19 @@ function ActionBar({
             {
               label: "Rename",
               onSelect: () => {
-                handleRename(selectedRows?.[0]?.title);
+                handleRename(
+                  selectedRows?.[0]?.title,
+                  selectedRows?.[0]?.parentDir
+                );
               },
             },
             {
               label: "Make a copy",
               onSelect: () => {
-                handleCopy(selectedRows?.[0]?.title);
+                handleCopy(
+                  selectedRows?.[0]?.title,
+                  selectedRows?.[0]?.parentDir
+                );
               },
             },
 

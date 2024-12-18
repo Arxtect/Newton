@@ -108,6 +108,7 @@ const FileLine = ({
     // endRenaming();
     handleRenameConfirm(value);
   };
+  
   const handleRename = useCallback(() => {
     if (!inputRef.current && !filepath) return;
     startRenaming({ pathname: filepath });

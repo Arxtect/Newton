@@ -35,10 +35,13 @@ class ProjectSync {
     token,
     position,
     otherOperation,
-    isLeave = false
+    isLeave = false,
+    parentDir = "."
   ) {
     this.folderMapName = `${rootPath}_folder_map_list_${roomId}`;
     this.rootPath = rootPath;
+    this.parentDir = parentDir;
+    this.currenProjectDir = path.join(this.parentDir, rootPath);
     this.roomId = roomId;
     this.yDoc = new Y.Doc();
 
@@ -99,7 +102,7 @@ class ProjectSync {
   }
 
   async removeProjectSyncInfo() {
-    await FS.removeProjectInfo(this.rootPath);
+    await FS.removeProjectInfo(this.currenProjectDir);
   }
 
   // 设置用户信息到 awareness
@@ -137,19 +140,21 @@ class ProjectSync {
       this.latexSyncToYText = null;
     }
 
-    this.currentFilePath = filePath;
-    this.yText = this.yDoc.getText(filePath);
+    const relativePath = FS.removeParentDirPath(filePath, this.parentDir);
+    console.log(relativePath, "relativePath");
+    this.currentFilePath = relativePath;
+    this.yText = this.yDoc.getText(relativePath);
     this.undoManager = new Y.UndoManager(this.yText);
-    const ext = path.extname(filePath).slice(1).toLowerCase(); // 获取文件扩展名并转换为小写
+    const ext = path.extname(relativePath).slice(1).toLowerCase(); // 获取文件扩展名并转换为小写
 
     if (assetExtensions.includes(ext)) {
       return;
     }
     if (this.aceBinding) {
-      this.aceBinding.updateCurrentFilePath(filePath, editor);
+      this.aceBinding.updateCurrentFilePath(relativePath, editor);
     } else {
       this.aceBinding = new AceBinding(this.awareness);
-      this.aceBinding.init(editor, filePath); // 初始化 AceBinding 实例
+      this.aceBinding.init(editor, relativePath); // 初始化 AceBinding 实例
     }
     this.aceBinding?.handleAwarenessChange &&
       this.aceBinding.handleAwarenessChange(editor);
@@ -178,6 +183,7 @@ class ProjectSync {
       this.yMap.set(filePath, contentToStore);
     });
   }
+
   // 删除文件
   async deleteFile(filePath, otherInfo = {}) {
     this.yDoc.transact(() => {
@@ -196,7 +202,8 @@ class ProjectSync {
         const filePath = path.join(folderPath, file.name); // 使用 path.join 进行路径拼接
 
         if (file.type == "file") {
-          await this.deleteFile(filePath); // 删除文件
+          const relativePath = FS.removeParentDirPath(filePath, this.parentDir);
+          await this.deleteFile(relativePath); // 删除文件
         } else if (file.type == "dir") {
           await this.deleteFolder(filePath); // 递归删除子文件夹
         }
@@ -212,9 +219,11 @@ class ProjectSync {
   async syncFileToYMap(filePath, content) {
     if (filePath.includes(".git")) return;
     try {
-      await this.syncToYMap(filePath, content);
-      if (this.yMap.has(filePath)) return;
-      const folderPath = path.dirname(filePath);
+      const relativePath = FS.removeParentDirPath(filePath, this.parentDir);
+      await this.syncToYMap(relativePath, content);
+      if (this.yMap.has(relativePath)) return;
+      const folderPath = path.dirname(relativePath);
+
       this.syncFolderInfo(folderPath);
     } catch (err) {
       console.error(`Error syncing file ${filePath}:`, err);
@@ -294,15 +303,17 @@ class ProjectSync {
   async handleFolderInfo(folderPath, key, content) {
     if (folderPath.includes(".git")) return;
     const files = await FS.readFileStats(folderPath, false);
+
     const fileNames = new Set(files.map((f) => f.name));
     const contentNames = new Set(content);
-
+    console.log(files, fileNames, "files");
     // 删除 files 中有但 content 中没有的文件夹
     for (const file of files) {
       const filePath = path.join(folderPath, file.name);
       if (file.name.includes(".git")) continue;
       if (file.type == "dir" && !contentNames.has(filePath)) {
-        await this.deleteFolder(filePath);
+        const folderPath = path.join(this.parentDir, filePath);
+        await this.deleteFolder(folderPath);
         console.log(`Deleted folder ${filePath}`);
       }
     }
@@ -310,7 +321,8 @@ class ProjectSync {
     // 创建 content 中有但 files 中没有的文件夹
     for (const folderName of contentNames) {
       if (!fileNames.has(folderName)) {
-        await FS.ensureDir(folderName);
+        const folderPath = path.join(this.parentDir, folderName);
+        await FS.ensureDir(folderPath);
         console.log(`Created folder ${folderName}`);
       }
     }
@@ -333,33 +345,40 @@ class ProjectSync {
         console.log(`Origin is null for key ${key}`, event?.transaction);
         return;
       }
-      const snapshot = Y.snapshot(this.yDoc);
-      console.log(snapshot, "snapshot");
 
       contentSyncedPromises.push(
         new Promise(async (resolve, reject) => {
           const content = this.yMap.get(key);
-
+          const relativePath = path.join(this.parentDir, key);
+          console.log(this.parentDir, relativePath, "this.parentDir");
           try {
             if (key == this.folderMapName) {
-              await FS.ensureDir(this.rootPath);
-              this.handleFolderInfo(this.rootPath, key, content);
+              await FS.ensureDir(this.currenProjectDir);
+
+              this.handleFolderInfo(
+                this.currenProjectDir,
+                relativePath,
+                content
+              );
               resolve();
               return;
             }
 
             if (content?._delete) {
               // 如果内容为空，则删除文件
-              await useFileStore.getState().deleteFile({ filename: key }, true);
+              await useFileStore
+                .getState()
+                .deleteFile({ filename: relativePath }, true);
               resolve();
               return;
             } else {
-              const dirpath = path.dirname(key);
+              const dirpath = path.dirname(relativePath);
               await FS.ensureDir(dirpath);
               const ext = path.extname(key).slice(1).toLowerCase();
               if (assetExtensions.includes(ext)) {
                 // 如果是资产文件类型，则将 Base64 编码的字符串转换回文件数据
-                await downloadFile(content, key);
+                console.log(relativePath, "relativePath");
+                await downloadFile(content, relativePath);
                 resolve();
                 // await downloadFileBinary(key, content);
               } else {
@@ -372,14 +391,14 @@ class ProjectSync {
                   const fileStore = useFileStore.getState();
                   // await fileStore.saveFile(key, content, false);
                   content?.length &&
-                    (await fileStore.saveFile(key, content, false));
+                    (await fileStore.saveFile(relativePath, content, false));
                   resolve();
                 }
               }
             }
           } catch (err) {
             reject(err);
-            console.error(err, key);
+            console.error(err, relativePath);
           }
         })
       );

@@ -10,6 +10,7 @@ import ArDialog from "@/components/arDialog";
 import { TextField, Box } from "@mui/material";
 import { useFileStore } from "store";
 import { toast } from "react-toastify";
+import path from "path";
 
 const CopyProject = ({
   dialogOpen,
@@ -17,6 +18,7 @@ const CopyProject = ({
   setSourceProject,
   getProjectList,
   sourceProject = "",
+  parentDir = ".",
 }) => {
   const [projectName, setProjectName] = useState("");
 
@@ -36,7 +38,9 @@ const CopyProject = ({
       toast.warning("Please enter project name");
       return;
     }
-    copyProject(sourceProject, projectName)
+    const newSourceProject = path.join(parentDir, sourceProject);
+    console.log(newSourceProject, "newSourceProject");
+    copyProject(newSourceProject, projectName)
       .then(() => {
         getProjectList();
         setDialogOpen(false);

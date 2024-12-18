@@ -62,7 +62,6 @@ async function extractLabelsFromTexFiles(fileList, currentProjectRoot) {
     const filepath = path.isAbsolute(file)
       ? file
       : path.join(currentProjectRoot, file);
-
     try {
       const fileContent = await readFile(filepath, "utf-8");
       const labels = extractLabels(fileContent.toString());

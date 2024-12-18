@@ -56,6 +56,14 @@ export const getProjectInfo = async (projectRoot) => {
   }
 };
 
+export const getShareProjectInfo = async (projectRoot, roomId) => {
+  let projectInfo = await getProjectInfo(projectRoot);
+  let newRoomId = projectInfo?.userId ? projectInfo?.userId : roomId;
+  let rootPath = projectInfo?.rootPath ? projectInfo?.rootPath : projectRoot;
+  console.log(projectInfo, newRoomId, rootPath, "newRoomId, newRoomPath");
+  return [newRoomId, rootPath];
+};
+
 // 检查项目信息文件是否存在的函数
 export const projectInfoExists = (filename) => {
   const projectInfoPath = `${projectInfoFileName}`;

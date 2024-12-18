@@ -47,6 +47,7 @@ const Tooltip = ({
         "data-tooltip-id": tooltipId,
         onMouseEnter: handleMouseEnter,
         onMouseLeave: handleMouseLeave,
+        key: uniqueId,
       })}
       <ReactTooltip
         id={tooltipId}
@@ -56,6 +57,7 @@ const Tooltip = ({
         clickable={clickable}
         isOpen={!disabled && isOpen}
         noArrow={noArrow}
+        key={uniqueId + tooltipId}
       >
         {htmlContent && htmlContent}
       </ReactTooltip>

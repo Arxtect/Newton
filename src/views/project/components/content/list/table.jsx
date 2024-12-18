@@ -14,6 +14,7 @@ import { useUserStore, useFileStore } from "@/store";
 import { formatDate } from "@/util";
 import "./index.scss";
 import Action from "./action";
+import path from "path";
 
 const Table = forwardRef(
   (
@@ -88,7 +89,11 @@ const Table = forwardRef(
                     () => {
                       e.stopPropagation();
                       changeCurrentProjectRoot({
-                        projectRoot: params.value,
+                        projectRoot: path.join(
+                          params.row.parentDir,
+                          params.value
+                        ),
+                        parentDir: params.row.parentDir,
                       });
                       navigate(`/newton`);
                     }
@@ -96,7 +101,8 @@ const Table = forwardRef(
                   if (isAuth) return;
                   e.stopPropagation();
                   changeCurrentProjectRoot({
-                    projectRoot: params.value,
+                    projectRoot: path.join(params.row.parentDir, params.value),
+                    parentDir: params.row.parentDir,
                   });
                   navigate(`/newton`);
                 }}

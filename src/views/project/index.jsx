@@ -3,11 +3,10 @@
  * @Author: Devin
  * @Date: 2024-05-28 13:48:03
  */
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, useCallback } from "react";
 import Slide from "./components/slide/index";
 import Content from "./components/content/index";
 import { useUserStore, useFileStore } from "@/store";
-import { useThrottleEffect } from "ahooks";
 import CopyProject from "./components/dialog/copyProject";
 import RenameProject from "./components/dialog/renameProject";
 import Share from "./components/dialog/share";
@@ -25,12 +24,15 @@ import {
   createProjectInfo,
   findAllProjectInfo,
   getProjectInfo,
+  getShareProjectInfo,
+  getShareUserStoragePath,
 } from "domain/filesystem";
 import ArDialog from "@/components/arDialog";
 import { toast } from "react-toastify";
 import { useAuthCallback } from "@/useHooks";
 import { waitForCondition } from "@/util";
 import { ArLoadingOverlay } from "@/components/arLoading";
+import path from "path";
 
 const Project = () => {
   const { user } = useUserStore((state) => ({
@@ -146,29 +148,47 @@ const Project = () => {
   //copy project
   const [sourceProject, setSourceProject] = useState("");
   const [copyDialogOpen, setCopyDialogOpen] = useState(false);
-  const handleCopy = (title) => {
+  const handleCopy = (title, parentDir) => {
     setSourceProject(title);
     setCopyDialogOpen(true);
+    setParentDir(parentDir);
   };
 
   //rename project
+  const [parentDir, setParentDir] = useState(".");
   const [renameSourceProject, setRenameSourceProject] = useState("");
   const [renameDialogOpen, setRenameDialogOpen] = useState(false);
-  const handleRename = (title) => {
+  const handleRename = async (title, parentDir) => {
+    const root = path.join(parentDir, title);
+    const projectInfo = await getProjectInfo(root);
+    if (!!projectInfo.isSync) {
+      toast.warning(
+        "This is a shared collaboration project. Renaming is prohibited"
+      );
+      return;
+    }
     setRenameSourceProject(title);
     setRenameDialogOpen(true);
+    setParentDir(parentDir);
   };
 
   // share project
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [shareProjectName, setShareProjectName] = useState("");
 
-  const controlShare = (project) => {
-    authCallback(() => {
-      setShareProjectName(project);
-      setShareDialogOpen(true);
-    }, "Please login first");
-  };
+  const controlShare = useCallback(
+    (project) => {
+      authCallback(async () => {
+        const [newRoomId, newRoomPath] = await getShareProjectInfo(
+          project,
+          user.id
+        );
+        setShareProjectName(newRoomPath);
+        setShareDialogOpen(true);
+      }, "Please login first");
+    },
+    [authCallback, user]
+  );
 
   // delete project
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -189,26 +209,29 @@ const Project = () => {
     }
   };
   const handleConfirmDelete = async () => {
-    await archivedDeleteProject({ dirpath: deleteProjectName });
+    await archivedDeleteProject({
+      dirpath: path.join(parentDir, deleteProjectName),
+    });
     toast.success("trash project success");
     getProjectList();
     setDeleteDialogOpen(false);
   };
 
   const handleTrashDelete = async () => {
-    await deleteProject({ dirpath: deleteProjectName });
+    await deleteProject({ dirpath: path.join(parentDir, deleteProjectName) });
     toast.success("delete project success");
     getProjectList();
     setDeleteDialogOpen(false);
   };
 
-  const handleDeleteProject = (deleteProjectName) => {
+  const handleDeleteProject = (deleteProjectName, parentDir = ".") => {
     if (!deleteProjectName) {
       toast.error("Please select a project to delete");
       return;
     }
     setDeleteDialogOpen(true);
     setDeleteProjectName(deleteProjectName);
+    setParentDir(parentDir);
   };
 
   // sync project
@@ -218,10 +241,11 @@ const Project = () => {
 
   const [syncParams, setSyncParams] = useState({});
 
-  const handleSyncProject = (syncProjectName, roomId) => {
-    setSyncParams({ roomId, project: syncProjectName });
+  const handleSyncProject = async (syncProjectName, roomId) => {
+    setSyncParams({ roomId: roomId, project: syncProjectName });
     setSyncDialogOpen(true);
   };
+
   const getYDocTokenReq = async (room) => {
     const res = await getYDocToken(room);
     return res;
@@ -230,6 +254,7 @@ const Project = () => {
   const [loading, setLoading] = useState(false);
 
   const handleConfirmSync = async () => {
+    const parentDir = getShareUserStoragePath(syncParams.roomId);
     const { token, position } = await getYDocTokenReq(
       syncParams.project + syncParams.roomId
     );
@@ -240,7 +265,8 @@ const Project = () => {
       token,
       position,
       getProjectList,
-      true
+      true,
+      parentDir
     );
     await projectSync.setObserveHandler();
     setLoading(true);
@@ -321,9 +347,9 @@ const Project = () => {
   const [githubDialogOpen, setGithubDialogOpen] = useState(false);
   const [projectName, setProjectName] = useState("");
 
-  const handleGithub = (open, proejctName) => {
+  const handleGithub = (open, projectName) => {
     setGithubDialogOpen(open);
-    setProjectName(proejctName);
+    setProjectName(projectName);
   };
 
   //get project list
@@ -389,6 +415,7 @@ const Project = () => {
           sourceProject={sourceProject}
           setSourceProject={setSourceProject}
           getProjectList={getProjectList}
+          parentDir={parentDir}
         />
         <RenameProject
           dialogOpen={renameDialogOpen}
@@ -396,6 +423,7 @@ const Project = () => {
           sourceProject={renameSourceProject}
           setSourceProject={setRenameSourceProject}
           getProjectList={getProjectList}
+          parentDir={parentDir}
         />
         <Share
           dialogOpen={shareDialogOpen}

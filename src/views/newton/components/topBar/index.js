@@ -7,7 +7,7 @@ import PublishDocument from "../dialog/publishDocument";
 import historyIcon from "@/assets/history.svg";
 import ViewHistory from "../viewHistory";
 import { useUserStore, useFileStore } from "@/store";
-import { downloadDirectoryAsZip } from "domain/filesystem";
+import { downloadDirectoryAsZip, getProjectInfo } from "domain/filesystem";
 import { useNavigate } from "react-router-dom";
 import { TextField } from "@mui/material";
 
@@ -18,6 +18,7 @@ import Tooltip from "@/components/tooltip";
 import fs from "fs";
 import path from "path";
 import pify from "pify";
+import { toast } from "react-toastify";
 
 const maxDisplayCount = 3; // 最大显示的名字数量
 
@@ -73,6 +74,7 @@ const TopBar = (props) => {
     filepath,
     changeCurrentProjectRoot,
     fileMoved,
+    parentDir,
   } = useFileStore((state) => ({
     shareUserList: state.shareUserList,
     projectSync: state.projectSync,
@@ -81,6 +83,7 @@ const TopBar = (props) => {
     filepath: state.filepath,
     changeCurrentProjectRoot: state.changeCurrentProjectRoot,
     fileMoved: state.fileMoved,
+    parentDir: state.parentDir,
   }));
 
   const handleClick = (type) => {
@@ -90,7 +93,7 @@ const TopBar = (props) => {
       case "History":
         break;
       case "Download":
-        downloadDirectoryAsZip(currentProjectRoot);
+        downloadDirectoryAsZip(path.basename(currentProjectRoot), parentDir);
         break;
       case "Down":
         break;
@@ -113,7 +116,7 @@ const TopBar = (props) => {
   // rename
   const [isEditing, setIsEditing] = useState(false);
 
-  const [value, setValue] = useState(currentProjectRoot);
+  const [value, setValue] = useState(path.basename(currentProjectRoot));
   const inputRef = useRef(null);
 
   const handleChange = (event) => {
@@ -126,24 +129,33 @@ const TopBar = (props) => {
     handleDirRenameConfirm(value);
   };
 
+  useEffect(() => {
+    setValue(path.basename(currentProjectRoot));
+  }, [currentProjectRoot]);
+
   const handleDirRenameConfirm = async (value) => {
     if (!value || value == "") {
       return;
     }
     try {
       // Rename the directory
-      await pify(fs.rename)(currentProjectRoot, value);
 
-      setValue(value);
-      fileMoved({ fromPath: currentProjectRoot, destPath: value });
-      changeCurrentProjectRoot({ projectRoot: value });
+      const newProjectName = path.join(parentDir, value);
+      await pify(fs.rename)(currentProjectRoot, newProjectName);
+
+      setValue(path.basename(newProjectName));
+      fileMoved({ fromPath: currentProjectRoot, destPath: newProjectName });
+      changeCurrentProjectRoot({
+        projectRoot: newProjectName,
+        parentDir: parentDir,
+      });
     } catch (error) {
       console.error("Error renaming directory:", error);
     }
   };
   const handleKeyDown = (ev) => {
     if (ev.key === "Escape") {
-      setValue(changeCurrentProjectRoot);
+      setValue(path.basename(currentProjectRoot));
       setIsEditing(false);
     } else if (ev.key === "Enter") {
       handleDirRenameConfirm(value);
@@ -151,7 +163,14 @@ const TopBar = (props) => {
     }
   };
 
-  const handleEditClick = () => {
+  const handleEditClick = async () => {
+    const projectInfo = await getProjectInfo(currentProjectRoot);
+    if (!!projectInfo.isSync) {
+      toast.warning(
+        "This is a shared collaboration project. Renaming is prohibited"
+      );
+      return;
+    }
     setIsEditing(true);
     setTimeout(() => {
       if (inputRef.current) {
@@ -198,7 +217,7 @@ const TopBar = (props) => {
           ) : (
             <React.Fragment>
               <span className="h-full text-[1rem]  text-center font-arx">
-                {currentProjectRoot}
+                {path.basename(currentProjectRoot)}
               </span>
               <ArIcon
                 name="Edit"

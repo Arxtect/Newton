@@ -16,19 +16,20 @@ export const FILE_STORE = "FILE_STORE";
 
 function removeRootPath(filePath, rootPath) {
   // 标准化路径
-  const normalizedFilePath = path.normalize(filePath);
-  const normalizedRootPath = path.basename(path.normalize(rootPath));
+  // const normalizedFilePath = path.normalize(filePath);
+  // const normalizedRootPath = path.basename(path.normalize(rootPath));
 
-  // 分割路径
-  const pathParts = normalizedFilePath.split(path.sep);
+  // // 分割路径
+  // const pathParts = normalizedFilePath.split(path.sep);
 
-  // 如果第一个部分与 rootPath 的文件夹名相同，则移除
-  if (pathParts[0] === normalizedRootPath) {
-    pathParts.shift();
-  }
+  // // 如果第一个部分与 rootPath 的文件夹名相同，则移除
+  // if (pathParts[0] === normalizedRootPath) {
+  //   pathParts.shift();
+  // }
 
-  // 重新组合路径
-  return pathParts.join(path.sep);
+  // // 重新组合路径
+  // return pathParts.join(path.sep);
+  return filePath.replace(rootPath, "");
 }
 
 function debounce(func, wait) {
@@ -71,6 +72,7 @@ export const useFileStore = create()(
       isDropFileSystem: true,
       shareIsRead: false,
       selectedFiles: [],
+      parentDir: "",
       setSelectedFiles: (filepath) => {
         // 如果传入的是数组就直接使用,否则包装成数组
         set({ selectedFiles: [filepath] });
@@ -120,7 +122,7 @@ export const useFileStore = create()(
         );
 
         let fileList = modifiedFiles.filter((i) => !!i);
-
+        console.log(fileList, "currentProjectRoot2");
         set({ currentProjectFileList: fileList });
         return [fileList, bibFilepathList];
         // await get().changeMainFile(files);
@@ -446,14 +448,18 @@ export const useFileStore = create()(
       changePreRenamingDirpath: ({ dirpath }) => {
         set({ preRenamingDirpath: dirpath });
       },
-      changeCurrentProjectRoot: async ({ projectRoot }) => {
+      changeCurrentProjectRoot: async ({ projectRoot, parentDir = "." }) => {
         // get().changeMainFile(projectRoot);
         set({ projectSync: null });
         if (!projectRoot) {
           return;
         }
         get().initFile();
-        set({ currentProjectRoot: projectRoot, currentSelectDir: projectRoot });
+        set({
+          currentProjectRoot: projectRoot,
+          currentSelectDir: projectRoot,
+          parentDir: parentDir,
+        });
         initializeGitStatus({ projectRoot });
       },
       createProject: async (newProjectRoot) => {

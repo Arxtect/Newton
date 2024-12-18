@@ -12,6 +12,7 @@ import AiTools from "./component/aiTools";
 import useAutoCompile from "./hook";
 import { useEngineStatusStore } from "@/store";
 import FileView from "@/features/fileView";
+import path from "path";
 
 import { TexMathJax, loadExtensions } from "./texMathjax";
 
@@ -29,12 +30,14 @@ const LatexEditor = ({ handleChange, sourceCode, filepath, mainFilepath }) => {
     updateCurrentProjectFileList,
     touchCounter,
     assetsFilePath,
+    parentDir,
   } = useFileStore((state) => ({
     loadFile: state.loadFile,
     currentProjectRoot: state.currentProjectRoot,
     updateCurrentProjectFileList: state.updateCurrentProjectFileList,
     touchCounter: state.touchCounter,
     assetsFilePath: state.assetsFilePath,
+    parentDir: state.parentDir,
   }));
 
   useEffect(() => {
