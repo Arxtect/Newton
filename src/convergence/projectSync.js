@@ -141,7 +141,6 @@ class ProjectSync {
     }
 
     const relativePath = FS.removeParentDirPath(filePath, this.parentDir);
-    console.log(relativePath, "relativePath");
     this.currentFilePath = relativePath;
     this.yText = this.yDoc.getText(relativePath);
     this.undoManager = new Y.UndoManager(this.yText);
@@ -221,7 +220,7 @@ class ProjectSync {
     try {
       const relativePath = FS.removeParentDirPath(filePath, this.parentDir);
       await this.syncToYMap(relativePath, content);
-      if (this.yMap.has(relativePath)) return;
+      // if (this.yMap.has(relativePath)) return;
       const folderPath = path.dirname(relativePath);
 
       this.syncFolderInfo(folderPath);
@@ -237,8 +236,10 @@ class ProjectSync {
     if (folderPath.includes(".git")) return;
     this.yDoc.transact(() => {
       let folderMap = this.yMap.get(this.folderMapName) || [];
+
       folderMap = [...folderMap, folderPath];
-      console.log(folderMap, "folderMap");
+      console.log(folderMap, folderPath, "folderMap");
+
       this.yMap.set(this.folderMapName, [...new Set(folderMap)]);
     });
   }
@@ -271,7 +272,6 @@ class ProjectSync {
         if (file.type === "file") {
           const promise = FS.readFile(filePath).then(async (content) => {
             await this.syncToYMap(filePath, content);
-            console.log("syncPromises3");
           });
           syncPromises.push(promise);
         } else if (file.type === "dir") {
@@ -306,13 +306,15 @@ class ProjectSync {
 
     const fileNames = new Set(files.map((f) => f.name));
     const contentNames = new Set(content);
-    console.log(files, fileNames, "files");
+
     // 删除 files 中有但 content 中没有的文件夹
     for (const file of files) {
       const filePath = path.join(folderPath, file.name);
+      const relativePath = FS.removeParentDirPath(filePath, this.parentDir);
       if (file.name.includes(".git")) continue;
-      if (file.type == "dir" && !contentNames.has(filePath)) {
-        const folderPath = path.join(this.parentDir, filePath);
+
+      if (file.type == "dir" && !contentNames.has(relativePath)) {
+        const folderPath = path.join(this.parentDir, relativePath);
         await this.deleteFolder(folderPath);
         console.log(`Deleted folder ${filePath}`);
       }
@@ -320,17 +322,18 @@ class ProjectSync {
 
     // 创建 content 中有但 files 中没有的文件夹
     for (const folderName of contentNames) {
-      if (!fileNames.has(folderName)) {
-        const folderPath = path.join(this.parentDir, folderName);
+      const folderPath = path.join(this.parentDir, folderName);
+      if (!fileNames.has(folderPath)) {
         await FS.ensureDir(folderPath);
-        console.log(`Created folder ${folderName}`);
+        console.log(`Created folder ${folderPath}`);
       }
     }
 
     // 递归处理子文件夹
     for (const file of files) {
-      if (file.type == "dir" && contentNames.has(file.name)) {
-        const filePath = path.join(folderPath, file.name);
+      const filePath = path.join(folderPath, file.name);
+      const relativePath = FS.removeParentDirPath(filePath, this.parentDir);
+      if (file.type == "dir" && contentNames.has(relativePath)) {
         await this.handleFolderInfo(filePath, key, content);
       }
     }
@@ -377,7 +380,6 @@ class ProjectSync {
               const ext = path.extname(key).slice(1).toLowerCase();
               if (assetExtensions.includes(ext)) {
                 // 如果是资产文件类型，则将 Base64 编码的字符串转换回文件数据
-                console.log(relativePath, "relativePath");
                 await downloadFile(content, relativePath);
                 resolve();
                 // await downloadFileBinary(key, content);

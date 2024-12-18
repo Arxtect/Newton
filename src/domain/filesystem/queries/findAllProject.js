@@ -27,7 +27,7 @@ export async function findAllProject(currentDir = ".") {
     const dirPromises = entries.map(async (entry) => {
       const entryPath = path.join(currentDir, entry);
       const stat = await pify(fs.stat)(entryPath);
-      console.log(stat);
+
       // 如果条目是一个目录，返回其名称，否则返回null
       return stat.isDirectory() ? entry : null;
     });
@@ -80,6 +80,11 @@ export async function findAllProjectInfo(currentDir = ".") {
       const tasks = entries.map(async (entry) => {
         const entryPath = path.join(currentDir, entry);
         const stat = await pify(fs.stat)(entryPath);
+
+        if (!stat.isDirectory()) {
+          return;
+        }
+
         let projectInfo = await getProjectInfo(entryPath);
 
         if (!projectInfo || JSON.stringify(projectInfo) === "{}") {
@@ -87,12 +92,7 @@ export async function findAllProjectInfo(currentDir = ".") {
           projectInfo = await getProjectInfo(entryPath);
         }
 
-        if (!stat.isDirectory()) {
-          return;
-        }
-
         if (isShareProjectStorage(entry)) {
-          console.log(entryPath, "entryPath");
           return getAllProject(entryPath); // 确保返回 Promise
         }
 
@@ -101,7 +101,7 @@ export async function findAllProjectInfo(currentDir = ".") {
         if (isExpired) {
           return;
         }
-        console.log(currentDir, "entryPath2", title);
+
         const lastModified = await getLastModified(entryPath);
         project.push({
           ...stat,
@@ -126,29 +126,28 @@ export async function findAllProjectInfo(currentDir = ".") {
   }
 }
 
+export function removeParentDirPath(filePath, parentDir) {
+  // Normalize parentDir
+  const normalizedParentDir = path.normalize(parentDir);
 
- export function removeParentDirPath(filePath, parentDir) {
-    // Normalize parentDir
-    const normalizedParentDir = path.normalize(parentDir);
+  // Log the normalized parentDir
+  console.log(`Normalized Parent Dir: ${normalizedParentDir}`);
 
-    // Log the normalized parentDir
-    console.log(`Normalized Parent Dir: ${normalizedParentDir}`);
-
-    // Check if parentDir is "."
-    if (normalizedParentDir === path.normalize(".")) {
-      return filePath;
-    }
-
-    // Normalize file paths
-    const normalizedFilePath = path.normalize(filePath);
-    const normalizedRootPath = path.normalize(parentDir);
-
-    // Get relative path
-    const relativePath = path.relative(normalizedRootPath, normalizedFilePath);
-
-    console.log(
-      `Relative Path: ${relativePath}, Root Path: ${normalizedRootPath}, File Path: ${normalizedFilePath}, Parent Dir: ${normalizedParentDir}`
-    );
-
-    return relativePath;
+  // Check if parentDir is "."
+  if (normalizedParentDir === path.normalize(".")) {
+    return filePath;
   }
+
+  // Normalize file paths
+  const normalizedFilePath = path.normalize(filePath);
+  const normalizedRootPath = path.normalize(parentDir);
+
+  // Get relative path
+  const relativePath = path.relative(normalizedRootPath, normalizedFilePath);
+
+  console.log(
+    `Relative Path: ${relativePath}, Root Path: ${normalizedRootPath}, File Path: ${normalizedFilePath}, Parent Dir: ${normalizedParentDir}`
+  );
+
+  return relativePath;
+}
