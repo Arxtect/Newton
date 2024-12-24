@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import AceEditor from "react-ace";
 import "ace-builds/src-noconflict/mode-latex";
 import "ace-builds/src-min-noconflict/ext-language_tools";
@@ -9,8 +9,9 @@ import AutoCompleteManager from "@/features/autoComplete/AutoCompleteManager";
 
 import EditorStateManager from "./component/editorStateManager"; // Import the class
 import AiTools from "./component/aiTools";
+import AiAutoComplete from "./component/aiAutoComplete";
 import useAutoCompile from "./hook";
-import { useEngineStatusStore } from "@/store";
+import { useEngineStatusStore, useLayout } from "@/store";
 import FileView from "@/features/fileView";
 import path from "path";
 
@@ -163,6 +164,9 @@ const LatexEditor = ({ handleChange, sourceCode, filepath, mainFilepath }) => {
       {latexRef?.current?.editor && (
         <AiTools editor={latexRef.current.editor} completer={completer} />
       )}
+      {/* {latexRef?.current?.editor && (
+        <AiAutoComplete editor={latexRef.current.editor} />
+      )} */}
       {!!assetsFilePath && <FileView filename={assetsFilePath} />}
       <TexMathJax latexRef={latexRef} />
     </div>
