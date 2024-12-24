@@ -21,7 +21,10 @@ import {
   useEngineStatusStore,
   useCompileSetting,
 } from "store";
-import { compileLatex } from "@/features/latexCompilation/latexCompilation";
+import {
+  compileLatex,
+  graceCloseCompiler,
+} from "@/features/latexCompilation/latexCompilation";
 import { EngineStatus } from "@/features/engineStatus/EngineStatus";
 import UploadFiles from "./uploadFiles";
 import * as constant from "@/constant";
@@ -86,7 +89,6 @@ const ContentTopBar = (props) => {
   // useEffect(() => {
   //   initializeDefaults(compileSetting);
   // }, []);
-
 
   const handleActionClick = (key) => {
     switch (key) {
@@ -180,6 +182,12 @@ const ContentTopBar = (props) => {
     ].filter(Boolean);
   }, []);
 
+  useEffect(() => {
+    return () => {
+      graceCloseCompiler();
+    };
+  }, []);
+
   return (
     <div className="flex items-center justify-between bg-[#e8f9ef] w-full">
       <div className="flex items-center pl-2 w-1/2 ">
@@ -249,7 +257,7 @@ const ContentTopBar = (props) => {
                   color="#inherit"
                   aria-label="toggleView"
                   size="small"
-                  
+
                   // onClick={() => icon.click(icon.key)}
                 >
                   <ArIcon

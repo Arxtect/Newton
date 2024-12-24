@@ -76,13 +76,16 @@ const Table = forwardRef(
               return <span className="font-[500]">{params.value}</span>;
             }
             return (
-              <div
+              <a
+                href={window.origin + `/#/newton`}
                 style={{ cursor: "pointer", color: "inherit" }}
                 onMouseOver={(e) =>
                   (e.target.style.textDecoration = "underline")
                 }
                 onMouseOut={(e) => (e.target.style.textDecoration = "none")}
                 onClick={async (e) => {
+                  e.preventDefault(); // 阻止默认行为，仅用于正常点击
+
                   const isAuth = auth(
                     params.row.name != "YOU" &&
                       (!user || JSON.stringify(user) === "{}"),
@@ -106,9 +109,25 @@ const Table = forwardRef(
                   });
                   navigate(`/newton`);
                 }}
+                onContextMenu={(e) => {
+                  if (
+                    params.row.name != "YOU" &&
+                    (!user || JSON.stringify(user) === "{}")
+                  ) {
+                    e.preventDefault(); // 阻止默认的上下文菜单
+                  } else {
+                    changeCurrentProjectRoot({
+                      projectRoot: path.join(
+                        params.row.parentDir,
+                        params.value
+                      ),
+                      parentDir: params.row.parentDir,
+                    });
+                  }
+                }}
               >
                 <span className="text-[#22c55e]">{params.value}</span>
-              </div>
+              </a>
             );
           },
         },
@@ -214,7 +233,7 @@ const Table = forwardRef(
             "& .MuiTablePagination-toolbar": {
               minHeight: 40,
             },
-            height: "calc(80vh - 100px)"
+            maxHeight: "calc(60vh)",
           }}
         />
       </div>

@@ -219,11 +219,12 @@ class ProjectSync {
     if (filePath.includes(".git")) return;
     try {
       const relativePath = FS.removeParentDirPath(filePath, this.parentDir);
-      await this.syncToYMap(relativePath, content);
-      // if (this.yMap.has(relativePath)) return;
-      const folderPath = path.dirname(relativePath);
+      if (!this.yMap.has(relativePath)) {
+        const folderPath = path.dirname(relativePath);
+        this.syncFolderInfo(folderPath);
+      }
 
-      this.syncFolderInfo(folderPath);
+      await this.syncToYMap(relativePath, content);
     } catch (err) {
       console.error(`Error syncing file ${filePath}:`, err);
       throw err;
@@ -344,6 +345,7 @@ class ProjectSync {
     let contentSyncedPromises = [];
 
     event.keysChanged.forEach((key) => {
+      console.log(key, "changeKey");
       if (event?.transaction?.origin == null) {
         console.log(`Origin is null for key ${key}`, event?.transaction);
         return;
@@ -404,6 +406,13 @@ class ProjectSync {
           }
         })
       );
+
+      // 非project不等待
+      if (!this.isLeave) {
+        this.isInitialSyncComplete = true; // 标记初始同步完成
+        this.changeInitial();
+      }
+
       if (event.keysChanged.size == contentSyncedPromises.length) {
         Promise.all(contentSyncedPromises).then(() => {
           this.otherOperation && this.otherOperation();

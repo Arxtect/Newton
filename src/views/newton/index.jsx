@@ -133,7 +133,7 @@ const Newton = () => {
           resolve();
           setLoading(false);
         } else {
-          setTimeout(checkSyncComplete, 100);
+          setTimeout(checkSyncComplete, 50);
         }
       };
       checkSyncComplete();

@@ -123,6 +123,13 @@ const DirectoryLineContent = ({
   const [hovered, setHovered] = useState(false);
 
   useEffect(() => {
+      console.log("Effect triggered by:", {
+        dirpath,
+        root,
+        opened,
+        touchCounter,
+      });
+
     let unmounted = false;
 
     const updateChildren = async () => {
