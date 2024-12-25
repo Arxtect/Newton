@@ -1,5 +1,4 @@
 import { memo } from 'react'
-// import { formatNumber } from '@/utils/format'
 
 const More = ({ more }) => {
 

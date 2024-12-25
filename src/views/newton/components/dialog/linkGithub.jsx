@@ -23,7 +23,7 @@ import BottomDrawer from "@/features/bottomDrawer/bottomDrawer";
 import ArIcon from "@/components/arIcon";
 
 import { getGitToken, createGitRepo, deleteGitRepo } from "@/services";
-import { getGiteaFullUrl, formatRepoName } from "@/util";
+import { getGiteaFullUrl, formatRepoName } from "@/utils";
 
 const GithubProgressBar = ({ progress, messages }) => {
   return (

@@ -32,7 +32,7 @@ import {
 } from "@/services";
 import { useCopyToClipboard } from "@/useHooks";
 import Tooltip from "@/components/tooltip";
-import { waitForCondition } from "@/util";
+import { waitForCondition } from "@/utils";
 
 const Share = forwardRef(({ rootPath, user }, ref) => {
   const [dialogOpen, setDialogOpen] = useState(false);

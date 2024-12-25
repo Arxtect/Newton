@@ -15,7 +15,7 @@ import { getPreviewPdfUrl, getDocumentById } from "services";
 import { useFileStore, useUserStore } from "store";
 import { uploadZip } from "domain/filesystem";
 import { useNavigate } from "react-router-dom";
-import { getPreViewUrl } from "@/util";
+import { getPreViewUrl } from "@/utils";
 import ArLoadingButton from "@/components/arLoadingButton";
 
 const DocumentDetails = () => {

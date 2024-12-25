@@ -5,7 +5,7 @@
  */
 import React, { useRef, useState } from "react";
 import { Tooltip as ReactTooltip } from "react-tooltip";
-import { randomString } from "@/util";
+import { randomString } from "@/utils";
 import "react-tooltip/dist/react-tooltip.css";
 
 const Tooltip = ({

@@ -11,7 +11,7 @@ import React, {
 import { useNavigate } from "react-router-dom";
 import { DataGrid } from "@mui/x-data-grid";
 import { useUserStore, useFileStore } from "@/store";
-import { formatDate } from "@/util";
+import { formatDate } from "@/utils";
 import "./index.scss";
 import Action from "./action";
 import path from "path";

@@ -1,11 +1,11 @@
 /*
- * @Description: 
+ * @Description:
  * @Author: Devin
  * @Date: 2024-05-28 13:48:03
  */
 import * as git from "isomorphic-git";
 import * as Parser from "../queries/parseStatusMatrix";
-import { gitCommandSuccess, gitCommandError } from "@/util";
+import { gitCommandSuccess, gitCommandError } from "@/utils";
 import fs from "fs";
 import { getAuthor } from "./gitAuth";
 import { getInfoProjectName } from "domain/filesystem";
@@ -25,14 +25,14 @@ export async function commitAll(root, message, author) {
   for (const filepath of modified) {
     console.log(filepath, "filepath");
     if (filepath == getInfoProjectName()) {
-      continue
+      continue;
     }
     if (removable.includes(filepath)) {
-      await git.remove({fs, dir: root, filepath });
+      await git.remove({ fs, dir: root, filepath });
     } else {
       // TODO: Why?????
       if (filepath) {
-        await git.add({ fs,dir: root, filepath });
+        await git.add({ fs, dir: root, filepath });
       }
     }
   }

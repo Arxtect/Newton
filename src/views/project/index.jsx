@@ -30,7 +30,7 @@ import {
 import ArDialog from "@/components/arDialog";
 import { toast } from "react-toastify";
 import { useAuthCallback } from "@/useHooks";
-import { waitForCondition } from "@/util";
+import { waitForCondition } from "@/utils";
 import { ArLoadingOverlay } from "@/components/arLoading";
 import path from "path";
 

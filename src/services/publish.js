@@ -5,7 +5,7 @@
  */
 import { toast } from "react-toastify"; // 假设你已经安装了react-toastify
 import { refreshAuth } from "./auth";
-import { setCookie, deleteCookie, pdfToImageFirst } from "@/util";
+import { setCookie, deleteCookie, pdfToImageFirst } from "@/utils";
 import { updateAccessToken } from "store";
 import { apiFetch } from "./apiFetch.js";
 

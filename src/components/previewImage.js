@@ -5,7 +5,7 @@
  */
 import React, { useState, useEffect } from "react";
 import Skeleton from "@mui/material/Skeleton";
-import { getPreViewUrl } from "@/util";
+import { getPreViewUrl } from "@/utils";
 const PreviewImage = ({ pageImage, height = 250, ...res }) => {
   return (
     <React.Fragment>

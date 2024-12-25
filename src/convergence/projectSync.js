@@ -16,7 +16,7 @@ import {
   downloadFileBinary,
 } from "./minio";
 import { assetExtensions } from "@/constant";
-import { debounce, getColors } from "@/util";
+import { debounce, getColors } from "@/utils";
 import { toast } from "react-toastify";
 import { LatexSyncToYText } from "./latexSyncToYText";
 

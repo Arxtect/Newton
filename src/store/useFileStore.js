@@ -6,11 +6,14 @@ import {
   initializeGitStatus,
   updateStatusMatrixOnSaveFile,
 } from "./useGitRepo";
-import { savePdfToIndexedDB, getPdfFromIndexedDB } from "@/util";
+import {
+  savePdfToIndexedDB,
+  getPdfFromIndexedDB,
+  isAssetExtension,
+} from "@/utils";
 import { useUserStore } from "./useUserStore";
 import { ProjectSync } from "@/convergence";
 import { useEditor } from "./useEditor";
-import { isAssetExtension } from "@/util";
 
 export const FILE_STORE = "FILE_STORE";
 

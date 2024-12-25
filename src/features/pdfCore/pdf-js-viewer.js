@@ -1,5 +1,5 @@
 import { memo, useCallback, useEffect, useRef, useState } from "react";
-import { debounce, throttle } from "@/util";
+import { debounce, throttle } from "@/utils";
 // import PdfViewerControlsToolbar from "./pdf-viewer-controls-toolbar";
 // import { useProjectContext } from "../../../shared/context/project-context";
 // import { buildHighlightElement } from "../util/highlights";

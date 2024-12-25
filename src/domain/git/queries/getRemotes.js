@@ -6,7 +6,7 @@
 import fs from "fs";
 import path from "path";
 import pify from "pify";
-import { parseGitConfig } from "@/util";
+import { parseGitConfig } from "@/utils";
 
 export async function getRemotes(projectRoot) {
   try {

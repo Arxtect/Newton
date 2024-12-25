@@ -6,7 +6,7 @@
 import crypto from "crypto-js";
 import path from "path";
 import { writeFile } from "domain/filesystem";
-import { getMimeType } from "@/util";
+import { getMimeType } from "@/utils";
 import {
   uploadToS3,
   downloadFileFromS3,

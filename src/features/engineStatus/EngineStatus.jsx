@@ -7,7 +7,7 @@ import { useRef, useState, useEffect } from "react";
 import { usePdfPreviewStore, useEngineStatusStore } from "store";
 import * as constant from "@/constant";
 import RotatingIcon from "./RotatingIconButton";
-import { randomString } from "@/util";
+import { randomString } from "@/utils";
 import Tooltip from "@/components/tooltip";
 import ArIcon from "@/components/arIcon";
 

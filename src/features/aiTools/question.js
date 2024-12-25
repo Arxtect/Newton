@@ -7,7 +7,7 @@ import { memo } from "react";
 import questionTriangle from "@/assets/chat/questionTriangle.svg";
 import { Markdown } from "./markdown";
 import ImageGallery from "./image-uploader/image-gallery";
-import { getFirstNUpperCaseChars } from "@/util";
+import { getFirstNUpperCaseChars } from "@/utils";
 
 const Question = ({ item, questionIcon, theme, user }) => {
   const { content, message_files } = item;

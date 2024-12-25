@@ -13,7 +13,7 @@ import { TextField } from "@mui/material";
 
 import ArIcon from "@/components/arIcon";
 
-import { getColors, getFirstNUpperCaseChars } from "@/util";
+import { getColors, getFirstNUpperCaseChars } from "@/utils";
 import Tooltip from "@/components/tooltip";
 import fs from "fs";
 import path from "path";
