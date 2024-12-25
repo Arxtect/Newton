@@ -457,7 +457,7 @@ const Project = () => {
         >
           <ArLoadingOverlay text="Synchronizing" loading={loading}>
             <div className="text-gray-500 mr-1 ml-2 h-12 flex items-center">
-              You are accepting this invite as <i>{user?.email}</i>
+              You are accepting this invite as&nbsp;<i>{user?.email}</i>
             </div>
           </ArLoadingOverlay>
         </ArDialog>

@@ -355,7 +355,7 @@ class ProjectSync {
         new Promise(async (resolve, reject) => {
           const content = this.yMap.get(key);
           const relativePath = path.join(this.parentDir, key);
-          console.log(this.parentDir, relativePath, "this.parentDir");
+
           try {
             if (key == this.folderMapName) {
               await FS.ensureDir(this.currenProjectDir);

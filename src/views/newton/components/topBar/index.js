@@ -202,7 +202,6 @@ const TopBar = (props) => {
       </div>
       <div
         className="h-full group flex justify-center items-center text-center w-2/5 text-[0.9rem]"
-        title={currentProjectRoot}
         onDoubleClick={handleEditClick}
       >
         <div className="flex items-center justify-center w-4/5 text-ellipsis whitespace-nowrap overflow-hidden relative">
@@ -216,9 +215,12 @@ const TopBar = (props) => {
             />
           ) : (
             <React.Fragment>
-              <span className="h-full text-[1rem]  text-center font-arx">
+              <div
+                className="h-full text-[1rem] text-center font-arx text-ellipsis overflow-hidden"
+                title={path.basename(currentProjectRoot)}
+              >
                 {path.basename(currentProjectRoot)}
-              </span>
+              </div>
               <ArIcon
                 name="Edit"
                 className="ml-2 w-4 h-4 opacity-0 group-hover:opacity-100 cursor-pointer"

@@ -182,6 +182,8 @@ const Table = forwardRef(
     }, [user, currentSelectMenu]);
 
     const [calculatedColumns, setCalculatedColumns] = useState([]);
+    const gridRef = useRef(null);
+    const [tableHeight, setTableHeight] = useState("80vh");
 
     useLayoutEffect(() => {
       const updateColumns = () => {
@@ -196,6 +198,11 @@ const Table = forwardRef(
             width: (viewportWidth * 0.7 * column.width) / totalWidth,
           }))
         );
+        if (gridRef.current) {
+          const offsetTop = gridRef.current.getBoundingClientRect().top;
+          const newHeight = `calc(100vh - ${offsetTop}px - 10px) `;
+          setTableHeight(newHeight);
+        }
       };
       updateColumns();
       window.addEventListener("resize", updateColumns);
@@ -204,7 +211,7 @@ const Table = forwardRef(
     }, [columns, user]);
 
     return (
-      <div>
+      <div ref={gridRef}>
         <DataGrid
           rows={sortedRows}
           columns={calculatedColumns}
@@ -233,7 +240,7 @@ const Table = forwardRef(
             "& .MuiTablePagination-toolbar": {
               minHeight: 40,
             },
-            maxHeight: "calc(60vh)",
+            maxHeight: tableHeight,
           }}
         />
       </div>
