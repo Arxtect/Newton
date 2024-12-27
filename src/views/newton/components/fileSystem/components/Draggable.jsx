@@ -5,7 +5,6 @@ import path from "path";
 import pify from "pify";
 import onExternalDrop from "./uploadFuntion";
 import { useFileStore } from "store";
-import { useDraggable, useDroppable } from "../hooks/draggable";
 import { getEmptyImage, NativeTypes } from "react-dnd-html5-backend";
 
 const DND_GROUP = "ENTITY";
