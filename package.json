@@ -101,6 +101,7 @@
     "react-file-viewer": "^1.2.1",
     "react-hook-form": "^7.50.0",
     "react-icons": "^5.2.1",
+    "@uppy/utils": "^5.7.0",
     "react-markdown": "^8.0.6",
     "react-pdf": "^9.1.0",
     "react-refresh": "^0.11.0",

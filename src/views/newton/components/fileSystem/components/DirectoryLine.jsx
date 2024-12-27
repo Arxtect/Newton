@@ -29,6 +29,9 @@ import { readFileStats } from "domain/filesystem";
 import { useFileStore } from "store";
 import ArIcon from "@/components/arIcon";
 import ContextMenu from "@/components/contextMenu";
+import FileTreeDraggablePreviewLayer from "./fileDraggablePreviewLayer";
+
+import { useDragDropManager, useDragLayer } from "react-dnd";
 
 const LinkedLines = ({
   dirpath,
@@ -487,7 +490,18 @@ const DirectoryLineContent = ({
 };
 
 const DirectoryLine = (props) => {
-  return <DirectoryLineContent {...props} />;
+  const dragLayer = useDragLayer((monitor) => ({
+    isDragging: monitor.isDragging(),
+    item: monitor.getItem(),
+    clientOffset: monitor.getClientOffset(),
+  }));
+
+  return (
+    <React.Fragment>
+      <FileTreeDraggablePreviewLayer {...dragLayer} />
+      <DirectoryLineContent {...props} />
+    </React.Fragment>
+  );
 };
 
 export default DirectoryLine;

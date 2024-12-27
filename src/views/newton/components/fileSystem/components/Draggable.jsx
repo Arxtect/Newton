@@ -5,21 +5,23 @@ import path from "path";
 import pify from "pify";
 import onExternalDrop from "./uploadFuntion";
 import { useFileStore } from "store";
+import { useDraggable, useDroppable } from "../hooks/draggable";
+import { getEmptyImage, NativeTypes } from "react-dnd-html5-backend";
 
-
-const DND_GROUP = "browser";
+const DND_GROUP = "ENTITY";
 
 async function moveItem(from, to) {
   if (from.pathname === to.pathname) {
     return;
   }
-  
+
   const fromPath = from.pathname;
   const basename = path.basename(from.pathname);
-  const destPath = to.type === "dir" 
-    ? path.join(to.pathname, basename)
-    : path.join(path.dirname(to.pathname), basename);
-    
+  const destPath =
+    to.type === "dir"
+      ? path.join(to.pathname, basename)
+      : path.join(path.dirname(to.pathname), basename);
+
   await pify(fs.rename)(fromPath, destPath);
   return {
     fromPath,
@@ -27,21 +29,47 @@ async function moveItem(from, to) {
   };
 }
 
-const DraggableItem = ({ children, isEnabled, externalHover, ...props }) => {
+const DraggableItem = ({
+  children,
+  isEnabled,
+  externalHover,
+  setIsDraggable,
+  ...props
+}) => {
   // Set up drag functionality
-  const {selectedFiles, currentSelectDir} = useFileStore((state) => ({selectedFiles: state.selectedFiles,currentSelectDir: state.currentSelectDir,}));
-  const [{ isDragging }, dragRef] = useDrag({
+
+  const [{ isDragging }, dragRef, preview] = useDrag({
     type: DND_GROUP,
-    item: () => {
-      console.log("Begin drag:", props);
-      return {items: [props]};
-      // if (props.type === "dir") {
-      //   return { items: [props] };
-      // }
-      // props.onDrag();
-      // const group = props.getGroup();
-      // console.log("current group", group);
-      // return { items: [...group] };
+    // item: () => {
+    //   console.log("Begin drag:", props);
+    //   return { items: [props] };
+    // if (props.type === "dir") {
+    //   return { items: [props] };
+    // }
+    // props.onDrag();
+    // const group = props.getGroup();
+    // console.log("current group", group);
+    // return { items: [...group] };
+    // },
+    item() {
+      const group = props.getGroup();
+      console.log("current group", group);
+      return {
+        type: DND_GROUP,
+        title:
+          group?.length > 1
+            ? `${group.length} items`
+            : path.basename(props.pathname),
+        items: [props],
+      };
+    },
+    end(item, monitor) {
+      if (monitor.didDrop()) {
+        const result = monitor.getDropResult();
+        if (result) {
+          console.log(result); // TODO: use result.dropEffect
+        }
+      }
     },
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
@@ -50,7 +78,7 @@ const DraggableItem = ({ children, isEnabled, externalHover, ...props }) => {
 
   // Set up drop functionality
   const [{ isOver }, dropRef] = useDrop({
-    accept: DND_GROUP,
+    accept: [DND_GROUP, NativeTypes.FILE],
     drop: (dragProps, monitor) => {
       if (monitor) {
         console.log("dragProps", dragProps);
@@ -64,6 +92,7 @@ const DraggableItem = ({ children, isEnabled, externalHover, ...props }) => {
         });
       }
     },
+
     hover: (item, monitor) => {
       if (monitor.isOver()) {
         const event = monitor.getClientOffset();
@@ -81,9 +110,12 @@ const DraggableItem = ({ children, isEnabled, externalHover, ...props }) => {
   const ref = useRef(null);
   dragRef(dropRef(ref));
 
+  useEffect(() => {
+    preview(getEmptyImage());
+  }, [preview]);
+
   const opacity = isDragging ? 0.4 : 1;
   const backgroundColor = isOver || externalHover ? "#eaf6ea" : "";
-  const dragItemCount = 1;
 
   return (
     <div
@@ -96,20 +128,6 @@ const DraggableItem = ({ children, isEnabled, externalHover, ...props }) => {
       }}
     >
       {children}
-      {isDragging && (
-        <div 
-          style={{ 
-            position: "absolute", 
-            top: 0, 
-            right: 0, 
-            background: "rgba(255,255,255,0.8)", 
-            padding: "2px 5px", 
-            borderRadius: "5px" 
-          }}
-        >
-          {dragItemCount} {dragItemCount > 1 ? "items" : "item"} dragging
-        </div>
-      )}
     </div>
   );
 };
@@ -166,6 +184,8 @@ const DraggableAndDroppable = ({
       }
     };
   }, [props.pathname, props.type, projectSync, reload]);
+
+  // const { dragRef, setIsDraggable } = useDraggable(props.pathname);
 
   return (
     <div id={props.pathname}>
