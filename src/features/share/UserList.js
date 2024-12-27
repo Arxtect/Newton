@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
-import {getColors} from "@/util"
+import {getColors} from "@/utils"
 import Permission from "./Permission"; 
 import { toast } from "react-toastify";
 

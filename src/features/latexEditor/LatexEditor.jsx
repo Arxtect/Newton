@@ -1,20 +1,21 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import AceEditor from "react-ace";
 import "ace-builds/src-noconflict/mode-latex";
 import "ace-builds/src-min-noconflict/ext-language_tools";
 import "ace-builds/src-min-noconflict/ext-searchbox";
 
-import { useEditor, useFileStore } from "@/store";
+import { useEditor, useFileStore, usePdfPreviewStore } from "@/store";
 import AutoCompleteManager from "@/features/autoComplete/AutoCompleteManager";
 
 import EditorStateManager from "./component/editorStateManager"; // Import the class
 import AiTools from "./component/aiTools";
+import AiAutoComplete from "./component/aiAutoComplete";
 import useAutoCompile from "./hook";
-import { useEngineStatusStore } from "@/store";
+import { useEngineStatusStore, useLayout } from "@/store";
 import FileView from "@/features/fileView";
+import path from "path";
 
-import {TexMathJax, loadExtensions } from "./texMathjax";
-
+import { TexMathJax, loadExtensions } from "./texMathjax";
 
 const LatexEditor = ({ handleChange, sourceCode, filepath, mainFilepath }) => {
   const latexRef = useRef(null);
@@ -24,18 +25,26 @@ const LatexEditor = ({ handleChange, sourceCode, filepath, mainFilepath }) => {
     updateEditor: state.updateEditor,
   }));
 
+  const { setCompiledPdfUrl } = usePdfPreviewStore((state) => ({
+    setCompiledPdfUrl: state.setCompiledPdfUrl,
+  }));
+
   const {
     loadFile,
     currentProjectRoot,
     updateCurrentProjectFileList,
     touchCounter,
     assetsFilePath,
+    parentDir,
+    getCurrentProjectPdf,
   } = useFileStore((state) => ({
     loadFile: state.loadFile,
     currentProjectRoot: state.currentProjectRoot,
     updateCurrentProjectFileList: state.updateCurrentProjectFileList,
     touchCounter: state.touchCounter,
     assetsFilePath: state.assetsFilePath,
+    parentDir: state.parentDir,
+    getCurrentProjectPdf: state.getCurrentProjectPdf,
   }));
 
   useEffect(() => {
@@ -49,11 +58,6 @@ const LatexEditor = ({ handleChange, sourceCode, filepath, mainFilepath }) => {
       updateEditor(null);
     };
   }, [latexRef]);
-
-  useEffect(() => {
-    if (!editor || !mainFilepath) return;
-    loadFile({ filepath: mainFilepath });
-  }, [editor]);
 
   const [isSetupCompleter, setIsSetupCompleter] = useState(false);
   const [completer, setCompleter] = useState(null);
@@ -90,6 +94,13 @@ const LatexEditor = ({ handleChange, sourceCode, filepath, mainFilepath }) => {
   }, [filepath, currentProjectRoot, touchCounter]);
 
   useEffect(() => {
+    (async () => {
+      const blobUrl = await getCurrentProjectPdf(currentProjectRoot);
+      if (blobUrl) {
+        setCompiledPdfUrl(blobUrl);
+      }
+    })();
+
     return () => {
       completer &&
         completer.offAddEventListener &&
@@ -128,9 +139,6 @@ const LatexEditor = ({ handleChange, sourceCode, filepath, mainFilepath }) => {
     setIsTriggerCompile(true);
   };
 
-
-
-
   return (
     <div className="h-full relative" id="editor">
       <AceEditor
@@ -156,8 +164,11 @@ const LatexEditor = ({ handleChange, sourceCode, filepath, mainFilepath }) => {
       {latexRef?.current?.editor && (
         <AiTools editor={latexRef.current.editor} completer={completer} />
       )}
+      {/* {latexRef?.current?.editor && (
+        <AiAutoComplete editor={latexRef.current.editor} />
+      )} */}
       {!!assetsFilePath && <FileView filename={assetsFilePath} />}
-      <TexMathJax latexRef={latexRef}/>
+      <TexMathJax latexRef={latexRef} />
     </div>
   );
 };

@@ -259,3 +259,15 @@ export const compileLatex = async (
     }
   }
 };
+
+export const graceCloseCompiler = () => {
+  // if (pdftexEngine) {
+  //   pdftexEngine.closeWorker();
+  // }
+  // if (xetexEngine) {
+  //   xetexEngine.closeWorker();
+  // }
+  // if (dviEngine) {
+  //   dviEngine.closeWorker();
+  // }
+};

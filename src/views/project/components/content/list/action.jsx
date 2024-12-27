@@ -20,6 +20,7 @@ import { toast } from "react-toastify";
 import { useFileStore } from "@/store";
 import ArIcon from "@/components/arIcon";
 import { useAuthCallback } from "@/useHooks";
+import path from "path";
 
 const HoverAction = forwardRef(
   ({ item, getProjectList, handleGithub, user, ...props }, ref) => {
@@ -100,7 +101,7 @@ const HoverAction = forwardRef(
                 size="small"
                 onClick={(e) => {
                   e.stopPropagation();
-                  restoreProject(item.title);
+                  restoreProject(path.join(item.parentDir, item.title));
                 }}
               >
                 <ArIcon name={"Restore"} className="text-black w-4 h-4" />
@@ -111,7 +112,7 @@ const HoverAction = forwardRef(
                 size="small"
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleDeleteProject(item.title);
+                  handleDeleteProject(item.title, item.parentDir);
                   setIsTrashDelete(true);
                   setIsGitDelete(false);
                 }}
@@ -130,7 +131,7 @@ const HoverAction = forwardRef(
                   e.preventDefault();
 
                   authCallback(() => {
-                    downloadDirectoryAsZip(item.title);
+                    downloadDirectoryAsZip(item.title, item.parentDir);
                   });
                 }}
               >
@@ -147,7 +148,7 @@ const HoverAction = forwardRef(
                   e.stopPropagation();
                   e.preventDefault();
                   authCallback(() => {
-                    handleCopy(item.title);
+                    handleCopy(item.title, item.parentDir);
                   });
                 }}
               >
@@ -173,7 +174,7 @@ const HoverAction = forwardRef(
                 size="small"
                 onClick={(e) => {
                   e.stopPropagation();
-                  console.log(item,user, "item");
+                  console.log(item, user, "item");
                   if (item.userId && item.userId != user?.id) {
                     toast.warning(
                       "this project is shared, You didn't have permission to share"
@@ -197,7 +198,7 @@ const HoverAction = forwardRef(
                   setIsGitDelete(false);
                   setIsTrashDelete(false);
                   authCallback(() => {
-                    handleDeleteProject(item.title);
+                    handleDeleteProject(item.title, item.parentDir);
                   });
                 }}
               >

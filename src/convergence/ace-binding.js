@@ -2,7 +2,7 @@ import { createMutex } from "lib0/mutex.js";
 import * as Y from "yjs"; // eslint-disable-line
 import { Awareness } from "y-protocols/awareness.js"; // eslint-disable-line
 import Ace from "ace-builds/src-min-noconflict/ace";
-import { isNullOrUndefined } from "@/util";
+import { isNullOrUndefined } from "@/utils";
 import { useFileStore } from "@/store";
 
 const Range = Ace.require("ace/range").Range;
@@ -17,7 +17,8 @@ class AceCursors {
 
     // Bind the marker update function to this context
     this.marker.update = (html, markerLayer, session, config) => {
-      this.markerUpdate(html, markerLayer, session, config, ace, userList);
+      setTimeout(() => {
+        this.markerUpdate(html, markerLayer, session, config, ace, userList);      }, 100);
     };
   }
 
@@ -36,7 +37,6 @@ class AceCursors {
     let start = config.firstRow,
       end = config.lastRow; //视图显示区域
     let cursors = this.markerCursors;
-    // console.log(this.markerCursors, "markerCursors");
 
     for (let i = 0; i < cursors.length; i++) {
       if (this.localUser?.id == cursors[i].userId) continue;
@@ -109,7 +109,6 @@ class AceCursors {
           });
           ace.container.appendChild(el); // Use ace to append the cursor element
         } else {
-          console.log(pos, "element");
           el.style.height = height + "px";
           el.style.width = width + "px";
           el.style.top = top + "px";
@@ -139,7 +138,7 @@ class AceCursors {
           this.markerID[c.id].hasOwnProperty("sel") &&
           this.markerID[c.id].sel !== undefined
         ) {
-          ace.session.removeMarker(this.markerID[c.id].sel);
+          ace.session?.removeMarker(this.markerID[c.id].sel);
           this.markerID[c.id].sel = undefined;
         }
 
@@ -175,7 +174,7 @@ class AceCursors {
           this.markerID[c.id].hasOwnProperty("sel") &&
           this.markerID[c.id].sel !== undefined
         ) {
-          ace.session.removeMarker(this.markerID[c.id].sel);
+          ace.session?.removeMarker(this.markerID[c.id].sel);
           this.markerID[c.id].sel = undefined;
         }
       }
@@ -278,7 +277,6 @@ export class AceBinding {
         .doc.positionToIndex(curSel.getSelectionLead());
       cursor.anchor = indexAnchor;
       cursor.head = indexHead;
-
       if (indexAnchor > indexHead) {
         cursor.anchor = indexHead;
         cursor.head = indexAnchor;
@@ -353,7 +351,6 @@ export class AceBinding {
     ace.getSession().selection.on("changeCursor", this.cursorChangeHandler);
 
     this.offChangeCursor = () => {
-      console.log("destroy cursor");
       ace.getSession().selection.off("changeCursor", this.cursorChangeHandler);
     };
 

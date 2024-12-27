@@ -6,29 +6,33 @@ import {
   initializeGitStatus,
   updateStatusMatrixOnSaveFile,
 } from "./useGitRepo";
-import { savePdfToIndexedDB, getPdfFromIndexedDB } from "@/util";
+import {
+  savePdfToIndexedDB,
+  getPdfFromIndexedDB,
+  isAssetExtension,
+} from "@/utils";
 import { useUserStore } from "./useUserStore";
 import { ProjectSync } from "@/convergence";
 import { useEditor } from "./useEditor";
-import { isAssetExtension } from "@/util";
 
 export const FILE_STORE = "FILE_STORE";
 
 function removeRootPath(filePath, rootPath) {
   // 标准化路径
-  const normalizedFilePath = path.normalize(filePath);
-  const normalizedRootPath = path.basename(path.normalize(rootPath));
+  // const normalizedFilePath = path.normalize(filePath);
+  // const normalizedRootPath = path.basename(path.normalize(rootPath));
 
-  // 分割路径
-  const pathParts = normalizedFilePath.split(path.sep);
+  // // 分割路径
+  // const pathParts = normalizedFilePath.split(path.sep);
 
-  // 如果第一个部分与 rootPath 的文件夹名相同，则移除
-  if (pathParts[0] === normalizedRootPath) {
-    pathParts.shift();
-  }
+  // // 如果第一个部分与 rootPath 的文件夹名相同，则移除
+  // if (pathParts[0] === normalizedRootPath) {
+  //   pathParts.shift();
+  // }
 
-  // 重新组合路径
-  return pathParts.join(path.sep);
+  // // 重新组合路径
+  // return pathParts.join(path.sep);
+  return filePath.replace(rootPath, "");
 }
 
 function debounce(func, wait) {
@@ -71,6 +75,7 @@ export const useFileStore = create()(
       isDropFileSystem: true,
       shareIsRead: false,
       selectedFiles: [],
+      parentDir: "",
       setSelectedFiles: (filepath) => {
         // 如果传入的是数组就直接使用,否则包装成数组
         set({ selectedFiles: [filepath] });
@@ -108,10 +113,7 @@ export const useFileStore = create()(
         const relativePathPrefix = `${currentProjectRoot}/`;
         const modifiedFiles = files.map((file) => {
           // 使用正则表达式匹配第一个 sync-demo/ 并替换为相对路径
-          if (
-            file.includes(".git") ||
-            file.includes("project-hasOwnProperty-arxtect-projectInfo.json")
-          ) {
+          if (file.includes(".git") || file.includes(FS.projectInfoFileName)) {
             return null;
           }
           // return file.replace(new RegExp(`^${relativePathPrefix}`), "");
@@ -123,7 +125,7 @@ export const useFileStore = create()(
         );
 
         let fileList = modifiedFiles.filter((i) => !!i);
-
+        console.log(fileList, "currentProjectRoot2");
         set({ currentProjectFileList: fileList });
         return [fileList, bibFilepathList];
         // await get().changeMainFile(files);
@@ -172,7 +174,7 @@ export const useFileStore = create()(
       updateIsDropFileSystem: (isDropFileSystem) => set({ isDropFileSystem }),
       updateDirOpen: (dirOpen) => set({ dirOpen }),
       updateProjectSync: async (projectSync) => {
-        set({ projectSync });
+        set({ projectSync: projectSync });
       },
       leaveProjectSyncRoom: () => {
         let projectSync = get().projectSync;
@@ -201,7 +203,6 @@ export const useFileStore = create()(
       loadFile: async ({ filepath }) => {
         if (!filepath) return;
         const { editor } = useEditor.getState();
-        const fileContent = await FS.readFile(filepath);
 
         if (isAssetExtension(filepath)) {
           set({
@@ -223,6 +224,9 @@ export const useFileStore = create()(
           projectSync?.updateEditorAndCurrentFilePath &&
             projectSync?.updateEditorAndCurrentFilePath(filepath, editor);
         }
+
+        const fileContent = await FS.readFile(filepath);
+
         set({
           filepath,
           assetsFilePath: "",
@@ -234,6 +238,13 @@ export const useFileStore = create()(
           currentSelectDir: "",
           selectedFiles: [filepath],
         });
+
+        if (projectSync && editor != null && filepath) {
+          setTimeout(() => {
+            projectSync?.updateCurrentFilePathYText &&
+              projectSync?.updateCurrentFilePathYText(filepath, editor);
+          }, 300);
+        }
       },
       changeCurrentSelectDir: (dirpath, isCtrl = false) => {
         if (!isCtrl) {
@@ -271,7 +282,7 @@ export const useFileStore = create()(
       },
       debouncedUpdateFileContent: debounce((filepath, value, isSync) => {
         get().updateFileContent(filepath, value, isSync);
-      }, 1500),
+      }, 0),
       changeValue: (value, isSync = true) => {
         const state = get();
         if (state.autosave && isSync) {
@@ -438,14 +449,20 @@ export const useFileStore = create()(
         set({ renamingPathname: null });
       },
       changePreRenamingDirpath: ({ dirpath }) => {
-        console.log(dirpath, "changePreRenamingDirpath");
         set({ preRenamingDirpath: dirpath });
       },
-      changeCurrentProjectRoot: async ({ projectRoot }) => {
-        get().changeMainFile(projectRoot);
+      changeCurrentProjectRoot: async ({ projectRoot, parentDir = "." }) => {
+        // get().changeMainFile(projectRoot);
         set({ projectSync: null });
+        if (!projectRoot) {
+          return;
+        }
         get().initFile();
-        set({ currentProjectRoot: projectRoot, currentSelectDir: projectRoot });
+        set({
+          currentProjectRoot: projectRoot,
+          currentSelectDir: projectRoot,
+          parentDir: parentDir,
+        });
         initializeGitStatus({ projectRoot });
       },
       createProject: async (newProjectRoot) => {

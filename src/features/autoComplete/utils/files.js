@@ -18,7 +18,7 @@ function getTeXFiles(fileList) {
 }
 
 function getOnlyTeXFiles(fileList) {
-  console.log(fileList, "fileList");
+  // console.log(fileList, "fileList");
   const texFiles = [];
   fileList.forEach((filePath) => {
     const fileName = path.basename(filePath);
@@ -62,7 +62,6 @@ async function extractLabelsFromTexFiles(fileList, currentProjectRoot) {
     const filepath = path.isAbsolute(file)
       ? file
       : path.join(currentProjectRoot, file);
-
     try {
       const fileContent = await readFile(filepath, "utf-8");
       const labels = extractLabels(fileContent.toString());

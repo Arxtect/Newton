@@ -6,7 +6,7 @@
 import { useRef, useState } from "react";
 import copy from "copy-to-clipboard";
 import Tooltip from "@/components/tooltip";
-import { randomString } from "@/util";
+import { randomString } from "@/utils";
 import "./index.css";
 
 const CopyBtn = ({ value, className, isPlain, position }) => {

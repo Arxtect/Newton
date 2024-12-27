@@ -5,7 +5,7 @@
  */
 import { useRef, useState } from "react";
 import Tooltip from "@/components/tooltip";
-import { randomString } from "@/util";
+import { randomString } from "@/utils";
 import ArIcon from "@/components/arIcon";
 
 const InsertBtn = ({ value, className, isPlain, position, insert }) => {

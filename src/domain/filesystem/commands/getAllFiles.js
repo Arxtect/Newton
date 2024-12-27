@@ -14,42 +14,42 @@ const fsPify = {
   writeFile: pify(fs.writeFile),
 };
 
-export async function readDirectoryTree(rootpath) {
+async function readDirectoryTree(rootpath, parentDir = ".") {
   async function readDirRecursive(currentPath) {
     const entries = await fsPify.readdir(currentPath);
-    const entryStats = await Promise.all(
-      entries.map((entry) => fsPify.stat(path.join(currentPath, entry)))
-    );
+    const filesPromises = [];
+    const dirPromises = [];
 
-    const filesPromises = entryStats.map((stat, index) => {
+    for (const index in entries) {
+      const entryPath = path.join(currentPath, entries[index]);
+      const stat = await fsPify.stat(entryPath);
+
       if (stat.isFile()) {
-        const filePath = path.join(currentPath, entries[index]);
-        if (!!projectInfoExists(filePath)) return null;
-        // 不指定编码，以便得到 Buffer 对象
-        return fsPify.readFile(filePath).then((content) => ({
-          path: filePath,
-          content, // 这里 content 是一个 Buffer
-        }));
+        if (!projectInfoExists(entryPath)) {
+          filesPromises.push(
+            fsPify.readFile(entryPath).then((content) => ({
+              path: entryPath,
+              content,
+            }))
+          );
+        }
+      } else if (stat.isDirectory()) {
+        console.log(currentPath, entryPath, entries[index], "stat222");
+        dirPromises.push(readDirRecursive(entryPath));
       }
-      return null;
-    });
+    }
 
-    const dirPromises = entryStats.map((stat, index) => {
-      if (stat.isDirectory()) {
-        const dirPath = path.join(currentPath, entries[index]);
-        return readDirRecursive(dirPath);
-      }
-      return null;
-    });
+    const files = await Promise.all(filesPromises);
+    const directories = await Promise.all(dirPromises);
 
     return {
       path: currentPath,
-      files: (await Promise.all(filesPromises)).filter(Boolean),
-      directories: (await Promise.all(dirPromises)).filter(Boolean),
+      files: files.filter(Boolean),
+      directories: directories.filter(Boolean),
     };
   }
 
-  return readDirRecursive(rootpath);
+  return readDirRecursive(path.join(parentDir, rootpath));
 }
 
 export async function writeDirectoryTree(rootpath, tree) {
@@ -105,13 +105,12 @@ function addFilesToZip(
     addFilesToZip(subDir, subFolder, relativeDirPath, rootpath, isMulti); // 递归调用时更新
   });
 }
-export async function downloadDirectoryAsZip(rootpath) {
-  console.log(rootpath, "downloadDirectoryAsZip");
-  const directoryTree = await readDirectoryTree(rootpath);
-  console.log(directoryTree, "directoryTree");
+
+export async function downloadDirectoryAsZip(rootpath, parentDir = ".") {
+  const directoryTree = await readDirectoryTree(rootpath, parentDir);
   const zip = new JSZip();
 
-  addFilesToZip(directoryTree, zip, "", rootpath);
+  addFilesToZip(directoryTree, zip, "", path.join(parentDir, rootpath), false);
 
   zip.generateAsync({ type: "blob" }).then(function (blob) {
     saveAs(blob, `${rootpath}.zip`);
@@ -185,26 +184,26 @@ export async function downloadSpecificVersion(repoPath, commitSHA) {
   const { tree } = await git.readTree({
     fs,
     dir: repoPath,
-    oid: commitSHA
+    oid: commitSHA,
   });
 
   // 递归函数，用于遍历文件树并添加文件到 ZIP
-  async function addToZip(tree, currentPath = '') {
+  async function addToZip(tree, currentPath = "") {
     for (const entry of tree) {
-      if (entry.type === 'tree') {
+      if (entry.type === "tree") {
         // 如果是目录，递归处理
         const subtree = await git.readTree({
           fs,
           dir: repoPath,
-          oid: entry.oid
+          oid: entry.oid,
         });
         await addToZip(subtree.tree, path.join(currentPath, entry.path));
-      } else if (entry.type === 'blob') {
+      } else if (entry.type === "blob") {
         // 如果是文件，读取内容并添加到 ZIP
         const { blob } = await git.readBlob({
           fs,
           dir: repoPath,
-          oid: entry.oid
+          oid: entry.oid,
         });
         zip.file(path.join(currentPath, entry.path), blob);
       }
@@ -215,7 +214,7 @@ export async function downloadSpecificVersion(repoPath, commitSHA) {
   await addToZip(tree);
 
   // 生成 ZIP 文件
-  const zipBlob = await zip.generateAsync({ type: 'blob' });
+  const zipBlob = await zip.generateAsync({ type: "blob" });
 
   // 将 ZIP 内容写入文件
   saveAs(zipBlob, `${repoPath}-${commitSHA.slice(0, 7)}.zip`);

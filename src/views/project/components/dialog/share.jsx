@@ -21,6 +21,7 @@ import {
 } from "@/services";
 import { useCopyToClipboard } from "@/useHooks";
 import ArIcon from "@/components/arIcon";
+import { ArLoadingOverlay } from "@/components/arLoading";
 
 const Share = ({
   dialogOpen,
@@ -47,9 +48,17 @@ const Share = ({
     return res;
   };
   const createProjectSync = async (rootPath, user) => {
-    const {token,position} = await getYDocTokenReq(rootPath+ user.id);
-    const projectSync = await new ProjectSync(rootPath, user, user.id, token,position);
-    projectSync.syncFolderToYMapRootPath(getProjectList);
+    const { token, position } = await getYDocTokenReq(rootPath + user.id);
+    const projectSync = await new ProjectSync(
+      rootPath,
+      user,
+      user.id,
+      token,
+      position
+    );
+    await projectSync.syncFolderToYMapRootPath(getProjectList);
+    setLoading(false);
+    projectSync?.leaveCollaboration && projectSync?.leaveCollaboration();
   };
 
   const handleSaveProject = async () => {
@@ -59,12 +68,11 @@ const Share = ({
     try {
       // 创建 ProjectSync 实例
       await createProjectSync(rootPath, user);
-      setLoading(false);
       // handleCancelProject();
     } catch (error) {
       toast.error("Share failed!");
     } finally {
-      setLoading(false);
+      // setLoading(false);
     }
   };
 
@@ -78,6 +86,17 @@ const Share = ({
     // handleSaveProject();
   };
 
+  const saveProjectSyncInfoToJson = async (user, rootPath, roomId) => {
+    const { id, ...otherInfo } = user;
+    await createProjectInfo(rootPath, {
+      rootPath: rootPath,
+      userId: roomId,
+      isSync: true,
+      isClose: false,
+      ...otherInfo,
+    });
+  };
+
   const handleInvite = async (searchInput, access) => {
     console.log(searchInput, access, "searchInput");
     let res = await inviteUser({
@@ -86,6 +105,7 @@ const Share = ({
       project_name: rootPath + user.id,
       access: access,
     });
+    await saveProjectSyncInfoToJson(user, rootPath, user.id);
     if (res?.status == "success") {
       toast.success(`Invite ${searchInput} success`);
       getRoomInfo();
@@ -193,18 +213,20 @@ const Share = ({
       buttonList={[{ title: "Cancel", click: handleCancelProject }]}
       width={"50vw"}
     >
-      <ShareProject
-        handleInvite={handleInvite}
-        handleUpdateUser={handleUpdateUser}
-        roomInfo={roomInfo}
-        getRoomInfo={getRoomInfo}
-        user={user}
-        handleRemoveUser={handleRemoveUser}
-        handleCloseRoom={handleCloseRoom}
-        handleReopenRoom={handleReopenRoom}
-      ></ShareProject>
+      <ArLoadingOverlay text="Synchronizing" loading={loading}>
+        <ShareProject
+          handleInvite={handleInvite}
+          handleUpdateUser={handleUpdateUser}
+          roomInfo={roomInfo}
+          getRoomInfo={getRoomInfo}
+          user={user}
+          handleRemoveUser={handleRemoveUser}
+          handleCloseRoom={handleCloseRoom}
+          handleReopenRoom={handleReopenRoom}
+        ></ShareProject>
+      </ArLoadingOverlay>
     </ArDialog>
   );
 };
 
-export default Share;
+export default React.memo(Share);

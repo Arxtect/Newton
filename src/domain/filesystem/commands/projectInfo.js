@@ -8,12 +8,12 @@ import { readFile } from "../queries/readFile";
 import { unlink } from "./unlink";
 import path from "path";
 
-
-const has = "hasOwnProperty-arxtect-projectInfo";
+export const projectInfoFileName =
+  "project-hasOwnProperty-arxtect-projectInfo.json";
 
 // 创建或更新项目信息文件的函数
 export const createProjectInfo = async (projectRoot, additionalInfo = {}) => {
-  const projectInfoPath = `${projectRoot}/project-${has}.json`;
+  const projectInfoPath = `${projectRoot}/${projectInfoFileName}`;
   let existingInfo = {};
 
   try {
@@ -45,7 +45,7 @@ export const createProjectInfo = async (projectRoot, additionalInfo = {}) => {
 
 // 获取项目信息文件的函数
 export const getProjectInfo = async (projectRoot) => {
-  const projectInfoPath = `${projectRoot}/project-${has}.json`;
+  const projectInfoPath = `${projectRoot}/${projectInfoFileName}`;
 
   try {
     const fileContent = await readFile(projectInfoPath);
@@ -56,17 +56,24 @@ export const getProjectInfo = async (projectRoot) => {
   }
 };
 
+export const getShareProjectInfo = async (projectRoot, roomId) => {
+  let projectInfo = await getProjectInfo(projectRoot);
+  let newRoomId = projectInfo?.userId ? projectInfo?.userId : roomId;
+  let rootPath = projectInfo?.rootPath ? projectInfo?.rootPath : projectRoot;
+  console.log(projectInfo, newRoomId, rootPath, "newRoomId, newRoomPath");
+  return [newRoomId, rootPath];
+};
 
 // 检查项目信息文件是否存在的函数
 export const projectInfoExists = (filename) => {
-  const projectInfoPath = `project-${has}.json`;
+  const projectInfoPath = `${projectInfoFileName}`;
   const basename = path.basename(filename);
   if (basename == projectInfoPath) return true;
   return false;
 };
 
 export const removeProjectInfo = async (projectRoot) => {
-  const projectInfoPath = `${projectRoot}/project-${has}.json`;
+  const projectInfoPath = `${projectRoot}/${projectInfoFileName}`;
   try {
     await unlink(projectInfoPath);
   } catch (err) {
@@ -75,5 +82,5 @@ export const removeProjectInfo = async (projectRoot) => {
 };
 
 export const getInfoProjectName = () => {
-  return `project-${has}.json`;
-}
+  return `${projectInfoFileName}`;
+};

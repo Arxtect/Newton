@@ -19,15 +19,15 @@ function DropZone({ type, handleUpload }) {
   };
 
   return (
-    <div className="flex flex-col justify-center items-center px-20 py-24 bg-green-100 max-md:px-5 max-md:pb-24 max-md:max-w-full">
-      <div className="flex flex-col mb-0 max-w-full w-[336px] max-md:mb-2.5">
+    <div className="flex flex-col justify-center items-center px-20 py-24 bg-green-100 max-md:px-5 max-md:pb-24 max-md:max-w-full w-full">
+      <div className="flex flex-col mb-0 max-w-full w-full max-md:mb-2.5">
         <img
           loading="lazy"
           src={vectorSvg}
           className="object-contain self-center w-10 aspect-square"
           alt=""
         />
-        <p className="mt-2.5">
+        <div className="mt-2.5">
           {type == "zip" ? (
             <div>
               Drag or{" "}
@@ -80,7 +80,7 @@ function DropZone({ type, handleUpload }) {
               from your computer
             </div>
           )}
-        </p>
+        </div>
       </div>
     </div>
   );

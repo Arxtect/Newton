@@ -1,14 +1,24 @@
+/*
+ * @Description:
+ * @Author: Devin
+ * @Date: 2024-11-14 12:44:40
+ */
 import * as Y from "yjs";
 import { WebsocketProvider } from "y-websocket";
 import { useFileStore } from "@/store"; // 假设 Zustand 文件操作在这里定义
 import path from "path";
 import * as FS from "domain/filesystem";
 import { AceBinding } from "./ace-binding"; // 导入AceBinding
-import { uploadFile, downloadFile } from "./minio";
+import {
+  uploadFile,
+  downloadFile,
+  uploadFileBinary,
+  downloadFileBinary,
+} from "./minio";
 import { assetExtensions } from "@/constant";
-import { debounce } from "@/util";
-import { getColors } from "@/util";
+import { debounce, getColors } from "@/utils";
 import { toast } from "react-toastify";
+import { LatexSyncToYText } from "./latexSyncToYText";
 
 const host = window.location.hostname;
 const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
@@ -18,11 +28,23 @@ const wsUrl = `wss://arxtect.com/websockets/`;
 // const wsUrl = `ws://10.10.99.42:8013/`;
 
 class ProjectSync {
-  constructor(rootPath, user, roomId, token, position, otherOperation) {
+  constructor(
+    rootPath,
+    user,
+    roomId,
+    token,
+    position,
+    otherOperation,
+    isLeave = false,
+    parentDir = "."
+  ) {
     this.folderMapName = `${rootPath}_folder_map_list_${roomId}`;
     this.rootPath = rootPath;
+    this.parentDir = parentDir;
+    this.currenProjectDir = path.join(this.parentDir, rootPath);
     this.roomId = roomId;
     this.yDoc = new Y.Doc();
+
     this.websocketProvider = new WebsocketProvider(
       wsUrl,
       this.rootPath + this.roomId,
@@ -33,8 +55,10 @@ class ProjectSync {
     this.userList = [];
     this.awareness = this.websocketProvider.awareness;
     this.currentFilePath = "";
-    this.isLocalChange = true; // 是否本地变更
-
+    this.latexSyncToYText = null;
+    this.initialized = false;
+    this.isInitialSyncComplete = false; // 初始化标志
+    this.isLeave = isLeave;
     // 设置用户信息
 
     // 使用 rootPath 作为命名空间
@@ -46,73 +70,93 @@ class ProjectSync {
     // 保存当前的观察者句柄
     this.currentObserver = null;
     this.setUserAwareness({ ...this.user, color: getColors(position) });
+
+    this.setObserveHandler = () => {
+      // 清理旧的观察者
+      if (this.currentObserver) {
+        this.yMap.unobserve(this.yMapObserveHandler.bind(this));
+      }
+      // 设置新的观察者
+      this.currentObserver = true;
+      this.yMap.observe(this.yMapObserveHandler.bind(this));
+    };
+
+    this.saveState = {
+      updateEditorAndCurrentFilePath:
+        this.updateEditorAndCurrentFilePath.bind(this),
+      updateCurrentFilePathYText: this.updateCurrentFilePathYText.bind(this),
+      syncFileToYMap: this.syncFileToYMap.bind(this),
+      deleteFile: this.deleteFile.bind(this),
+      deleteFolder: this.deleteFolder.bind(this),
+      leaveCollaboration: this.leaveCollaboration.bind(this),
+      setObserveHandler: this.setObserveHandler.bind(this),
+      isInitialSyncComplete: this.isInitialSyncComplete,
+      syncFolderToYMapRootPath: this.syncFolderToYMapRootPath.bind(this),
+      changeIsInitialSyncComplete: this.changeIsInitialSyncComplete.bind(this),
+      changeInitial: this.changeInitial.bind(this),
+    };
   }
 
-  // set observe handler
-  setObserveHandler(editor = "default-editor") {
-    // 清理旧的观察者
-    if (this.currentObserver) {
-      this.yMap.unobserve(this.currentObserver);
-    }
-
-    // 设置新的观察者
-    this.currentObserver = this.yMapObserveHandler.bind(this, editor);
-    this.yMap.observe(this.currentObserver);
-  }
-
-  async saveProjectSyncInfoToJson() {
-    const { id, ...otherInfo } = this.user;
-    await FS.createProjectInfo(this.rootPath, {
-      rootPath: this.rootPath,
-      userId: this.roomId,
-      isSync: true,
-      isClose: false,
-      ...otherInfo,
-    });
+  changeIsInitialSyncComplete() {
+    this.isInitialSyncComplete = true;
   }
 
   async removeProjectSyncInfo() {
-    await FS.removeProjectInfo(this.rootPath);
+    await FS.removeProjectInfo(this.currenProjectDir);
   }
 
   // 设置用户信息到 awareness
   setUserAwareness(user) {
     this.awareness.setLocalStateField("user", user);
   }
+
   setEditorContent(content) {
     const handleChange = useFileStore.getState().changeValue;
     handleChange(content, false);
   }
 
-  isCurrentFile(editor, filePath) {
-    return (
-      editor != null && this.currentFilePath && filePath == this.currentFilePath
+  isCurrentFile(filePath) {
+    return this.currentFilePath && filePath == this.currentFilePath;
+  }
+
+  changeInitial() {
+    this.initialized = true;
+  }
+
+  updateCurrentFilePathYText(filePath, editor) {
+    let latexSyncToYText = new LatexSyncToYText(
+      this.yText,
+      filePath,
+      editor,
+      this.changeInitial.bind(this),
+      this.initialized
     );
+    this.latexSyncToYText = latexSyncToYText.destroy.bind(latexSyncToYText);
   }
 
   updateEditorAndCurrentFilePath(filePath, editor) {
-    this.currentFilePath = filePath;
-    this.yText = this.yDoc.getText(filePath);
-    console.log(this.yText, "this.yText");
-    this.undoManager = new Y.UndoManager(this.yText);
-    this.setObserveHandler(editor);
+    if (this.latexSyncToYText != null) {
+      this.latexSyncToYText(); // 取消之前的监听
+      this.latexSyncToYText = null;
+    }
 
+    const relativePath = FS.removeParentDirPath(filePath, this.parentDir);
+    this.currentFilePath = relativePath;
+    this.yText = this.yDoc.getText(relativePath);
+    this.undoManager = new Y.UndoManager(this.yText);
+    const ext = path.extname(relativePath).slice(1).toLowerCase(); // 获取文件扩展名并转换为小写
+
+    if (assetExtensions.includes(ext)) {
+      return;
+    }
     if (this.aceBinding) {
-      this.aceBinding.updateCurrentFilePath(filePath, editor);
+      this.aceBinding.updateCurrentFilePath(relativePath, editor);
     } else {
       this.aceBinding = new AceBinding(this.awareness);
-      this.aceBinding.init(editor, filePath); // 初始化 AceBinding 实例
+      this.aceBinding.init(editor, relativePath); // 初始化 AceBinding 实例
     }
-  }
-  getVal() {
-    // 实现获取当前文本内容的方法
-    return this.yText.toString();
-  }
-
-  getRange() {
-    // 实现获取当前选择范围的方法
-    // 这里假设返回一个默认值
-    return [0, this.yText.length];
+    this.aceBinding?.handleAwarenessChange &&
+      this.aceBinding.handleAwarenessChange(editor);
   }
 
   //同步文件内容到 Yjs Map
@@ -123,6 +167,7 @@ class ProjectSync {
       // 如果是资产文件类型，则转换为 Base64 编码
       try {
         contentToStore = await uploadFile(filePath, content);
+        // contentToStore = uploadFileBinary(filePath, content);
       } catch (err) {
         // contentToStore = content.toString();
         console.log(err.message, "err.message");
@@ -137,6 +182,7 @@ class ProjectSync {
       this.yMap.set(filePath, contentToStore);
     });
   }
+
   // 删除文件
   async deleteFile(filePath, otherInfo = {}) {
     this.yDoc.transact(() => {
@@ -155,7 +201,8 @@ class ProjectSync {
         const filePath = path.join(folderPath, file.name); // 使用 path.join 进行路径拼接
 
         if (file.type == "file") {
-          await this.deleteFile(filePath); // 删除文件
+          const relativePath = FS.removeParentDirPath(filePath, this.parentDir);
+          await this.deleteFile(relativePath); // 删除文件
         } else if (file.type == "dir") {
           await this.deleteFolder(filePath); // 递归删除子文件夹
         }
@@ -171,9 +218,13 @@ class ProjectSync {
   async syncFileToYMap(filePath, content) {
     if (filePath.includes(".git")) return;
     try {
-      await this.syncToYMap(filePath, content);
-      const folderPath = path.dirname(filePath);
-      this.syncFolderInfo(folderPath);
+      const relativePath = FS.removeParentDirPath(filePath, this.parentDir);
+      if (!this.yMap.has(relativePath)) {
+        const folderPath = path.dirname(relativePath);
+        this.syncFolderInfo(folderPath);
+      }
+
+      await this.syncToYMap(relativePath, content);
     } catch (err) {
       console.error(`Error syncing file ${filePath}:`, err);
       throw err;
@@ -184,11 +235,12 @@ class ProjectSync {
   // 同步文件夹列表
   syncFolderInfo(folderPath) {
     if (folderPath.includes(".git")) return;
-    console.log(folderPath, "folderPath");
     this.yDoc.transact(() => {
       let folderMap = this.yMap.get(this.folderMapName) || [];
+
       folderMap = [...folderMap, folderPath];
-      console.log(folderMap, "folderMap");
+      console.log(folderMap, folderPath, "folderMap");
+
       this.yMap.set(this.folderMapName, [...new Set(folderMap)]);
     });
   }
@@ -208,25 +260,30 @@ class ProjectSync {
   // 同步整个文件夹到 Yjs Map
   async syncFolderToYMap(folderPath) {
     if (folderPath.includes(".git")) return;
-    try {
+
+    const syncPromises = [];
+
+    const handlePromise = async (folderPath) => {
       this.syncFolderInfo(folderPath);
       const files = await FS.readFileStats(folderPath, false);
 
-      console.log(files, "files");
+      for (const file of files) {
+        const filePath = path.join(folderPath, file.name);
 
-      // Create an array of promises for each file and directory
-      const syncPromises = files.map(async (file) => {
-        const filePath = path.join(folderPath, file.name); // 使用 path.join 进行路径拼接
-
-        if (file.type == "file") {
-          const content = await FS.readFile(filePath);
-          await this.syncToYMap(filePath, content); // 只同步相对路径
-        } else if (file.type == "dir") {
-          await this.syncFolderToYMap(filePath); // 递归同步子文件夹
+        if (file.type === "file") {
+          const promise = FS.readFile(filePath).then(async (content) => {
+            await this.syncToYMap(filePath, content);
+          });
+          syncPromises.push(promise);
+        } else if (file.type === "dir") {
+          await handlePromise(filePath);
         }
-      });
+      }
+    };
 
-      // Wait for all promises to resolve
+    try {
+      await handlePromise(folderPath);
+
       await Promise.all(syncPromises);
     } catch (err) {
       console.error(`Error syncing folder ${folderPath}:`, err);
@@ -236,106 +293,140 @@ class ProjectSync {
 
   debouncedRepoChanged = debounce(() => {
     useFileStore.getState().repoChanged();
-  }, 200);
+  }, 1000);
 
   async syncFolderToYMapRootPath(callback) {
-    await this.saveProjectSyncInfoToJson(this.rootPath);
     await this.syncFolderToYMap(this.rootPath); // 保存项目信息
+
     callback && callback();
   }
 
   async handleFolderInfo(folderPath, key, content) {
     if (folderPath.includes(".git")) return;
     const files = await FS.readFileStats(folderPath, false);
+
     const fileNames = new Set(files.map((f) => f.name));
     const contentNames = new Set(content);
 
     // 删除 files 中有但 content 中没有的文件夹
     for (const file of files) {
       const filePath = path.join(folderPath, file.name);
+      const relativePath = FS.removeParentDirPath(filePath, this.parentDir);
       if (file.name.includes(".git")) continue;
-      if (file.type == "dir" && !contentNames.has(filePath)) {
-        await this.deleteFolder(filePath);
+
+      if (file.type == "dir" && !contentNames.has(relativePath)) {
+        const folderPath = path.join(this.parentDir, relativePath);
+        await this.deleteFolder(folderPath);
         console.log(`Deleted folder ${filePath}`);
       }
     }
 
     // 创建 content 中有但 files 中没有的文件夹
     for (const folderName of contentNames) {
-      if (!fileNames.has(folderName)) {
-        await FS.ensureDir(folderName);
-        console.log(`Created folder ${folderName}`);
+      const folderPath = path.join(this.parentDir, folderName);
+      if (!fileNames.has(folderPath)) {
+        await FS.ensureDir(folderPath);
+        console.log(`Created folder ${folderPath}`);
       }
     }
 
     // 递归处理子文件夹
     for (const file of files) {
-      if (file.type == "dir" && contentNames.has(file.name)) {
-        const filePath = path.join(folderPath, file.name);
+      const filePath = path.join(folderPath, file.name);
+      const relativePath = FS.removeParentDirPath(filePath, this.parentDir);
+      if (file.type == "dir" && contentNames.has(relativePath)) {
         await this.handleFolderInfo(filePath, key, content);
       }
     }
   }
 
   // Yjs Map 观察者处理函数
-
-  async yMapObserveHandler(editor, event) {
-    const contentSyncedPromises = [];
+  async yMapObserveHandler(event) {
+    let contentSyncedPromises = [];
 
     event.keysChanged.forEach((key) => {
+      console.log(key, "changeKey");
+      if (event?.transaction?.origin == null) {
+        console.log(`Origin is null for key ${key}`, event?.transaction);
+        return;
+      }
+
       contentSyncedPromises.push(
-        new Promise(async (resolve) => {
+        new Promise(async (resolve, reject) => {
           const content = this.yMap.get(key);
+          const relativePath = path.join(this.parentDir, key);
 
           try {
-            console.log("YMap event:", event, key); // 打印事件对象
             if (key == this.folderMapName) {
-              await FS.ensureDir(this.rootPath);
-              console.log(content, "content");
-              this.handleFolderInfo(this.rootPath, key, content);
+              await FS.ensureDir(this.currenProjectDir);
+
+              this.handleFolderInfo(
+                this.currenProjectDir,
+                relativePath,
+                content
+              );
               resolve();
               return;
             }
+
             if (content?._delete) {
               // 如果内容为空，则删除文件
-              await useFileStore.getState().deleteFile({ filename: key }, true);
-
-              console.log(`File ${key} deleted successfully.`);
+              await useFileStore
+                .getState()
+                .deleteFile({ filename: relativePath }, true);
               resolve();
               return;
             } else {
-              const dirpath = path.dirname(key);
+              const dirpath = path.dirname(relativePath);
               await FS.ensureDir(dirpath);
               const ext = path.extname(key).slice(1).toLowerCase();
               if (assetExtensions.includes(ext)) {
                 // 如果是资产文件类型，则将 Base64 编码的字符串转换回文件数据
-                const fileData = await downloadFile(content, key);
-                console.log(content, "content");
-                await FS.writeFile(key, Buffer.from(fileData));
+                await downloadFile(content, relativePath);
+                resolve();
+                // await downloadFileBinary(key, content);
               } else {
-                if (this.isCurrentFile(editor, key)) {
-                  this.setEditorContent(content);
+                if (this.isCurrentFile(key)) {
+                  resolve();
+                  console.log(this.initialized, "initialized");
+                  // if (!this.initialized) this.setEditorContent(content);
+                  // console.log(key, "content");
                 } else {
                   const fileStore = useFileStore.getState();
-                  await fileStore.saveFile(key, content, false, false);
+                  // await fileStore.saveFile(key, content, false);
+                  content?.length &&
+                    (await fileStore.saveFile(relativePath, content, false));
+                  resolve();
                 }
               }
             }
           } catch (err) {
-            console.error(err, key);
-          } finally {
-            // 调用需要防抖处理的函数
-            this.debouncedRepoChanged();
-            // 等待所有内容同步完成后再进行光标同步
-            Promise.all(contentSyncedPromises).then(() => {
-              this.otherOperation && this.otherOperation();
-              this.aceBinding?.handleAwarenessChange &&
-                this.aceBinding.handleAwarenessChange(editor);
-            });
-            resolve(); // 同步完成后，Promise 解决
+            reject(err);
+            console.error(err, relativePath);
           }
         })
       );
+
+      // 非project不等待
+      if (!this.isLeave) {
+        this.isInitialSyncComplete = true; // 标记初始同步完成
+        this.changeInitial();
+      }
+
+      if (event.keysChanged.size == contentSyncedPromises.length) {
+        Promise.all(contentSyncedPromises).then(() => {
+          this.otherOperation && this.otherOperation();
+          contentSyncedPromises = [];
+          this.debouncedRepoChanged();
+          if (this.isLeave) {
+            this.leaveCollaboration();
+          }
+          if (!this.isInitialSyncComplete) {
+            this.isInitialSyncComplete = true; // 标记初始同步完成
+            this.changeInitial();
+          }
+        });
+      }
     });
   }
 

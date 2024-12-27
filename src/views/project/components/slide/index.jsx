@@ -36,9 +36,9 @@ const subCategories = [
 ];
 
 const Slide = ({
-  contentRef,
   currentSelectMenu,
   setCurrentSelectMenu,
+  getProjectList,
   user,
 }) => {
   const handleClick = (key) => {
@@ -149,7 +149,7 @@ const Slide = ({
       <Github
         dialogOpen={githubDialogOpen}
         setDialogOpen={setGithubDialogOpen}
-        getProjectList={contentRef.current && contentRef.current.getProjectList}
+        getProjectList={getProjectList}
         user={user}
         projectName={projectName}
         setProjectName={setProjectName}
@@ -159,4 +159,4 @@ const Slide = ({
   );
 };
 
-export default Slide;
+export default React.memo(Slide);

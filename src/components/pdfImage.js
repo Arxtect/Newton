@@ -6,7 +6,7 @@
 import React, { useState, useEffect } from "react";
 import { pdfjs } from "react-pdf";
 import Skeleton from "@mui/material/Skeleton";
-import { getPreViewUrl } from "@/util";
+import { getPreViewUrl } from "@/utils";
 
 // 设置 pdf.js 的 worker，这是必须的步骤
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;

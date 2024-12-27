@@ -20,6 +20,7 @@ const RenameProject = ({
   setSourceProject,
   getProjectList,
   sourceProject = "",
+  parentDir = ".",
 }) => {
   const [projectName, setProjectName] = useState("");
 
@@ -42,17 +43,19 @@ const RenameProject = ({
       toast.warning("Please enter project name");
       return;
     }
-    const parentDir = path.dirname(sourceProject);
-    const newDirPath = path.join(parentDir, projectName);
+    const newSourceProject = path.join(parentDir, sourceProject);
+    const newProjectName = path.dirname(newSourceProject);
+
+    const newDirPath = path.join(newProjectName, projectName);
     try {
       // Rename the directory
-      await pify(fs.rename)(sourceProject, newDirPath);
-      await fileMoved({ fromPath: sourceProject, destPath: newDirPath });
+      await pify(fs.rename)(newSourceProject, newDirPath);
+      await fileMoved({ fromPath: newSourceProject, destPath: newDirPath });
       setDialogOpen(false);
       setSourceProject("");
       toast.success("Project renamed successfully");
 
-      await createProjectInfo(newDirPath, {});
+      // await createProjectInfo(newDirPath, {});
       getProjectList();
     } catch (error) {
       console.error("Error renaming directory:", error);

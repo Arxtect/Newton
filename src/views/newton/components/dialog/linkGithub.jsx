@@ -18,12 +18,12 @@ import { toast } from "react-toastify";
 import ArTextField from "@/components/arTextField";
 import path from "path";
 import { setupAndPushToRepo } from "domain/git";
-import { existsPath } from "domain/filesystem";
+import { existsPath, removeParentDirPath } from "domain/filesystem";
 import BottomDrawer from "@/features/bottomDrawer/bottomDrawer";
 import ArIcon from "@/components/arIcon";
 
 import { getGitToken, createGitRepo, deleteGitRepo } from "@/services";
-import { getGiteaFullUrl, formatRepoName } from "@/util";
+import { getGiteaFullUrl, formatRepoName } from "@/utils";
 
 const GithubProgressBar = ({ progress, messages }) => {
   return (
@@ -65,8 +65,9 @@ const LinkGithub = (props) => {
 
   const [messages, setMessages] = useState("");
   const [progress, setProgress] = useState(0);
-  const { currentProjectRoot } = useFileStore((state) => ({
+  const { currentProjectRoot, parentDir } = useFileStore((state) => ({
     currentProjectRoot: state.currentProjectRoot,
+    parentDir: state.parentDir,
   }));
   const { initializeGitStatus, deleteGitFolder } = useGitRepo();
 
@@ -126,7 +127,9 @@ const LinkGithub = (props) => {
       let remoteUrl = getGiteaFullUrl(userName, projectName);
       console.log(remoteUrl);
 
-      let result = await setupAndPushToRepo(currentProjectRoot, remoteUrl, {
+      const relativePath = removeParentDirPath(currentProjectRoot, parentDir);
+
+      let result = await setupAndPushToRepo(relativePath, remoteUrl, {
         singleBranch: false,
         token: gitConfig.githubApiToken,
         onProgress,
@@ -194,8 +197,10 @@ const LinkGithub = (props) => {
     if (!user?.id) {
       toast.warning("Plaese login first");
     }
+
+    const relativePath = removeParentDirPath(currentProjectRoot, parentDir);
     console.log(currentProjectRoot, "currentProjectRoot");
-    setProjectName(formatRepoName(currentProjectRoot));
+    setProjectName(formatRepoName(relativePath));
     getGiteaToekn(githubApiToken);
   }, [dialogOpen]);
 

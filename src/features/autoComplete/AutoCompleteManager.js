@@ -206,6 +206,8 @@ class AutoCompleteManager {
     };
   }
 
+
+
   async createLabelCompleter(fileList) {
     let labels = await files.extractLabelsFromTexFiles(
       fileList,

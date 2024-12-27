@@ -18,12 +18,13 @@ const fsPify = {
 
 export async function copyProject(projectRoot, copyProjectRoot) {
   console.log(projectRoot, "projectRoot", copyProjectRoot);
+
   async function copyDirRecursive(sourcePath, destPath) {
     // 确保目标目录存在
     await fsPify.mkdir(destPath, { recursive: true });
     const entries = await fsPify.readdir(sourcePath);
 
-    for (const entry of entries) {
+    const copyPromises = entries.map(async (entry) => {
       const sourceEntryPath = path.join(sourcePath, entry);
       const destEntryPath = path.join(destPath, entry);
       const entryStats = await fsPify.stat(sourceEntryPath);
@@ -31,14 +32,18 @@ export async function copyProject(projectRoot, copyProjectRoot) {
 
       if (entryStats.isDirectory()) {
         // 如果是目录，则递归复制
-        await copyDirRecursive(sourceEntryPath, destEntryPath);
+        return copyDirRecursive(sourceEntryPath, destEntryPath);
       } else if (entryStats.isFile()) {
+        console.log(entry, entryStats, "entryStats2");
         if (!!projectInfoExists(sourceEntryPath)) return null;
         // 如果是文件，则直接复制
-        await fsPify.copyFile(sourceEntryPath, destEntryPath);
+        return fsPify.copyFile(sourceEntryPath, destEntryPath);
       }
-    }
+    });
+
+    // 等待所有复制操作完成
+    await Promise.all(copyPromises);
   }
 
-  return await copyDirRecursive(projectRoot, copyProjectRoot);
+  return copyDirRecursive(projectRoot, copyProjectRoot);
 }

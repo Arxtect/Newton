@@ -19,7 +19,7 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { updateDialogLoginOpen } from "@/store";
 import { useUserStore } from "store";
-import { getPreViewUrl } from "@/util";
+import { getPreViewUrl } from "@/utils";
 import ArButton from "@/components/arButton";
 
 const Einstein = () => {

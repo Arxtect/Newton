@@ -1,8 +1,9 @@
 /*
  * @Description:
  * @Author: Devin
- * @Date: 2024-03-06 21:26:51
+ * @Date: 2024-11-14 12:44:41
  */
+
 import React, {
   useEffect,
   useState,
@@ -15,6 +16,7 @@ import { toast } from "react-toastify";
 import { ProjectSync } from "@/convergence";
 import { getProjectInfo, createProjectInfo } from "domain/filesystem";
 import { updateDialogLoginOpen, useUserStore, useFileStore } from "@/store";
+import { ArLoadingOverlay } from "@/components/arLoading";
 
 import ArIcon from "@/components/arIcon";
 
@@ -30,6 +32,7 @@ import {
 } from "@/services";
 import { useCopyToClipboard } from "@/useHooks";
 import Tooltip from "@/components/tooltip";
+import { waitForCondition } from "@/utils";
 
 const Share = forwardRef(({ rootPath, user }, ref) => {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -37,7 +40,6 @@ const Share = forwardRef(({ rootPath, user }, ref) => {
 
   const controlShare = async () => {
     const info = await getProjectInfo(rootPath);
-    console.log(info, "info");
     if (info.userId && info.userId != user.id && user.role != "admin") {
       await copyToClipboard(
         link,
@@ -92,12 +94,32 @@ const Share = forwardRef(({ rootPath, user }, ref) => {
       token,
       position
     );
-    updateProjectSync(projectSync);
-    await projectSync.syncFolderToYMapRootPath();
-    // await projectSync.setObserveHandler();
-    setTimeout(() => {
-      filepath && loadFile({ filepath: filepath });
-    }, [500]);
+
+    const callback = async () => {
+      await projectSync.setObserveHandler();
+
+      waitForCondition({
+        condition: () => projectSync.isInitialSyncComplete,
+        onSuccess: () => {
+          if (filepath) {
+            loadFile({ filepath: filepath });
+            setLoading(false);
+            console.log("loadFile", projectSync.isInitialSyncComplete);
+          }
+        },
+        onFailure: () => {
+          setLoading(false);
+          toast.error("Sync failed, please try again.");
+        },
+        intervalTime: 100,
+        maxElapsedTime: 60000,
+      });
+    };
+
+    await projectSync.syncFolderToYMapRootPath(callback);
+    updateProjectSync(projectSync.saveState);
+    projectSync.changeIsInitialSyncComplete(); // 标记初始同步完成
+    projectSync.changeInitial && projectSync.changeInitial();
   };
 
   const copyLink = async () => {
@@ -117,13 +139,23 @@ const Share = forwardRef(({ rootPath, user }, ref) => {
     try {
       // 创建 ProjectSync 实例
       await createProjectSync(rootPath, user);
-      setLoading(false);
       // handleCancelProject();
     } catch (error) {
       toast.error("Share failed!");
     } finally {
       setLoading(false);
     }
+  };
+
+  const saveProjectSyncInfoToJson = async (user, rootPath, roomId) => {
+    const { id, ...otherInfo } = user;
+    await createProjectInfo(rootPath, {
+      rootPath: rootPath,
+      userId: roomId,
+      isSync: true,
+      isClose: false,
+      ...otherInfo,
+    });
   };
 
   const handleInvite = async (searchInput, access) => {
@@ -137,11 +169,13 @@ const Share = forwardRef(({ rootPath, user }, ref) => {
       project_name: rootPath + roomId,
       access: access,
     });
+    await saveProjectSyncInfoToJson(user, rootPath, roomId);
     if (res?.status == "success") {
       toast.success(`Invite ${searchInput} success`);
       getRoomInfo();
-      !projectInfo?.userId&&handleSaveProject();
+      !projectInfo?.userId && handleSaveProject();
     }
+
     return res?.status;
   };
 
@@ -189,7 +223,7 @@ const Share = forwardRef(({ rootPath, user }, ref) => {
     });
     if (res?.status == "success") {
       await getRoomInfo();
-      handleSaveProject();
+      await handleSaveProject();
       toast.success(`Reopen room success`);
     }
     return res?.status;
@@ -263,16 +297,18 @@ const Share = forwardRef(({ rootPath, user }, ref) => {
         buttonList={[{ title: "Cancel", click: handleCancelProject }]}
         width={"50vw"}
       >
-        <ShareProject
-          handleInvite={handleInvite}
-          handleUpdateUser={handleUpdateUser}
-          roomInfo={roomInfo}
-          getRoomInfo={getRoomInfo}
-          user={user}
-          handleRemoveUser={handleRemoveUser}
-          handleCloseRoom={handleCloseRoom}
-          handleReopenRoom={handleReopenRoom}
-        ></ShareProject>
+        <ArLoadingOverlay text="Synchronizing" loading={loading}>
+          <ShareProject
+            handleInvite={handleInvite}
+            handleUpdateUser={handleUpdateUser}
+            roomInfo={roomInfo}
+            getRoomInfo={getRoomInfo}
+            user={user}
+            handleRemoveUser={handleRemoveUser}
+            handleCloseRoom={handleCloseRoom}
+            handleReopenRoom={handleReopenRoom}
+          ></ShareProject>
+        </ArLoadingOverlay>
       </ArDialog>
     </React.Fragment>
   );
