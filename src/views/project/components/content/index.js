@@ -163,8 +163,17 @@ const Content = React.forwardRef(
 
       if (currentSelectMenu == "git") {
         project = await getRepoList();
+        console.log(project, "remote_project");
       } else {
-        project = await findAllProjectInfo();
+        // project = await findAllProjectInfo();
+        const remote_project = await getRepoList();
+        console.log(remote_project, "remote_project");
+
+        const local_project = await findAllProjectInfo();
+        console.log(local_project, "local_project");
+
+        project = [...local_project, ...remote_project];
+        console.log(project, "all_project");
       }
       if (!project) return;
 
@@ -174,6 +183,7 @@ const Content = React.forwardRef(
           return handleSwitchMenu(currentSelectMenu, user, item, index);
         })
         .filter((item) => item?.title);
+      console.log(projectData, "projectData");
       setProjectData(projectData);
     };
 
@@ -222,6 +232,11 @@ const Content = React.forwardRef(
               ...item,
             };
           } else if (item.name == "YOU" && !item.isClosed) {
+            return {
+              id: index + 1,
+              ...item,
+            };
+          } else if (item?.type == "git") {
             return {
               id: index + 1,
               ...item,
@@ -296,7 +311,9 @@ const Content = React.forwardRef(
       return res;
     };
     const handleConfirmSync = async () => {
-      const {token,position} = await getYDocTokenReq(syncParams.project+syncParams.roomId);
+      const { token, position } = await getYDocTokenReq(
+        syncParams.project + syncParams.roomId
+      );
       const projectSync = new ProjectSync(
         syncParams.project,
         user,

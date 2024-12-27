@@ -178,6 +178,8 @@ const Table = forwardRef(
       return () => window.removeEventListener("resize", updateColumns);
     }, [columns, user]);
 
+    console.log(sortedRows, "sortedRows");
+    
     return (
       <div>
         <DataGrid
