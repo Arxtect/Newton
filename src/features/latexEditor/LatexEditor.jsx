@@ -4,7 +4,12 @@ import "ace-builds/src-noconflict/mode-latex";
 import "ace-builds/src-min-noconflict/ext-language_tools";
 import "ace-builds/src-min-noconflict/ext-searchbox";
 
-import { useEditor, useFileStore, usePdfPreviewStore } from "@/store";
+import {
+  useEditor,
+  useFileStore,
+  usePdfPreviewStore,
+  useCompileSetting,
+} from "@/store";
 import AutoCompleteManager from "@/features/autoComplete/AutoCompleteManager";
 
 import EditorStateManager from "./component/editorStateManager"; // Import the class
@@ -14,6 +19,7 @@ import useAutoCompile from "./hook";
 import { useEngineStatusStore, useLayout } from "@/store";
 import FileView from "@/features/fileView";
 import path from "path";
+import { compileLatex } from "@/features/latexCompilation/latexCompilation";
 
 import { TexMathJax, loadExtensions } from "./texMathjax";
 
@@ -25,27 +31,21 @@ const LatexEditor = ({ handleChange, sourceCode, filepath, mainFilepath }) => {
     updateEditor: state.updateEditor,
   }));
 
-  const { setCompiledPdfUrl } = usePdfPreviewStore((state) => ({
-    setCompiledPdfUrl: state.setCompiledPdfUrl,
-  }));
-
   const {
     loadFile,
     currentProjectRoot,
     updateCurrentProjectFileList,
     touchCounter,
     assetsFilePath,
-    parentDir,
-    getCurrentProjectPdf,
   } = useFileStore((state) => ({
     loadFile: state.loadFile,
     currentProjectRoot: state.currentProjectRoot,
     updateCurrentProjectFileList: state.updateCurrentProjectFileList,
     touchCounter: state.touchCounter,
     assetsFilePath: state.assetsFilePath,
-    parentDir: state.parentDir,
-    getCurrentProjectPdf: state.getCurrentProjectPdf,
   }));
+
+
 
   useEffect(() => {
     loadExtensions();
@@ -94,13 +94,6 @@ const LatexEditor = ({ handleChange, sourceCode, filepath, mainFilepath }) => {
   }, [filepath, currentProjectRoot, touchCounter]);
 
   useEffect(() => {
-    (async () => {
-      const blobUrl = await getCurrentProjectPdf(currentProjectRoot);
-      if (blobUrl) {
-        setCompiledPdfUrl(blobUrl);
-      }
-    })();
-
     return () => {
       completer &&
         completer.offAddEventListener &&

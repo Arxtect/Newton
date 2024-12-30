@@ -124,12 +124,12 @@ export const compileLatex = async (
 
   // Make sure the engines are ready for compilation
   if (usePdfTeX) {
-    if (!pdftexEngine.isReady()) {
+    if (!pdftexEngine?.isReady()) {
       console.log("PDFTeX Engine not ready yet!");
       return;
     }
   } else {
-    if (!xetexEngine.isReady() || !dviEngine.isReady()) {
+    if (!xetexEngine?.isReady() || !dviEngine?.isReady()) {
       console.log("XeTeX or DVI Engine not ready yet!");
       return;
     }
@@ -187,6 +187,7 @@ export const compileLatex = async (
       const pdfBlob = new Blob([pdftexCompilation.pdf], {
         type: "application/pdf",
       });
+      console.log(pdftexCompilation.pdf, "blobUrl.pdf");
       if (compileCount < 3) {
         await compileLatex(
           currentProject,

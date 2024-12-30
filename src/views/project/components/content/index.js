@@ -37,19 +37,20 @@ const Content = ({
   //table list
   const sortedRows = useMemo(() => {
     return [...projectData]
-      .filter((data) => data.title.includes(searchInput))
+      .filter((data) =>
+        data.title.toLowerCase().includes(searchInput.toLowerCase())
+      )
       .sort((a, b) => {
         if (sortSelect === "lastModified") {
           return b.lastModified - a.lastModified;
         } else if (sortSelect === "lastCreated") {
           return b.created_at - a.created_at;
         } else if (sortSelect === "alphabetical") {
-          return a.title.localeCompare(b.title);
+          return a.title.toLowerCase().localeCompare(b.title.toLowerCase());
         }
         return 0;
       });
   }, [projectData, searchInput, sortSelect]);
-
   return (
     <>
       <div className="flex flex-col w-full">
