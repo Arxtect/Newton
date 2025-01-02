@@ -57,6 +57,7 @@ export const useFileStore = create()(
       assetValue: "",
       lastSavedValue: "",
       reloadCounter: 0,
+      fileTree:[],
 
       // repo
       fileCreatingDir: null,
@@ -76,6 +77,10 @@ export const useFileStore = create()(
       shareIsRead: false,
       selectedFiles: [],
       parentDir: "",
+      updateFileTree: async () => {
+        let fileTree = await FS.readFileTree(get().currentProjectRoot);
+        set({ fileTree });
+      },
       setSelectedFiles: (filepath) => {
         // 如果传入的是数组就直接使用,否则包装成数组
         set({ selectedFiles: [filepath] });

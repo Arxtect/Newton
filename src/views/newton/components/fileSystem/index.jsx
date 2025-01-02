@@ -29,6 +29,8 @@ const FileSystem = () => {
     preRenamingDirpath,
     changePreRenamingDirpath,
     parentDir,
+    fileTree,
+    updateFileTree,
   } = useFileStore((state) => ({
     currentProjectRoot: state.currentProjectRoot,
     changeCurrentProjectRoot: state.changeCurrentProjectRoot,
@@ -48,7 +50,18 @@ const FileSystem = () => {
     endRenaming: state.endRenaming,
     preRenamingDirpath: state.preRenamingDirpath,
     changePreRenamingDirpath: state.changePreRenamingDirpath,
+    fileTree: state.fileTree,
+    updateFileTree: state.updateFileTree,
   }));
+
+  useEffect(() => {
+    if (!currentProjectRoot) return;
+    updateFileTree();
+  }, [currentProjectRoot, touchCounter]);
+
+  useEffect(() => {
+    console.log(fileTree, "fileTree");
+  }, [fileTree]);
 
   return (
     <main className="max-w-[100%] h-full">
@@ -76,6 +89,7 @@ const FileSystem = () => {
           preRenamingDirpath={preRenamingDirpath}
           changePreRenamingDirpath={changePreRenamingDirpath}
           changeCurrentProjectRoot={changeCurrentProjectRoot}
+          fileTree={fileTree}
         />
       </div>
     </main>

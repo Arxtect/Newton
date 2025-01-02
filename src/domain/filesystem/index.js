@@ -12,7 +12,7 @@ export * from "./queries/existsPath";
 export * from "./queries/getFileRecursively";
 export * from "./queries/readFile";
 export * from "./queries/readFileStats";
-
+export * from "./queries/readFileTree";
 export * from "./commands/getAllFiles";
 export * from "./commands/findMainFile";
 

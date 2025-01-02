@@ -30,51 +30,7 @@ import { useFileStore } from "store";
 import ArIcon from "@/components/arIcon";
 import ContextMenu from "@/components/contextMenu";
 import { toast } from "react-toastify";
-
-const LinkedLines = ({
-  dirpath,
-  root,
-  depth,
-  fileList,
-  editingFilepath,
-  ...res
-}) => {
-  return (
-    <>
-      {fileList.map((f) => {
-        const filepath = path.join(dirpath, f.name);
-        if (f.type === "file") {
-          return (
-            <FileLine
-              {...res}
-              key={f.name}
-              depth={depth}
-              filepath={filepath}
-              ignoreGit={f.ignored}
-            />
-          );
-        } else if (f.type === "dir") {
-          if (f.name === ".git") return null;
-          return (
-            <DirectoryLine
-              {...res}
-              key={f.name}
-              root={root}
-              dirpath={filepath}
-              depth={depth}
-              open={
-                editingFilepath != null &&
-                !path.relative(filepath, editingFilepath).startsWith("..")
-              }
-              ignoreGit={f.ignored}
-            />
-          );
-        }
-        return null;
-      })}
-    </>
-  );
-};
+import DirectoryLineWrapper from "./DirectoryLineWrapper";
 
 const DirectoryLineContent = ({
   dirpath,
@@ -99,61 +55,19 @@ const DirectoryLineContent = ({
   preRenamingDirpath,
   changePreRenamingDirpath,
   changeCurrentProjectRoot,
+  fileTree,
 }) => {
-  const {
-    dirOpen,
-    isDropFileSystem,
-    updateIsDropFileSystem,
-    filepath,
-    projectSync,
-    reload,
-  } = useFileStore((state) => ({
-    dirOpen: state.dirOpen,
-    updateIsDropFileSystem: state.updateIsDropFileSystem,
-    isDropFileSystem: state.isDropFileSystem,
-    filepath: state.filepath,
-    projectSync: state.projectSync,
-    reload: state.repoChanged,
-  }));
+  const { dirOpen, isDropFileSystem, filepath, projectSync, reload } =
+    useFileStore((state) => ({
+      dirOpen: state.dirOpen,
+      isDropFileSystem: state.isDropFileSystem,
+      filepath: state.filepath,
+      projectSync: state.projectSync,
+      reload: state.repoChanged,
+    }));
 
   const [opened, setOpened] = useState(open);
-  const [fileList, setFileList] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [hovered, setHovered] = useState(false);
-
-  useEffect(() => {
-      console.log("Effect triggered by:", {
-        dirpath,
-        root,
-        opened,
-        touchCounter,
-      });
-
-    let unmounted = false;
-
-    const updateChildren = async () => {
-      try {
-        const fileList = await readFileStats(dirpath);
-
-        if (!unmounted) {
-          setFileList(fileList);
-          setLoading(false);
-        }
-      } catch (error) {
-        if (!unmounted) {
-          setError(error);
-          setLoading(false);
-        }
-      }
-    };
-
-    updateChildren();
-
-    return () => {
-      unmounted = true;
-    };
-  }, [dirpath, root, opened, touchCounter]);
 
   const handleMouseOver = () => setHovered(true);
 
@@ -162,10 +76,8 @@ const DirectoryLineContent = ({
   const handleClick = (e, dirpath) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!loading) {
-      setOpened(!opened);
-      changeCurrentSelectDir(dirpath);
-    }
+    setOpened(!opened);
+    changeCurrentSelectDir(dirpath);
   };
 
   const handleFileMove = (result) => {
@@ -371,90 +283,63 @@ const DirectoryLineContent = ({
                 paddingLeft: `${depth * 8}px`,
               }}
             >
-              <ListItemIcon
-                style={{
-                  minWidth: "unset",
-                  // visibility:
-                  //   fileList && fileList.length > 0 ? 'visible' : 'hidden' ,
-                }}
-                onClick={(e) => handleClick(e, dirpath)}
-              >
-                {opened ? <ExpandMoreIcon /> : <ChevronRightIcon />}
-              </ListItemIcon>
-              <ListItemIcon
-                style={{ minWidth: "unset" }}
-                onClick={(e) => handleClick(e, dirpath)}
-              >
-                {opened ? (
-                  <ArIcon
-                    name={"FolderOpen"}
-                    className="text-black w-[1.5rem]"
+              <DirectoryLineWrapper>
+                {renamingPathname === dirpath ? (
+                  <TextField
+                    className="tailwind-classes-for-input"
+                    variant="outlined"
+                    size="small"
+                    value={value}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    onKeyDown={handleKeyDown}
+                    onClick={(e) => e.stopPropagation()}
+                    inputRef={inputRef}
+                    sx={{
+                      "& .MuiInputBase-input": {
+                        height: "24px",
+                        padding: "0 6px",
+                      },
+                      "& .MuiOutlinedInput-root": {
+                        "& fieldset": {
+                          borderColor: "#81C784",
+                        },
+                        "&:hover fieldset": {
+                          borderColor: "#81C784",
+                        },
+                        "&.Mui-focused fieldset": {
+                          borderColor: "#81C784",
+                        },
+                      },
+                    }}
                   />
                 ) : (
-                  <ArIcon
-                    name={"FolderClose"}
-                    className="text-black w-[1.5rem]"
-                  />
-                )}
-              </ListItemIcon>
-              {renamingPathname === dirpath ? (
-                <TextField
-                  className="tailwind-classes-for-input"
-                  variant="outlined"
-                  size="small"
-                  value={value}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  onKeyDown={handleKeyDown}
-                  onClick={(e) => e.stopPropagation()}
-                  inputRef={inputRef}
-                  sx={{
-                    "& .MuiInputBase-input": {
-                      height: "24px",
-                      padding: "0 6px",
-                    },
-                    "& .MuiOutlinedInput-root": {
-                      "& fieldset": {
-                        borderColor: "#81C784",
-                      },
-                      "&:hover fieldset": {
-                        borderColor: "#81C784",
-                      },
-                      "&.Mui-focused fieldset": {
-                        borderColor: "#81C784",
-                      },
-                    },
-                  }}
-                />
-              ) : (
-                <React.Fragment>
-                  <div
-                    className="w-full"
-                    onClick={(e) => handleClick(e, dirpath)}
-                  >
-                    <Pathname ignoreGit={ignoreGit}>
+                  <React.Fragment>
+                    <span
+                      onClick={(e) => handleClick(e, dirpath)}
+                      className="text-overflow-ellipsis"
+                    >
                       {basename || `${path.basename(dirpath)}`}
-                    </Pathname>
-                  </div>
-
-                  <HoverMenu
-                    basename={basename}
-                    dirpath={basename}
-                    root={basename}
-                    onAddFile={onAddFile}
-                    onAddFolder={onAddFolder}
-                    onDelete={(event) => {
-                      handleDeleteDirectory(event, dirpath);
-                    }}
-                    onRename={(event) => {
-                      handleRename(event);
-                    }}
-                    depth={depth}
-                    menuItems={menuItems}
-                    hovered={hovered}
-                  />
-                </React.Fragment>
-              )}
+                    </span>
+                    <HoverMenu
+                      basename={basename}
+                      dirpath={basename}
+                      root={basename}
+                      onAddFile={onAddFile}
+                      onAddFolder={onAddFolder}
+                      onDelete={(event) => {
+                        handleDeleteDirectory(event, dirpath);
+                      }}
+                      onRename={(event) => {
+                        handleRename(event);
+                      }}
+                      depth={depth}
+                      menuItems={menuItems}
+                      hovered={hovered}
+                    />
+                  </React.Fragment>
+                )}
+              </DirectoryLineWrapper>
             </ListItem>
           </Draggable>
         </div>
@@ -473,32 +358,60 @@ const DirectoryLineContent = ({
           )}
         </>
       )}
-      {opened && fileList != null && (
-        <LinkedLines
-          root={root}
-          dirpath={dirpath}
-          depth={depth + 1}
-          fileList={fileList}
-          editingFilepath={editingFilepath}
-          touchCounter={touchCounter}
-          isFileCreating={isFileCreating}
-          isDirCreating={isDirCreating}
-          fileMoved={fileMoved}
-          startFileCreating={startFileCreating}
-          startDirCreating={startDirCreating}
-          deleteDirectory={deleteDirectory}
-          ignoreGit={ignoreGit}
-          loadFile={loadFile}
-          currentSelectDir={currentSelectDir}
-          changeCurrentSelectDir={changeCurrentSelectDir}
-          renamingPathname={renamingPathname}
-          startRenaming={startRenaming}
-          endRenaming={endRenaming}
-          preRenamingDirpath={preRenamingDirpath}
-          changePreRenamingDirpath={changePreRenamingDirpath}
-          changeCurrentProjectRoot={changeCurrentProjectRoot}
-        />
-      )}
+      {opened &&
+        fileTree.length > 0 &&
+        fileTree.map((item) => {
+          if (item.type === "file") {
+            return (
+              <FileLine
+                key={item.name}
+                depth={item.depth}
+                filepath={item.filepath}
+                ignoreGit={item.ignored}
+                loadFile={loadFile}
+                fileMoved={fileMoved}
+                startRenaming={startRenaming}
+                endRenaming={endRenaming}
+              />
+            );
+          } else if (item.type === "dir") {
+            if (item.name === ".git") return null;
+            return (
+              <DirectoryLine
+                key={item.name}
+                root={root}
+                fileTree={item.children}
+                dirpath={item.filepath}
+                depth={item.depth}
+                open={
+                  editingFilepath != null &&
+                  !path
+                    .relative(item.filepath, editingFilepath)
+                    .startsWith("..")
+                }
+                touchCounter={touchCounter}
+                ignoreGit={item.ignored}
+                editingFilepath={editingFilepath}
+                isFileCreating={isFileCreating}
+                isDirCreating={isDirCreating}
+                fileMoved={fileMoved}
+                startFileCreating={startFileCreating}
+                startDirCreating={startDirCreating}
+                deleteDirectory={deleteDirectory}
+                loadFile={loadFile}
+                currentSelectDir={currentSelectDir}
+                changeCurrentSelectDir={changeCurrentSelectDir}
+                renamingPathname={renamingPathname}
+                startRenaming={startRenaming}
+                endRenaming={endRenaming}
+                preRenamingDirpath={preRenamingDirpath}
+                changePreRenamingDirpath={changePreRenamingDirpath}
+                changeCurrentProjectRoot={changeCurrentProjectRoot}
+              />
+            );
+          }
+          return null;
+        })}
     </List>
   );
 };

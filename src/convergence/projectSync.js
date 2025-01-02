@@ -95,6 +95,14 @@ class ProjectSync {
       changeIsInitialSyncComplete: this.changeIsInitialSyncComplete.bind(this),
       changeInitial: this.changeInitial.bind(this),
     };
+
+    this.websocketProvider.on("status", (event) => {
+      console.log(event, "event22");
+    });
+
+    this.websocketProvider.on("close", () => {
+      this.setUserAwareness(null);
+    });
   }
 
   changeIsInitialSyncComplete() {
@@ -107,6 +115,10 @@ class ProjectSync {
 
   // 设置用户信息到 awareness
   setUserAwareness(user) {
+    if (user == null) {
+      this.awareness.setLocalState(null);
+      return;
+    }
     this.awareness.setLocalStateField("user", user);
   }
 
@@ -343,6 +355,8 @@ class ProjectSync {
   // Yjs Map 观察者处理函数
   async yMapObserveHandler(event) {
     let contentSyncedPromises = [];
+
+    console.log(event, "event");
 
     event.keysChanged.forEach((key) => {
       console.log(key, "changeKey");
