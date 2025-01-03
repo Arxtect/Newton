@@ -13,16 +13,8 @@ import AddDir from "./AddDir";
 import AddFile from "./AddFile";
 import Draggable from "./Draggable";
 import FileLine from "./FileLine";
-import Pathname from "./Pathname";
-import HoverMenu from "./HoverMenu";
-import { List, ListItem, ListItemText, ListItemIcon } from "@mui/material";
-import {
-  Folder as FolderIcon,
-  FolderOpen as FolderOpenIcon,
-  ChevronRight as ChevronRightIcon,
-  ExpandMore as ExpandMoreIcon,
-} from "@mui/icons-material";
-import FileIcon from "@mui/icons-material/InsertDriveFile";
+import { List, ListItem } from "@mui/material";
+
 import { Box, TextField } from "@mui/material";
 
 import { readFileStats, getProjectInfo } from "domain/filesystem";
@@ -276,14 +268,29 @@ const DirectoryLineContent = ({
               onMouseOver={handleMouseOver}
               onMouseLeave={handleMouseLeave}
               className={`hover:bg-[#bae6bc5c] transition duration-300 ${
-                currentSelectDir == dirpath ? "bg-[#81c784]" : ""
+                currentSelectDir == dirpath && renamingPathname != dirpath
+                  ? "bg-[#81c784]"
+                  : ""
               }`}
               style={{
-                padding: "3px 0px 3px 0px",
+                padding: "4px 0 1px 0",
                 paddingLeft: `${depth * 8}px`,
               }}
             >
-              <DirectoryLineWrapper>
+              <DirectoryLineWrapper
+                handleClick={handleClick}
+                dirpath={dirpath}
+                opened={opened}
+                title={basename || `${path.basename(dirpath)}`}
+                basename={basename}
+                onAddFile={onAddFile}
+                onAddFolder={onAddFolder}
+                handleDeleteDirectory={handleDeleteDirectory}
+                handleRename={handleRename}
+                depth={depth}
+                menuItems={menuItems}
+                hovered={hovered}
+              >
                 {renamingPathname === dirpath ? (
                   <TextField
                     className="tailwind-classes-for-input"
@@ -314,30 +321,9 @@ const DirectoryLineContent = ({
                     }}
                   />
                 ) : (
-                  <React.Fragment>
-                    <span
-                      onClick={(e) => handleClick(e, dirpath)}
-                      className="text-overflow-ellipsis"
-                    >
-                      {basename || `${path.basename(dirpath)}`}
-                    </span>
-                    <HoverMenu
-                      basename={basename}
-                      dirpath={basename}
-                      root={basename}
-                      onAddFile={onAddFile}
-                      onAddFolder={onAddFolder}
-                      onDelete={(event) => {
-                        handleDeleteDirectory(event, dirpath);
-                      }}
-                      onRename={(event) => {
-                        handleRename(event);
-                      }}
-                      depth={depth}
-                      menuItems={menuItems}
-                      hovered={hovered}
-                    />
-                  </React.Fragment>
+                  <span className="overflow-hidden text-ellipsis">
+                    <span>{basename || `${path.basename(dirpath)}`}</span>
+                  </span>
                 )}
               </DirectoryLineWrapper>
             </ListItem>
@@ -366,7 +352,7 @@ const DirectoryLineContent = ({
               <FileLine
                 key={item.name}
                 depth={item.depth}
-                filepath={item.filepath}
+                filepath={path.join(root, item.filepath)}
                 ignoreGit={item.ignored}
                 loadFile={loadFile}
                 fileMoved={fileMoved}
@@ -381,12 +367,12 @@ const DirectoryLineContent = ({
                 key={item.name}
                 root={root}
                 fileTree={item.children}
-                dirpath={item.filepath}
+                dirpath={path.join(root, item.filepath)}
                 depth={item.depth}
                 open={
                   editingFilepath != null &&
                   !path
-                    .relative(item.filepath, editingFilepath)
+                    .relative(path.join(root, item.filepath), editingFilepath)
                     .startsWith("..")
                 }
                 touchCounter={touchCounter}

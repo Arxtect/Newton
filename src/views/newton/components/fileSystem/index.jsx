@@ -90,6 +90,7 @@ const FileSystem = () => {
           changePreRenamingDirpath={changePreRenamingDirpath}
           changeCurrentProjectRoot={changeCurrentProjectRoot}
           fileTree={fileTree}
+          parentDir={parentDir}
         />
       </div>
     </main>

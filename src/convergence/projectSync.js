@@ -196,9 +196,10 @@ class ProjectSync {
   }
 
   // 删除文件
-  async deleteFile(filePath, otherInfo = {}) {
+  async deleteFile(filePath) {
     this.yDoc.transact(() => {
-      this.yMap.set(filePath, { _delete: true, ...otherInfo });
+      // this.yMap.set(filePath, { _delete: true, ...otherInfo });
+      this.yMap.delete(filePath);
     });
   }
 
@@ -207,7 +208,6 @@ class ProjectSync {
     try {
       if (!(await FS.existsPath(folderPath))) return;
       const files = await FS.readFileStats(folderPath, false);
-      this.removeFolderInfo(folderPath);
 
       for (const file of files) {
         const filePath = path.join(folderPath, file.name); // 使用 path.join 进行路径拼接
@@ -219,7 +219,6 @@ class ProjectSync {
           await this.deleteFolder(filePath); // 递归删除子文件夹
         }
       }
-      await FS.removeDir(folderPath);
     } catch (err) {
       console.error(`Error deleting folder ${folderPath}:`, err);
       // throw err;
@@ -231,11 +230,6 @@ class ProjectSync {
     if (filePath.includes(".git")) return;
     try {
       const relativePath = FS.removeParentDirPath(filePath, this.parentDir);
-      if (!this.yMap.has(relativePath)) {
-        const folderPath = path.dirname(relativePath);
-        this.syncFolderInfo(folderPath);
-      }
-
       await this.syncToYMap(relativePath, content);
     } catch (err) {
       console.error(`Error syncing file ${filePath}:`, err);
@@ -244,58 +238,35 @@ class ProjectSync {
     }
   }
 
-  // 同步文件夹列表
-  syncFolderInfo(folderPath) {
-    if (folderPath.includes(".git")) return;
+  // 同步文件树到 Yjs Map
+  syncTreeToYMap(fileTree) {
     this.yDoc.transact(() => {
-      let folderMap = this.yMap.get(this.folderMapName) || [];
-
-      folderMap = [...folderMap, folderPath];
-      console.log(folderMap, folderPath, "folderMap");
-
-      this.yMap.set(this.folderMapName, [...new Set(folderMap)]);
-    });
-  }
-
-  // 从 Yjs Map 中删除文件夹
-  removeFolderInfo(folderPath) {
-    if (folderPath.includes(".git")) return;
-    this.yDoc.transact(() => {
-      let folderMap = this.yMap.get(this.folderMapName) || [];
-      if (folderMap.includes(folderPath)) {
-        folderMap = folderMap.filter((item) => item != folderPath);
-        this.yMap.set(this.folderMapName, [...new Set(folderMap)]);
-      }
+      this.yMap.set(this.folderMapName, fileTree);
     });
   }
 
   // 同步整个文件夹到 Yjs Map
   async syncFolderToYMap(folderPath) {
-    if (folderPath.includes(".git")) return;
-
+    let fileTree = await FS.readFileTree(this.currenProjectDir);
+    this.syncTreeToYMap(fileTree);
     const syncPromises = [];
 
-    const handlePromise = async (folderPath) => {
-      this.syncFolderInfo(folderPath);
-      const files = await FS.readFileStats(folderPath, false);
+    const handlePromise = async (fileTree) => {
+      for (const file of fileTree) {
+        const filePath = path.join(this.currenProjectDir, file.filepath);
 
-      for (const file of files) {
-        const filePath = path.join(folderPath, file.name);
-
-        if (file.type === "file") {
-          const promise = FS.readFile(filePath).then(async (content) => {
-            await this.syncToYMap(filePath, content);
-          });
+        const promise = FS.readFile(filePath).then(async (content) => {
+          await this.syncToYMap(filePath, content);
           syncPromises.push(promise);
-        } else if (file.type === "dir") {
-          await handlePromise(filePath);
+        });
+        if (file.children) {
+          await handlePromise(file.children);
         }
       }
     };
 
     try {
-      await handlePromise(folderPath);
-
+      await handlePromise(fileTree);
       await Promise.all(syncPromises);
     } catch (err) {
       console.error(`Error syncing folder ${folderPath}:`, err);
@@ -313,43 +284,43 @@ class ProjectSync {
     callback && callback();
   }
 
-  async handleFolderInfo(folderPath, key, content) {
-    if (folderPath.includes(".git")) return;
-    const files = await FS.readFileStats(folderPath, false);
-
-    const fileNames = new Set(files.map((f) => f.name));
-    const contentNames = new Set(content);
-
-    // 删除 files 中有但 content 中没有的文件夹
-    for (const file of files) {
-      const filePath = path.join(folderPath, file.name);
-      const relativePath = FS.removeParentDirPath(filePath, this.parentDir);
-      if (file.name.includes(".git")) continue;
-
-      if (file.type == "dir" && !contentNames.has(relativePath)) {
-        const folderPath = path.join(this.parentDir, relativePath);
-        await this.deleteFolder(folderPath);
-        console.log(`Deleted folder ${filePath}`);
+  async handleFolderInfo(folderPath, content) {
+    let folderList = content.map((item) => {
+      if (item.children) {
+        return path.join(this.parentDir, item.filepath);
       }
-    }
+    });
 
-    // 创建 content 中有但 files 中没有的文件夹
-    for (const folderName of contentNames) {
-      const folderPath = path.join(this.parentDir, folderName);
-      if (!fileNames.has(folderPath)) {
-        await FS.ensureDir(folderPath);
-        console.log(`Created folder ${folderPath}`);
+    // 创建本地没有的文件树
+    const createFolder = async (tree) => {
+      for (const file of tree) {
+        if (!file.children) continue;
+        const filePath = path.join(this.parentDir, file.filepath);
+        let isExistPath = await FS.existsPath(filePath);
+        if (!isExistPath) {
+          await FS.ensureDir(filePath);
+        }
+        createFolder(file.children);
       }
-    }
+    };
+    await createFolder(content);
 
-    // 递归处理子文件夹
-    for (const file of files) {
-      const filePath = path.join(folderPath, file.name);
-      const relativePath = FS.removeParentDirPath(filePath, this.parentDir);
-      if (file.type == "dir" && contentNames.has(relativePath)) {
-        await this.handleFolderInfo(filePath, key, content);
+    // 删除本地多余的文件树
+    const deleteFolder = async (folderPath) => {
+      const files = await FS.readFileTree(folderPath);
+      for (const file of files) {
+        if (!file.children) continue;
+        const filePath = path.join(file.filepath);
+        if (!folderList.includes(filePath)) {
+          const folderPath = path.join(this.parentDir, file.filepath);
+          await this.deleteFolder(folderPath);
+          console.log(`Deleted folder ${filePath}`);
+        } else {
+          deleteFolder(file.children);
+        }
       }
-    }
+    };
+    await deleteFolder(folderPath);
   }
 
   // Yjs Map 观察者处理函数
@@ -359,6 +330,11 @@ class ProjectSync {
     console.log(event, "event");
 
     event.keysChanged.forEach((key) => {
+      const change = event.changes.keys.get(key);
+      console.log(change?.action, "change.action");
+      if (change.action === "delete") {
+        console.log(`Key deleted: ${key}`);
+      }
       console.log(key, "changeKey");
       if (event?.transaction?.origin == null) {
         console.log(`Origin is null for key ${key}`, event?.transaction);
@@ -374,11 +350,7 @@ class ProjectSync {
             if (key == this.folderMapName) {
               await FS.ensureDir(this.currenProjectDir);
 
-              this.handleFolderInfo(
-                this.currenProjectDir,
-                relativePath,
-                content
-              );
+              this.handleFolderInfo(this.currenProjectDir, content);
               resolve();
               return;
             }

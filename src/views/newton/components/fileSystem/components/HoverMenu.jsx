@@ -24,6 +24,7 @@ const HoverMenu = ({
   depth,
   menuItems,
   hovered,
+  className,
 }) => {
   const [menuVisible, setMenuVisible] = useState(false);
 
@@ -39,7 +40,10 @@ const HoverMenu = ({
 
   return (
     <Tooltip content="Menu" position="bottom" isHasChildren={true}>
-      <div className="relative ml-auto group mr-2" id="hover-menu">
+      <div
+        className={`relative ml-auto group mr-2 ${className}`}
+        id="hover-menu"
+      >
         {/* <div className="absolute inset-0 flex items-center justify-end space-x-1"> */}
         <ClickContextMenu items={menuItems} onOpenChange={onOpenChange}>
           {(hovered || menuVisible) && (

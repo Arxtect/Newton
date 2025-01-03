@@ -18,20 +18,6 @@ import { useEditor } from "./useEditor";
 export const FILE_STORE = "FILE_STORE";
 
 function removeRootPath(filePath, rootPath) {
-  // 标准化路径
-  // const normalizedFilePath = path.normalize(filePath);
-  // const normalizedRootPath = path.basename(path.normalize(rootPath));
-
-  // // 分割路径
-  // const pathParts = normalizedFilePath.split(path.sep);
-
-  // // 如果第一个部分与 rootPath 的文件夹名相同，则移除
-  // if (pathParts[0] === normalizedRootPath) {
-  //   pathParts.shift();
-  // }
-
-  // // 重新组合路径
-  // return pathParts.join(path.sep);
   return filePath.replace(rootPath, "");
 }
 
@@ -438,6 +424,7 @@ export const useFileStore = create()(
           }
           await FS.removeDirectory(dirpath);
           get().startUpdate({ changedPath: files });
+          get().updateFileTree();
           // TODO: 这里可能需要更新 Git 状态，根据你的应用逻辑进行调整
         } catch (err) {
           console.log(err);

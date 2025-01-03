@@ -12,6 +12,7 @@ import {
   ExpandMore as ExpandMoreIcon,
 } from "@mui/icons-material";
 import { List, ListItem, ListItemText, ListItemIcon } from "@mui/material";
+import HoverMenu from "./HoverMenu";
 
 const DirectoryLineWrapper = ({
   handleClick,
@@ -19,18 +20,28 @@ const DirectoryLineWrapper = ({
   opened,
   children,
   title,
+  basename,
+  onAddFile,
+  onAddFolder,
+  handleDeleteDirectory,
+  handleRename,
+  depth,
+  menuItems,
+  hovered,
 }) => {
   return (
-    <div class="flex cursor-pointer items-center gap-1 p-1 w-full whitespace-nowrap rounded-sm text-sm leading-5 select-none">
+    <div class="flex cursor-pointer items-center  w-full whitespace-nowrap  select-none ">
       <ListItemIcon
         style={{
           minWidth: "unset",
         }}
         onClick={(e) => handleClick(e, dirpath)}
+        className="mt-[-0.2rem]"
       >
         {opened ? <ExpandMoreIcon /> : <ChevronRightIcon />}
       </ListItemIcon>
       <ListItemIcon
+        className="mt-[-0.2rem]"
         style={{ minWidth: "unset" }}
         onClick={(e) => handleClick(e, dirpath)}
       >
@@ -41,18 +52,32 @@ const DirectoryLineWrapper = ({
         )}
       </ListItemIcon>
       <div
-        className=" flex"
+        className="flex pl-1 whitespace-nowrap overflow-hidden"
         style={{
-          width: "calc(100% - 80px)",
+          width: "100%",
         }}
+        title={title}
+        onClick={(e) => handleClick(e, dirpath)}
       >
-        <span
-          className={"flex-shrink flex-grow py-[1px]  whitespace-nowrap overflow-hidden"}
-          title={title}
-        >
-          {children}
-        </span>
+        {children}
       </div>
+      <HoverMenu
+        basename={basename}
+        dirpath={basename}
+        root={basename}
+        onAddFile={onAddFile}
+        onAddFolder={onAddFolder}
+        onDelete={(event) => {
+          handleDeleteDirectory(event, dirpath);
+        }}
+        onRename={(event) => {
+          handleRename(event);
+        }}
+        depth={depth}
+        menuItems={menuItems}
+        hovered={hovered}
+        className="mt-[-0.2rem]"
+      />
     </div>
   );
 };

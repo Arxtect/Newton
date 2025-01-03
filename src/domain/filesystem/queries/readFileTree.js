@@ -12,33 +12,40 @@ export async function readFileTree(
   dirpath,
   parentName = path.basename(dirpath),
   isNotSync = true,
-  depth = 1
+  depth = 1,
+  baseDir = dirpath // Add a baseDir parameter
 ) {
   const filenames = await readdir(dirpath);
 
   const ret = await Promise.all(
     filenames.map(async (name) => {
+      if (name === ".git") return null;
+
       if (!!projectInfoExists(name) && isNotSync) return null;
       const childPath = path.join(dirpath, name);
       if (IGNORE_PATTERNS.includes(childPath)) {
         return null;
       }
       const stats = await stat(childPath);
-
+      console.log(stats, "filetree");
+      const mtime = stats.mtime.getTime(); // 转为时间戳
+      const relativePath = path.relative(baseDir, childPath); // Calculate relative path
       if (stats.isDirectory()) {
         // Recursively get children for directories
         const children = await readFileTree(
           childPath,
-          path.basename(dirpath),
+          path.basename(childPath),
           isNotSync,
-          depth + 1
+          depth + 1,
+          baseDir // Pass baseDir to recursive calls
         );
         return {
           name,
           type: "dir",
           parentName,
-          filepath: childPath,
+          filepath: relativePath, // Use relative path
           depth,
+          mtime, // Include mtime as timestamp
           children,
         };
       } else {
@@ -46,8 +53,9 @@ export async function readFileTree(
           name,
           type: "file",
           parentName,
-          filepath: childPath,
+          filepath: relativePath, // Use relative path
           depth,
+          mtime, // Include mtime as timestamp
         };
       }
     })
