@@ -8,8 +8,7 @@ import React, {
 import fs from "fs";
 import path from "path";
 import pify from "pify";
-import Draggable from "./Draggable"; // Adjust the import path as needed
-import Pathname from "./Pathname"; // Adjust the import path as needed
+import Draggable from "./Draggable"; 
 import { ListItemIcon } from "@mui/material";
 import { Box, TextField } from "@mui/material";
 import { useFileStore } from "store";
@@ -329,23 +328,23 @@ const FileLine = ({
                   padding: "3px 0 1px 0",
                   paddingLeft: `${depth * 8 + 24}px`,
                 }}
-                onClick={handleFileClick}
-                onDoubleClick={(e) => {
-                  if (
-                    filepath !== editingFilepath &&
-                    filepath !== assetsFilePath
-                  ) {
-                    return;
-                  }
-                  onRename(e);
-                }}
               >
-                <div class="flex cursor-pointer items-center  w-full whitespace-nowrap  select-none   ">
+                <div class="flex cursor-pointer items-center  w-full whitespace-nowrap  select-none">
                   <ListItemIcon
                     style={{
                       minWidth: "unset",
                     }}
                     className="mt-[-0.2rem]"
+                    onClick={handleFileClick}
+                    onDoubleClick={(e) => {
+                      if (
+                        filepath !== editingFilepath &&
+                        filepath !== assetsFilePath
+                      ) {
+                        return;
+                      }
+                      onRename(e);
+                    }}
                   >
                     <ArIcon name={"File"} className="text-black w-[1.5rem]" />
                   </ListItemIcon>
@@ -355,8 +354,18 @@ const FileLine = ({
                       width: "100%",
                     }}
                     title={basename}
+                    onClick={handleFileClick}
+                    onDoubleClick={(e) => {
+                      if (
+                        filepath !== editingFilepath &&
+                        filepath !== assetsFilePath
+                      ) {
+                        return;
+                      }
+                      onRename(e);
+                    }}
                   >
-                    <span className="overflow-hidden text-ellipsis">
+                    <span className="overflow-hidden text-ellipsis" >
                       {basename}
                       {mainFilepath &&
                         path.basename(mainFilepath) == basename && (
@@ -374,12 +383,6 @@ const FileLine = ({
                     </span>
                   </div>
                   <HoverMenu
-                    dirpath={filepath}
-                    onDelete={(e) => {
-                      e.stopPropagation();
-                      deleteFile({ filename: filepath });
-                    }}
-                    onRename={onRename}
                     menuItems={menuItems}
                     hovered={hovered}
                     className="mt-[-0.2rem]"

@@ -275,7 +275,6 @@ const Project = () => {
       onSuccess: () => {
         setLoading(false);
         setSyncDialogOpen(false);
-        console.log("loadFile", projectSync.isInitialSyncComplete);
       },
       onFailure: () => {
         setLoading(false);

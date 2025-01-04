@@ -10,8 +10,8 @@ const stat = pify(fs.stat);
 
 export async function readFileTree(
   dirpath,
-  parentName = path.basename(dirpath),
   isNotSync = true,
+  parentName = path.basename(dirpath),
   depth = 1,
   baseDir = dirpath // Add a baseDir parameter
 ) {
@@ -34,8 +34,9 @@ export async function readFileTree(
         // Recursively get children for directories
         const children = await readFileTree(
           childPath,
-          path.basename(childPath),
+
           isNotSync,
+          path.basename(childPath),
           depth + 1,
           baseDir // Pass baseDir to recursive calls
         );

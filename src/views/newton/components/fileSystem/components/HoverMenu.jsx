@@ -14,14 +14,6 @@ import ClickContextMenu from "@/components/contextMenu/ClickContextMenu";
 import ArIcon from "@/components/arIcon";
 
 const HoverMenu = ({
-  basename,
-  dirpath,
-  root,
-  onAddFile,
-  onAddFolder,
-  onDelete,
-  onRename,
-  depth,
   menuItems,
   hovered,
   className,
@@ -61,60 +53,6 @@ const HoverMenu = ({
             </IconButton>
           )}
         </ClickContextMenu>
-
-        {/* {onAddFile && (
-          <Tooltip title="add file">
-            <IconButton
-              size="small"
-              onClick={(e) => {
-                e.stopPropagation();
-                onAddFile(e);
-              }}
-            >
-              <AddBoxIcon fontSize="inherit" />
-            </IconButton>
-          </Tooltip>
-        )}
-        {onAddFolder && (
-          <Tooltip title="add folder">
-            <IconButton
-              size="small"
-              onClick={(e) => {
-                e.stopPropagation();
-                onAddFolder(e);
-              }}
-            >
-              <CreateNewFolderIcon fontSize="inherit" />
-            </IconButton>
-          </Tooltip>
-        )} */}
-        {/* basename !== ".git" && dirpath !== root && */}
-        {/* {onDelete && depth != 0 && (
-          <Tooltip title="delete">
-            <IconButton
-              size="small"
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete(e);
-              }}
-            >
-              <DeleteIcon fontSize="inherit" />
-            </IconButton>
-          </Tooltip>
-        )}
-        {onRename && (
-          <Tooltip title="rename">
-            <IconButton
-              size="small"
-              onClick={(e) => {
-                e.stopPropagation();
-                onRename(e);
-              }}
-            >
-              <EditIcon fontSize="inherit" />
-            </IconButton>
-          </Tooltip>
-        )} */}
       </div>
     </Tooltip>
   );

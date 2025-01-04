@@ -43,7 +43,7 @@ export const useFileStore = create()(
       assetValue: "",
       lastSavedValue: "",
       reloadCounter: 0,
-      fileTree:[],
+      fileTree: [],
 
       // repo
       fileCreatingDir: null,
@@ -192,6 +192,7 @@ export const useFileStore = create()(
       // Actions
       setAutosave: (autosave) => set({ autosave }),
       loadFile: async ({ filepath }) => {
+        console.log("loadFile", filepath);
         if (!filepath) return;
         const { editor } = useEditor.getState();
 
@@ -397,6 +398,9 @@ export const useFileStore = create()(
       },
 
       deleteFile: async ({ filename }, isSync = false) => {
+        if (filename == get().filepath) {
+          set({ filepath: "", value: "" });
+        }
         if (!isSync) {
           set({ filepath: "", value: "" });
         }

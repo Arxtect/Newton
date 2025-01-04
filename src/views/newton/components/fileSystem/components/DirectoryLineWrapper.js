@@ -62,18 +62,6 @@ const DirectoryLineWrapper = ({
         {children}
       </div>
       <HoverMenu
-        basename={basename}
-        dirpath={basename}
-        root={basename}
-        onAddFile={onAddFile}
-        onAddFolder={onAddFolder}
-        onDelete={(event) => {
-          handleDeleteDirectory(event, dirpath);
-        }}
-        onRename={(event) => {
-          handleRename(event);
-        }}
-        depth={depth}
         menuItems={menuItems}
         hovered={hovered}
         className="mt-[-0.2rem]"

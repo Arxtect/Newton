@@ -247,7 +247,7 @@ class ProjectSync {
 
   // 同步整个文件夹到 Yjs Map
   async syncFolderToYMap(folderPath) {
-    let fileTree = await FS.readFileTree(this.currenProjectDir);
+    let fileTree = await FS.readFileTree(this.currenProjectDir, false);
     this.syncTreeToYMap(fileTree);
     const syncPromises = [];
 
@@ -304,14 +304,13 @@ class ProjectSync {
       }
     };
     await createFolder(content);
-
+    const files = await FS.readFileTree(folderPath);
     // 删除本地多余的文件树
-    const deleteFolder = async (folderPath) => {
-      const files = await FS.readFileTree(folderPath);
+    const deleteFolder = async (files) => {
       for (const file of files) {
         if (!file.children) continue;
-        const filePath = path.join(file.filepath);
-        if (!folderList.includes(filePath)) {
+        const filePath = file.filepath;
+        if (!folderList.includes(file.filepath)) {
           const folderPath = path.join(this.parentDir, file.filepath);
           await this.deleteFolder(folderPath);
           console.log(`Deleted folder ${filePath}`);
@@ -320,7 +319,7 @@ class ProjectSync {
         }
       }
     };
-    await deleteFolder(folderPath);
+    await deleteFolder(files);
   }
 
   // Yjs Map 观察者处理函数
@@ -329,13 +328,18 @@ class ProjectSync {
 
     console.log(event, "event");
 
-    event.keysChanged.forEach((key) => {
+    event.keysChanged.forEach(async (key) => {
       const change = event.changes.keys.get(key);
-      console.log(change?.action, "change.action");
-      if (change.action === "delete") {
+      console.log(change?.action, key, "change.action");
+      if (change?.action === "delete" || !change?.action) {
         console.log(`Key deleted: ${key}`);
+        const relativePath = path.join(this.parentDir, key);
+        await useFileStore
+          .getState()
+          .deleteFile({ filename: relativePath }, true);
+        return;
       }
-      console.log(key, "changeKey");
+
       if (event?.transaction?.origin == null) {
         console.log(`Origin is null for key ${key}`, event?.transaction);
         return;
@@ -349,42 +353,42 @@ class ProjectSync {
           try {
             if (key == this.folderMapName) {
               await FS.ensureDir(this.currenProjectDir);
-
               this.handleFolderInfo(this.currenProjectDir, content);
+
               resolve();
               return;
             }
 
-            if (content?._delete) {
-              // 如果内容为空，则删除文件
-              await useFileStore
-                .getState()
-                .deleteFile({ filename: relativePath }, true);
+            // if (content?._delete) {
+            //   // 如果内容为空，则删除文件
+            //   await useFileStore
+            //     .getState()
+            //     .deleteFile({ filename: relativePath }, true);
+            //   resolve();
+            //   return;
+            // } else {
+            const dirpath = path.dirname(relativePath);
+            await FS.ensureDir(dirpath);
+            const ext = path.extname(key).slice(1).toLowerCase();
+            if (assetExtensions.includes(ext)) {
+              // 如果是资产文件类型，则将 Base64 编码的字符串转换回文件数据
+              await downloadFile(content, relativePath);
               resolve();
-              return;
+              // await downloadFileBinary(key, content);
             } else {
-              const dirpath = path.dirname(relativePath);
-              await FS.ensureDir(dirpath);
-              const ext = path.extname(key).slice(1).toLowerCase();
-              if (assetExtensions.includes(ext)) {
-                // 如果是资产文件类型，则将 Base64 编码的字符串转换回文件数据
-                await downloadFile(content, relativePath);
+              if (this.isCurrentFile(key)) {
                 resolve();
-                // await downloadFileBinary(key, content);
+                console.log(this.initialized, "initialized");
+                // if (!this.initialized) this.setEditorContent(content);
+                // console.log(key, "content");
               } else {
-                if (this.isCurrentFile(key)) {
-                  resolve();
-                  console.log(this.initialized, "initialized");
-                  // if (!this.initialized) this.setEditorContent(content);
-                  // console.log(key, "content");
-                } else {
-                  const fileStore = useFileStore.getState();
-                  // await fileStore.saveFile(key, content, false);
-                  content?.length &&
-                    (await fileStore.saveFile(relativePath, content, false));
-                  resolve();
-                }
+                const fileStore = useFileStore.getState();
+                // await fileStore.saveFile(key, content, false);
+                content?.length &&
+                  (await fileStore.saveFile(relativePath, content, false));
+                resolve();
               }
+              // }
             }
           } catch (err) {
             reject(err);

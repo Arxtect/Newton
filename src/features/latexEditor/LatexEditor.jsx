@@ -32,13 +32,11 @@ const LatexEditor = ({ handleChange, sourceCode, filepath, mainFilepath }) => {
   }));
 
   const {
-    loadFile,
     currentProjectRoot,
     updateCurrentProjectFileList,
     touchCounter,
     assetsFilePath,
   } = useFileStore((state) => ({
-    loadFile: state.loadFile,
     currentProjectRoot: state.currentProjectRoot,
     updateCurrentProjectFileList: state.updateCurrentProjectFileList,
     touchCounter: state.touchCounter,
