@@ -203,7 +203,7 @@ const ContentTopBar = (props) => {
       if (pdfUrl) return;
       let blobUrl = await getCurrentProjectPdf(currentProjectRoot);
 
-      console.log(blobUrl, "blobUrl");
+      console.log(blobUrl, compileSetting, "blobUrl");
       // blobUrl = null;
       if (blobUrl) {
         setCompiledPdfUrl(blobUrl);
@@ -211,7 +211,8 @@ const ContentTopBar = (props) => {
         if (
           engineStatus == constant.readyEngineStatus &&
           !onceCompile &&
-          !!mainFilepath
+          !!mainFilepath &&
+          !compileSetting.autoCompile
         ) {
           setOnceCompile(true);
           compileLatex(currentProjectRoot, mainFilepath, compileSetting);

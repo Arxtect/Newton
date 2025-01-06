@@ -328,7 +328,7 @@ export const useFileStore = create()(
       syncFileTreeToYMap: async () => {
         let projectSync = get().projectSync;
         if (projectSync) {
-          projectSync.getFileTree && (await projectSync.getFileTree());
+          projectSync.syncFileTree && (await projectSync.syncFileTree());
         }
       },
       endFileCreating: (filepath) => {

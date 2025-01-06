@@ -95,7 +95,7 @@ class ProjectSync {
       syncFolderToYMapRootPath: this.syncFolderToYMapRootPath.bind(this),
       changeIsInitialSyncComplete: this.changeIsInitialSyncComplete.bind(this),
       changeInitial: this.changeInitial.bind(this),
-      getFileTree: this.getFileTree.bind(this),
+      syncFileTree: this.syncFileTree.bind(this),
     };
 
     this.websocketProvider.on("status", (event) => {
@@ -235,7 +235,7 @@ class ProjectSync {
       };
       await deleteFolderHandler(folderPath);
       await FS.removeDirectory(folderPath);
-      await this.getFileTree();
+      await this.syncFileTree();
     } catch (err) {
       console.error(`Error deleting folder ${folderPath}:`, err);
       // throw err;
@@ -263,7 +263,7 @@ class ProjectSync {
     });
   }
 
-  async getFileTree() {
+  async syncFileTree() {
     let fileTree = await FS.readFileTree(
       this.currenProjectDir,
       false,
@@ -275,7 +275,7 @@ class ProjectSync {
 
   // 同步整个文件夹到 Yjs Map
   async syncFolderToYMap() {
-    let fileTree = await this.getFileTree();
+    let fileTree = await this.syncFileTree();
 
     const syncPromises = [];
 

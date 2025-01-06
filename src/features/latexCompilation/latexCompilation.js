@@ -83,13 +83,12 @@ export const ensureFileExists = async (list, currentProject, usePdfTeX) => {
     );
 
     if (shouldIgnore) continue;
-
     let fileBlob = await fsPify.readFile(fullFilename);
     let filepath = path.relative(currentProject, fullFilename);
     let ext = path.extname(filepath);
 
     // if (LATEX_FILE_EXTENSIONS.includes(ext)) {
-    console.log(filepath, "filepath");
+    console.log(filepath, fullFilename, currentProject, "filepath");
     if (usePdfTeX) {
       pdftexEngine.writeMemFSFile(filepath, fileBlob);
       if (path.extname(filepath) == ".tex") {

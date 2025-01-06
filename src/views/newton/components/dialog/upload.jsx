@@ -109,7 +109,7 @@ const FolderUploader = forwardRef(
           projectSync.syncFileToYMap(filePath, content);
         }
 
-        await projectSync.getFileTree();
+        await projectSync.syncFileTree();
       }
       console.log(filePaths, "filePaths");
     };
