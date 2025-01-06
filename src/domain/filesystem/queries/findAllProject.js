@@ -146,7 +146,7 @@ export function removeParentDirPath(filePath, parentDir) {
   const relativePath = path.relative(normalizedRootPath, normalizedFilePath);
 
   console.log(
-    `Relative Path: ${relativePath}, Root Path: ${normalizedRootPath}, File Path: ${normalizedFilePath}, Parent Dir: ${normalizedParentDir}`
+    `Relative Path: ${relativePath}, Root Path: ${normalizedRootPath}, File Path: ${normalizedFilePath}, Parent Dir: ${normalizedParentDir},filePath: ${filePath}`
   );
 
   return relativePath;

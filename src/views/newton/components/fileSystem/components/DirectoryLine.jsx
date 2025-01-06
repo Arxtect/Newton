@@ -48,6 +48,7 @@ const DirectoryLineContent = ({
   changePreRenamingDirpath,
   changeCurrentProjectRoot,
   fileTree,
+  parentDir,
 }) => {
   const { dirOpen, isDropFileSystem, filepath, projectSync, reload } =
     useFileStore((state) => ({
@@ -88,10 +89,6 @@ const DirectoryLineContent = ({
     },
     [deleteDirectory]
   );
-
-  const relpath = path.relative(root, dirpath);
-  const basename = path.basename(relpath);
-  const ignoreGit = relpath === ".git" || p_ignoreGit || false;
 
   const [value, setValue] = useState(path.basename(dirpath));
   const inputRef = useRef(null);
@@ -281,8 +278,8 @@ const DirectoryLineContent = ({
                 handleClick={handleClick}
                 dirpath={dirpath}
                 opened={opened}
-                title={basename || `${path.basename(dirpath)}`}
-                basename={basename}
+                title={`${path.basename(dirpath)}`}
+                basename={`${path.basename(dirpath)}`}
                 onAddFile={onAddFile}
                 onAddFolder={onAddFolder}
                 handleDeleteDirectory={handleDeleteDirectory}
@@ -322,7 +319,7 @@ const DirectoryLineContent = ({
                   />
                 ) : (
                   <span className="overflow-hidden text-ellipsis">
-                    <span>{basename || `${path.basename(dirpath)}`}</span>
+                    <span>{`${path.basename(dirpath)}`}</span>
                   </span>
                 )}
               </DirectoryLineWrapper>
@@ -352,12 +349,13 @@ const DirectoryLineContent = ({
               <FileLine
                 key={item.name}
                 depth={item.depth}
-                filepath={path.join(root, item.filepath)}
+                filepath={path.join(parentDir, item.filepath)}
                 ignoreGit={item.ignored}
                 loadFile={loadFile}
                 fileMoved={fileMoved}
                 startRenaming={startRenaming}
                 endRenaming={endRenaming}
+                parentDir={parentDir}
               />
             );
           } else if (item.type === "dir") {
@@ -367,12 +365,15 @@ const DirectoryLineContent = ({
                 key={item.name}
                 root={root}
                 fileTree={item.children}
-                dirpath={path.join(root, item.filepath)}
+                dirpath={path.join(parentDir, item.filepath)}
                 depth={item.depth}
                 open={
                   editingFilepath != null &&
                   !path
-                    .relative(path.join(root, item.filepath), editingFilepath)
+                    .relative(
+                      path.join(parentDir, item.filepath),
+                      editingFilepath
+                    )
                     .startsWith("..")
                 }
                 touchCounter={touchCounter}
@@ -393,6 +394,7 @@ const DirectoryLineContent = ({
                 preRenamingDirpath={preRenamingDirpath}
                 changePreRenamingDirpath={changePreRenamingDirpath}
                 changeCurrentProjectRoot={changeCurrentProjectRoot}
+                parentDir={parentDir}
               />
             );
           }

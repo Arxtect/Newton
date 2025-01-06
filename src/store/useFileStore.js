@@ -64,7 +64,12 @@ export const useFileStore = create()(
       selectedFiles: [],
       parentDir: "",
       updateFileTree: async () => {
-        let fileTree = await FS.readFileTree(get().currentProjectRoot);
+        let fileTree = await FS.readFileTree(
+          get().currentProjectRoot,
+          true,
+          get().parentDir
+        );
+
         set({ fileTree });
       },
       setSelectedFiles: (filepath) => {
@@ -320,10 +325,16 @@ export const useFileStore = create()(
         const state = get();
         set({ touchCounter: state.touchCounter + 1 });
       },
+      syncFileTreeToYMap: async () => {
+        let projectSync = get().projectSync;
+        if (projectSync) {
+          projectSync.getFileTree && (await projectSync.getFileTree());
+        }
+      },
       endFileCreating: (filepath) => {
         set({ fileCreatingDir: null });
       },
-      endDirCreating: (filepath) => {
+      endDirCreating: async (filepath) => {
         set({ dirCreatingDir: null });
       },
       startUpdate: async ({ changedPath, isDir = false }) => {
@@ -367,6 +378,8 @@ export const useFileStore = create()(
         get().loadFile({ filepath });
         get().changeSingleBibFilepath(filepath);
         get().updateDirOpen(false);
+
+        await get().syncFileTreeToYMap();
       },
       cancelFileCreating: () => {
         get().updateDirOpen(false);
@@ -382,6 +395,7 @@ export const useFileStore = create()(
         get().endDirCreating({ dirpath });
         get().startUpdate({ changedPath: dirpath, isDir: true });
         get().updateDirOpen(false);
+        await get().syncFileTreeToYMap();
       },
 
       createFile: async ({ filepath, content = "" }) => {
@@ -401,9 +415,9 @@ export const useFileStore = create()(
         if (filename == get().filepath) {
           set({ filepath: "", value: "" });
         }
-        if (!isSync) {
-          set({ filepath: "", value: "" });
-        }
+        // if (!isSync) {
+        //   set({ filepath: "", value: "" });
+        // }
         if (!(await FS.existsPath(filename))) return;
         await FS.unlink(filename);
         const projectSync = get().projectSync;
@@ -423,12 +437,14 @@ export const useFileStore = create()(
               get().changeSingleBibFilepath(item, false);
             }
           });
+
+          await get().updateFileTree();
           if (projectSync && dirpath) {
-            projectSync.deleteFolder(dirpath);
+            await projectSync.deleteFolder(dirpath);
+          } else {
+            await FS.removeDirectory(dirpath);
           }
-          await FS.removeDirectory(dirpath);
           get().startUpdate({ changedPath: files });
-          get().updateFileTree();
           // TODO: 这里可能需要更新 Git 状态，根据你的应用逻辑进行调整
         } catch (err) {
           console.log(err);
@@ -437,6 +453,7 @@ export const useFileStore = create()(
 
       fileMoved: async ({ fromPath, destPath }) => {
         get().startUpdate({ changedPath: [fromPath, destPath] });
+        get().syncFileTreeToYMap();
       },
       startRenaming: ({ pathname }) => {
         set({ renamingPathname: pathname });

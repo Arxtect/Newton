@@ -1,3 +1,8 @@
+/*
+ * @Description:
+ * @Author: Devin
+ * @Date: 2025-01-02 11:42:20
+ */
 import fs from "fs";
 import path from "path";
 import pify from "pify";
@@ -11,9 +16,8 @@ const stat = pify(fs.stat);
 export async function readFileTree(
   dirpath,
   isNotSync = true,
-  parentName = path.basename(dirpath),
+  parentDir = ".",
   depth = 1,
-  baseDir = dirpath // Add a baseDir parameter
 ) {
   const filenames = await readdir(dirpath);
 
@@ -29,21 +33,20 @@ export async function readFileTree(
       const stats = await stat(childPath);
       console.log(stats, "filetree");
       const mtime = stats.mtime.getTime(); // 转为时间戳
-      const relativePath = path.relative(baseDir, childPath); // Calculate relative path
+      
+      const relativePath = path.relative(parentDir, childPath); // Calculate relative path
       if (stats.isDirectory()) {
         // Recursively get children for directories
         const children = await readFileTree(
           childPath,
-
           isNotSync,
-          path.basename(childPath),
-          depth + 1,
-          baseDir // Pass baseDir to recursive calls
+          parentDir,
+          depth + 1
         );
         return {
           name,
           type: "dir",
-          parentName,
+          parentDir,
           filepath: relativePath, // Use relative path
           depth,
           mtime, // Include mtime as timestamp
@@ -53,7 +56,7 @@ export async function readFileTree(
         return {
           name,
           type: "file",
-          parentName,
+          parentDir,
           filepath: relativePath, // Use relative path
           depth,
           mtime, // Include mtime as timestamp

@@ -3,6 +3,29 @@ import * as Y from "yjs";
 import Ace from "ace-builds/src-min-noconflict/ace";
 const Range = Ace.require("ace/range").Range;
 
+export class YTextManager {
+  constructor(yDoc) {
+    this.yDoc = yDoc;
+    this.yTextMap = new Map();
+  }
+
+  setYText(filepath) {
+    if (this.yTextMap.has(filepath)) return;
+    // Initialize yTextMap from yMap
+    let yText = this.yDoc.getText(filepath);
+    this.yTextMap.set(filepath, yText);
+  }
+
+  getYText(filepath) {
+    // Retrieve Y.Text from yTextMap or Y.Map
+    if (!this.yTextMap.has(filepath)) {
+      this.setYText(filepath);
+    }
+
+    return this.yTextMap.get(filepath);
+  }
+}
+
 export class LatexSyncToYText {
   constructor(yText, filepath, ace, changeInitial, initialized) {
     const mux = createMutex();
@@ -16,7 +39,7 @@ export class LatexSyncToYText {
     const initialContent = aceDocument.getValue();
     let typeLength = this.type?.toString().length;
     if (typeLength === 0) {
-      this.type.insert(0, initialContent);
+      // this.type.insert(0, initialContent);
     } else {
       initialContent.length != typeLength &&
         aceDocument.setValue(this.type.toString());

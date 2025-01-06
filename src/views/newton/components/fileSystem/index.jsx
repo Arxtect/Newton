@@ -31,6 +31,7 @@ const FileSystem = () => {
     parentDir,
     fileTree,
     updateFileTree,
+    syncFileTreeToYMap,
   } = useFileStore((state) => ({
     currentProjectRoot: state.currentProjectRoot,
     changeCurrentProjectRoot: state.changeCurrentProjectRoot,
@@ -50,13 +51,16 @@ const FileSystem = () => {
     endRenaming: state.endRenaming,
     preRenamingDirpath: state.preRenamingDirpath,
     changePreRenamingDirpath: state.changePreRenamingDirpath,
+    parentDir: state.parentDir,
     fileTree: state.fileTree,
     updateFileTree: state.updateFileTree,
+    syncFileTreeToYMap: state.syncFileTreeToYMap,
   }));
 
   useEffect(() => {
     if (!currentProjectRoot) return;
     updateFileTree();
+    console.log("updateFileTree", touchCounter);
   }, [currentProjectRoot, touchCounter]);
 
   useEffect(() => {
