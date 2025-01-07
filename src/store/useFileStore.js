@@ -467,6 +467,11 @@ export const useFileStore = create()(
 
       fileMoved: async ({ fromPath, destPath }) => {
         get().startUpdate({ changedPath: [fromPath, destPath] });
+        const mainFileDirPath = path.dirname(get().mainFilepath);
+        const fromDirPath = path.dirname(fromPath);
+        if (mainFileDirPath === fromDirPath) {
+          get().changeMainFile(get().currentProjectRoot);
+        }
         get().syncFileTreeToYMap();
       },
       startRenaming: ({ pathname }) => {
