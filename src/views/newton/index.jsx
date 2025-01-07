@@ -31,6 +31,7 @@ import { getYDocToken } from "services";
 import { getRoomUserAccess } from "@/services";
 import { toast } from "react-toastify";
 import { ArLoadingScreen } from "@/components/arLoading";
+import path from "path";
 
 const Newton = () => {
   const navigate = useNavigate();
@@ -44,6 +45,7 @@ const Newton = () => {
     updateShareIsRead,
     changeMainFile,
     leaveProjectSyncRoom,
+    changeCurrentProjectRoot,
   } = useFileStore((state) => ({
     filepath: state.filepath,
     setMainFile: state.setMainFile,
@@ -53,6 +55,7 @@ const Newton = () => {
     updateShareIsRead: state.updateShareIsRead,
     changeMainFile: state.changeMainFile,
     leaveProjectSyncRoom: state.leaveProjectSyncRoom,
+    changeCurrentProjectRoot: state.changeCurrentProjectRoot,
   }));
 
   useLayoutEffect(() => {
@@ -151,7 +154,7 @@ const Newton = () => {
     await Promise.race([waitForSync, timeout]);
 
     updateProjectSync(projectSyncClass.saveState);
-  }, [user]);
+  }, [user, currentProjectRoot]);
 
   useEffect(() => {
     if (projectSync && editor != null && filepath) {
@@ -163,6 +166,7 @@ const Newton = () => {
   }, [filepath, projectSync, editor]);
 
   useEffect(() => {
+    if (!currentProjectRoot) return;
     initShareProject()
       .then(() => {
         changeMainFile(currentProjectRoot);
@@ -176,9 +180,11 @@ const Newton = () => {
     return () => {
       setMainFile("");
     };
-  }, []);
+  }, [currentProjectRoot]);
 
   useEffect(() => {
+    setLoadingProject(true);
+    handleProject();
     refreshAuth();
     return () => {
       console.log("leaveProjectSyncRoom");
@@ -186,7 +192,32 @@ const Newton = () => {
     };
   }, []);
 
-  return !loading ? (
+  const [loadingProject, setLoadingProject] = useState(true);
+
+  const handleProject = () => {
+    try {
+      const hash = window.location.hash;
+      const queryString = hash.includes("?") ? hash.split("?")[1] : "";
+      const searchParams = new URLSearchParams(queryString);
+
+      const project = searchParams.get("project");
+      const parentDir = searchParams.get("parentDir");
+      if (!project) {
+        return;
+      }
+      console.log(project, "project");
+      changeCurrentProjectRoot({
+        projectRoot: path.join(parentDir, project),
+        parentDir: parentDir,
+      });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoadingProject(false);
+    }
+  };
+
+  return !loading && !loadingProject ? (
     <React.Fragment>
       <TopBar></TopBar>
       <Layout

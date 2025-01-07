@@ -77,7 +77,7 @@ const Table = forwardRef(
             }
             return (
               <a
-                href={window.origin + `/#/newton`}
+                href={window.origin + `/#/newton?project=${params.value}&parentDir=${params.row.parentDir}`}
                 style={{ cursor: "pointer", color: "inherit" }}
                 onMouseOver={(e) =>
                   (e.target.style.textDecoration = "underline")
@@ -116,13 +116,13 @@ const Table = forwardRef(
                   ) {
                     e.preventDefault(); // 阻止默认的上下文菜单
                   } else {
-                    changeCurrentProjectRoot({
-                      projectRoot: path.join(
-                        params.row.parentDir,
-                        params.value
-                      ),
-                      parentDir: params.row.parentDir,
-                    });
+                    // changeCurrentProjectRoot({
+                    //   projectRoot: path.join(
+                    //     params.row.parentDir,
+                    //     params.value
+                    //   ),
+                    //   parentDir: params.row.parentDir,
+                    // });
                   }
                 }}
               >

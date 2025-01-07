@@ -30,6 +30,17 @@ function debounce(func, wait) {
   };
 }
 
+const getStorage = () => {
+  const urlParams = new URLSearchParams(window.location.hash.split("?")[1]);
+  const hasProject = urlParams.has("project");
+  console.log(hasProject, "hasProject");
+  if (hasProject) {
+    return sessionStorage;
+  } else {
+    return localStorage;
+  }
+};
+
 export const useFileStore = create()(
   persist(
     (set, get) => ({
@@ -522,6 +533,7 @@ export const useFileStore = create()(
     {
       name: FILE_STORE,
       version: 1,
+      getStorage: () => getStorage(), //
     }
   )
 );
