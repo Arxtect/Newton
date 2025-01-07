@@ -429,7 +429,10 @@ export const useFileStore = create()(
       },
       deleteDirectory: async ({ dirpath }) => {
         try {
-          set({ filepath: "", value: "", currentSelectDir: "" });
+          console.log(path.dirname(get().filepath), dirpath, "dirpath");
+          if (path.dirname(get().filepath) == dirpath) {
+            set({ filepath: "", value: "", currentSelectDir: "" });
+          }
           const files = await FS.getFilesRecursively(dirpath);
           const projectSync = get().projectSync;
           files.map((item) => {
