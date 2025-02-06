@@ -164,9 +164,9 @@ const LatexEditor = ({ handleChange, sourceCode, filepath, mainFilepath }) => {
       {latexRef?.current?.editor && (
         <AiTools editor={latexRef.current.editor} completer={completer} />
       )}
-      {/* {latexRef?.current?.editor && (
+      {latexRef?.current?.editor && (
         <AiAutoComplete editor={latexRef.current.editor} />
-      )} */}
+      )}
       {!!assetsFilePath && <FileView filename={assetsFilePath} />}
       <TexMathJax latexRef={latexRef} />
     </div>
