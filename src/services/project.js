@@ -31,12 +31,21 @@ export async function getProjectViaOwner() {
   }
 }
 
-export async function createProject(project_name, share_link) {
+export async function createProject(
+  project_name,
+  share_link,
+  room_name,
+  email,
+  is_sync = false
+) {
   try {
     await refreshAuth();
     const response = await apiFetch(getApiUrl("/create"), "POST", {
       project_name,
       share_link,
+      room_name,
+      email,
+      is_sync,
     });
     return response;
   } catch (error) {
@@ -44,12 +53,22 @@ export async function createProject(project_name, share_link) {
   }
 }
 
-export async function UpdateProject(id, project_name, share_link) {
+export async function UpdateProject(
+  id,
+  project_name,
+  share_link,
+  room_name,
+  email,
+  is_sync = false
+) {
   try {
     await refreshAuth();
     const response = await apiFetch(getApiUrl(`/update/${id}`), "POST", {
       project_name,
       share_link,
+      room_name,
+      email,
+      is_sync,
     });
     return response;
   } catch (error) {

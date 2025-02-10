@@ -10,11 +10,12 @@ import {
   savePdfToIndexedDB,
   getPdfFromIndexedDB,
   isAssetExtension,
+  createProjectService,
 } from "@/utils";
 import { useUserStore } from "./useUserStore";
 import { ProjectSync } from "@/convergence";
 import { useEditor } from "./useEditor";
-
+import { addShareRoom, getYDocToken } from "@/services";
 export const FILE_STORE = "FILE_STORE";
 
 function removeRootPath(filePath, rootPath) {
@@ -497,16 +498,44 @@ export const useFileStore = create()(
         });
         initializeGitStatus({ projectRoot });
       },
+
       createProject: async (newProjectRoot) => {
         let isExists = await FS.existsPath(newProjectRoot);
 
+        const user = useUserStore.getState().user;
+
         if (!isExists) {
-          const user = useUserStore.getState().user;
+          const roomName = newProjectRoot + user.id;
+          const res = await createProjectService(
+            newProjectRoot,
+            roomName,
+            user
+          );
+          const addRoomRes = await addShareRoom({
+            project_name: roomName,
+          });
+          console.log(res, newProjectRoot, "projectInfo");
           await FS.mkdir(newProjectRoot);
           await FS.createProjectInfo(newProjectRoot, {
             name: "YOU",
             ...user,
+            ...res,
+            project_id: res?.id,
           });
+
+          const { token, position } = await getYDocToken(roomName);
+          // const projectSyncClass = await new ProjectSync(
+          //   newProjectRoot,
+          //   user,
+          //   user.id,
+          //   token,
+          //   position,
+          //   () => {},
+          //   false,
+          //   "."
+          // );
+
+          // await projectSyncClass.syncFolderToYMapRootPath();
         } else {
           throw new Error("Project name is already exists");
         }

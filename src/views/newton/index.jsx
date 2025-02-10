@@ -46,6 +46,7 @@ const Newton = () => {
     changeMainFile,
     leaveProjectSyncRoom,
     changeCurrentProjectRoot,
+    parentDirStore,
   } = useFileStore((state) => ({
     filepath: state.filepath,
     setMainFile: state.setMainFile,
@@ -56,6 +57,7 @@ const Newton = () => {
     changeMainFile: state.changeMainFile,
     leaveProjectSyncRoom: state.leaveProjectSyncRoom,
     changeCurrentProjectRoot: state.changeCurrentProjectRoot,
+    parentDirStore: state.parentDir,
   }));
 
   useLayoutEffect(() => {
@@ -80,21 +82,24 @@ const Newton = () => {
     if (!user?.id) return;
     const projectInfo = await getProjectInfo(currentProjectRoot);
 
-    const project = projectInfo?.["rootPath"];
-    const roomId = projectInfo?.["userId"];
-    const isSync = projectInfo?.["isSync"];
+    const project_id = projectInfo?.["project_id"];
+
+    const project = projectInfo?.["project_name"];
+    const roomId = projectInfo?.["owner_id"];
+    const isSync = projectInfo?.["is_sync"];
     let parentDir = getShareUserStoragePath(roomId);
 
-    if (user.id == roomId) {
+    if (user.id == roomId && parentDirStore == ".") {
       parentDir = ".";
     }
 
     console.log(projectInfo, isSync, project, roomId, "projectInfo");
 
-    if (!isSync || !project || !roomId) {
-      setLoading(false);
-      return;
-    }
+    // if (!isSync || !project || !roomId) {
+    //   setLoading(false);
+    //   return;
+    // }
+
     const res = await getRoomUserAccess({
       project_name: project + roomId,
     });
@@ -130,6 +135,8 @@ const Newton = () => {
     );
 
     await projectSyncClass.setObserveHandler();
+
+    updateProjectSync(projectSyncClass.saveState);
     const waitForSync = new Promise((resolve, reject) => {
       const checkSyncComplete = () => {
         if (projectSyncClass.isInitialSyncComplete) {
@@ -144,16 +151,14 @@ const Newton = () => {
 
     // Set a timeout for 10 seconds
     const timeout = new Promise((_, reject) =>
-      setTimeout(
-        () => reject(new Error("Sync timed out, please try again")),
-        60000
-      )
+      setTimeout(() => {
+        setLoading(false);
+        reject(new Error("Sync timed out, please try again"));
+      }, 60000)
     );
 
     // Wait for either the sync to complete or the timeout
     await Promise.race([waitForSync, timeout]);
-
-    updateProjectSync(projectSyncClass.saveState);
   }, [user, currentProjectRoot]);
 
   useEffect(() => {

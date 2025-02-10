@@ -17,7 +17,7 @@ export async function readFileTree(
   dirpath,
   isNotSync = true,
   parentDir = ".",
-  depth = 1,
+  depth = 1
 ) {
   const filenames = await readdir(dirpath);
 
@@ -25,15 +25,15 @@ export async function readFileTree(
     filenames.map(async (name) => {
       if (name === ".git") return null;
 
-      if (!!projectInfoExists(name) && isNotSync) return null;
+      // if (!!projectInfoExists(name) && isNotSync) return null; // TODO: read project info file
       const childPath = path.join(dirpath, name);
       if (IGNORE_PATTERNS.includes(childPath)) {
         return null;
       }
       const stats = await stat(childPath);
-      console.log(stats, "filetree");
+
       const mtime = stats.mtime.getTime(); // 转为时间戳
-      
+
       const relativePath = path.relative(parentDir, childPath); // Calculate relative path
       if (stats.isDirectory()) {
         // Recursively get children for directories

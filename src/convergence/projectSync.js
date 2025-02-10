@@ -22,10 +22,11 @@ import { LatexSyncToYText, YTextManager } from "./latexSyncToYText";
 
 const host = window.location.hostname;
 const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-const wsUrl = `wss://arxtect.com/websockets/`;
+// const wsUrl = `wss://arxtect.com/websockets/`;
 // const wsUrl = `ws://3.227.9.181:8013`;
 // const wsUrl = `ws://206.190.239.91:9008/`;
 // const wsUrl = `ws://10.10.99.42:8013/`;
+const wsUrl = `ws://localhost:8013/`;
 
 class ProjectSync {
   constructor(
@@ -277,6 +278,8 @@ class ProjectSync {
   async syncFolderToYMap() {
     let fileTree = await this.syncFileTree();
 
+    console.log(fileTree, "fileTree");
+
     const syncPromises = [];
 
     const handlePromise = async (fileTree) => {
@@ -307,7 +310,7 @@ class ProjectSync {
   }, 1000);
 
   async syncFolderToYMapRootPath(callback) {
-    await this.syncFolderToYMap(this.rootPath); // 保存项目信息
+    await this.syncFolderToYMap(); // 保存项目信息
 
     callback && callback();
   }
@@ -386,7 +389,6 @@ class ProjectSync {
             if (key == this.folderMapName) {
               await FS.ensureDir(this.currenProjectDir);
               this.handleFolderInfo(this.currenProjectDir, content);
-
               resolve();
               return;
             }
@@ -434,7 +436,7 @@ class ProjectSync {
         this.isInitialSyncComplete = true; // 标记初始同步完成
         this.changeInitial();
       }
-
+      console.log(contentSyncedPromises, "contentSyncedPromises");
       if (event.keysChanged.size == contentSyncedPromises.length) {
         Promise.all(contentSyncedPromises).then(() => {
           this.otherOperation && this.otherOperation();

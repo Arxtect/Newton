@@ -87,8 +87,10 @@ export async function findAllProjectInfo(currentDir = ".") {
 
         let projectInfo = await getProjectInfo(entryPath);
 
+        console.log(projectInfo, entryPath, "projectInfo");
+
         if (!projectInfo || JSON.stringify(projectInfo) === "{}") {
-          await createProjectInfo(entryPath, { name: "YOU" });
+          await createProjectInfo(entryPath, { name: "YOU", test: "111" });
           projectInfo = await getProjectInfo(entryPath);
         }
 
