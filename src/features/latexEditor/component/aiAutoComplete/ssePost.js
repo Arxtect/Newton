@@ -19,6 +19,14 @@ const baseOptions = {
   redirect: "follow",
 };
 
+function unicodeToChar(text) {
+  if (!text) return "";
+
+  return text.replace(/\\u[0-9a-f]{4}/g, (_match, p1) => {
+    return String.fromCharCode(parseInt(p1, 16));
+  });
+}
+
 export const ssePost = async (
   url,
   fetchOptions,
@@ -58,14 +66,14 @@ export const ssePost = async (
 
     // 直接解析完整响应
     const responseData = await response.json();
-    
-    if (responseData.answer) {
-      responseData.answer = unicodeToChar(responseData.answer);
+    const { suggestion } = responseData?.data?.data?.outputs || {};
+
+    if (suggestion) {
+      onSuccess?.(unicodeToChar(suggestion));
+    } else {
+      throw new Error("Suggestion not found");
     }
-
-    onSuccess?.(responseData);
-    return responseData;
-
+    return suggestion;
   } catch (error) {
     if (error.name !== 'AbortError') {
       toast.error(error.message || "Request failed");
