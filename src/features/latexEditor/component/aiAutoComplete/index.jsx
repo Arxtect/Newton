@@ -176,7 +176,7 @@ const AiAutoComplete = ({ editor }) => {
         }),
       },
       {
-        onSuccess: (data) => setHint(data.outputs.suggestion),
+        onSuccess: (suggestion) => setHint(suggestion),
         onError: (err) => console.error("请求失败:", err)
       }
     );
