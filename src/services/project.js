@@ -63,7 +63,7 @@ export async function UpdateProject(
 ) {
   try {
     await refreshAuth();
-    const response = await apiFetch(getApiUrl(`/update/${id}`), "POST", {
+    const response = await apiFetch(getApiUrl(`/update/${id}`), "PUT", {
       project_name,
       share_link,
       room_name,

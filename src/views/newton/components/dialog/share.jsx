@@ -138,7 +138,7 @@ const Share = forwardRef(({ rootPath, user }, ref) => {
     setLoading(true);
     try {
       // 创建 ProjectSync 实例
-      await createProjectSync(rootPath, user);
+      // await createProjectSync(rootPath, user);
       // handleCancelProject();
     } catch (error) {
       toast.error("Share failed!");

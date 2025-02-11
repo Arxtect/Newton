@@ -1,4 +1,5 @@
-import { createProject } from "@/services";
+import { createProject, addShareRoom } from "@/services";
+import { createProjectInfo, mkdir } from "domain/filesystem";
 
 export const createProjectService = async (
   project_name,
@@ -19,4 +20,21 @@ export const createProjectService = async (
   } catch (error) {
     throw error;
   }
+};
+
+export const initProject = async (projectName, user) => {
+  const roomName = projectName + user.id;
+  const res = await createProjectService(projectName, roomName, user);
+  const addRoomRes = await addShareRoom({
+    project_name: roomName,
+  });
+  console.log(res, projectName, "projectInfo");
+  await mkdir(projectName);
+  await createProjectInfo(projectName, {
+    name: "YOU",
+    ...user,
+    ...res,
+    project_id: res?.id,
+    is_sync: false,
+  });
 };

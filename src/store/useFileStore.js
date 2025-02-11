@@ -10,7 +10,7 @@ import {
   savePdfToIndexedDB,
   getPdfFromIndexedDB,
   isAssetExtension,
-  createProjectService,
+  initProject,
 } from "@/utils";
 import { useUserStore } from "./useUserStore";
 import { ProjectSync } from "@/convergence";
@@ -505,41 +505,11 @@ export const useFileStore = create()(
         const user = useUserStore.getState().user;
 
         if (!isExists) {
-          const roomName = newProjectRoot + user.id;
-          const res = await createProjectService(
-            newProjectRoot,
-            roomName,
-            user
-          );
-          const addRoomRes = await addShareRoom({
-            project_name: roomName,
-          });
-          console.log(res, newProjectRoot, "projectInfo");
-          await FS.mkdir(newProjectRoot);
-          await FS.createProjectInfo(newProjectRoot, {
-            name: "YOU",
-            ...user,
-            ...res,
-            project_id: res?.id,
-          });
-
-          const { token, position } = await getYDocToken(roomName);
-          // const projectSyncClass = await new ProjectSync(
-          //   newProjectRoot,
-          //   user,
-          //   user.id,
-          //   token,
-          //   position,
-          //   () => {},
-          //   false,
-          //   "."
-          // );
-
-          // await projectSyncClass.syncFolderToYMapRootPath();
+          await initProject(newProjectRoot, user);
+          get().changeCurrentProjectRoot({ projectRoot: newProjectRoot });
         } else {
           throw new Error("Project name is already exists");
         }
-        get().changeCurrentProjectRoot({ projectRoot: newProjectRoot });
       },
       copyProject: async (projectRoot, copyProjectRoot) => {
         let isExists = await FS.existsPath(copyProjectRoot);

@@ -60,7 +60,6 @@ class ProjectSync {
     this.initialized = false;
     this.isInitialSyncComplete = false; // 初始化标志
     this.isLeave = isLeave;
-    // 设置用户信息
 
     // 使用 rootPath 作为命名空间
     this.yMap = this.yDoc.getMap(this.rootPath + this.roomId);
@@ -74,6 +73,7 @@ class ProjectSync {
     this.setUserAwareness({ ...this.user, color: getColors(position) });
 
     this.setObserveHandler = () => {
+      console.log("Setting observe handler", this.yMap);
       // 清理旧的观察者
       if (this.currentObserver) {
         this.yMap.unobserve(this.yMapObserveHandler.bind(this));
@@ -97,15 +97,20 @@ class ProjectSync {
       changeIsInitialSyncComplete: this.changeIsInitialSyncComplete.bind(this),
       changeInitial: this.changeInitial.bind(this),
       syncFileTree: this.syncFileTree.bind(this),
+      cleanup: this.cleanup.bind(this),
     };
 
     this.websocketProvider.on("status", (event) => {
       console.log(event, "event22");
+      if (event.status === "connected") {
+      }
     });
 
     this.websocketProvider.on("close", () => {
       this.setUserAwareness(null);
     });
+
+    this.websocketProvider.on("synced", async () => {});
   }
 
   changeIsInitialSyncComplete() {
@@ -311,7 +316,6 @@ class ProjectSync {
 
   async syncFolderToYMapRootPath(callback) {
     await this.syncFolderToYMap(); // 保存项目信息
-
     callback && callback();
   }
 
@@ -365,10 +369,13 @@ class ProjectSync {
     event.keysChanged.forEach(async (key) => {
       if (event?.transaction?.origin == null) {
         console.log(`Origin is null for key ${key}`, event?.transaction);
+        this.isInitialSyncComplete = true; // 标记初始同步完成
+        this.changeInitial();
         return;
       }
       const change = event.changes.keys.get(key);
       console.log(change?.action, key, "change.action");
+      console.log(this.yMap, this.yMap.keys(), "yMap");
 
       contentSyncedPromises.push(
         new Promise(async (resolve, reject) => {
@@ -525,4 +532,84 @@ class ProjectSync {
   }
 }
 
-export { ProjectSync };
+class ProjectSyncDownload {
+  constructor(
+    rootPath,
+    roomId,
+    token,
+    otherOperation,
+    parentDir = ".",
+    download = false
+  ) {
+    this.folderMapName = `${rootPath}_folder_map_list_${roomId}`;
+    this.rootPath = rootPath;
+    this.parentDir = parentDir;
+    this.currenProjectDir = path.join(this.parentDir, rootPath);
+    this.roomId = roomId;
+    this.yDoc = new Y.Doc();
+    this.download = download;
+
+    this.websocketProvider = new WebsocketProvider(
+      wsUrl,
+      this.rootPath + this.roomId,
+      this.yDoc,
+      { params: { yauth: token } }
+    );
+
+    // 使用 rootPath 作为命名空间
+    this.yMap = this.yDoc.getMap(this.rootPath + this.roomId);
+
+    this.otherOperation = otherOperation && otherOperation; // 保存回调函数
+
+    this.websocketProvider.on("synced", async () => {
+      if (this.download) {
+        await FS.ensureDir(this.currenProjectDir);
+        await this.downloadAllFile();
+        this.leaveCollaboration();
+        this.otherOperation && this.otherOperation();
+      }
+    });
+  }
+
+  // download all file into local
+  async downloadAllFile() {
+    let fileTree = this.yMap.get(this.folderMapName);
+    let folderList = fileTree.map((item) => {
+      if (item.children) {
+        return path.join(this.parentDir, item.filepath);
+      }
+    });
+
+    console.log(folderList, "fileTree22");
+
+    // 创建本地没有的文件树
+    const createFolder = async (tree) => {
+      for (const file of tree) {
+        const filePath = path.join(this.parentDir, file.filepath);
+        if (!file.children) {
+          const content = this.yMap.get(file.filepath);
+          console.log(content, file.filepath, "downloadAllFile");
+          await FS.writeFile(filePath, content ?? "");
+          continue;
+        }
+
+        let isExistPath = await FS.existsPath(filePath);
+        if (!isExistPath) {
+          await FS.ensureDir(filePath);
+        }
+        createFolder(file.children);
+      }
+    };
+    await createFolder(fileTree);
+  }
+
+  // 离开协作进程
+  leaveCollaboration() {
+    // 断开 WebSocket 连接
+    if (this.websocketProvider) {
+      this.websocketProvider.disconnect();
+    }
+  }
+}
+
+export { ProjectSync, ProjectSyncDownload };

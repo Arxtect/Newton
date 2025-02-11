@@ -24,11 +24,12 @@ import {
   findAllProject,
   getProjectInfo,
   getShareUserStoragePath,
+  createProjectInfo,
 } from "domain/filesystem";
 import { useFileStore, useUserStore, useEditor } from "store";
 import { ProjectSync } from "@/convergence";
 import { getYDocToken } from "services";
-import { getRoomUserAccess } from "@/services";
+import { getRoomUserAccess, UpdateProject } from "@/services";
 import { toast } from "react-toastify";
 import { ArLoadingScreen } from "@/components/arLoading";
 import path from "path";
@@ -78,6 +79,11 @@ const Newton = () => {
 
   const [loading, setLoading] = useState(true);
 
+  const UpdateProjectSyncService = async (id, is_sync) => {
+    const res = await UpdateProject(id, "", "", "", "", is_sync);
+    return res;
+  };
+
   const initShareProject = useCallback(async () => {
     if (!user?.id) return;
     const projectInfo = await getProjectInfo(currentProjectRoot);
@@ -95,10 +101,10 @@ const Newton = () => {
 
     console.log(projectInfo, isSync, project, roomId, "projectInfo");
 
-    // if (!isSync || !project || !roomId) {
-    //   setLoading(false);
-    //   return;
-    // }
+    if (!project || !roomId) {
+      setLoading(false);
+      return;
+    }
 
     const res = await getRoomUserAccess({
       project_name: project + roomId,
@@ -134,9 +140,18 @@ const Newton = () => {
       parentDir
     );
 
-    await projectSyncClass.setObserveHandler();
-
+    projectSyncClass.setObserveHandler();
     updateProjectSync(projectSyncClass.saveState);
+
+    if (!isSync) {
+      await UpdateProjectSyncService(project_id, true);
+      await createProjectInfo(project, {
+        is_sync: true,
+      });
+
+      await projectSyncClass.syncFolderToYMapRootPath();
+    }
+
     const waitForSync = new Promise((resolve, reject) => {
       const checkSyncComplete = () => {
         if (projectSyncClass.isInitialSyncComplete) {
@@ -154,7 +169,7 @@ const Newton = () => {
       setTimeout(() => {
         setLoading(false);
         reject(new Error("Sync timed out, please try again"));
-      }, 60000)
+      }, 30000)
     );
 
     // Wait for either the sync to complete or the timeout
@@ -165,7 +180,6 @@ const Newton = () => {
     if (projectSync && editor != null && filepath) {
       editor.blur && editor.blur();
       projectSync?.updateEditorAndCurrentFilePath &&
-        projectSync.changeIsInitialSyncComplete &&
         projectSync?.updateEditorAndCurrentFilePath(filepath, editor);
     }
   }, [filepath, projectSync, editor]);
