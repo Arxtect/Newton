@@ -1,9 +1,8 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
-import { set, useLayout } from "store";
-import { ssePost } from "@/features/aiTools/ssePost";
+import { useLayout } from "store";
 import { getChatAccessToken, getChatApp} from "@/services";
 import { chatAccessToken, updateChatAccessToken, useUserStore } from "@/store";
-import { last } from "lodash";
+import { ssePost } from "./ssePost";
 import { useFileStore } from "@/store/useFileStore";
 import path from "path";
 
@@ -26,6 +25,7 @@ const AiAutoComplete = ({ editor }) => {
 
   const [hint, setHint] = useState("");
   const [hintPosition, setHintPosition] = useState({ top: 0, left: 0 });
+  const [isTyping, setIsTyping] = useState(false);  // 用于判断用户是否在输入
   const sideWidthRef = useRef();
   const { sideWidth } = useLayout();
 
@@ -94,7 +94,7 @@ const AiAutoComplete = ({ editor }) => {
         const currentFile = useFileStore.getState().selectedFiles;
         const fileName = path.basename(currentFile[0]);
         console.log("fileName:", fileName);
-        const message = editorValue;
+        const message = editorValue; // TODO: 这里需要设置成简要的上下文内容，需要修改
         console.log("message:", message);
         const data = {
           inputs: { currentContent: message, filename: fileName},
@@ -166,7 +166,20 @@ const AiAutoComplete = ({ editor }) => {
   }, [editor, handleChange, addCustomCommand]);
 
   const getAISuggestion = async (data) => {
-    setHint("This is a test hint");
+    // setHint("This is a test hint");
+    ssePost(
+      `/api/v1/chat/auto-complete`,
+      {
+        body: data,
+        headers: new Headers({
+          "APP-Authorization": `Bearer ${currentAppToken}`,
+        }),
+      },
+      {
+        onSuccess: (data) => setHint(data.outputs.suggestion),
+        onError: (err) => console.error("请求失败:", err)
+      }
+    );
   }
   return (
     <>
