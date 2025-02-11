@@ -588,6 +588,10 @@ class ProjectSyncDownload {
         const filePath = path.join(this.parentDir, file.filepath);
         if (!file.children) {
           const content = this.yMap.get(file.filepath);
+          if (content?._delete) {
+            continue;
+          }
+
           console.log(content, file.filepath, "downloadAllFile");
           await FS.writeFile(filePath, content ?? "");
           continue;

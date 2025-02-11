@@ -38,3 +38,19 @@ export const initProject = async (projectName, user) => {
     is_sync: false,
   });
 };
+
+export const initUploadProject = async (projectName, user) => {
+  const roomName = projectName + user.id;
+  const res = await createProjectService(projectName, roomName, user);
+  const addRoomRes = await addShareRoom({
+    project_name: roomName,
+  });
+
+  await createProjectInfo(projectName, {
+    name: "YOU",
+    ...user,
+    ...res,
+    project_id: res?.id,
+    is_sync: false,
+  });
+};

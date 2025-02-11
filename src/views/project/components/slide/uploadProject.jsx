@@ -10,6 +10,7 @@ import { uploadZip } from "domain/filesystem";
 import path from "path";
 import { useNavigate } from "react-router-dom";
 import FileUploader from "@/features/uploadFiles";
+import { initUploadProject } from "@/utils";
 
 const UploadProject = ({ dialogOpen, setDialogOpen, user }) => {
   const navigate = useNavigate();
@@ -33,6 +34,7 @@ const UploadProject = ({ dialogOpen, setDialogOpen, user }) => {
       const projectName = path.parse(file.name)?.name;
       try {
         await uploadZip(file, ".", repoChanged, projectName, onProgress, user);
+        await initUploadProject(projectName, user);
         toast.success("Project uploaded successfully");
         setDialogOpen(false);
         navigate(`/newton`);
