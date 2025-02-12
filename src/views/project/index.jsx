@@ -97,7 +97,11 @@ const Project = () => {
       case "category":
         return null;
       case "shared":
-        if (item?.email != user?.email && item?.isSync && !item.isClosed) {
+        if (
+          item?.email != user?.email &&
+          item?.parentDir !== "." &&
+          !item.isClosed
+        ) {
           return {
             id: index + 1,
             ...item,
@@ -119,7 +123,8 @@ const Project = () => {
         if (
           user?.email &&
           !item.isClosed &&
-          (item?.email == user?.email || item?.isSync)
+          (item?.email == user?.email || item?.parentDir !== ".") &&
+          !item?.parentDir?.includes(user?.id)
         ) {
           return {
             id: index + 1,

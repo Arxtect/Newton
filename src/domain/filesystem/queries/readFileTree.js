@@ -25,7 +25,7 @@ export async function readFileTree(
     filenames.map(async (name) => {
       if (name === ".git") return null;
 
-      // if (!!projectInfoExists(name) && isNotSync) return null; // TODO: read project info file
+      if (!!projectInfoExists(name) && isNotSync) return null; // TODO: read project info file
       const childPath = path.join(dirpath, name);
       if (IGNORE_PATTERNS.includes(childPath)) {
         return null;
