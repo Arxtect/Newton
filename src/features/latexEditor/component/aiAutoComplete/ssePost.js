@@ -8,7 +8,19 @@ const ContentType = {
     download: "application/octet-stream", // for download
     upload: "multipart/form-data", // for upload
   };
-  
+
+function extractCode(s) {
+  // 使用正则表达式匹配 ```latex 和 ``` 之间的内容
+  const regex = /```latex([\s\S]*?)```/;
+  const match = s.match(regex);
+  // 如果匹配成功，返回代码部分，否则返回整个字符串
+  if (match && match[1]) {
+      return match[1].trim(); // 移除前后的空白字符
+  }
+  return s;
+}
+
+
 const baseOptions = {
   method: "GET",
   mode: "cors",
@@ -63,17 +75,15 @@ export const ssePost = async (
       const errorData = await response.json();
       throw new Error(errorData.message || "Request failed");
     }
-
     // 直接解析完整响应
     const responseData = await response.json();
-    const { suggestion } = responseData?.data?.data?.outputs || {};
+    const suggestion  = responseData?.suggestion || {};
 
     if (suggestion) {
-      onSuccess?.(unicodeToChar(suggestion));
+      onSuccess?.(extractCode(unicodeToChar(suggestion)));
     } else {
       throw new Error("Suggestion not found");
     }
-    return suggestion;
   } catch (error) {
     if (error.name !== 'AbortError') {
       toast.error(error.message || "Request failed");
