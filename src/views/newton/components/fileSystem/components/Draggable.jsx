@@ -1,116 +1,144 @@
-import React, { useEffect, useState } from "react";
-import { DragSource, DropTarget } from "react-dnd";
+import React, { useEffect, useState, useRef } from "react";
+import { useDrag, useDrop } from "react-dnd";
 import fs from "fs";
 import path from "path";
 import pify from "pify";
-import onExternalDrop from "./uploadFuntion";
+import onExternalDrop from "./uploadFunction";
+import { getEmptyImage, NativeTypes } from "react-dnd-html5-backend";
 
-const DND_GROUP = "browser";
-
-const fileSource = {
-  beginDrag(props) {
-    console.log("Begin drag:", props);
-    if (props.type === "dir") {
-      return { items: [props] };
-    }
-    props.onDrag();
-    const group = props.getGroup();
-    console.log("current group", group);
-    return { items: [...group] }; // 返回一个包含多个拖动项信息的对象数组
-  },
-};
-
-const fileTarget = {
-  drop(dropProps, monitor) {
-    if (monitor) {
-      const dragProps = monitor.getItem();
-      console.log("dragProps", dragProps);
-      dragProps.items.forEach((item) => {
-        if (dropProps.pathname !== item.pathname) {
-          moveItem(item, dropProps).then((result) => {
-            dropProps.onDropByOther(result);
-            item.onDrop(result);
-          });
-        }
-      });
-    }
-  },
-  hover(props, monitor, component) {
-    if (monitor.isOver()) {
-      const event = monitor.getClientOffset();
-      if (event) {
-        console.log("Hover event:", event);
-      }
-    }
-  },
-};
+const DND_GROUP = "ENTITY";
 
 async function moveItem(from, to) {
   if (from.pathname === to.pathname) {
     return;
   }
-  if (to.type === "dir") {
-    const fromPath = from.pathname;
-    const basename = path.basename(from.pathname);
-    const destPath = path.join(to.pathname, basename);
 
-    await pify(fs.rename)(fromPath, destPath);
-    return {
-      fromPath,
-      destPath,
-    };
-  }
-  if (to.type === "file") {
-    const fromPath = from.pathname;
-    const basename = path.basename(from.pathname);
-    const destPath = path.join(path.dirname(to.pathname), basename);
-    await pify(fs.rename)(fromPath, destPath);
-    return {
-      fromPath,
-      destPath,
-    };
-  }
+  const fromPath = from.pathname;
+  const basename = path.basename(from.pathname);
+  const destPath =
+    to.type === "dir"
+      ? path.join(to.pathname, basename)
+      : path.join(path.dirname(to.pathname), basename);
+
+  await pify(fs.rename)(fromPath, destPath);
+  return {
+    fromPath,
+    destPath,
+  };
 }
 
-function DraggableItem(props) {
-  const {
-    connectDragSource,
-    connectDropTarget,
-    isDragging,
-    children,
-    isHover,
-    externalHover,
-  } = props;
-  const opacity = isDragging ? 0.4 : 1;
-  const backgroundColor = isHover || externalHover ? "#eaf6ea" : "";
+const DraggableItem = ({
+  children,
+  isEnabled,
+  externalHover,
+  setIsDraggable,
+  ...props
+}) => {
+  // Set up drag functionality
 
-  return connectDragSource(
-    connectDropTarget(
-      <div
-        className="drop-target"
-        style={{
-          opacity: props.isEnabled ? opacity : 1,
-          backgroundColor: props.isEnabled ? backgroundColor : "",
-          pointerEvents: props.isEnabled ? "auto" : "none",
-        }}
-      >
-        {children}
-      </div>
-    )
-  );
-}
-
-const DraggableDropTargetItem = React.memo(
-  DropTarget(DND_GROUP, fileTarget, (connect, monitor) => ({
-    connectDropTarget: connect.dropTarget(),
-    isHover: monitor.isOver(),
-  }))(
-    DragSource(DND_GROUP, fileSource, (connect, monitor) => ({
-      connectDragSource: connect.dragSource(),
+  const [{ isDragging }, dragRef, preview] = useDrag({
+    type: DND_GROUP,
+    // item: () => {
+    //   console.log("Begin drag:", props);
+    //   return { items: [props] };
+    // if (props.type === "dir") {
+    //   return { items: [props] };
+    // }
+    // props.onDrag();
+    // const group = props.getGroup();
+    // console.log("current group", group);
+    // return { items: [...group] };
+    // },
+    item() {
+      const group = props.getGroup();
+      console.log("current group", group);
+      return {
+        type: DND_GROUP,
+        title:
+          group?.length > 1
+            ? `${group.length} items`
+            : path.basename(props.pathname),
+        group: group,
+        items: [props],
+      };
+    },
+    end(item, monitor) {
+      if (monitor.didDrop()) {
+        const result = monitor.getDropResult();
+        if (result) {
+          console.log(result); // TODO: use result.dropEffect
+        }
+      }
+    },
+    collect: (monitor) => ({
       isDragging: monitor.isDragging(),
-    }))(DraggableItem)
-  )
-);
+    }),
+  });
+
+  // Set up drop functionality
+  const [{ isOver }, dropRef] = useDrop({
+    accept: [DND_GROUP, NativeTypes.FILE],
+    drop: (dragProps, monitor) => {
+      if (monitor) {
+        console.log("dragProps", dragProps);
+        dragProps.items.forEach((item) => {
+          if (props.pathname !== item.pathname) {
+            moveItem(item, props).then((result) => {
+              props.onDropByOther(result);
+              item.onDrop(result);
+            });
+          }
+        });
+      }
+    },
+
+    hover: (item, monitor) => {
+      if (monitor.isOver()) {
+        const event = monitor.getClientOffset();
+        if (event) {
+          console.log("Hover event:", event);
+        }
+      }
+    },
+    collect: (monitor) => ({
+      isOver: monitor.isOver(),
+    }),
+  });
+
+  // Combine drag and drop refs
+  const ref = useRef(null);
+  dragRef(dropRef(ref));
+
+  useEffect(() => {
+    preview(getEmptyImage());
+  }, [preview]);
+
+  // const opacity = isDragging ? 0.4 : 1;
+  const backgroundColor = isOver || externalHover ? "#81c784" : "";
+
+  // set folder background
+  useEffect(() => {
+    if (props.type === "file" && backgroundColor != "") {
+      props.setDragParentDirBgColor && props.setDragParentDirBgColor(true);
+    } else {
+      props.setDragParentDirBgColor && props.setDragParentDirBgColor(false);
+    }
+  }, [isOver, externalHover]);
+
+  return (
+    <div
+      ref={ref}
+      style={{
+        // opacity: isEnabled ? opacity : 1,
+        backgroundColor:
+          isEnabled && props.type === "dir" ? backgroundColor : "",
+        // pointerEvents: isEnabled ? "auto" : "none",
+      }}
+    >
+      {children}
+    </div>
+  );
+};
 
 const DraggableAndDroppable = ({
   isEnabled = true,
@@ -136,7 +164,7 @@ const DraggableAndDroppable = ({
       if (files.length > 0) {
         onExternalDrop(
           items,
-          props.type == "file" ? path.dirname(props.pathname) : props.pathname,
+          props.type === "file" ? path.dirname(props.pathname) : props.pathname,
           projectSync,
           reload
         );
@@ -163,21 +191,19 @@ const DraggableAndDroppable = ({
         element.removeEventListener("dragleave", handleDragLeave);
       }
     };
-  }, [onExternalDrop]);
+  }, [props.pathname, props.type, projectSync, reload]);
 
-  // if (!isEnabled) {
-  //   return <div>{children}</div>;
-  // }
+  // const { dragRef, setIsDraggable } = useDraggable(props.pathname);
 
   return (
     <div id={props.pathname}>
-      <DraggableDropTargetItem
+      <DraggableItem
         isEnabled={isEnabled}
         externalHover={externalHover}
         {...props}
       >
         {children}
-      </DraggableDropTargetItem>
+      </DraggableItem>
     </div>
   );
 };

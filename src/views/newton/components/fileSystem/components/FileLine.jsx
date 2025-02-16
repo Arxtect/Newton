@@ -8,7 +8,7 @@ import React, {
 import fs from "fs";
 import path from "path";
 import pify from "pify";
-import Draggable from "./Draggable"; 
+import Draggable from "./Draggable";
 import { ListItemIcon } from "@mui/material";
 import { Box, TextField } from "@mui/material";
 import { useFileStore } from "store";
@@ -20,16 +20,6 @@ import ArIcon from "@/components/arIcon";
 import ContextMenu from "@/components/contextMenu";
 import { toast } from "react-toastify";
 
-const Container = ({ selected, children }) => {
-  // Define the base classes for the component
-  const baseClasses = "cursor-pointer";
-
-  // Define the dynamic classes based on the `selected` prop
-  const hoverClasses = selected ? "bg-[#81c784]" : "hover:bg-[#bae6bc5c]";
-
-  return <div className={`${baseClasses} ${hoverClasses}`}>{children}</div>;
-};
-
 const FileLine = ({
   depth,
   filepath,
@@ -40,6 +30,8 @@ const FileLine = ({
   ignoreGit,
   startRenaming,
   endRenaming,
+  isDragging,
+  setDragParentDirBgColor
 }) => {
   const [hovered, setHovered] = useState(false);
 
@@ -127,6 +119,10 @@ const FileLine = ({
       inputRef.current.setSelectionRange(0, filenameNoExt?.length);
     }, 0);
   };
+
+  useEffect(() => {
+    console.log(isDragging, filepath, "isDragging");
+  }, [isDragging]);
 
   const handleKeyDown = (ev) => {
     if (ev.key === "Escape") {
@@ -311,11 +307,18 @@ const FileLine = ({
           }}
           projectSync={projectSync}
           reload={reload}
+          setDragParentDirBgColor={setDragParentDirBgColor}
         >
-          <Container
-            selected={
-              selectedFiles.includes(filepath) // Multi-select condition
-            }
+          <div
+            className={`cursor-pointer 
+              ${
+                selectedFiles.includes(filepath)
+                  ? isDragging
+                    ? "bg-[#bae6bc5c]"
+                    : "bg-[#81c784]"
+                  : "hover:bg-[#bae6bc5c]"
+              }
+              `}
           >
             <div
               className="flex items-center"
@@ -365,7 +368,7 @@ const FileLine = ({
                       onRename(e);
                     }}
                   >
-                    <span className="overflow-hidden text-ellipsis" >
+                    <span className="overflow-hidden text-ellipsis">
                       {basename}
                       {mainFilepath &&
                         path.basename(mainFilepath) == basename && (
@@ -390,7 +393,7 @@ const FileLine = ({
                 </div>
               </div>
             </div>
-          </Container>
+          </div>
         </Draggable>
       </div>
     </ContextMenu>

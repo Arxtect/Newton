@@ -23,6 +23,9 @@ import ArIcon from "@/components/arIcon";
 import ContextMenu from "@/components/contextMenu";
 import { toast } from "react-toastify";
 import DirectoryLineWrapper from "./DirectoryLineWrapper";
+import FileTreeDraggablePreviewLayer from "./fileDraggablePreviewLayer";
+
+import { useDragDropManager, useDragLayer } from "react-dnd";
 
 const DirectoryLineContent = ({
   dirpath,
@@ -49,15 +52,23 @@ const DirectoryLineContent = ({
   changeCurrentProjectRoot,
   fileTree,
   parentDir,
+  isDragging,
 }) => {
-  const { dirOpen, isDropFileSystem, filepath, projectSync, reload } =
-    useFileStore((state) => ({
-      dirOpen: state.dirOpen,
-      isDropFileSystem: state.isDropFileSystem,
-      filepath: state.filepath,
-      projectSync: state.projectSync,
-      reload: state.repoChanged,
-    }));
+  const {
+    dirOpen,
+    isDropFileSystem,
+    filepath,
+    projectSync,
+    reload,
+    selectedFiles,
+  } = useFileStore((state) => ({
+    dirOpen: state.dirOpen,
+    isDropFileSystem: state.isDropFileSystem,
+    filepath: state.filepath,
+    projectSync: state.projectSync,
+    reload: state.repoChanged,
+    selectedFiles: state.selectedFiles,
+  }));
 
   const [opened, setOpened] = useState(open);
   const [hovered, setHovered] = useState(false);
@@ -65,6 +76,8 @@ const DirectoryLineContent = ({
   const handleMouseOver = () => setHovered(true);
 
   const handleMouseLeave = () => setHovered(false);
+
+
 
   const handleClick = (e, dirpath) => {
     e.preventDefault();
@@ -245,6 +258,8 @@ const DirectoryLineContent = ({
     onAddFolder,
   ]);
 
+  const [dragParentDirBgColor, setDragParentDirBgColor] = useState(false);
+
   return (
     <List className="p-0">
       <ContextMenu items={menuItems}>
@@ -265,10 +280,18 @@ const DirectoryLineContent = ({
               onMouseOver={handleMouseOver}
               onMouseLeave={handleMouseLeave}
               className={`hover:bg-[#bae6bc5c] transition duration-300 ${
-                currentSelectDir == dirpath && renamingPathname != dirpath
+                (currentSelectDir == dirpath || !!dragParentDirBgColor) &&
+                renamingPathname != dirpath
                   ? "bg-[#81c784]"
                   : ""
-              }`}
+              } `}
+              // className={`hover:bg-[#bae6bc5c] transition duration-300 ${
+              //   selectedFiles.includes(dirpath)
+              //     ? "bg-[#e3f3e4]"
+              //     : currentSelectDir == dirpath && renamingPathname != dirpath
+              //     ? "bg-[#81c784]"
+              //     : ""
+              // }`}
               style={{
                 padding: "4px 0 1px 0",
                 paddingLeft: `${depth * 8}px`,
@@ -356,6 +379,8 @@ const DirectoryLineContent = ({
                 startRenaming={startRenaming}
                 endRenaming={endRenaming}
                 parentDir={parentDir}
+                isDragging={isDragging}
+                setDragParentDirBgColor={setDragParentDirBgColor}
               />
             );
           } else if (item.type === "dir") {
@@ -395,6 +420,7 @@ const DirectoryLineContent = ({
                 changePreRenamingDirpath={changePreRenamingDirpath}
                 changeCurrentProjectRoot={changeCurrentProjectRoot}
                 parentDir={parentDir}
+                isDragging={isDragging}
               />
             );
           }
@@ -405,7 +431,18 @@ const DirectoryLineContent = ({
 };
 
 const DirectoryLine = (props) => {
-  return <DirectoryLineContent {...props} />;
+  const dragLayer = useDragLayer((monitor) => ({
+    isDragging: monitor.isDragging(),
+    item: monitor.getItem(),
+    clientOffset: monitor.getClientOffset(),
+  }));
+
+  return (
+    <React.Fragment>
+      <FileTreeDraggablePreviewLayer {...dragLayer} />
+      <DirectoryLineContent {...props} {...dragLayer} />
+    </React.Fragment>
+  );
 };
 
 export default DirectoryLine;
