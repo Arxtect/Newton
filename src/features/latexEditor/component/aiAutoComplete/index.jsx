@@ -1,110 +1,87 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useLayout } from "store";
-import { getChatAccessToken, getChatApp} from "@/services";
-import { chatAccessToken, updateChatAccessToken, useUserStore } from "@/store";
 import { ssePost } from "./ssePost";
 import { useFileStore } from "@/store/useFileStore";
 import path from "path";
 
-const getAppList = async () => {
-  const appList = await getChatApp();
-  return appList;
-}
-
-const getAccessTokenAndStore = async (token) => {
-  if (chatAccessToken[token]) return chatAccessToken[token];
-  let accessToken = await getChatAccessToken(token);
-  updateChatAccessToken(token, accessToken);
-  return accessToken;
-};
 
 const AiAutoComplete = ({ editor }) => {
-  const { accessToken } = useUserStore((state) => ({
-    accessToken: state.accessToken,
-  }));
-
   const [hint, setHint] = useState("");
   const [hintPosition, setHintPosition] = useState({ top: 0, left: 0 });
   const [isTyping, setIsTyping] = useState(false);  // 用于判断用户是否在输入
   const sideWidthRef = useRef();
   const { sideWidth } = useLayout();
 
-  const [appList, setAppList] = useState([]);
-  const [currentApp, setCurrentApp] = useState(null);
-  const [currentAppToken, setCurrentAppToken] = useState(null);
-  // 用于记录上一次输入的位置
-  const [lastChangRow, setLastChangRow] = useState(0);
-  const [lastChangCol, setLastChangCol] = useState(0);
-
-  const [lastMessage, setLastMessage] = useState("");
-
-  const handleGetAppList = useCallback(() => {
-    if (!accessToken) return;
-    getAppList().then((res) => {
-      setAppList(res);
-      setCurrentApp(res?.find((item) => item.default) || res?.[0]);
-    });
-  }, []);
-
-  const setDefaultApp = useCallback(() => {
-    setCurrentApp(appList.find((item) => item.default) || appList[0]);
-  }, [appList]);
-
-  const handleGetAccessToken = useCallback(async (token) => {
-    let res = await getAccessTokenAndStore(token);
-    setCurrentAppToken(res);
-  }, []);
-
-  useEffect(() => {
-    if (!currentApp) return;
-    console.log(currentApp, "currentApp");
-    handleGetAccessToken(currentApp.access_token);
-  }, [currentApp]);
-
-  useEffect(() => {
-    handleGetAppList();
-  }, []);
-
   const debounceTimeout = useRef(null);
+  const typingTimeout = useRef(null);
 
-  const handleChange = useCallback(() => {
+  const getCodeContext = (editor, cursorPosition) => {
     const session = editor.getSession();
-    const editorValue = session.getValue();
+  
+    // 计算要提取的开始行（最多取20行）
+    const startLine = Math.max(cursorPosition.row - 20, 0);
+    const endLine = cursorPosition.row;  // 光标所在行
+  
+    // 提取从 startLine 到 endLine 之间的代码
+    const contextLines = [];
+    if (startLine > 0) contextLines.push("...");
+    for (let i = startLine; i < endLine; i++) {
+      contextLines.push(session.getLine(i));
+    }
+    contextLines.push(session.getLine(cursorPosition.row).slice(0, cursorPosition.column));
+    // 返回拼接的上下文，合并成一个字符串
+    return contextLines.join("\n");
+  };
 
-    const cursorPosition = editor.getCursorPosition();
-    const lineText = session.getLine(cursorPosition.row);
-
-    setLastChangRow(cursorPosition.row);
-    setLastChangCol(cursorPosition.column);
-    // console.log("changePosition:", cursorPosition)
+  const handleChange = useCallback((delta) => {
     if (debounceTimeout.current) {
       clearTimeout(debounceTimeout.current); // 清除之前的定时器
     }
-
-    setIsTyping(true);
-    // 如果新输入的字符与 hint 第一个字符一致，就删除hint的第一个字符
-    if (hint && ((cursorPosition.column === 0 && hint[0] === "\n") ||
-      (cursorPosition.column > 0 && lineText[cursorPosition.column] === hint[0])
-    )) {
-      setHint(hint.slice(1));
-    } else { // 否则，重新获取 hint
-      setHint("");
-      debounceTimeout.current = setTimeout(() => {
-        setIsTyping(false); // 用户停止输入
-        const currentFile = useFileStore.getState().selectedFiles;
-        const fileName = path.basename(currentFile[0]);
-        console.log("fileName:", fileName);
-        const message = editorValue; // TODO: 这里需要设置成简要的上下文内容，需要修改
-        console.log("message:", message);
-        const data = {
-          inputs: { currentContent: message, filename: fileName},
-          reponse_mode: "blocking",
-        };
-        // 调用 getAISuggestion 函数并处理返回的建议
-        getAISuggestion(data);
-      }, 500);  // 延迟 0.5 秒后调用 getAISuggestion
+    if (!isTyping) {
+      setIsTyping(true); // 用户开始输入
+    } else {
+      clearTimeout(typingTimeout.current); // 用户停止输入，清除定时器
+    }
+    if (hint !== "") {
+      if (delta.action === "insert") {
+        const newContent = delta.lines.join("\n");
+        // 如果新输入的内容与hint前缀相同，则消除hint中的该部分
+        if (hint.startsWith(newContent)) {
+          const newHint = hint.slice(newContent.length);
+          setHint(newHint);
+        } else {
+          setHint(""); // 输入内容与hint前缀不匹配，清除hint
+        }
+      } else {
+        // 重新获取 hint
+        setHint("");
+      }
     }
   }, [editor, hint]);
+
+  useEffect(() => {
+    console.log("isTyping:", isTyping);
+    if (isTyping) {
+      typingTimeout.current = setTimeout(() => {
+        setIsTyping(false); // 用户停止输入
+      }, 1000);
+    } else if (hint === "") {
+        debounceTimeout.current = setTimeout(() => {
+          const cursorPosition = editor.getCursorPosition();
+          const currentFile = useFileStore.getState().selectedFiles;
+          const fileName = path.basename(currentFile[0]);
+          // console.log("fileName:", fileName);
+          const message = getCodeContext(editor, cursorPosition);
+          // console.log("message:", message);
+          const data = {
+            inputs: { currentContent: message, filename: fileName},
+            reponse_mode: "blocking",
+          };
+          // 调用 getAISuggestion 函数并处理返回的建议
+          getAISuggestion(data);
+      }, 1000);
+    }
+  }, [isTyping, hint]);
 
   const updateHintPosition = useCallback(() => {
     const cursorPosition = editor.getCursorPosition();
@@ -113,22 +90,21 @@ const AiAutoComplete = ({ editor }) => {
       cursorPosition.column
     );
     // console.log("cursorPosition:", cursorPosition, "lastPosition:", lastChangRow, lastChangCol)
-    if (lastChangCol !== cursorPosition.column - 1 || !isTyping) {
-      setHint("");  // 光标移动则清空 hint
-      if (debounceTimeout.current) {
-        clearTimeout(debounceTimeout.current); // 清除之前的定时器
-      }
-    }
+    // if (!isTyping) {
+    //   setHint("");  // 光标移动则清空 hint
+    //   if (debounceTimeout.current) {
+    //     clearTimeout(debounceTimeout.current); // 清除之前的定时器
+    //   }
+    // }
     
     const editorElement = editor.container;
     const rect = editorElement.getBoundingClientRect();
-    const lineNumberWidth = editor.renderer.gutterWidth; //显示行占用宽度
 
     const floatingTop = screenCoordinates.pageY - rect.top;
     const floatingLeft = screenCoordinates.pageX - sideWidthRef.current;
 
     setHintPosition({ top: floatingTop, left: floatingLeft });
-  }, [editor, lastChangRow, lastChangCol]);
+  }, [editor]);
 
   const insertText = useCallback(() => {
     if (hint) {
@@ -172,7 +148,7 @@ const AiAutoComplete = ({ editor }) => {
       {
         body: data,
         headers: new Headers({
-          "APP-Authorization": `Bearer ${currentAppToken}`,
+          "APP-Authorization": `Bearer vipUserToken`, // TODO: 之后需要添加身份认证，这里为第一重认证
         }),
       },
       {
