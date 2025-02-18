@@ -69,7 +69,7 @@ const LatexEditor = ({ handleChange, sourceCode, filepath, mainFilepath }) => {
 
   // auto completer
   useEffect(() => {
-    if (latexRef.current && latexRef.current.editor && !!filepath) {
+    if (latexRef.current && latexRef.current.editor && !!filepath && !isVipUser()) {
       updateCurrentProjectFileList(currentProjectRoot).then(
         ([fileList, bibFilepathList]) => {
           setIsSetupCompleter(true);
@@ -95,6 +95,9 @@ const LatexEditor = ({ handleChange, sourceCode, filepath, mainFilepath }) => {
           setCompleter(newCompleter);
         }
       );
+    }
+    else {
+      setCompleter(null);
     }
   }, [filepath, currentProjectRoot, touchCounter]);
 
