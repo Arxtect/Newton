@@ -9,6 +9,13 @@ const ContentType = {
     upload: "multipart/form-data", // for upload
   };
 
+const suggestionExtractor = (response) => {
+  if (response.startsWith("[")) {
+    response = response.slice(1, -1);
+  }
+  return response;
+}
+
 const baseOptions = {
   method: "GET",
   mode: "cors",
@@ -68,7 +75,7 @@ export const ssePost = async (
     const suggestion  = responseData?.suggestion || {};
 
     if (suggestion) {
-      onSuccess?.(unicodeToChar(suggestion));
+      onSuccess?.(suggestionExtractor(unicodeToChar(suggestion)));
     } else {
       throw new Error("Suggestion not found");
     }
