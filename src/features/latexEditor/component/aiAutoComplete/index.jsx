@@ -14,6 +14,7 @@ const AiAutoComplete = ({ editor }) => {
 
   const debounceTimeout = useRef(null);
   const typingTimeout = useRef(null);
+  const hintVersion = useRef(0);
 
   const getCodeContext = (editor, cursorPosition) => {
     const session = editor.getSession();
@@ -34,9 +35,6 @@ const AiAutoComplete = ({ editor }) => {
   };
 
   const handleChange = useCallback((delta) => {
-    if (debounceTimeout.current) {
-      clearTimeout(debounceTimeout.current); // 清除之前的定时器
-    }
     if (!isTyping) {
       setIsTyping(true); // 用户开始输入
     } else {
@@ -60,11 +58,11 @@ const AiAutoComplete = ({ editor }) => {
   }, [editor, hint]);
 
   useEffect(() => {
-    console.log("isTyping:", isTyping);
+    // console.log("isTyping:", isTyping);
     if (isTyping) {
       typingTimeout.current = setTimeout(() => {
         setIsTyping(false); // 用户停止输入
-      }, 1000);
+      }, 300);
     } else if (hint === "") {
         debounceTimeout.current = setTimeout(() => {
           const cursorPosition = editor.getCursorPosition();
@@ -79,7 +77,7 @@ const AiAutoComplete = ({ editor }) => {
           };
           // 调用 getAISuggestion 函数并处理返回的建议
           getAISuggestion(data);
-      }, 1000);
+      }, 2000);
     }
   }, [isTyping, hint]);
 
@@ -90,12 +88,12 @@ const AiAutoComplete = ({ editor }) => {
       cursorPosition.column
     );
     // console.log("cursorPosition:", cursorPosition, "lastPosition:", lastChangRow, lastChangCol)
-    // if (!isTyping) {
-    //   setHint("");  // 光标移动则清空 hint
-    //   if (debounceTimeout.current) {
-    //     clearTimeout(debounceTimeout.current); // 清除之前的定时器
-    //   }
-    // }
+    if (!isTyping) {
+      setHint("");  // 光标移动则清空 hint
+      if (debounceTimeout.current) {
+        clearTimeout(debounceTimeout.current); // 清除之前的定时器
+      }
+    }
     
     const editorElement = editor.container;
     const rect = editorElement.getBoundingClientRect();
@@ -143,6 +141,7 @@ const AiAutoComplete = ({ editor }) => {
 
   const getAISuggestion = async (data) => {
     // setHint("This is a test hint");
+    const version = ++hintVersion.current; // 竞争版本控制，避免多次请求
     ssePost(
       `/api/v1/chat/auto-complete`,
       {
@@ -152,7 +151,10 @@ const AiAutoComplete = ({ editor }) => {
         }),
       },
       {
-        onSuccess: (suggestion) => setHint(suggestion),
+        onSuccess: (suggestion) => {
+          if (version !== hintVersion.current) return; // 忽略旧请求的响应
+          setHint(suggestion)
+        },
         onError: (err) => console.error("请求失败:", err)
       }
     );
