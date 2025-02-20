@@ -9,23 +9,6 @@ const ContentType = {
     upload: "multipart/form-data", // for upload
   };
 
-function extractCode(s) {
-  // 使用正则表达式匹配 ```latex 和 ``` 之间的内容
-  const regex = /```latex([\s\S]*?)```/;
-  const match = s.match(regex);
-  // 如果匹配成功，返回代码部分，否则返回空字符串
-  if (match && match[1]) {
-      return match[1].trim(); // 移除前后的空白字符
-  }
-  const regex2 = /```([\s\S]*?)```/;
-  const match2 = s.match(regex2);
-  if (match2 && match2[1]) {
-      return match2[1].trim(); // 移除前后的空白字符
-  }
-  return s;
-}
-
-
 const baseOptions = {
   method: "GET",
   mode: "cors",
@@ -85,7 +68,7 @@ export const ssePost = async (
     const suggestion  = responseData?.suggestion || {};
 
     if (suggestion) {
-      onSuccess?.(extractCode(unicodeToChar(suggestion)));
+      onSuccess?.(unicodeToChar(suggestion));
     } else {
       throw new Error("Suggestion not found");
     }
