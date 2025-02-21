@@ -35,13 +35,18 @@ const AiAutoComplete = ({ editor }) => {
   };
 
   const handleChange = useCallback((delta) => {
+    clearTimeout(typingTimeout.current) // 取消之前的定时器
     setIsTyping(true); // 用户开始输入
+    typingTimeout.current = setTimeout(() => {
+      setIsTyping(false); // 用户停止输入
+    }, 1000);
     hintVersion.current += 1; // 版本控制，用于竞争请求
     if (hint !== "") {
       if (delta.action === "insert") {
         const newContent = delta.lines.join("\n");
         // 如果新输入的内容与hint前缀相同，则消除hint中的该部分
         if (hint.startsWith(newContent)) {
+          // console.log("hint is starting with newContent");
           const newHint = hint.slice(newContent.length);
           setHint(newHint);
         } else {
@@ -52,16 +57,12 @@ const AiAutoComplete = ({ editor }) => {
         setHint("");
       }
     }
-  }, [editor, hint]);
+  }, [hint]);
 
   useEffect(() => {
-    console.log("isTyping:", isTyping);
-    let timer;
-    if (isTyping) {
-      timer = setTimeout(() => {
-        setIsTyping(false); // 停止输入
-      }, 700);
-    } else if (hint === "") {
+    // console.log("isTyping:", isTyping);
+    if (hint === "" && !isTyping) {
+        clearTimeout(debounceTimeout.current);
         debounceTimeout.current = setTimeout(() => {
           const cursorPosition = editor.getCursorPosition();
           const currentFile = useFileStore.getState().selectedFiles;
@@ -76,12 +77,15 @@ const AiAutoComplete = ({ editor }) => {
           const version = hintVersion.current; // 竞争版本控制
           // 调用 getAISuggestion 函数并处理返回的建议
           getAISuggestion(data, version);
-      }, 2000);
-      return () => {
-        if (timer) clearTimeout(timer);
-      }
+      }, 1500);
     }
-  }, [isTyping, hint]);
+  }, [isTyping, hint, editor]);
+
+  useEffect(() => {
+    if (hint && !isTyping) {
+      setHint("");
+    }
+  }, [hintPosition])
 
   const updateHintPosition = useCallback(() => {
     const cursorPosition = editor.getCursorPosition();
@@ -89,22 +93,13 @@ const AiAutoComplete = ({ editor }) => {
       cursorPosition.row,
       cursorPosition.column
     );
-    // console.log("cursorPosition:", cursorPosition, "lastPosition:", lastChangRow, lastChangCol)
-    setTimeout(() => {
-      if (!isTyping) {
-        setHint("");  // 光标移动则清空 hint
-        if (debounceTimeout.current) {
-          clearTimeout(debounceTimeout.current); // 清除之前的定时器
-        }
-      }
-    }, 500);
     
     const editorElement = editor.container;
     const rect = editorElement.getBoundingClientRect();
-
+    
     const floatingTop = screenCoordinates.pageY - rect.top;
     const floatingLeft = screenCoordinates.pageX - sideWidthRef.current;
-
+    
     setHintPosition({ top: floatingTop, left: floatingLeft });
   }, [editor]);
 
@@ -112,9 +107,7 @@ const AiAutoComplete = ({ editor }) => {
     if (hint) {
       const session = editor.getSession();
       const cursor = editor.getCursorPosition();
-      session.off("change", handleChange); // 防止触发 onChange 事件
       session.insert(cursor, hint);
-      session.on("change", handleChange); // 重新开启 onChange 事件
       setHint("");
     }
   }, [hint, editor]);
@@ -146,7 +139,6 @@ const AiAutoComplete = ({ editor }) => {
   }, [editor, handleChange, addCustomCommand]);
 
   const getAISuggestion = async (data, version) => {
-    // setHint("This is a test hint");
     ssePost(
       `/api/v1/chat/auto-complete`,
       {
@@ -158,12 +150,7 @@ const AiAutoComplete = ({ editor }) => {
       {
         onSuccess: (suggestion) => {
           if (version !== hintVersion.current) return; // 忽略旧请求的响应
-          if (suggestion) {
-            if (!suggestion.endsWith("\n")) {
-              suggestion += "\n";
-            }
-          }
-          setHint(suggestion)
+          setHint(suggestion?.endsWith("\n") ? suggestion : suggestion + "\n");
         },
         onError: (err) => console.error("请求失败:", err)
       }
