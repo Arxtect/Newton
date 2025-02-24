@@ -23,6 +23,11 @@ import { compileLatex } from "@/features/latexCompilation/latexCompilation";
 
 import { TexMathJax, loadExtensions } from "./texMathjax";
 
+const isVipUser = () => {
+  // TODO: check if user is vip
+  return true; // Assuming the user is a VIP for testing purposes
+};
+
 const LatexEditor = ({ handleChange, sourceCode, filepath, mainFilepath }) => {
   const latexRef = useRef(null);
 
@@ -62,7 +67,7 @@ const LatexEditor = ({ handleChange, sourceCode, filepath, mainFilepath }) => {
 
   // auto completer
   useEffect(() => {
-    if (latexRef.current && latexRef.current.editor && !!filepath) {
+    if (latexRef.current && latexRef.current.editor && !!filepath && !isVipUser()) {
       updateCurrentProjectFileList(currentProjectRoot).then(
         ([fileList, bibFilepathList]) => {
           setIsSetupCompleter(true);
@@ -88,6 +93,9 @@ const LatexEditor = ({ handleChange, sourceCode, filepath, mainFilepath }) => {
           setCompleter(newCompleter);
         }
       );
+    }
+    else {
+      setCompleter(null);
     }
   }, [filepath, currentProjectRoot, touchCounter]);
 
@@ -152,12 +160,14 @@ const LatexEditor = ({ handleChange, sourceCode, filepath, mainFilepath }) => {
         ref={latexRef}
         className={filepath === "" ? "disabled-editor" : "ace_editor ace-tm"}
       ></AceEditor>
-      {latexRef?.current?.editor && (
-        <AiTools editor={latexRef.current.editor} completer={completer} />
-      )}
-      {/* {latexRef?.current?.editor && (
+      {latexRef?.current?.editor && isVipUser() && (
         <AiAutoComplete editor={latexRef.current.editor} />
-      )} */}
+      )}
+      {latexRef?.current?.editor && (
+        <>
+          <AiTools editor={latexRef.current.editor} completer={completer} />
+        </>
+      )}
       {!!assetsFilePath && <FileView filename={assetsFilePath} />}
       <TexMathJax latexRef={latexRef} />
     </div>
