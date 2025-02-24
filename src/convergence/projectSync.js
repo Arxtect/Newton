@@ -26,8 +26,8 @@ const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
 // const wsUrl = `ws://3.227.9.181:8013`;
 // const wsUrl = `ws://206.190.239.91:9008/`;
 // const wsUrl = `ws://10.10.99.42:8013/`;
-const wsUrl = `ws://localhost:8013/`;
-// const wsUrl = `ws://10.10.101.159:8013/`;
+// const wsUrl = `ws://localhost:8013/`;
+const wsUrl = `ws://network.jancsitech.net:5913/`;
 
 class ProjectSync {
   constructor(
@@ -575,7 +575,8 @@ class ProjectSyncDownload {
   // download all file into local
   async downloadAllFile() {
     let fileTree = this.yMap.get(this.folderMapName);
-    let folderList = fileTree.map((item) => {
+    if (!fileTree) return;
+    let folderList = fileTree?.map((item) => {
       if (item.children) {
         return path.join(this.parentDir, item.filepath);
       }

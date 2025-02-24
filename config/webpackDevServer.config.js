@@ -115,9 +115,9 @@ module.exports = function (proxy, allowedHost) {
       },
       "/api/v1": {
         // target: "http://3.227.9.181:8012",
-        target: "http://172.17.15.200:8012",
+        // target: "http://172.17.15.200:8012",
         // target: "http://127.0.0.1:8012",
-        // target: "http://network.jancsitech.net:5912",
+        target: "http://network.jancsitech.net:5912",
         // target: "https://arxtect.com",
         changeOrigin: true,
         onProxyReq: function (proxyReq, req, res) {

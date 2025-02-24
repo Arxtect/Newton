@@ -1,13 +1,13 @@
 import { toast } from "react-toastify";
 
 const ContentType = {
-    json: "application/json",
-    stream: "text/event-stream",
-    audio: "audio/mpeg",
-    form: "application/x-www-form-urlencoded; charset=UTF-8",
-    download: "application/octet-stream", // for download
-    upload: "multipart/form-data", // for upload
-  };
+  json: "application/json",
+  stream: "text/event-stream",
+  audio: "audio/mpeg",
+  form: "application/x-www-form-urlencoded; charset=UTF-8",
+  download: "application/octet-stream", // for download
+  upload: "multipart/form-data", // for upload
+};
 
 const baseOptions = {
   method: "GET",
@@ -22,7 +22,9 @@ const baseOptions = {
 function unicodeToChar(text) {
   if (!text) return "";
 
-  return text.replace(/\\u[0-9a-f]{4}/g, (_match, p1) => {
+  console.log(text, "text");
+
+  return text?.replace(/\\u[0-9a-f]{4}/g, (_match, p1) => {
     return String.fromCharCode(parseInt(p1, 16));
   });
 }
@@ -65,7 +67,7 @@ export const ssePost = async (
     }
     // 直接解析完整响应
     const responseData = await response.json();
-    const suggestion  = responseData?.suggestion || {};
+    const suggestion = responseData?.data || {};
 
     if (suggestion) {
       onSuccess?.(unicodeToChar(suggestion));
@@ -73,7 +75,7 @@ export const ssePost = async (
       throw new Error("Suggestion not found");
     }
   } catch (error) {
-    if (error.name !== 'AbortError') {
+    if (error.name !== "AbortError") {
       toast.error(error.message || "Request failed");
       onError?.(error.message);
     }
