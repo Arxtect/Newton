@@ -172,7 +172,7 @@ const LatexEditor = ({ handleChange, sourceCode, filepath, mainFilepath }) => {
       {latexRef?.current?.editor && isVipUser() && (
         <AiAutoComplete editor={latexRef.current.editor} />
       )}
-      {latexRef?.current?.editor && !isVipUser() && (
+      {latexRef?.current?.editor && (
         <>
           <AiTools editor={latexRef.current.editor} completer={completer} />
         </>
