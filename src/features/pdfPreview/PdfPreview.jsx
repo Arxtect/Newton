@@ -33,7 +33,6 @@ export const PdfPreview = () => {
       className={`h-full relative  ${willResizing ? "z-10" : ""}`}
       style={{ overflow: "auto" }} // 添加这一行以允许滚动
     >
-       
       {/* <PdfPreviewProvider>
         <div
           className={`h-full relative  ${willResizing ? "z-10" : ""}`}
