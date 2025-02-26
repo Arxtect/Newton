@@ -48,8 +48,6 @@ const LatexEditor = ({ handleChange, sourceCode, filepath, mainFilepath }) => {
     assetsFilePath: state.assetsFilePath,
   }));
 
-
-
   useEffect(() => {
     loadExtensions();
     console.log(latexRef.current, "latexRef.current");
@@ -67,7 +65,12 @@ const LatexEditor = ({ handleChange, sourceCode, filepath, mainFilepath }) => {
 
   // auto completer
   useEffect(() => {
-    if (latexRef.current && latexRef.current.editor && !!filepath && !isVipUser()) {
+    if (
+      latexRef.current &&
+      latexRef.current.editor &&
+      !!filepath &&
+      !isVipUser()
+    ) {
       updateCurrentProjectFileList(currentProjectRoot).then(
         ([fileList, bibFilepathList]) => {
           setIsSetupCompleter(true);
@@ -93,8 +96,7 @@ const LatexEditor = ({ handleChange, sourceCode, filepath, mainFilepath }) => {
           setCompleter(newCompleter);
         }
       );
-    }
-    else {
+    } else {
       setCompleter(null);
     }
   }, [filepath, currentProjectRoot, touchCounter]);
@@ -160,9 +162,9 @@ const LatexEditor = ({ handleChange, sourceCode, filepath, mainFilepath }) => {
         ref={latexRef}
         className={filepath === "" ? "disabled-editor" : "ace_editor ace-tm"}
       ></AceEditor>
-      {latexRef?.current?.editor && isVipUser() && (
+      {/* {latexRef?.current?.editor && isVipUser() && (
         <AiAutoComplete editor={latexRef.current.editor} />
-      )}
+      )} */}
       {latexRef?.current?.editor && (
         <>
           <AiTools editor={latexRef.current.editor} completer={completer} />
