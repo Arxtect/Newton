@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
-import { useLayout } from "store";
+import { set, useLayout } from "store";
 import { ssePost } from "./ssePost";
 import { useFileStore } from "@/store/useFileStore";
 import path from "path";
@@ -15,6 +15,7 @@ const AiAutoComplete = ({ editor }) => {
   const debounceTimeout = useRef(null);
   const typingTimeout = useRef(null);
   const hintVersion = useRef(0);
+  const [isFocus, setIsFocus] = useState(false);
 
   const getCodeContext = (editor, cursorPosition) => {
     const session = editor.getSession();
@@ -63,6 +64,7 @@ const AiAutoComplete = ({ editor }) => {
     // console.log("isTyping:", isTyping);
     if (hint === "" && !isTyping) {
         clearTimeout(debounceTimeout.current);
+        if (!isFocus) return;
         debounceTimeout.current = setTimeout(() => {
           const cursorPosition = editor.getCursorPosition();
           const currentFile = useFileStore.getState().selectedFiles;
@@ -127,10 +129,19 @@ const AiAutoComplete = ({ editor }) => {
     sideWidthRef.current = sideWidth;
   }, [sideWidth]);
 
+  const handleBlur = useCallback(() => {
+    setHint("");
+    setIsFocus(false);
+    clearTimeout(debounceTimeout.current);
+    hintVersion.current += 1;
+  }, []);
+
   useEffect(() => {
     addCustomCommand(editor);
     editor.session.on("change", handleChange);
     editor.session.selection.on("changeCursor", updateHintPosition);
+    editor.on("focus", () => setIsFocus(true));
+    editor.on("blur", handleBlur);
 
     return () => {
       editor.session.off("change", handleChange);
