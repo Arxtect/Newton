@@ -111,7 +111,7 @@ const Share = ({
       getRoomInfo();
       let projectInfo = await getProjectInfo(rootPath);
       // if (projectInfo?.isSync) return;
-      handleSaveProject();
+      // handleSaveProject();
     }
     return res?.status;
   };

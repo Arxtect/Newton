@@ -49,6 +49,7 @@ const ContentTopBar = (props) => {
     currentSelectDir,
     updateDirOpen,
     reload,
+    getCurrentProjectPdf,
   } = useFileStore((state) => ({
     projectSync: state.projectSync,
     sourceCode: state.value,
@@ -60,6 +61,7 @@ const ContentTopBar = (props) => {
     currentSelectDir: state.currentSelectDir,
     updateDirOpen: state.updateDirOpen,
     reload: state.repoChanged,
+    getCurrentProjectPdf: state.getCurrentProjectPdf,
   }));
 
   const { updateSetting, getSetting, compileSetting } = useCompileSetting(
@@ -187,6 +189,37 @@ const ContentTopBar = (props) => {
       graceCloseCompiler();
     };
   }, []);
+
+  const { setCompiledPdfUrl, pdfUrl } = usePdfPreviewStore((state) => ({
+    setCompiledPdfUrl: state.setCompiledPdfUrl,
+    pdfUrl: state.pdfUrl,
+  }));
+
+  const [onceCompile, setOnceCompile] = useState(false);
+
+  // compile when load
+  useEffect(() => {
+    (async () => {
+      if (pdfUrl) return;
+      let blobUrl = await getCurrentProjectPdf(currentProjectRoot);
+
+      console.log(blobUrl, compileSetting, "blobUrl");
+      // blobUrl = null;
+      if (blobUrl) {
+        setCompiledPdfUrl(blobUrl);
+      } else {
+        if (
+          engineStatus == constant.readyEngineStatus &&
+          !onceCompile &&
+          !!mainFilepath &&
+          !compileSetting.autoCompile
+        ) {
+          setOnceCompile(true);
+          compileLatex(currentProjectRoot, mainFilepath, compileSetting);
+        }
+      }
+    })();
+  }, [engineStatus, onceCompile, mainFilepath]);
 
   return (
     <div className="flex items-center justify-between bg-[#e8f9ef] w-full">

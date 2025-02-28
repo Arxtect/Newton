@@ -8,8 +8,7 @@ import React, {
 import fs from "fs";
 import path from "path";
 import pify from "pify";
-import Draggable from "./Draggable"; // Adjust the import path as needed
-import Pathname from "./Pathname"; // Adjust the import path as needed
+import Draggable from "./Draggable"; 
 import { ListItemIcon } from "@mui/material";
 import { Box, TextField } from "@mui/material";
 import { useFileStore } from "store";
@@ -108,7 +107,7 @@ const FileLine = ({
     // endRenaming();
     handleRenameConfirm(value);
   };
-  
+
   const handleRename = useCallback(() => {
     if (!inputRef.current && !filepath) return;
     startRenaming({ pathname: filepath });
@@ -245,7 +244,7 @@ const FileLine = ({
         sx={{
           display: "flex",
           alignItems: "center",
-          padding: "1px 0px",
+          padding: "3px 0 1px 0",
           paddingLeft: `${depth * 8 + 24}px`,
         }}
       >
@@ -253,11 +252,12 @@ const FileLine = ({
           style={{
             minWidth: "unset",
           }}
+          className="mt-[-0.2rem]"
         >
           <ArIcon name={"File"} className="text-black w-[1.5rem]" />
         </ListItemIcon>
         <TextField
-          className="tailwind-classes-for-input"
+          className="tailwind-classes-for-input  pl-1"
           variant="outlined"
           size="small"
           value={value}
@@ -325,52 +325,70 @@ const FileLine = ({
               <div
                 className="flex items-center w-full"
                 style={{
-                  padding: "1px 0px",
+                  padding: "3px 0 1px 0",
                   paddingLeft: `${depth * 8 + 24}px`,
                 }}
-                onClick={handleFileClick}
-                onDoubleClick={(e) => {
-                  if (
-                    filepath !== editingFilepath &&
-                    filepath !== assetsFilePath
-                  ) {
-                    return;
-                  }
-                  onRename(e);
-                }}
               >
-                <ListItemIcon
-                  style={{
-                    minWidth: "unset",
-                  }}
-                >
-                  <ArIcon name={"File"} className="text-black w-[1.5rem]" />
-                </ListItemIcon>
-                <Pathname ignoreGit={ignoreGit}>
-                  {basename}
-                  {mainFilepath && path.basename(mainFilepath) == basename && (
-                    <span
-                      style={{
-                        marginLeft: "4px",
-                        fontSize: "0.8em",
-                        color: "lightgray",
-                      }}
-                    >
-                      main
+                <div class="flex cursor-pointer items-center  w-full whitespace-nowrap  select-none">
+                  <ListItemIcon
+                    style={{
+                      minWidth: "unset",
+                    }}
+                    className="mt-[-0.2rem]"
+                    onClick={handleFileClick}
+                    onDoubleClick={(e) => {
+                      if (
+                        filepath !== editingFilepath &&
+                        filepath !== assetsFilePath
+                      ) {
+                        return;
+                      }
+                      onRename(e);
+                    }}
+                  >
+                    <ArIcon name={"File"} className="text-black w-[1.5rem]" />
+                  </ListItemIcon>
+                  <div
+                    className="flex pl-1 whitespace-nowrap overflow-hidden"
+                    style={{
+                      width: "100%",
+                    }}
+                    title={basename}
+                    onClick={handleFileClick}
+                    onDoubleClick={(e) => {
+                      if (
+                        filepath !== editingFilepath &&
+                        filepath !== assetsFilePath
+                      ) {
+                        return;
+                      }
+                      onRename(e);
+                    }}
+                  >
+                    <span className="overflow-hidden text-ellipsis" >
+                      {basename}
+                      {mainFilepath &&
+                        path.basename(mainFilepath) == basename && (
+                          <span
+                            style={{
+                              marginLeft: "4px",
+                              fontSize: "0.8em",
+                              color: "lightgray",
+                            }}
+                            className="mt-[-0.2rem]"
+                          >
+                            main
+                          </span>
+                        )}
                     </span>
-                  )}
-                </Pathname>
+                  </div>
+                  <HoverMenu
+                    menuItems={menuItems}
+                    hovered={hovered}
+                    className="mt-[-0.2rem]"
+                  />
+                </div>
               </div>
-              <HoverMenu
-                dirpath={filepath}
-                onDelete={(e) => {
-                  e.stopPropagation();
-                  deleteFile({ filename: filepath });
-                }}
-                onRename={onRename}
-                menuItems={menuItems}
-                hovered={hovered}
-              />
             </div>
           </Container>
         </Draggable>

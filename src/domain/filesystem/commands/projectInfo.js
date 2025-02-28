@@ -36,6 +36,8 @@ export const createProjectInfo = async (projectRoot, additionalInfo = {}) => {
     createdAt: existingInfo.createdAt || new Date().toISOString(), // 保留原始创建时间
   };
 
+  console.log(projectInfo, "projectInfo");
+
   try {
     await writeFile(projectInfoPath, JSON.stringify(projectInfo, null, 2));
   } catch (err) {

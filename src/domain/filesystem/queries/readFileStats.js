@@ -52,7 +52,7 @@ export async function readFileStats(dirpath, isNotSync = true) {
 
   const ret = await Promise.all(
     filenames.map(async (name) => {
-      if (!!projectInfoExists(name) && isNotSync) return null; // TODO: remove
+      if (!!projectInfoExists(name) && isNotSync) return null; // TODO: read project info file
       const childPath = path.join(dirpath, name);
       if (IGNORE_PATTERNS.includes(childPath)) {
         return null;

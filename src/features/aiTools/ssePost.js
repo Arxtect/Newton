@@ -1,3 +1,8 @@
+/*
+ * @Description:
+ * @Author: Devin
+ * @Date: 2024-12-27 11:40:42
+ */
 import { toast } from "react-toastify";
 
 const ContentType = {
@@ -22,7 +27,9 @@ const baseOptions = {
 function unicodeToChar(text) {
   if (!text) return "";
 
-  return text.replace(/\\u[0-9a-f]{4}/g, (_match, p1) => {
+  console.log(text, "text");
+
+  return text?.replace(/\\u[0-9a-f]{4}/g, (_match, p1) => {
     return String.fromCharCode(parseInt(p1, 16));
   });
 }

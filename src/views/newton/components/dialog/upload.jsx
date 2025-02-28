@@ -10,7 +10,7 @@ import React, {
   forwardRef,
   useImperativeHandle,
 } from "react";
-import { uploadFile, uploadFolder,readFile} from "@/domain/filesystem";
+import { uploadFile, uploadFolder, readFile } from "@/domain/filesystem";
 import UploadFileIcon from "@mui/icons-material/UploadFileRounded";
 import path from "path";
 import DriveFolderUploadIcon from "@mui/icons-material/DriveFolderUploadRounded";
@@ -43,7 +43,7 @@ const FileUploader = forwardRef(
       if (!!projectSync) {
         for (const filePath of filePaths) {
           const content = await readFile(filePath);
-          projectSync.syncFileToYMap(filePath, content);
+          await projectSync.syncFileToYMap(filePath, content);
         }
       }
       console.log(filePaths, "filePaths");
@@ -64,7 +64,7 @@ const FileUploader = forwardRef(
           <IconButton color="#inherit" aria-label="controls" size="small">
             {/* <UploadFileIcon fontSize="small" /> */}
             {/* <img src={uploadFileSvg} alt="" className="w-5 h-5" /> */}
-            <ArIcon name={"UploadFile"}  className="text-black w-5 h-5"/>
+            <ArIcon name={"UploadFile"} className="text-black w-5 h-5" />
           </IconButton>
         </Tooltip>
         <input
@@ -108,6 +108,8 @@ const FolderUploader = forwardRef(
           const content = await readFile(filePath);
           projectSync.syncFileToYMap(filePath, content);
         }
+
+        await projectSync.syncFileTree();
       }
       console.log(filePaths, "filePaths");
     };
@@ -126,7 +128,7 @@ const FolderUploader = forwardRef(
           <IconButton color="#inherit" aria-label="controls" size="small">
             {/* <DriveFolderUploadIcon className="text-[#000]" fontSize="small" /> */}
             {/* <img src={uploadFolderSvg} alt="" className="w-5 h-5" /> */}
-            <ArIcon name={"uploadFolder"}  className="text-black w-5 h-5"/>
+            <ArIcon name={"uploadFolder"} className="text-black w-5 h-5" />
           </IconButton>
         </Tooltip>
         <input

@@ -10,28 +10,15 @@ import {
   savePdfToIndexedDB,
   getPdfFromIndexedDB,
   isAssetExtension,
+  initProject,
 } from "@/utils";
 import { useUserStore } from "./useUserStore";
 import { ProjectSync } from "@/convergence";
 import { useEditor } from "./useEditor";
-
+import { addShareRoom, getYDocToken } from "@/services";
 export const FILE_STORE = "FILE_STORE";
 
 function removeRootPath(filePath, rootPath) {
-  // 标准化路径
-  // const normalizedFilePath = path.normalize(filePath);
-  // const normalizedRootPath = path.basename(path.normalize(rootPath));
-
-  // // 分割路径
-  // const pathParts = normalizedFilePath.split(path.sep);
-
-  // // 如果第一个部分与 rootPath 的文件夹名相同，则移除
-  // if (pathParts[0] === normalizedRootPath) {
-  //   pathParts.shift();
-  // }
-
-  // // 重新组合路径
-  // return pathParts.join(path.sep);
   return filePath.replace(rootPath, "");
 }
 
@@ -43,6 +30,17 @@ function debounce(func, wait) {
     timeout = setTimeout(() => func.apply(context, args), wait);
   };
 }
+
+const getStorage = () => {
+  const urlParams = new URLSearchParams(window.location.hash.split("?")[1]);
+  const hasProject = urlParams.has("project");
+  console.log(hasProject, "hasProject");
+  if (hasProject) {
+    return sessionStorage;
+  } else {
+    return localStorage;
+  }
+};
 
 export const useFileStore = create()(
   persist(
@@ -57,6 +55,7 @@ export const useFileStore = create()(
       assetValue: "",
       lastSavedValue: "",
       reloadCounter: 0,
+      fileTree: [],
 
       // repo
       fileCreatingDir: null,
@@ -76,6 +75,15 @@ export const useFileStore = create()(
       shareIsRead: false,
       selectedFiles: [],
       parentDir: "",
+      updateFileTree: async () => {
+        let fileTree = await FS.readFileTree(
+          get().currentProjectRoot,
+          true,
+          get().parentDir
+        );
+
+        set({ fileTree });
+      },
       setSelectedFiles: (filepath) => {
         // 如果传入的是数组就直接使用,否则包装成数组
         set({ selectedFiles: [filepath] });
@@ -201,6 +209,7 @@ export const useFileStore = create()(
       // Actions
       setAutosave: (autosave) => set({ autosave }),
       loadFile: async ({ filepath }) => {
+        console.log("loadFile", filepath);
         if (!filepath) return;
         const { editor } = useEditor.getState();
 
@@ -328,10 +337,16 @@ export const useFileStore = create()(
         const state = get();
         set({ touchCounter: state.touchCounter + 1 });
       },
+      syncFileTreeToYMap: async () => {
+        let projectSync = get().projectSync;
+        if (projectSync) {
+          projectSync.syncFileTree && (await projectSync.syncFileTree());
+        }
+      },
       endFileCreating: (filepath) => {
         set({ fileCreatingDir: null });
       },
-      endDirCreating: (filepath) => {
+      endDirCreating: async (filepath) => {
         set({ dirCreatingDir: null });
       },
       startUpdate: async ({ changedPath, isDir = false }) => {
@@ -375,6 +390,8 @@ export const useFileStore = create()(
         get().loadFile({ filepath });
         get().changeSingleBibFilepath(filepath);
         get().updateDirOpen(false);
+
+        await get().syncFileTreeToYMap();
       },
       cancelFileCreating: () => {
         get().updateDirOpen(false);
@@ -390,6 +407,7 @@ export const useFileStore = create()(
         get().endDirCreating({ dirpath });
         get().startUpdate({ changedPath: dirpath, isDir: true });
         get().updateDirOpen(false);
+        await get().syncFileTreeToYMap();
       },
 
       createFile: async ({ filepath, content = "" }) => {
@@ -406,9 +424,12 @@ export const useFileStore = create()(
       },
 
       deleteFile: async ({ filename }, isSync = false) => {
-        if (!isSync) {
+        if (filename == get().filepath) {
           set({ filepath: "", value: "" });
         }
+        // if (!isSync) {
+        //   set({ filepath: "", value: "" });
+        // }
         if (!(await FS.existsPath(filename))) return;
         await FS.unlink(filename);
         const projectSync = get().projectSync;
@@ -420,7 +441,10 @@ export const useFileStore = create()(
       },
       deleteDirectory: async ({ dirpath }) => {
         try {
-          set({ filepath: "", value: "", currentSelectDir: "" });
+          console.log(path.dirname(get().filepath), dirpath, "dirpath");
+          if (path.dirname(get().filepath) == dirpath) {
+            set({ filepath: "", value: "", currentSelectDir: "" });
+          }
           const files = await FS.getFilesRecursively(dirpath);
           const projectSync = get().projectSync;
           files.map((item) => {
@@ -428,10 +452,13 @@ export const useFileStore = create()(
               get().changeSingleBibFilepath(item, false);
             }
           });
+
+          await get().updateFileTree();
           if (projectSync && dirpath) {
-            projectSync.deleteFolder(dirpath);
+            await projectSync.deleteFolder(dirpath);
+          } else {
+            await FS.removeDirectory(dirpath);
           }
-          await FS.removeDirectory(dirpath);
           get().startUpdate({ changedPath: files });
           // TODO: 这里可能需要更新 Git 状态，根据你的应用逻辑进行调整
         } catch (err) {
@@ -441,6 +468,12 @@ export const useFileStore = create()(
 
       fileMoved: async ({ fromPath, destPath }) => {
         get().startUpdate({ changedPath: [fromPath, destPath] });
+        const mainFileDirPath = path.dirname(get().mainFilepath);
+        const fromDirPath = path.dirname(fromPath);
+        if (mainFileDirPath === fromDirPath) {
+          get().changeMainFile(get().currentProjectRoot);
+        }
+        get().syncFileTreeToYMap();
       },
       startRenaming: ({ pathname }) => {
         set({ renamingPathname: pathname });
@@ -465,20 +498,18 @@ export const useFileStore = create()(
         });
         initializeGitStatus({ projectRoot });
       },
+
       createProject: async (newProjectRoot) => {
         let isExists = await FS.existsPath(newProjectRoot);
 
+        const user = useUserStore.getState().user;
+
         if (!isExists) {
-          const user = useUserStore.getState().user;
-          await FS.mkdir(newProjectRoot);
-          await FS.createProjectInfo(newProjectRoot, {
-            name: "YOU",
-            ...user,
-          });
+          await initProject(newProjectRoot, user);
+          get().changeCurrentProjectRoot({ projectRoot: newProjectRoot });
         } else {
           throw new Error("Project name is already exists");
         }
-        get().changeCurrentProjectRoot({ projectRoot: newProjectRoot });
       },
       copyProject: async (projectRoot, copyProjectRoot) => {
         let isExists = await FS.existsPath(copyProjectRoot);
@@ -506,6 +537,7 @@ export const useFileStore = create()(
     {
       name: FILE_STORE,
       version: 1,
+      getStorage: () => getStorage(), //
     }
   )
 );

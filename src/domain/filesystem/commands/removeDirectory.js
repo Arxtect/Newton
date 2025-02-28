@@ -71,7 +71,6 @@ export async function deleteExpiredProject(dirpath) {
   let projectInfo = await getProjectInfo(dirpath);
 
   if (projectInfo?.close_at) {
-    
     let closeDate = new Date(projectInfo.close_at); // 将关闭日期转换为 Date 对象
     let now = new Date();
 
@@ -83,6 +82,5 @@ export async function deleteExpiredProject(dirpath) {
       return true;
     }
   }
-  return false
+  return false;
 }
-

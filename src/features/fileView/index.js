@@ -13,7 +13,7 @@ function FileView({ filename }) {
 
   useEffect(() => {
     setFileContent("");
-    if (!filename && filename == "") return;
+    if (!filename || filename == "") return;
     (async () => {
       const content = await readFile(filename);
       setFileContent(content);

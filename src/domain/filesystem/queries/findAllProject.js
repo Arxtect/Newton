@@ -87,8 +87,10 @@ export async function findAllProjectInfo(currentDir = ".") {
 
         let projectInfo = await getProjectInfo(entryPath);
 
+        console.log(projectInfo, entryPath, "projectInfo");
+
         if (!projectInfo || JSON.stringify(projectInfo) === "{}") {
-          await createProjectInfo(entryPath, { name: "YOU" });
+          await createProjectInfo(entryPath, { name: "YOU", test: "111" });
           projectInfo = await getProjectInfo(entryPath);
         }
 
@@ -146,7 +148,7 @@ export function removeParentDirPath(filePath, parentDir) {
   const relativePath = path.relative(normalizedRootPath, normalizedFilePath);
 
   console.log(
-    `Relative Path: ${relativePath}, Root Path: ${normalizedRootPath}, File Path: ${normalizedFilePath}, Parent Dir: ${normalizedParentDir}`
+    `Relative Path: ${relativePath}, Root Path: ${normalizedRootPath}, File Path: ${normalizedFilePath}, Parent Dir: ${normalizedParentDir},filePath: ${filePath}`
   );
 
   return relativePath;

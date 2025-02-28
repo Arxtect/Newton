@@ -16,8 +16,10 @@ import {
   deleteGitRepo,
   getGitRepoList,
   getRoomUserAccess,
+  getProjectViaOwner,
+  deleteProject as deleteProjectService,
 } from "services";
-import { ProjectSync } from "@/convergence";
+import { ProjectSync, ProjectSyncDownload } from "@/convergence";
 import { useNavigate } from "react-router-dom";
 import {
   downloadDirectoryAsZip,
@@ -26,6 +28,7 @@ import {
   getProjectInfo,
   getShareProjectInfo,
   getShareUserStoragePath,
+  existsPath,
 } from "domain/filesystem";
 import ArDialog from "@/components/arDialog";
 import { toast } from "react-toastify";
@@ -94,7 +97,11 @@ const Project = () => {
       case "category":
         return null;
       case "shared":
-        if (item?.email != user?.email && item?.isSync && !item.isClosed) {
+        if (
+          item?.email != user?.email &&
+          item?.parentDir !== "." &&
+          !item.isClosed
+        ) {
           return {
             id: index + 1,
             ...item,
@@ -116,7 +123,8 @@ const Project = () => {
         if (
           user?.email &&
           !item.isClosed &&
-          (item?.email == user?.email || item?.isSync)
+          (item?.email == user?.email || item?.parentDir !== ".") &&
+          !item?.parentDir?.includes(user?.id)
         ) {
           return {
             id: index + 1,
@@ -217,11 +225,28 @@ const Project = () => {
     setDeleteDialogOpen(false);
   };
 
+  const deleteProjectRemote = async (id, callback) => {
+    try {
+      let res = await deleteProjectService(id);
+      console.log(res, "res");
+      callback && callback();
+    } catch {
+      toast.success("delete project failed");
+    }
+  };
+
   const handleTrashDelete = async () => {
-    await deleteProject({ dirpath: path.join(parentDir, deleteProjectName) });
-    toast.success("delete project success");
-    getProjectList();
-    setDeleteDialogOpen(false);
+    let projectName = path.join(parentDir, deleteProjectName);
+
+    const callback = async () => {
+      await deleteProject({ dirpath: projectName });
+      toast.success("delete project success");
+      getProjectList();
+      setDeleteDialogOpen(false);
+    };
+
+    let info = await getProjectInfo(projectName);
+    await deleteProjectRemote(info.project_id, callback);
   };
 
   const handleDeleteProject = (deleteProjectName, parentDir = ".") => {
@@ -275,7 +300,6 @@ const Project = () => {
       onSuccess: () => {
         setLoading(false);
         setSyncDialogOpen(false);
-        console.log("loadFile", projectSync.isInitialSyncComplete);
       },
       onFailure: () => {
         setLoading(false);
@@ -378,6 +402,36 @@ const Project = () => {
   useEffect(() => {
     getProjectList();
   }, [currentSelectMenu, user]);
+
+  const getAllProjectRemote = async () => {
+    let list = await getProjectViaOwner();
+    if (!list || list?.length < 1) return;
+    for (let project of list) {
+      let isExistPath = await existsPath(project.project_name);
+      if (project.is_sync && !isExistPath) {
+        await getAllProjectFromYjs(project.project_name, project.owner_id);
+      }
+    }
+  };
+
+  const getAllProjectFromYjs = useCallback(async (project, roomId) => {
+    const { token, position } = await getYDocTokenReq(project + roomId);
+    const projectSync = new ProjectSyncDownload(
+      project,
+      roomId,
+      token,
+      () => {
+        console.log("aaaaaa");
+        getProjectList();
+      },
+      parentDir,
+      true
+    );
+  }, []);
+
+  useEffect(() => {
+    getAllProjectRemote();
+  }, []);
 
   return (
     <div className="w-full flex  bg-white h-full overflow-hidden">

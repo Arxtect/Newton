@@ -24,13 +24,15 @@ import {
   findAllProject,
   getProjectInfo,
   getShareUserStoragePath,
+  createProjectInfo,
 } from "domain/filesystem";
 import { useFileStore, useUserStore, useEditor } from "store";
 import { ProjectSync } from "@/convergence";
 import { getYDocToken } from "services";
-import { getRoomUserAccess } from "@/services";
+import { getRoomUserAccess, UpdateProject } from "@/services";
 import { toast } from "react-toastify";
 import { ArLoadingScreen } from "@/components/arLoading";
+import path from "path";
 
 const Newton = () => {
   const navigate = useNavigate();
@@ -44,6 +46,8 @@ const Newton = () => {
     updateShareIsRead,
     changeMainFile,
     leaveProjectSyncRoom,
+    changeCurrentProjectRoot,
+    parentDirStore,
   } = useFileStore((state) => ({
     filepath: state.filepath,
     setMainFile: state.setMainFile,
@@ -53,6 +57,8 @@ const Newton = () => {
     updateShareIsRead: state.updateShareIsRead,
     changeMainFile: state.changeMainFile,
     leaveProjectSyncRoom: state.leaveProjectSyncRoom,
+    changeCurrentProjectRoot: state.changeCurrentProjectRoot,
+    parentDirStore: state.parentDir,
   }));
 
   useLayoutEffect(() => {
@@ -73,25 +79,33 @@ const Newton = () => {
 
   const [loading, setLoading] = useState(true);
 
+  const UpdateProjectSyncService = async (id, is_sync) => {
+    const res = await UpdateProject(id, "", "", "", "", is_sync);
+    return res;
+  };
+
   const initShareProject = useCallback(async () => {
     if (!user?.id) return;
     const projectInfo = await getProjectInfo(currentProjectRoot);
 
-    const project = projectInfo?.["rootPath"];
-    const roomId = projectInfo?.["userId"];
-    const isSync = projectInfo?.["isSync"];
+    const project_id = projectInfo?.["project_id"];
+
+    const project = projectInfo?.["project_name"];
+    const roomId = projectInfo?.["owner_id"];
+    const isSync = projectInfo?.["is_sync"];
     let parentDir = getShareUserStoragePath(roomId);
 
-    if (user.id == roomId) {
+    if (user.id == roomId && parentDirStore == ".") {
       parentDir = ".";
     }
 
     console.log(projectInfo, isSync, project, roomId, "projectInfo");
 
-    if (!isSync || !project || !roomId) {
+    if (!project || !roomId) {
       setLoading(false);
       return;
     }
+
     const res = await getRoomUserAccess({
       project_name: project + roomId,
     });
@@ -126,7 +140,18 @@ const Newton = () => {
       parentDir
     );
 
-    await projectSyncClass.setObserveHandler();
+    projectSyncClass.setObserveHandler();
+    updateProjectSync(projectSyncClass.saveState);
+
+    if (!isSync) {
+      await UpdateProjectSyncService(project_id, true);
+      await createProjectInfo(project, {
+        is_sync: true,
+      });
+
+      await projectSyncClass.syncFolderToYMapRootPath();
+    }
+
     const waitForSync = new Promise((resolve, reject) => {
       const checkSyncComplete = () => {
         if (projectSyncClass.isInitialSyncComplete) {
@@ -141,28 +166,26 @@ const Newton = () => {
 
     // Set a timeout for 10 seconds
     const timeout = new Promise((_, reject) =>
-      setTimeout(
-        () => reject(new Error("Sync timed out, please try again")),
-        60000
-      )
+      setTimeout(() => {
+        setLoading(false);
+        reject(new Error("Sync timed out, please try again"));
+      }, 30000)
     );
 
     // Wait for either the sync to complete or the timeout
     await Promise.race([waitForSync, timeout]);
-
-    updateProjectSync(projectSyncClass.saveState);
-  }, [user]);
+  }, [user, currentProjectRoot]);
 
   useEffect(() => {
     if (projectSync && editor != null && filepath) {
       editor.blur && editor.blur();
       projectSync?.updateEditorAndCurrentFilePath &&
-        projectSync.changeIsInitialSyncComplete &&
         projectSync?.updateEditorAndCurrentFilePath(filepath, editor);
     }
   }, [filepath, projectSync, editor]);
 
   useEffect(() => {
+    if (!currentProjectRoot) return;
     initShareProject()
       .then(() => {
         changeMainFile(currentProjectRoot);
@@ -176,9 +199,11 @@ const Newton = () => {
     return () => {
       setMainFile("");
     };
-  }, []);
+  }, [currentProjectRoot]);
 
   useEffect(() => {
+    setLoadingProject(true);
+    handleProject();
     refreshAuth();
     return () => {
       console.log("leaveProjectSyncRoom");
@@ -186,7 +211,32 @@ const Newton = () => {
     };
   }, []);
 
-  return !loading ? (
+  const [loadingProject, setLoadingProject] = useState(true);
+
+  const handleProject = () => {
+    try {
+      const hash = window.location.hash;
+      const queryString = hash.includes("?") ? hash.split("?")[1] : "";
+      const searchParams = new URLSearchParams(queryString);
+
+      const project = searchParams.get("project");
+      const parentDir = searchParams.get("parentDir");
+      if (!project) {
+        return;
+      }
+      console.log(project, "project");
+      changeCurrentProjectRoot({
+        projectRoot: path.join(parentDir, project),
+        parentDir: parentDir,
+      });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoadingProject(false);
+    }
+  };
+
+  return !loading && !loadingProject ? (
     <React.Fragment>
       <TopBar></TopBar>
       <Layout

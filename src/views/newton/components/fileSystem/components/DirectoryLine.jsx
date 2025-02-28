@@ -13,16 +13,8 @@ import AddDir from "./AddDir";
 import AddFile from "./AddFile";
 import Draggable from "./Draggable";
 import FileLine from "./FileLine";
-import Pathname from "./Pathname";
-import HoverMenu from "./HoverMenu";
-import { List, ListItem, ListItemText, ListItemIcon } from "@mui/material";
-import {
-  Folder as FolderIcon,
-  FolderOpen as FolderOpenIcon,
-  ChevronRight as ChevronRightIcon,
-  ExpandMore as ExpandMoreIcon,
-} from "@mui/icons-material";
-import FileIcon from "@mui/icons-material/InsertDriveFile";
+import { List, ListItem } from "@mui/material";
+
 import { Box, TextField } from "@mui/material";
 
 import { readFileStats, getProjectInfo } from "domain/filesystem";
@@ -30,51 +22,7 @@ import { useFileStore } from "store";
 import ArIcon from "@/components/arIcon";
 import ContextMenu from "@/components/contextMenu";
 import { toast } from "react-toastify";
-
-const LinkedLines = ({
-  dirpath,
-  root,
-  depth,
-  fileList,
-  editingFilepath,
-  ...res
-}) => {
-  return (
-    <>
-      {fileList.map((f) => {
-        const filepath = path.join(dirpath, f.name);
-        if (f.type === "file") {
-          return (
-            <FileLine
-              {...res}
-              key={f.name}
-              depth={depth}
-              filepath={filepath}
-              ignoreGit={f.ignored}
-            />
-          );
-        } else if (f.type === "dir") {
-          if (f.name === ".git") return null;
-          return (
-            <DirectoryLine
-              {...res}
-              key={f.name}
-              root={root}
-              dirpath={filepath}
-              depth={depth}
-              open={
-                editingFilepath != null &&
-                !path.relative(filepath, editingFilepath).startsWith("..")
-              }
-              ignoreGit={f.ignored}
-            />
-          );
-        }
-        return null;
-      })}
-    </>
-  );
-};
+import DirectoryLineWrapper from "./DirectoryLineWrapper";
 
 const DirectoryLineContent = ({
   dirpath,
@@ -99,61 +47,20 @@ const DirectoryLineContent = ({
   preRenamingDirpath,
   changePreRenamingDirpath,
   changeCurrentProjectRoot,
+  fileTree,
+  parentDir,
 }) => {
-  const {
-    dirOpen,
-    isDropFileSystem,
-    updateIsDropFileSystem,
-    filepath,
-    projectSync,
-    reload,
-  } = useFileStore((state) => ({
-    dirOpen: state.dirOpen,
-    updateIsDropFileSystem: state.updateIsDropFileSystem,
-    isDropFileSystem: state.isDropFileSystem,
-    filepath: state.filepath,
-    projectSync: state.projectSync,
-    reload: state.repoChanged,
-  }));
+  const { dirOpen, isDropFileSystem, filepath, projectSync, reload } =
+    useFileStore((state) => ({
+      dirOpen: state.dirOpen,
+      isDropFileSystem: state.isDropFileSystem,
+      filepath: state.filepath,
+      projectSync: state.projectSync,
+      reload: state.repoChanged,
+    }));
 
   const [opened, setOpened] = useState(open);
-  const [fileList, setFileList] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [hovered, setHovered] = useState(false);
-
-  useEffect(() => {
-      console.log("Effect triggered by:", {
-        dirpath,
-        root,
-        opened,
-        touchCounter,
-      });
-
-    let unmounted = false;
-
-    const updateChildren = async () => {
-      try {
-        const fileList = await readFileStats(dirpath);
-
-        if (!unmounted) {
-          setFileList(fileList);
-          setLoading(false);
-        }
-      } catch (error) {
-        if (!unmounted) {
-          setError(error);
-          setLoading(false);
-        }
-      }
-    };
-
-    updateChildren();
-
-    return () => {
-      unmounted = true;
-    };
-  }, [dirpath, root, opened, touchCounter]);
 
   const handleMouseOver = () => setHovered(true);
 
@@ -162,10 +69,8 @@ const DirectoryLineContent = ({
   const handleClick = (e, dirpath) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!loading) {
-      setOpened(!opened);
-      changeCurrentSelectDir(dirpath);
-    }
+    setOpened(!opened);
+    changeCurrentSelectDir(dirpath);
   };
 
   const handleFileMove = (result) => {
@@ -184,10 +89,6 @@ const DirectoryLineContent = ({
     },
     [deleteDirectory]
   );
-
-  const relpath = path.relative(root, dirpath);
-  const basename = path.basename(relpath);
-  const ignoreGit = relpath === ".git" || p_ignoreGit || false;
 
   const [value, setValue] = useState(path.basename(dirpath));
   const inputRef = useRef(null);
@@ -364,97 +265,64 @@ const DirectoryLineContent = ({
               onMouseOver={handleMouseOver}
               onMouseLeave={handleMouseLeave}
               className={`hover:bg-[#bae6bc5c] transition duration-300 ${
-                currentSelectDir == dirpath ? "bg-[#81c784]" : ""
+                currentSelectDir == dirpath && renamingPathname != dirpath
+                  ? "bg-[#81c784]"
+                  : ""
               }`}
               style={{
-                padding: "3px 0px 3px 0px",
+                padding: "4px 0 1px 0",
                 paddingLeft: `${depth * 8}px`,
               }}
             >
-              <ListItemIcon
-                style={{
-                  minWidth: "unset",
-                  // visibility:
-                  //   fileList && fileList.length > 0 ? 'visible' : 'hidden' ,
-                }}
-                onClick={(e) => handleClick(e, dirpath)}
+              <DirectoryLineWrapper
+                handleClick={handleClick}
+                dirpath={dirpath}
+                opened={opened}
+                title={`${path.basename(dirpath)}`}
+                basename={`${path.basename(dirpath)}`}
+                onAddFile={onAddFile}
+                onAddFolder={onAddFolder}
+                handleDeleteDirectory={handleDeleteDirectory}
+                handleRename={handleRename}
+                depth={depth}
+                menuItems={menuItems}
+                hovered={hovered}
               >
-                {opened ? <ExpandMoreIcon /> : <ChevronRightIcon />}
-              </ListItemIcon>
-              <ListItemIcon
-                style={{ minWidth: "unset" }}
-                onClick={(e) => handleClick(e, dirpath)}
-              >
-                {opened ? (
-                  <ArIcon
-                    name={"FolderOpen"}
-                    className="text-black w-[1.5rem]"
+                {renamingPathname === dirpath ? (
+                  <TextField
+                    className="tailwind-classes-for-input"
+                    variant="outlined"
+                    size="small"
+                    value={value}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    onKeyDown={handleKeyDown}
+                    onClick={(e) => e.stopPropagation()}
+                    inputRef={inputRef}
+                    sx={{
+                      "& .MuiInputBase-input": {
+                        height: "24px",
+                        padding: "0 6px",
+                      },
+                      "& .MuiOutlinedInput-root": {
+                        "& fieldset": {
+                          borderColor: "#81C784",
+                        },
+                        "&:hover fieldset": {
+                          borderColor: "#81C784",
+                        },
+                        "&.Mui-focused fieldset": {
+                          borderColor: "#81C784",
+                        },
+                      },
+                    }}
                   />
                 ) : (
-                  <ArIcon
-                    name={"FolderClose"}
-                    className="text-black w-[1.5rem]"
-                  />
+                  <span className="overflow-hidden text-ellipsis">
+                    <span>{`${path.basename(dirpath)}`}</span>
+                  </span>
                 )}
-              </ListItemIcon>
-              {renamingPathname === dirpath ? (
-                <TextField
-                  className="tailwind-classes-for-input"
-                  variant="outlined"
-                  size="small"
-                  value={value}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  onKeyDown={handleKeyDown}
-                  onClick={(e) => e.stopPropagation()}
-                  inputRef={inputRef}
-                  sx={{
-                    "& .MuiInputBase-input": {
-                      height: "24px",
-                      padding: "0 6px",
-                    },
-                    "& .MuiOutlinedInput-root": {
-                      "& fieldset": {
-                        borderColor: "#81C784",
-                      },
-                      "&:hover fieldset": {
-                        borderColor: "#81C784",
-                      },
-                      "&.Mui-focused fieldset": {
-                        borderColor: "#81C784",
-                      },
-                    },
-                  }}
-                />
-              ) : (
-                <React.Fragment>
-                  <div
-                    className="w-full"
-                    onClick={(e) => handleClick(e, dirpath)}
-                  >
-                    <Pathname ignoreGit={ignoreGit}>
-                      {basename || `${path.basename(dirpath)}`}
-                    </Pathname>
-                  </div>
-
-                  <HoverMenu
-                    basename={basename}
-                    dirpath={basename}
-                    root={basename}
-                    onAddFile={onAddFile}
-                    onAddFolder={onAddFolder}
-                    onDelete={(event) => {
-                      handleDeleteDirectory(event, dirpath);
-                    }}
-                    onRename={(event) => {
-                      handleRename(event);
-                    }}
-                    depth={depth}
-                    menuItems={menuItems}
-                    hovered={hovered}
-                  />
-                </React.Fragment>
-              )}
+              </DirectoryLineWrapper>
             </ListItem>
           </Draggable>
         </div>
@@ -473,32 +341,65 @@ const DirectoryLineContent = ({
           )}
         </>
       )}
-      {opened && fileList != null && (
-        <LinkedLines
-          root={root}
-          dirpath={dirpath}
-          depth={depth + 1}
-          fileList={fileList}
-          editingFilepath={editingFilepath}
-          touchCounter={touchCounter}
-          isFileCreating={isFileCreating}
-          isDirCreating={isDirCreating}
-          fileMoved={fileMoved}
-          startFileCreating={startFileCreating}
-          startDirCreating={startDirCreating}
-          deleteDirectory={deleteDirectory}
-          ignoreGit={ignoreGit}
-          loadFile={loadFile}
-          currentSelectDir={currentSelectDir}
-          changeCurrentSelectDir={changeCurrentSelectDir}
-          renamingPathname={renamingPathname}
-          startRenaming={startRenaming}
-          endRenaming={endRenaming}
-          preRenamingDirpath={preRenamingDirpath}
-          changePreRenamingDirpath={changePreRenamingDirpath}
-          changeCurrentProjectRoot={changeCurrentProjectRoot}
-        />
-      )}
+      {opened &&
+        fileTree.length > 0 &&
+        fileTree.map((item) => {
+          if (item.type === "file") {
+            return (
+              <FileLine
+                key={item.name}
+                depth={item.depth}
+                filepath={path.join(parentDir, item.filepath)}
+                ignoreGit={item.ignored}
+                loadFile={loadFile}
+                fileMoved={fileMoved}
+                startRenaming={startRenaming}
+                endRenaming={endRenaming}
+                parentDir={parentDir}
+              />
+            );
+          } else if (item.type === "dir") {
+            if (item.name === ".git") return null;
+            return (
+              <DirectoryLine
+                key={item.name}
+                root={root}
+                fileTree={item.children}
+                dirpath={path.join(parentDir, item.filepath)}
+                depth={item.depth}
+                open={
+                  editingFilepath != null &&
+                  !path
+                    .relative(
+                      path.join(parentDir, item.filepath),
+                      editingFilepath
+                    )
+                    .startsWith("..")
+                }
+                touchCounter={touchCounter}
+                ignoreGit={item.ignored}
+                editingFilepath={editingFilepath}
+                isFileCreating={isFileCreating}
+                isDirCreating={isDirCreating}
+                fileMoved={fileMoved}
+                startFileCreating={startFileCreating}
+                startDirCreating={startDirCreating}
+                deleteDirectory={deleteDirectory}
+                loadFile={loadFile}
+                currentSelectDir={currentSelectDir}
+                changeCurrentSelectDir={changeCurrentSelectDir}
+                renamingPathname={renamingPathname}
+                startRenaming={startRenaming}
+                endRenaming={endRenaming}
+                preRenamingDirpath={preRenamingDirpath}
+                changePreRenamingDirpath={changePreRenamingDirpath}
+                changeCurrentProjectRoot={changeCurrentProjectRoot}
+                parentDir={parentDir}
+              />
+            );
+          }
+          return null;
+        })}
     </List>
   );
 };

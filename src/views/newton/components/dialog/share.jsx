@@ -138,7 +138,7 @@ const Share = forwardRef(({ rootPath, user }, ref) => {
     setLoading(true);
     try {
       // 创建 ProjectSync 实例
-      await createProjectSync(rootPath, user);
+      // await createProjectSync(rootPath, user);
       // handleCancelProject();
     } catch (error) {
       toast.error("Share failed!");
@@ -160,16 +160,17 @@ const Share = forwardRef(({ rootPath, user }, ref) => {
 
   const handleInvite = async (searchInput, access) => {
     let projectInfo = await getProjectInfo(rootPath);
+    let projectPath = projectInfo?.rootPath ? projectInfo?.rootPath : rootPath;
     let roomId = projectInfo?.userId ? projectInfo?.userId : user.id;
-    let roomLink = `${window.location.origin}/#/project?project=${rootPath}&&roomId=${roomId}`;
+    let roomLink = `${window.location.origin}/#/project?project=${projectPath}&&roomId=${roomId}`;
 
     let res = await inviteUser({
       email: searchInput,
       share_link: roomLink,
-      project_name: rootPath + roomId,
+      project_name: projectPath + roomId,
       access: access,
     });
-    await saveProjectSyncInfoToJson(user, rootPath, roomId);
+    await saveProjectSyncInfoToJson(user, projectPath, roomId);
     if (res?.status == "success") {
       toast.success(`Invite ${searchInput} success`);
       getRoomInfo();
@@ -180,9 +181,12 @@ const Share = forwardRef(({ rootPath, user }, ref) => {
   };
 
   const handleRemoveUser = async (email) => {
+    let projectInfo = await getProjectInfo(rootPath);
+    let projectPath = projectInfo?.rootPath ? projectInfo?.rootPath : rootPath;
+    let roomId = projectInfo?.userId ? projectInfo?.userId : user.id;
     let res = await deleteInviteUser({
       email: email,
-      project_name: rootPath + user.id,
+      project_name: projectPath + roomId,
     });
     if (res?.status == "success") {
       getRoomInfo();
@@ -192,8 +196,11 @@ const Share = forwardRef(({ rootPath, user }, ref) => {
   };
 
   const handleCloseRoom = async () => {
+    let projectInfo = await getProjectInfo(rootPath);
+    let projectPath = projectInfo?.rootPath ? projectInfo?.rootPath : rootPath;
+    let roomId = projectInfo?.userId ? projectInfo?.userId : user.id;
     let res = await closeRoom({
-      project_name: rootPath + user.id,
+      project_name: projectPath + roomId,
     });
     if (res?.status == "success") {
       toast.success(`Close room success`);
@@ -204,11 +211,12 @@ const Share = forwardRef(({ rootPath, user }, ref) => {
 
   const handleUpdateUser = async (searchInput, access) => {
     let projectInfo = await getProjectInfo(rootPath);
+    let projectPath = projectInfo?.rootPath ? projectInfo?.rootPath : rootPath;
     let roomId = projectInfo?.userId ? projectInfo?.userId : user.id;
     let res = await inviteUser({
       email: searchInput,
       share_link: link,
-      project_name: rootPath + roomId,
+      project_name: projectPath + roomId,
       access: access,
     });
     if (res?.status == "success") {
@@ -218,8 +226,11 @@ const Share = forwardRef(({ rootPath, user }, ref) => {
     return res?.status;
   };
   const handleReopenRoom = async () => {
+    let projectInfo = await getProjectInfo(rootPath);
+    let projectPath = projectInfo?.rootPath ? projectInfo?.rootPath : rootPath;
+    let roomId = projectInfo?.userId ? projectInfo?.userId : user.id;
     let res = await reopenRoom({
-      project_name: rootPath + user.id,
+      project_name: projectPath + roomId,
     });
     if (res?.status == "success") {
       await getRoomInfo();
@@ -233,20 +244,21 @@ const Share = forwardRef(({ rootPath, user }, ref) => {
 
   const getRoomInfo = async () => {
     let projectInfo = await getProjectInfo(rootPath);
+    let projectPath = projectInfo?.rootPath ? projectInfo?.rootPath : rootPath;
     let roomId = projectInfo?.userId ? projectInfo?.userId : user.id;
     let res = await getRoomInfoList({
-      project_name: rootPath + roomId,
+      project_name: projectPath + roomId,
     });
     const roomInfo = res?.data?.room;
     if (roomInfo?.is_closed) {
-      await createProjectInfo(rootPath, {
+      await createProjectInfo(projectPath, {
         ...projectInfo,
         isSync: false,
         isClose: true,
       });
       leaveProjectSyncRoom();
     } else {
-      await createProjectInfo(rootPath, {
+      await createProjectInfo(projectPath, {
         ...projectInfo,
         isClose: false,
       });

@@ -18,14 +18,16 @@ import {
 import { assetExtensions } from "@/constant";
 import { debounce, getColors } from "@/utils";
 import { toast } from "react-toastify";
-import { LatexSyncToYText } from "./latexSyncToYText";
+import { LatexSyncToYText, YTextManager } from "./latexSyncToYText";
 
 const host = window.location.hostname;
 const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-const wsUrl = `wss://arxtect.com/websockets/`;
+// const wsUrl = `wss://arxtect.com/websockets/`;
 // const wsUrl = `ws://3.227.9.181:8013`;
 // const wsUrl = `ws://206.190.239.91:9008/`;
 // const wsUrl = `ws://10.10.99.42:8013/`;
+// const wsUrl = `ws://localhost:8013/`;
+const wsUrl = `ws://network.jancsitech.net:5913/`;
 
 class ProjectSync {
   constructor(
@@ -59,19 +61,20 @@ class ProjectSync {
     this.initialized = false;
     this.isInitialSyncComplete = false; // 初始化标志
     this.isLeave = isLeave;
-    // 设置用户信息
 
     // 使用 rootPath 作为命名空间
     this.yMap = this.yDoc.getMap(this.rootPath + this.roomId);
 
     this.otherOperation = otherOperation && otherOperation; // 保存回调函数
     this.isExistAllFile = false;
+    this.YTextManager = new YTextManager(this.yDoc);
 
     // 保存当前的观察者句柄
     this.currentObserver = null;
     this.setUserAwareness({ ...this.user, color: getColors(position) });
 
     this.setObserveHandler = () => {
+      console.log("Setting observe handler", this.yMap);
       // 清理旧的观察者
       if (this.currentObserver) {
         this.yMap.unobserve(this.yMapObserveHandler.bind(this));
@@ -94,7 +97,21 @@ class ProjectSync {
       syncFolderToYMapRootPath: this.syncFolderToYMapRootPath.bind(this),
       changeIsInitialSyncComplete: this.changeIsInitialSyncComplete.bind(this),
       changeInitial: this.changeInitial.bind(this),
+      syncFileTree: this.syncFileTree.bind(this),
+      cleanup: this.cleanup.bind(this),
     };
+
+    this.websocketProvider.on("status", (event) => {
+      console.log(event, "event22");
+      if (event.status === "connected") {
+      }
+    });
+
+    this.websocketProvider.on("close", () => {
+      this.setUserAwareness(null);
+    });
+
+    this.websocketProvider.on("synced", async () => {});
   }
 
   changeIsInitialSyncComplete() {
@@ -107,6 +124,10 @@ class ProjectSync {
 
   // 设置用户信息到 awareness
   setUserAwareness(user) {
+    if (user == null) {
+      this.awareness.setLocalState(null);
+      return;
+    }
     this.awareness.setLocalStateField("user", user);
   }
 
@@ -142,7 +163,8 @@ class ProjectSync {
 
     const relativePath = FS.removeParentDirPath(filePath, this.parentDir);
     this.currentFilePath = relativePath;
-    this.yText = this.yDoc.getText(relativePath);
+    this.yText = this.YTextManager.getYText(relativePath);
+
     this.undoManager = new Y.UndoManager(this.yText);
     const ext = path.extname(relativePath).slice(1).toLowerCase(); // 获取文件扩展名并转换为小写
 
@@ -180,13 +202,23 @@ class ProjectSync {
 
     this.yDoc.transact(() => {
       this.yMap.set(filePath, contentToStore);
+      let YText = this.yDoc.getText(filePath);
+      let typeLength = YText?.toString().length;
+
+      if (typeLength === 0) {
+        YText.insert(0, contentToStore);
+      }
+      this.YTextManager.setYText(filePath);
     });
   }
 
-  // 删除文件
+  // 删除YMap文件
   async deleteFile(filePath, otherInfo = {}) {
     this.yDoc.transact(() => {
-      this.yMap.set(filePath, { _delete: true, ...otherInfo });
+      const relativePath = FS.removeParentDirPath(filePath, this.parentDir);
+      console.log(`yMap deleting file ${relativePath}`);
+      this.yMap.set(relativePath, { _delete: true, ...otherInfo });
+      // this.yMap.delete(filePath);
     });
   }
 
@@ -194,20 +226,23 @@ class ProjectSync {
   async deleteFolder(folderPath) {
     try {
       if (!(await FS.existsPath(folderPath))) return;
-      const files = await FS.readFileStats(folderPath, false);
-      this.removeFolderInfo(folderPath);
+      const deleteFolderHandler = async (folderPath) => {
+        const files = await FS.readFileStats(folderPath, false);
+        console.log(files, folderPath, "files");
 
-      for (const file of files) {
-        const filePath = path.join(folderPath, file.name); // 使用 path.join 进行路径拼接
-
-        if (file.type == "file") {
-          const relativePath = FS.removeParentDirPath(filePath, this.parentDir);
-          await this.deleteFile(relativePath); // 删除文件
-        } else if (file.type == "dir") {
-          await this.deleteFolder(filePath); // 递归删除子文件夹
+        for (const file of files) {
+          const filePath = path.join(this.parentDir, folderPath, file.name); // 使用 path.join 进行路径拼接
+          console.log(filePath, "filePath");
+          if (file.type == "file") {
+            await this.deleteFile(filePath); // 删除文件
+          } else if (file.type == "dir") {
+            await deleteFolderHandler(filePath); // 递归删除子文件夹
+          }
         }
-      }
-      await FS.removeDir(folderPath);
+      };
+      await deleteFolderHandler(folderPath);
+      await FS.removeDirectory(folderPath);
+      await this.syncFileTree();
     } catch (err) {
       console.error(`Error deleting folder ${folderPath}:`, err);
       // throw err;
@@ -219,11 +254,6 @@ class ProjectSync {
     if (filePath.includes(".git")) return;
     try {
       const relativePath = FS.removeParentDirPath(filePath, this.parentDir);
-      if (!this.yMap.has(relativePath)) {
-        const folderPath = path.dirname(relativePath);
-        this.syncFolderInfo(folderPath);
-      }
-
       await this.syncToYMap(relativePath, content);
     } catch (err) {
       console.error(`Error syncing file ${filePath}:`, err);
@@ -232,61 +262,51 @@ class ProjectSync {
     }
   }
 
-  // 同步文件夹列表
-  syncFolderInfo(folderPath) {
-    if (folderPath.includes(".git")) return;
+  // 同步文件树到 Yjs Map
+  syncTreeToYMap(fileTree) {
     this.yDoc.transact(() => {
-      let folderMap = this.yMap.get(this.folderMapName) || [];
-
-      folderMap = [...folderMap, folderPath];
-      console.log(folderMap, folderPath, "folderMap");
-
-      this.yMap.set(this.folderMapName, [...new Set(folderMap)]);
+      console.log(fileTree, "fileTree2");
+      this.yMap.set(this.folderMapName, fileTree);
     });
   }
 
-  // 从 Yjs Map 中删除文件夹
-  removeFolderInfo(folderPath) {
-    if (folderPath.includes(".git")) return;
-    this.yDoc.transact(() => {
-      let folderMap = this.yMap.get(this.folderMapName) || [];
-      if (folderMap.includes(folderPath)) {
-        folderMap = folderMap.filter((item) => item != folderPath);
-        this.yMap.set(this.folderMapName, [...new Set(folderMap)]);
-      }
-    });
+  async syncFileTree() {
+    let fileTree = await FS.readFileTree(
+      this.currenProjectDir,
+      false,
+      this.parentDir
+    );
+    this.syncTreeToYMap(fileTree);
+    return fileTree;
   }
 
   // 同步整个文件夹到 Yjs Map
-  async syncFolderToYMap(folderPath) {
-    if (folderPath.includes(".git")) return;
+  async syncFolderToYMap() {
+    let fileTree = await this.syncFileTree();
+
+    console.log(fileTree, "fileTree");
 
     const syncPromises = [];
 
-    const handlePromise = async (folderPath) => {
-      this.syncFolderInfo(folderPath);
-      const files = await FS.readFileStats(folderPath, false);
+    const handlePromise = async (fileTree) => {
+      for (const file of fileTree) {
+        const filePath = path.join(this.parentDir, file.filepath);
 
-      for (const file of files) {
-        const filePath = path.join(folderPath, file.name);
-
-        if (file.type === "file") {
-          const promise = FS.readFile(filePath).then(async (content) => {
-            await this.syncToYMap(filePath, content);
-          });
+        const promise = FS.readFile(filePath).then(async (content) => {
+          await this.syncToYMap(filePath, content);
           syncPromises.push(promise);
-        } else if (file.type === "dir") {
-          await handlePromise(filePath);
+        });
+        if (file.children) {
+          await handlePromise(file.children);
         }
       }
     };
 
     try {
-      await handlePromise(folderPath);
-
+      await handlePromise(fileTree);
       await Promise.all(syncPromises);
     } catch (err) {
-      console.error(`Error syncing folder ${folderPath}:`, err);
+      console.error(`Error syncing folder ${this.currenProjectDir}:`, err);
       throw err;
     }
   }
@@ -296,75 +316,87 @@ class ProjectSync {
   }, 1000);
 
   async syncFolderToYMapRootPath(callback) {
-    await this.syncFolderToYMap(this.rootPath); // 保存项目信息
-
+    await this.syncFolderToYMap(); // 保存项目信息
     callback && callback();
   }
 
-  async handleFolderInfo(folderPath, key, content) {
-    if (folderPath.includes(".git")) return;
-    const files = await FS.readFileStats(folderPath, false);
-
-    const fileNames = new Set(files.map((f) => f.name));
-    const contentNames = new Set(content);
-
-    // 删除 files 中有但 content 中没有的文件夹
-    for (const file of files) {
-      const filePath = path.join(folderPath, file.name);
-      const relativePath = FS.removeParentDirPath(filePath, this.parentDir);
-      if (file.name.includes(".git")) continue;
-
-      if (file.type == "dir" && !contentNames.has(relativePath)) {
-        const folderPath = path.join(this.parentDir, relativePath);
-        await this.deleteFolder(folderPath);
-        console.log(`Deleted folder ${filePath}`);
+  async handleFolderInfo(folderPath, content) {
+    let folderList = content.map((item) => {
+      if (item.children) {
+        return path.join(this.parentDir, item.filepath);
       }
-    }
+    });
 
-    // 创建 content 中有但 files 中没有的文件夹
-    for (const folderName of contentNames) {
-      const folderPath = path.join(this.parentDir, folderName);
-      if (!fileNames.has(folderPath)) {
-        await FS.ensureDir(folderPath);
-        console.log(`Created folder ${folderPath}`);
-      }
-    }
+    console.log(content, folderList, "fileTree22");
 
-    // 递归处理子文件夹
-    for (const file of files) {
-      const filePath = path.join(folderPath, file.name);
-      const relativePath = FS.removeParentDirPath(filePath, this.parentDir);
-      if (file.type == "dir" && contentNames.has(relativePath)) {
-        await this.handleFolderInfo(filePath, key, content);
+    // 创建本地没有的文件树
+    const createFolder = async (tree) => {
+      for (const file of tree) {
+        if (!file.children) continue;
+        const filePath = path.join(this.parentDir, file.filepath);
+        let isExistPath = await FS.existsPath(filePath);
+        if (!isExistPath) {
+          await FS.ensureDir(filePath);
+        }
+        createFolder(file.children);
       }
-    }
+    };
+    await createFolder(content);
+    const files = await FS.readFileTree(folderPath, false, this.parentDir);
+    // 删除本地多余的文件树
+    const deleteFolder = async (files) => {
+      for (const file of files) {
+        if (!file.children) continue;
+        const filePath = file.filepath;
+        const folderPath = path.join(this.parentDir, file.filepath);
+
+        if (!folderList.includes(folderPath)) {
+          await this.deleteFolder(folderPath);
+          console.log(`Deleted folder ${filePath}`);
+        } else {
+          deleteFolder(file.children);
+        }
+      }
+    };
+    await deleteFolder(files);
   }
 
   // Yjs Map 观察者处理函数
   async yMapObserveHandler(event) {
     let contentSyncedPromises = [];
 
-    event.keysChanged.forEach((key) => {
-      console.log(key, "changeKey");
+    console.log(event, "event");
+
+    event.keysChanged.forEach(async (key) => {
       if (event?.transaction?.origin == null) {
         console.log(`Origin is null for key ${key}`, event?.transaction);
+        this.isInitialSyncComplete = true; // 标记初始同步完成
+        this.changeInitial();
         return;
       }
+      const change = event.changes.keys.get(key);
+      console.log(change?.action, key, "change.action");
+      console.log(this.yMap, this.yMap.keys(), "yMap");
 
       contentSyncedPromises.push(
         new Promise(async (resolve, reject) => {
           const content = this.yMap.get(key);
           const relativePath = path.join(this.parentDir, key);
-
+          this.YTextManager.setYText(relativePath);
+          console.log(content, key, "content");
           try {
+            // if (change?.action === "delete" || !change?.action) {
+            //   console.log(`Key deleted: ${key}`);
+            //   const relativePath = path.join(this.parentDir, key);
+            //   await useFileStore
+            //     .getState()
+            //     .deleteFile({ filename: relativePath }, true);
+            //   resolve();
+            //   return;
+            // }
             if (key == this.folderMapName) {
               await FS.ensureDir(this.currenProjectDir);
-
-              this.handleFolderInfo(
-                this.currenProjectDir,
-                relativePath,
-                content
-              );
+              this.handleFolderInfo(this.currenProjectDir, content);
               resolve();
               return;
             }
@@ -412,7 +444,7 @@ class ProjectSync {
         this.isInitialSyncComplete = true; // 标记初始同步完成
         this.changeInitial();
       }
-
+      console.log(contentSyncedPromises, "contentSyncedPromises");
       if (event.keysChanged.size == contentSyncedPromises.length) {
         Promise.all(contentSyncedPromises).then(() => {
           this.otherOperation && this.otherOperation();
@@ -501,4 +533,89 @@ class ProjectSync {
   }
 }
 
-export { ProjectSync };
+class ProjectSyncDownload {
+  constructor(
+    rootPath,
+    roomId,
+    token,
+    otherOperation,
+    parentDir = ".",
+    download = false
+  ) {
+    this.folderMapName = `${rootPath}_folder_map_list_${roomId}`;
+    this.rootPath = rootPath;
+    this.parentDir = parentDir;
+    this.currenProjectDir = path.join(this.parentDir, rootPath);
+    this.roomId = roomId;
+    this.yDoc = new Y.Doc();
+    this.download = download;
+
+    this.websocketProvider = new WebsocketProvider(
+      wsUrl,
+      this.rootPath + this.roomId,
+      this.yDoc,
+      { params: { yauth: token } }
+    );
+
+    // 使用 rootPath 作为命名空间
+    this.yMap = this.yDoc.getMap(this.rootPath + this.roomId);
+
+    this.otherOperation = otherOperation && otherOperation; // 保存回调函数
+
+    this.websocketProvider.on("synced", async () => {
+      if (this.download) {
+        await FS.ensureDir(this.currenProjectDir);
+        await this.downloadAllFile();
+        this.leaveCollaboration();
+        this.otherOperation && this.otherOperation();
+      }
+    });
+  }
+
+  // download all file into local
+  async downloadAllFile() {
+    let fileTree = this.yMap.get(this.folderMapName);
+    if (!fileTree) return;
+    let folderList = fileTree?.map((item) => {
+      if (item.children) {
+        return path.join(this.parentDir, item.filepath);
+      }
+    });
+
+    console.log(folderList, "fileTree22");
+
+    // 创建本地没有的文件树
+    const createFolder = async (tree) => {
+      for (const file of tree) {
+        const filePath = path.join(this.parentDir, file.filepath);
+        if (!file.children) {
+          const content = this.yMap.get(file.filepath);
+          if (content?._delete) {
+            continue;
+          }
+
+          console.log(content, file.filepath, "downloadAllFile");
+          await FS.writeFile(filePath, content ?? "");
+          continue;
+        }
+
+        let isExistPath = await FS.existsPath(filePath);
+        if (!isExistPath) {
+          await FS.ensureDir(filePath);
+        }
+        createFolder(file.children);
+      }
+    };
+    await createFolder(fileTree);
+  }
+
+  // 离开协作进程
+  leaveCollaboration() {
+    // 断开 WebSocket 连接
+    if (this.websocketProvider) {
+      this.websocketProvider.disconnect();
+    }
+  }
+}
+
+export { ProjectSync, ProjectSyncDownload };

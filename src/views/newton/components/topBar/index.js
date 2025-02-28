@@ -231,7 +231,7 @@ const TopBar = (props) => {
         </div>
       </div>
       <div className="flex items-center space-x-20 mr-4 w-2/5 justify-end">
-        {!!projectSync && (
+        {!!projectSync && shareUserList?.length > 1 && (
           <div className="flex items-center">
             {shareUserList.slice(0, maxDisplayCount).map((user, index) => (
               <Tooltip content={user.name} position="bottom">

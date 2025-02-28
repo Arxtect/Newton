@@ -83,13 +83,12 @@ export const ensureFileExists = async (list, currentProject, usePdfTeX) => {
     );
 
     if (shouldIgnore) continue;
-
     let fileBlob = await fsPify.readFile(fullFilename);
     let filepath = path.relative(currentProject, fullFilename);
     let ext = path.extname(filepath);
 
     // if (LATEX_FILE_EXTENSIONS.includes(ext)) {
-    console.log(filepath, "filepath");
+    console.log(filepath, fullFilename, currentProject, "filepath");
     if (usePdfTeX) {
       pdftexEngine.writeMemFSFile(filepath, fileBlob);
       if (path.extname(filepath) == ".tex") {
@@ -124,12 +123,12 @@ export const compileLatex = async (
 
   // Make sure the engines are ready for compilation
   if (usePdfTeX) {
-    if (!pdftexEngine.isReady()) {
+    if (!pdftexEngine?.isReady()) {
       console.log("PDFTeX Engine not ready yet!");
       return;
     }
   } else {
-    if (!xetexEngine.isReady() || !dviEngine.isReady()) {
+    if (!xetexEngine?.isReady() || !dviEngine?.isReady()) {
       console.log("XeTeX or DVI Engine not ready yet!");
       return;
     }
@@ -187,6 +186,7 @@ export const compileLatex = async (
       const pdfBlob = new Blob([pdftexCompilation.pdf], {
         type: "application/pdf",
       });
+      console.log(pdftexCompilation.pdf, "blobUrl.pdf");
       if (compileCount < 3) {
         await compileLatex(
           currentProject,
