@@ -6,6 +6,7 @@ import LinkGithub from "../dialog/linkGithub";
 import PublishDocument from "../dialog/publishDocument";
 import historyIcon from "@/assets/history.svg";
 import ViewHistory from "../viewHistory";
+import ViewSnapshot from "../viewSnapshot";
 import { useUserStore, useFileStore } from "@/store";
 import { downloadDirectoryAsZip, getProjectInfo } from "domain/filesystem";
 import { useNavigate } from "react-router-dom";
@@ -61,7 +62,7 @@ const RenameTextInput = ({
   />
 );
 
-const TopBar = (props) => {
+const TopBar = ({ saveSnapshot, loadSnapshot, deleteSnapshot, getSnapshotInfo }) => {
   const { user } = useUserStore((state) => ({
     user: state.user,
   }));
@@ -107,6 +108,7 @@ const TopBar = (props) => {
     // { key: "Review", src: review, label: "Review", click: handleClick },
     { key: "Sync", src: "", label: "Sync", click: handleClick },
     { key: "History", src: historyIcon, label: "History", click: handleClick },
+    { key: "Snapshot", src: historyIcon, label: "Snapshot", click: handleClick },
     { key: "Publish", src: "", label: "Publish", click: handleClick },
     { key: "Share", src: "", label: "Share", click: handleClick },
     { key: "Download", src: "Download", label: "", click: handleClick },
@@ -276,6 +278,15 @@ const TopBar = (props) => {
             }
             if (button.key === "History") {
               return <ViewHistory></ViewHistory>;
+            }
+            if (button.key === "Snapshot") {  // 新增 Snapshot 组件
+              return <ViewSnapshot 
+                currentProject = {currentProjectRoot} 
+                saveSnapshot={saveSnapshot}
+                loadSnapshot={loadSnapshot}
+                deleteSnapshot={deleteSnapshot}
+                getSnapshotInfo = {getSnapshotInfo}
+              />;
             }
             return (
               <Tooltip content={button.key} position="bottom">

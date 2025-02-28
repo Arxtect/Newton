@@ -26,7 +26,8 @@ const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
 // const wsUrl = `ws://3.227.9.181:8013`;
 // const wsUrl = `ws://206.190.239.91:9008/`;
 // const wsUrl = `ws://10.10.99.42:8013/`;
-const wsUrl = `ws://localhost:8013/`;
+// const wsUrl = `ws://localhost:8013/`;
+const wsUrl = `ws://network.jancsitech.net:5913`;
 // const wsUrl = `ws://10.10.101.159:8013/`;
 
 class ProjectSync {
@@ -45,7 +46,7 @@ class ProjectSync {
     this.parentDir = parentDir;
     this.currenProjectDir = path.join(this.parentDir, rootPath);
     this.roomId = roomId;
-    this.yDoc = new Y.Doc();
+    this.yDoc = new Y.Doc({ gc: false });
 
     this.websocketProvider = new WebsocketProvider(
       wsUrl,
@@ -61,7 +62,7 @@ class ProjectSync {
     this.initialized = false;
     this.isInitialSyncComplete = false; // 初始化标志
     this.isLeave = isLeave;
-
+    this.onsyncCount = 0;
     // 使用 rootPath 作为命名空间
     this.yMap = this.yDoc.getMap(this.rootPath + this.roomId);
 
@@ -111,9 +112,36 @@ class ProjectSync {
       this.setUserAwareness(null);
     });
 
-    this.websocketProvider.on("synced", async () => {});
+    this.websocketProvider.on("synced", async () => {this.onsyncCount++;});
   }
 
+  getDoc() {
+    return new Promise((resolve, reject) => {
+      const checkSync = () => {
+        if (this.onsyncCount === 1) {
+          resolve(this.yDoc);
+        } else {
+          console.log("Waiting for projectsync...");
+          setTimeout(checkSync, 1000); // 每秒检查一次
+        }
+      };
+      checkSync();
+    });
+  }
+
+  getMap() {
+    return new Promise((resolve, reject) => {
+      const checkSync = () => {
+        if (this.onsyncCount === 1) {
+          resolve(this.yMap);
+        } else {
+          console.log("Waiting for projectsync...");
+          setTimeout(checkSync, 1000); // 每秒检查一次
+        }
+      };
+      checkSync();
+    });
+  }
   changeIsInitialSyncComplete() {
     this.isInitialSyncComplete = true;
   }

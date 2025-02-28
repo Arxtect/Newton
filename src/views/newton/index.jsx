@@ -28,11 +28,13 @@ import {
 } from "domain/filesystem";
 import { useFileStore, useUserStore, useEditor } from "store";
 import { ProjectSync } from "@/convergence";
+import { snapshotSync } from "@/convergence/snapshot.js";
 import { getYDocToken } from "services";
 import { getRoomUserAccess, UpdateProject } from "@/services";
 import { toast } from "react-toastify";
 import { ArLoadingScreen } from "@/components/arLoading";
 import path from "path";
+import * as FS from "domain/filesystem";
 
 const Newton = () => {
   const navigate = useNavigate();
@@ -213,6 +215,49 @@ const Newton = () => {
 
   const [loadingProject, setLoadingProject] = useState(true);
 
+  const getInfo = async () => {
+    const projectInfo = await getProjectInfo(currentProjectRoot);
+    const project = projectInfo?.["project_name"];
+    const roomId = projectInfo?.["owner_id"];
+    let parentDir = getShareUserStoragePath(roomId);
+    if (user.id == roomId && parentDirStore == ".") {
+      parentDir = ".";
+    }
+    const { token, position } = await getYDocTokenReq(project + roomId);
+    return { project, roomId, token, position, parentDir }
+  };
+  const saveSnapshot = async ({ snapshotName, creationTime, snapshotId }) => {
+    const { project, roomId, token, position, parentDir } = await getInfo();
+    const projectSyncClass = await new ProjectSync(project, user, roomId, token, position, () => { }, false, parentDir);
+    const yDoc = await projectSyncClass.getDoc()
+    if (yDoc) {
+      const snapshotSyncClass = new snapshotSync(currentProjectRoot, user.id);
+      snapshotSyncClass.saveSnapshot({ yDoc, snapshotName, creationTime, snapshotId });
+    }
+  }
+  
+  const loadSnapshot = async (snapshotId) => {
+    const { project, roomId, token, position, parentDir } = await getInfo();
+    const projectSyncClass = await new ProjectSync(project, user, roomId, token, position, () => { }, false, parentDir);
+    const yDoc = await projectSyncClass.getDoc()
+    if(yDoc) {
+      const snapshotSyncClass = new snapshotSync(currentProjectRoot, user.id);
+      snapshotSyncClass.loadSnapshot(snapshotId, yDoc);
+    }
+    await FS.removeDirectory(currentProjectRoot);
+    navigate("/project")
+  }
+  
+  const deleteSnapshot = async (snapshotId) => {
+    const snapshotSyncClass = new snapshotSync(currentProjectRoot, user.id);
+    snapshotSyncClass.deleteSnapshot(snapshotId);
+  }
+
+  const getSnapshotInfo = async () => {
+      const snapshotSyncClass = new snapshotSync(currentProjectRoot, user.id);
+      const snapshotList = await snapshotSyncClass.getSnapshotList();
+      return snapshotList;
+  }
   const handleProject = () => {
     try {
       const hash = window.location.hash;
@@ -238,7 +283,12 @@ const Newton = () => {
 
   return !loading && !loadingProject ? (
     <React.Fragment>
-      <TopBar></TopBar>
+      <TopBar
+        saveSnapshot={saveSnapshot}
+        loadSnapshot={loadSnapshot}
+        deleteSnapshot={deleteSnapshot}
+        getSnapshotInfo={getSnapshotInfo}
+      />
       <Layout
         left={<FileSystem />}
         // rightBefore={<RightBefore />}
