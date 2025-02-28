@@ -25,7 +25,7 @@ import { TexMathJax, loadExtensions } from "./texMathjax";
 
 const isVipUser = () => {
   // TODO: check if user is vip
-  return true; // Assuming the user is a VIP for testing purposes
+  return false; // Assuming the user is a VIP for testing purposes
 };
 
 const LatexEditor = ({ handleChange, sourceCode, filepath, mainFilepath }) => {
