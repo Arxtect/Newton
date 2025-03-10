@@ -36,7 +36,6 @@ import { useAuthCallback } from "@/useHooks";
 import { waitForCondition } from "@/utils";
 import { ArLoadingOverlay } from "@/components/arLoading";
 import path from "path";
-import { createYDocStore, createYDocFromSimulatePath } from "@/store/useYDocStore";
 import * as Y from "yjs";
 import * as FS from "domain/filesystem";
 import { rm } from "fs";
@@ -380,88 +379,6 @@ const Project = () => {
     setProjectName(projectName);
   };
 
-  const testYDocStore = async (userId) => {
-    const store = createYDocStore(userId); // 创建 store 实例
-  
-    try {
-      // Step 1: 创建 YDoc
-      await store.getState().createYDocFromSimulatePath('mockProject');
-      console.log('YDoc created from file tree');
-      // let keys = Array.from(store.getState().getYDoc().getMap("projectsMap").get('mockProject').keys());
-      // console.log(keys, "before keys");
-
-
-      // Step 2: 保存快照
-      await store.getState().saveSnapshot('mockProject');
-      console.log('Snapshot saved');
-        
-      // Step 3: 获取快照信息
-      const snapshots = await store.getState().getSnapshotInfo('mockProject');
-      console.log('Snapshot info:', snapshots);
-          
-      const snapshotId = snapshots[0]?.snapshotId; // 获取第一个快照的 ID
-      console.log(snapshotId, "snapshotId");
-      
-      // Step 4: 修改文件内容（例如，更新 file1.txt）
-      store.getState().getYDoc().getMap("projectsMap").get('mockProject').get('dir1').set('file1.txt', new Y.Text('Updated file1 content'));
-      
-      // Step 5: 修改后验证文件内容
-      store.getState().getYDoc().getMap("projectsMap").get('mockProject').get('dir1').forEach((value, key) => {
-        if (key === 'file1.txt') {
-          console.log('After Modification file1.txt:', value.toString());
-        }
-        if (key === 'file2.txt') {
-          console.log('After Modification file2.txt:', value.toString());
-        }
-      });
-
-      store.getState().getYDoc().getMap("projectsMap").get('mockProject').get('dir2').forEach((value, key) => {
-        if (key === 'file1.txt') {
-          console.log('After Modification file1.txt:', value.toString());
-        }
-        if (key === 'file2.txt') {
-          console.log('After Modification file2.txt:', value.toString());
-        }
-      });
-
-      // keys = Array.from(store.getState().getYDoc().getMap("projectsMap").get('mockProject').keys());
-      // console.log(keys, "After keys");
-
-      // Step 6: 加载快照
-      await store.getState().loadSnapshot('mockProject', snapshotId);
-      console.log('Snapshot loaded');
-      
-      // Step 7: 快照恢复后验证文件内容
-      store.getState().getYDoc().getMap("projectsMap").get('mockProject').get('dir1').forEach((value, key) => {
-        if (key === 'file1.txt') {
-          console.log('After Snapshot Restore file1.txt:', value.toString()); // 应该是原始内容
-        }
-        if (key === 'file2.txt') {
-          console.log('After Snapshot Restore file2.txt:', value.toString()); // 应该是原始内容
-        }
-      });
-      store.getState().getYDoc().getMap("projectsMap").get('mockProject').get('dir2').forEach((value, key) => {
-        if (key === 'file1.txt') {
-          console.log('After Snapshot Restore file1.txt:', value.toString()); // 应该是原始内容
-        }
-        if (key === 'file2.txt') {
-          console.log('After Snapshot Restore file2.txt:', value.toString()); // 应该是原始内容
-        }
-      });
-      
-      // Step 8: 删除快照
-      await store.getState().deleteSnapshot('mockProject', snapshotId);
-      console.log('Snapshot deleted');
-      
-      // Step 9: 验证快照已删除
-      const snapshotsAfterDelete = await store.getState().getSnapshotInfo('mockProject');
-      console.log('Snapshots after delete:', snapshotsAfterDelete); // 应该为空
-  
-    } catch (error) {
-      console.error('Error during test:', error);
-    }
-  };
-  
   //get project list
   const getProjectList = async () => {
     let project = [];
@@ -480,23 +397,6 @@ const Project = () => {
       })
       .filter((item) => item?.title);
     setProjectData(projectData);
-    // const userId = 'test-user-123';
-    // testYDocStore(userId);
-    // console.log(user.id);
-    // let projects = [];
-    // projects = projectData.map((item) => {
-    //     return item.title;
-    // });
-    // console.log(projects);
-    // if(user?.id) {
-    //   const yDocStore = createYDocStore(user?.id);
-    //   // await yDocStore.getState().createYDocFromPath("123");
-    //   for(const item of projects) {
-    //     await yDocStore.getState().createYDocFromPath(item);
-    //   }
-
-    //   // console.log(yDocStore.getState().getYDoc().getMap("projectsMap").get("123").get("1.tex").toString(), "1.tex content");
-    // }
   };
 
   // slider menu
@@ -512,9 +412,7 @@ const Project = () => {
     if (!list || list?.length < 1) return;
     for (let project of list) {
       let isExistPath = await existsPath(project.project_name);
-      // console.log(project.is_sync, isExistPath, "info");
       if (project.is_sync && !isExistPath) {
-        // console.log("SYNCCCCCCCCCCCC")
         await getAllProjectFromYjs(project.project_name, project.owner_id);
       }
     }
@@ -539,14 +437,6 @@ const Project = () => {
     getAllProjectRemote();
   }, []);
 
-  // useEffect(() => {
-  //   // FS.removeDirectory
-  //   // getAllProjectRemote();
-  //   // getProjectList();
-  //   setTimeout(() => {
-  //     navigate("/newton");
-  //   }, 5000);
-  // }, []);
 
   return (
     <div className="w-full flex  bg-white h-full overflow-hidden">

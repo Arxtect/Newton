@@ -242,7 +242,7 @@ const TopBar = ({ saveSnapshot, loadSnapshot, deleteSnapshot, getSnapshotInfo })
                   className="relative rounded-full w-8 h-8 flex items-center justify-center border-2 border-white"
                   style={{
                     backgroundColor: user?.color || getColors(index),
-                    marginLeft: index === 0 ? "0" : "-0.5rem", // Adjust the overlap
+                    marginLeft: index === 0 ? "0" : "-0.5rem", 
                     zIndex: 100 - index,
                   }}
                 >
@@ -257,7 +257,7 @@ const TopBar = ({ saveSnapshot, loadSnapshot, deleteSnapshot, getSnapshotInfo })
                 className="rounded-full w-8 h-8 flex items-center justify-center border-2 border-white"
                 style={{
                   backgroundColor: getColors(12),
-                  marginLeft: "-0.5rem", // Adjust the overlap
+                  marginLeft: "-0.5rem", 
                 }}
               >
                 <img src={ellipsis} alt="" />
@@ -279,7 +279,7 @@ const TopBar = ({ saveSnapshot, loadSnapshot, deleteSnapshot, getSnapshotInfo })
             if (button.key === "History") {
               return <ViewHistory></ViewHistory>;
             }
-            if (button.key === "Snapshot") {  // 新增 Snapshot 组件
+            if (button.key === "Snapshot") { 
               return <ViewSnapshot 
                 currentProject = {currentProjectRoot} 
                 saveSnapshot={saveSnapshot}

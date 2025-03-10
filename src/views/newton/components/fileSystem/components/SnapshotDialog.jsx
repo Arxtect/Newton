@@ -14,112 +14,27 @@ export function SnapshotDialog({ open, onClose, onSave }) {
 
   return (
     <>
-      <style>
-        {`
-          .dialog-overlay {
-            position: fixed;
-            inset: 0;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-          }
-
-          .dialog {
-            background-color: white;
-            border-radius: 0.5rem;
-            padding: 1.5rem;
-            width: 400px;
-          }
-
-          .dialog__title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: #1f2937;
-            margin-bottom: 0.5rem;
-          }
-
-          .dialog__description {
-            color: #6b7280;
-            margin-bottom: 1rem;
-          }
-
-          .dialog__input {
-            width: 100%;
-            padding: 0.5rem 0.75rem;
-            border: 1px solid #d1d5db;
-            border-radius: 0.375rem;
-            outline: none;
-            margin-bottom: 1rem;
-            transition: border-color 0.2s, box-shadow 0.2s;
-          }
-
-          .dialog__input:focus {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
-          }
-
-          .dialog__actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 0.5rem;
-          }
-
-          .dialog__button {
-            padding: 0.5rem 1rem;
-            border-radius: 0.375rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background-color 0.2s;
-          }
-
-          .dialog__button--primary {
-            background-color: #3b82f6;
-            color: white;
-            border: none;
-          }
-
-          .dialog__button--primary:hover {
-            background-color: #2563eb;
-          }
-
-          .dialog__button--primary:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-          }
-
-          .dialog__button--secondary {
-            background-color: #f3f4f6;
-            color: #4b5563;
-            border: none;
-          }
-
-          .dialog__button--secondary:hover {
-            background-color: #e5e7eb;
-          }
-        `}
-      </style>
-      <div className="dialog-overlay">
-        <div className="dialog">
-          <h2 className="dialog__title">Save Snapshot</h2>
-          <p className="dialog__description">
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div className="bg-white rounded-lg p-6 w-96">
+          <h2 className="text-xl font-semibold text-gray-800 mb-2">Save Snapshot</h2>
+          <p className="text-gray-600 mb-4">
             Create a named snapshot of the current file state.
           </p>
           <input
             value={snapshotName}
             onChange={(e) => setSnapshotName(e.target.value)}
             placeholder="Enter snapshot name"
-            className="dialog__input"
+            className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-200 mb-4"
           />
-          <div className="dialog__actions">
+          <div className="flex justify-end gap-2">
             <button
-              className="dialog__button dialog__button--secondary"
+              className="px-4 py-2 rounded-md font-medium bg-gray-100 text-gray-700 hover:bg-gray-200"
               onClick={onClose}
             >
               Cancel
             </button>
             <button
-              className="dialog__button dialog__button--primary"
+              className="px-4 py-2 rounded-md font-medium bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
               onClick={handleSave}
               disabled={!snapshotName.trim()}
             >

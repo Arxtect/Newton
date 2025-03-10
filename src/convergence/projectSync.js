@@ -19,6 +19,7 @@ import { assetExtensions } from "@/constant";
 import { debounce, getColors } from "@/utils";
 import { toast } from "react-toastify";
 import { LatexSyncToYText, YTextManager } from "./latexSyncToYText";
+import { startUpdate } from "../store/useFileStore";
 
 const host = window.location.hostname;
 const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
@@ -122,7 +123,7 @@ class ProjectSync {
           resolve(this.yDoc);
         } else {
           console.log("Waiting for projectsync...");
-          setTimeout(checkSync, 1000); // 每秒检查一次
+          setTimeout(checkSync, 50); 
         }
       };
       checkSync();
@@ -136,7 +137,7 @@ class ProjectSync {
           resolve(this.yMap);
         } else {
           console.log("Waiting for projectsync...");
-          setTimeout(checkSync, 1000); // 每秒检查一次
+          setTimeout(checkSync, 50);
         }
       };
       checkSync();
@@ -389,6 +390,64 @@ class ProjectSync {
     await deleteFolder(files);
   }
 
+  async updateAllFile() {
+    const yMap = await this.getMap();
+    let fileTree = yMap.get(this.folderMapName);
+    let folderList = fileTree.map((item) => {
+      if (item.children) {
+        return path.join(this.parentDir, item.filepath);
+      }
+    });
+  
+    console.log(folderList, "fileTree22");
+  
+    const deleteExtraFiles = async (fileTree) => {
+      const localFiles = await FS.getFilesRecursively(this.parentDir);
+      for (const localFile of localFiles) {
+        const relativePath = path.relative(this.parentDir, localFile);
+        const isFileInTree = fileTree.some((file) => file.filepath === relativePath);
+        if (!isFileInTree) {
+          console.log(`Deleting extra file: ${localFile}`);
+          await FS.unlink(localFile); 
+        }
+      }
+  
+      for (const folder of fileTree) {
+        const folderPath = path.join(this.parentDir, folder.filepath);
+        if (folder.children) {
+          const isFolderInTree = fileTree.some((file) => file.filepath === folder.filepath);
+          if (!isFolderInTree) {
+            console.log(`Deleting extra folder: ${folderPath}`);
+            await FS.removeDirectory(folderPath); 
+          } else {
+            await deleteExtraFiles(folder.children);
+          }
+        }
+      }
+    };
+    const createFolder = async (tree) => {
+      for (const file of tree) {
+        const filePath = path.join(this.parentDir, file.filepath);
+        if (!file.children) {
+          const content = this.yMap.get(file.filepath);
+          if (content?._delete) {
+            continue;
+          }
+          console.log(content, file.filepath, "updateAllFile");
+          await FS.writeFile(filePath, content ?? ""); 
+          continue;
+        }
+        let isExistPath = await FS.existsPath(filePath);
+        if (!isExistPath) {
+          await FS.ensureDir(filePath); 
+        }
+        await createFolder(file.children);
+      }
+    };
+    await deleteExtraFiles(fileTree);
+    await createFolder(fileTree);
+    startUpdate();
+  }
   // Yjs Map 观察者处理函数
   async yMapObserveHandler(event) {
     let contentSyncedPromises = [];
@@ -602,7 +661,9 @@ class ProjectSyncDownload {
 
   // download all file into local
   async downloadAllFile() {
-    let fileTree = this.yMap.get(this.folderMapName);
+    // let fileTree = this.yMap.get(this.folderMapName);
+    const yMap = await this.getMap();
+    let fileTree = yMap.get(this.folderMapName);
     let folderList = fileTree.map((item) => {
       if (item.children) {
         return path.join(this.parentDir, item.filepath);

@@ -67,6 +67,7 @@ const Newton = () => {
     initializeLatexEngines();
   }, []);
 
+  const projectSyncRef = useRef(null);
   const { user } = useUserStore((state) => ({
     user: state.user,
   }));
@@ -131,7 +132,7 @@ const Newton = () => {
       return;
     }
     const { token, position } = await getYDocTokenReq(project + roomId);
-    const projectSyncClass = await new ProjectSync(
+    projectSyncRef.current = await new ProjectSync(
       project,
       user,
       roomId,
@@ -141,6 +142,7 @@ const Newton = () => {
       false,
       parentDir
     );
+    const projectSyncClass = projectSyncRef.current;
 
     projectSyncClass.setObserveHandler();
     updateProjectSync(projectSyncClass.saveState);
@@ -200,6 +202,9 @@ const Newton = () => {
       });
     return () => {
       setMainFile("");
+      if (projectSyncRef.current) {
+        projectSyncRef.current.cleanup();
+      }
     };
   }, [currentProjectRoot]);
 
@@ -223,31 +228,48 @@ const Newton = () => {
     if (user.id == roomId && parentDirStore == ".") {
       parentDir = ".";
     }
-    const { token, position } = await getYDocTokenReq(project + roomId);
-    return { project, roomId, token, position, parentDir }
+    const response = await getYDocTokenReq(project + roomId);
+    if (response && response.token) {
+      const { token, position } = response;
+      return { project, roomId, token, position, parentDir }
+    } else {
+      console.error('The response data is missing token or position:', response);
+    }
   };
   const saveSnapshot = async ({ snapshotName, creationTime, snapshotId }) => {
+    if (!projectSyncRef.current) return;
+    const projectSyncClass = projectSyncRef.current;
     const { project, roomId, token, position, parentDir } = await getInfo();
-    const projectSyncClass = await new ProjectSync(project, user, roomId, token, position, () => { }, false, parentDir);
+    if(token == null) {
+      console.log("token is null")
+      return;
+    }
     const yDoc = await projectSyncClass.getDoc()
     if (yDoc) {
+      //snapshotSyncClass need token
       const snapshotSyncClass = new snapshotSync(currentProjectRoot, user.id);
       snapshotSyncClass.saveSnapshot({ yDoc, snapshotName, creationTime, snapshotId });
     }
   }
   
   const loadSnapshot = async (snapshotId) => {
-    const { project, roomId, token, position, parentDir } = await getInfo();
-    const projectSyncClass = await new ProjectSync(project, user, roomId, token, position, () => { }, false, parentDir);
+    if (!projectSyncRef.current) return;
+    const projectSyncClass = projectSyncRef.current;
     const yDoc = await projectSyncClass.getDoc()
     if(yDoc) {
+      //snapshotSyncClass need token
       const snapshotSyncClass = new snapshotSync(currentProjectRoot, user.id);
       snapshotSyncClass.loadSnapshot(snapshotId, yDoc);
+      await syncProject(projectSyncClass);
     }
-    await FS.removeDirectory(currentProjectRoot);
-    navigate("/project")
   }
   
+  const syncProject = async (projectSyncClass) => {
+    setLoading(true);
+    projectSyncClass.updateAllFile();
+    changeMainFile(currentProjectRoot)
+    setLoading(false);
+  }
   const deleteSnapshot = async (snapshotId) => {
     const snapshotSyncClass = new snapshotSync(currentProjectRoot, user.id);
     snapshotSyncClass.deleteSnapshot(snapshotId);

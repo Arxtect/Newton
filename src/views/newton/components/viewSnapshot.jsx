@@ -37,12 +37,10 @@ const ViewSnapshot = ({ currentProject, saveSnapshot, loadSnapshot, deleteSnapsh
     setSnapshots(snapshots.filter((snapshot) => snapshot.id !== snapshotId))
   }
 
-  // 打开历史记录对话框
   const handleOpenHistory = () => {
     setShowHistory(true)
   }
 
-  // 关闭历史记录对话框
   const handleCloseHistory = () => {
     setShowHistory(false)
   }
@@ -58,7 +56,6 @@ const ViewSnapshot = ({ currentProject, saveSnapshot, loadSnapshot, deleteSnapsh
 
   return (
     <React.Fragment>
-      {/* Tooltip 和按钮 */}
       <Tooltip title="View History">
         <button
           className={`flex items-center text-gray-700 px-2 py-1 hover:bg-gray-200 ${
@@ -71,7 +68,6 @@ const ViewSnapshot = ({ currentProject, saveSnapshot, loadSnapshot, deleteSnapsh
         </button>
       </Tooltip>
 
-      {/* Dialog 弹窗，显示历史快照 */}
       <Dialog
         open={showHistory}
         onClose={handleCloseHistory}

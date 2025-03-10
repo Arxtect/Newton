@@ -37,7 +37,7 @@ class snapshotSync {
                     resolve(this.yMap);
                 } else {
                     console.log("Waiting for sync...");
-                    setTimeout(checkSync, 1000);
+                    setTimeout(checkSync, 50);
                 }
             };
             checkSync();
