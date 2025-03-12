@@ -266,8 +266,7 @@ const Newton = () => {
     }
     const yDoc = await projectSyncClass.getDoc()
     if (yDoc) {
-      //snapshotSyncClass need token
-      const snapshotSyncClass = new snapshotSync(currentProjectRoot, user.id);
+      const snapshotSyncClass = new snapshotSync(currentProjectRoot, user.id, token);
       snapshotSyncClass.saveSnapshot({ yDoc, snapshotName, creationTime, snapshotId });
     }
   }
@@ -276,9 +275,13 @@ const Newton = () => {
     if (!projectSyncRef.current) return;
     const projectSyncClass = projectSyncRef.current;
     const yDoc = await projectSyncClass.getDoc()
+    const { project, roomId, token, position, parentDir } = await getInfo();
+    if(token == null) {
+      console.log("token is null")
+      return;
+    }
     if(yDoc) {
-      //snapshotSyncClass need token
-      const snapshotSyncClass = new snapshotSync(currentProjectRoot, user.id);
+      const snapshotSyncClass = new snapshotSync(currentProjectRoot, user.id, token);
       await snapshotSyncClass.loadSnapshot(snapshotId, yDoc);
       await syncProject(projectSyncClass);
     }
@@ -290,7 +293,7 @@ const Newton = () => {
       console.log("token is null")
       return;
     }
-    const snapshotSyncClass = new snapshotSync(currentProjectRoot, user.id);
+    const snapshotSyncClass = new snapshotSync(currentProjectRoot, user.id, token);
     await snapshotSyncClass.renameSnapshot(snapshotId, newName);
   }
 
@@ -301,7 +304,12 @@ const Newton = () => {
     setLoading(false);
   }
   const deleteSnapshot = async (snapshotId) => {
-    const snapshotSyncClass = new snapshotSync(currentProjectRoot, user.id);
+    const { project, roomId, token, position, parentDir } = await getInfo();
+    if(token == null) {
+      console.log("token is null")
+      return;
+    }
+    const snapshotSyncClass = new snapshotSync(currentProjectRoot, user.id, token);
     snapshotSyncClass.deleteSnapshot(snapshotId);
   }
 

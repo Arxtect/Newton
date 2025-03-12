@@ -5,7 +5,7 @@ import { IndexeddbPersistence } from "y-indexeddb";
 const wsUrl = `ws://network.jancsitech.net:5913`;
 
 class snapshotSync {
-    constructor(projectRoot, userId) {
+    constructor(projectRoot, userId, token) {
         this.yDoc = new Y.Doc();
         this.namespace = projectRoot + userId;
         this.roomId = "snapshot-" + this.namespace;
@@ -15,6 +15,7 @@ class snapshotSync {
               wsUrl,
               this.roomId,
               this.yDoc,
+              { params: { yauth: token } },
             );
         this.onsyncCount = 0; 
         this.yMap = this.yDoc.getMap(this.namespace);
