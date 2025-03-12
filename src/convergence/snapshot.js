@@ -46,27 +46,27 @@ class snapshotSync {
 
     
     async saveSnapshot({ yDoc, snapshotName, creationTime, snapshotId }) {
-        const snapshot = Y.snapshot(yDoc);
-        const encodedSnapshot = Y.encodeSnapshot(snapshot);
+        const snapshotUpdate = Y.encodeStateAsUpdate(yDoc);
         this.yDoc.transact(async () => {
             const yMap = await this.getMap();
-            yMap.set(snapshotId, { snapshotName, encodedSnapshot, creationTime, snapshotId });
+            yMap.set(snapshotId, { snapshotName, snapshotUpdate, creationTime, snapshotId });
         });
     }
 
-    
     async loadSnapshot(snapshotId, originYdoc) {
-        const yMap = await this.getMap(); 
-        const encodedSnapshot = yMap.get(snapshotId).encodedSnapshot;
-        const decodedSnapshot = Y.decodeSnapshot(encodedSnapshot);
-        const tempDoc = Y.createDocFromSnapshot(originYdoc, decodedSnapshot);
-        const restoredMap = tempDoc.getMap(this.namespace);
-        const originalMap = originYdoc.getMap(this.namespace);
-        originYdoc.transact(() => {
-            originalMap.clear();
-            copyYMap(restoredMap, originalMap);
-            copyYtext(tempDoc, originYdoc, this.namespace);
-        });
+        const snapshotDoc = new Y.Doc();
+        const yMap = await this.getMap();
+        const snapshotUpdate = yMap.get(snapshotId).snapshotUpdate;
+        Y.applyUpdate(snapshotDoc, snapshotUpdate);
+        const currentStateVector = Y.encodeStateVector(originYdoc);
+        const snapshotStateVector = Y.encodeStateVector(snapshotDoc);
+        const changesSinceSnapshotUpdate = Y.encodeStateAsUpdate(originYdoc, snapshotStateVector);
+        const undoManager = new Y.UndoManager(snapshotDoc.getMap(this.namespace));
+        Y.applyUpdate(snapshotDoc, changesSinceSnapshotUpdate)
+        undoManager.undo();
+        const revertChangesSinceSnapshotUpdate = Y.encodeStateAsUpdate(snapshotDoc, currentStateVector);
+        Y.applyUpdate(originYdoc, revertChangesSinceSnapshotUpdate);
+        copyYtext(snapshotDoc, originYdoc, this.namespace);
     }
 
     async deleteSnapshot(snapshotId) {
