@@ -50,7 +50,7 @@ const RenameProject = ({
     try {
       // Rename the directory
       await pify(fs.rename)(newSourceProject, newDirPath);
-      await fileMoved({ fromPath: newSourceProject, destPath: newDirPath });
+      await fileMoved({ fromPath: newSourceProject, destPath: newDirPath, type: "dir" });
       setDialogOpen(false);
       setSourceProject("");
       toast.success("Project renamed successfully");

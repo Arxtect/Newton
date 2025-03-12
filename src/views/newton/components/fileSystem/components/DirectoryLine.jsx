@@ -152,7 +152,7 @@ const DirectoryLineContent = ({
 
       endRenaming();
       setValue(path.basename(newDirPath));
-      fileMoved({ fromPath: dirpath, destPath: newDirPath });
+      fileMoved({ fromPath: dirpath, destPath: newDirPath, type: "dir" });
       if (depth == 0) {
         changeCurrentProjectRoot({ projectRoot: newDirPath });
       }

@@ -58,6 +58,7 @@ async function moveItem(from, to) {
     return {
       fromPath,
       destPath,
+      type: from.type,
     };
   }
   if (to.type === "file") {
@@ -68,6 +69,7 @@ async function moveItem(from, to) {
     return {
       fromPath,
       destPath,
+      type: from.type,
     };
   }
 }

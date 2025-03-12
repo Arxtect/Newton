@@ -146,7 +146,7 @@ const TopBar = ({ saveSnapshot, loadSnapshot, deleteSnapshot, getSnapshotInfo, r
       await pify(fs.rename)(currentProjectRoot, newProjectName);
 
       setValue(path.basename(newProjectName));
-      fileMoved({ fromPath: currentProjectRoot, destPath: newProjectName });
+      fileMoved({ fromPath: currentProjectRoot, destPath: newProjectName, type: "dir" });
       changeCurrentProjectRoot({
         projectRoot: newProjectName,
         parentDir: parentDir,

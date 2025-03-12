@@ -466,12 +466,20 @@ export const useFileStore = create()(
         }
       },
 
-      fileMoved: async ({ fromPath, destPath }) => {
+      fileMoved: async ({ fromPath, destPath, type }) => {
         get().startUpdate({ changedPath: [fromPath, destPath] });
         const mainFileDirPath = path.dirname(get().mainFilepath);
         const fromDirPath = path.dirname(fromPath);
         if (mainFileDirPath === fromDirPath) {
           get().changeMainFile(get().currentProjectRoot);
+        }
+        if(type === 'file') {
+          const projectSync = get().projectSync;
+          await projectSync.moveFile(fromPath, destPath);
+        }
+        if(type === 'dir') {
+          const projectSync = get().projectSync;
+          await projectSync.moveFolder(fromPath, destPath);
         }
         get().syncFileTreeToYMap();
       },

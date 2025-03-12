@@ -384,6 +384,7 @@ module.exports = function (webpackEnv) {
         querystring: require.resolve("querystring-es3"),
         url: require.resolve("url/"),
         util: require.resolve("util/"),
+        "constants": require.resolve("constants-browserify")
       },
       // These are the reasonable defaults supported by the Node ecosystem.
       // We also include JSX as a common component filename extension to support

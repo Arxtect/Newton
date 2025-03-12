@@ -9,7 +9,8 @@ class snapshotSync {
         this.yDoc = new Y.Doc();
         this.namespace = projectRoot + userId;
         this.roomId = "snapshot-" + this.namespace;
-        this.idbPersistence = new IndexeddbPersistence(`snap-${projectRoot}`, this.yDoc);
+        this.dbName = `snap-${projectRoot}`;
+        this.idbPersistence = new IndexeddbPersistence(this.dbName, this.yDoc);
         this.websocketProvider = new WebsocketProvider(
               wsUrl,
               this.roomId,
@@ -20,6 +21,9 @@ class snapshotSync {
         this.saveSnapshot = this.saveSnapshot.bind(this);
         this.loadSnapshot = this.loadSnapshot.bind(this);
         this.deleteSnapshot = this.deleteSnapshot.bind(this);
+        this.renameSnapshot = this.renameSnapshot.bind(this);
+        this.getSnapshotList = this.getSnapshotList.bind(this);
+        this.clearIndexedDB = this.clearIndexedDB.bind(this);
         this.websocketProvider.on("synced", () => {
             this.onsyncCount++;
             console.log("snapshotSync synced");
@@ -44,6 +48,19 @@ class snapshotSync {
         });
     }
 
+    async clearIndexedDB() {
+        await this.idbPersistence.destroy();
+        const request = indexedDB.deleteDatabase(this.dbName);
+        request.onsuccess = function() {
+            console.log("Database deleted successfully");
+        };
+        request.onerror = function(event) {
+            console.error("Database deletion failed", event.target.errorCode);
+        };
+        request.onblocked = function() {
+            console.log("Database deletion is blocked");
+        };
+    }
     
     async saveSnapshot({ yDoc, snapshotName, creationTime, snapshotId }) {
         const snapshotUpdate = Y.encodeStateAsUpdate(yDoc);

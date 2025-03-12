@@ -20,6 +20,7 @@ import { debounce, getColors } from "@/utils";
 import { toast } from "react-toastify";
 import { LatexSyncToYText, YTextManager } from "./latexSyncToYText";
 import { startUpdate } from "../store/useFileStore";
+import { move } from "fs-extra";
 
 const host = window.location.hostname;
 const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
@@ -47,7 +48,7 @@ class ProjectSync {
     this.parentDir = parentDir;
     this.currenProjectDir = path.join(this.parentDir, rootPath);
     this.roomId = roomId;
-    this.yDoc = new Y.Doc({ gc: false });
+    this.yDoc = new Y.Doc();
 
     this.websocketProvider = new WebsocketProvider(
       wsUrl,
@@ -101,6 +102,9 @@ class ProjectSync {
       changeInitial: this.changeInitial.bind(this),
       syncFileTree: this.syncFileTree.bind(this),
       cleanup: this.cleanup.bind(this),
+      moveFile: this.moveFile.bind(this),
+      moveFolder: this.moveFolder.bind(this),
+      updateAllFile: this.updateAllFile.bind(this),
     };
 
     this.websocketProvider.on("status", (event) => {
@@ -414,6 +418,8 @@ class ProjectSync {
 
     const folderListFromYjs = getAllFolders(fileTreeFromYjs)
     const fileListFromYjs = getAllFiles(fileTreeFromYjs);
+    console.log("Folder list from Yjs:", folderListFromYjs);
+    console.log("File list from Yjs:", fileListFromYjs);
     const createItems = async (tree) => {
       for (const item of tree) {
         const itemPath = path.join(this.parentDir, item.filepath);
@@ -422,11 +428,13 @@ class ProjectSync {
           if(content?.delete) {
             continue;
           }
+          console.log("Writing file:", itemPath, content);
           await FS.writeFile(itemPath, content);
         }
         else {
           let isExistPath = await FS.existsPath(itemPath);
           if(!isExistPath) {
+            console.log("Creating directory:", itemPath);
             await FS.ensureDir(itemPath);
           }
           await createItems(item.children);
@@ -438,6 +446,7 @@ class ProjectSync {
         const itemPath = path.join(this.parentDir, item.filepath);
         if(item.children) {
           if(!folderListFromYjs.includes(itemPath)) {
+            console.log("Removing directory:", itemPath);
             await FS.removeDirectory(itemPath);
           }
           else {
@@ -446,6 +455,7 @@ class ProjectSync {
         }
         else {
           if(!fileListFromYjs.includes(itemPath)) {
+            console.log("Unlinking file:", itemPath);
             await FS.unlink(itemPath);
           }
         }
@@ -456,6 +466,38 @@ class ProjectSync {
     await deleteItems(fileTreeFromLocal);
     useFileStore.getState().repoChanged();
   }
+    async moveFile (fromPath, destPath) {
+      console.log(`moveFile from ${fromPath} to ${destPath}`);
+      const yMap = await this.getMap();
+      const yDoc = await this.getDoc();
+      yMap.set(destPath, yMap.get(fromPath));
+      yMap.delete(fromPath);
+      const fromYtext = yDoc.getText(fromPath);
+      const destYtext = yDoc.getText(destPath);
+      destYtext.delete(0, destYtext.length);
+      destYtext.insert(0, fromYtext.toString());
+      fromYtext.delete(0, fromYtext.length);
+      this.updateAllFile();
+    }
+    async moveFolder(fromPath, destPath) {
+      console.log(`moveFolder from ${fromPath} to ${destPath}`)
+      const yMap = await this.getMap();
+      const yDoc = await this.getDoc();
+      const keys = Array.from(yMap.keys());
+      for (const key of keys) {
+        if(key.startsWith(fromPath)) {
+          const newDestKey = key.replace(fromPath, destPath);
+          yMap.set(newDestKey, yMap.get(key))
+          yMap.delete(key);
+          const fromYText = yDoc.getText(key);
+          const destYText = yDoc.getText(newDestKey);
+          destYText.delete(0, destYText.length);
+          destYText.insert(0, fromYText.toString());
+          fromYText.delete(0, fromYText.length);
+        }
+      }
+      this.updateAllFile();
+    }
   // Yjs Map 观察者处理函数
   async yMapObserveHandler(event) {
     let contentSyncedPromises = [];

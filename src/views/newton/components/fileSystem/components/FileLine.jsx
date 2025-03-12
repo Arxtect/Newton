@@ -93,7 +93,7 @@ const FileLine = ({
 
     endRenaming();
     setValue(value);
-    fileMoved({ fromPath: filepath, destPath });
+    fileMoved({ fromPath: filepath, destPath, type: "file" });
   };
 
   const [value, setValue] = useState(basename);
@@ -205,14 +205,14 @@ const FileLine = ({
     handleRename();
   };
 
-  const handleFileClick = (e) => {
+  const handleFileClick = async (e) => {
     if (e.ctrlKey || e.metaKey) {
       changeCurrentSelectDir("", true);
       toggleFileSelection(filepath); // 多选逻辑
     } else {
       clearFileSelection();
       toggleFileSelection(filepath);
-      loadFile({ filepath }); // 加载文件
+      await loadFile({ filepath }); // 加载文件
       if (isMobile) {
         pushScene({ nextScene: "edit" }); // 移动设备场景切换
       }
