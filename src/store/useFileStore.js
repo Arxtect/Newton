@@ -75,6 +75,10 @@ export const useFileStore = create()(
       shareIsRead: false,
       selectedFiles: [],
       parentDir: "",
+      isModified: false,
+      setIsModified:(value) => {
+        set({ isModified: value });
+      },
       updateFileTree: async () => {
         let fileTree = await FS.readFileTree(
           get().currentProjectRoot,
@@ -293,6 +297,7 @@ export const useFileStore = create()(
         get().updateFileContent(filepath, value, isSync);
       }, 0),
       changeValue: (value, isSync = true) => {
+        get().setIsModified(true);
         const state = get();
         if (state.autosave && isSync) {
           set({
@@ -334,6 +339,7 @@ export const useFileStore = create()(
         set({ dirCreatingDir });
       },
       repoChanged: () => {
+        get().setIsModified(true);
         const state = get();
         set({ touchCounter: state.touchCounter + 1 });
       },

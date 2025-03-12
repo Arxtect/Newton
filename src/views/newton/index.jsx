@@ -34,6 +34,7 @@ import { getRoomUserAccess, UpdateProject } from "@/services";
 import { toast } from "react-toastify";
 import { ArLoadingScreen } from "@/components/arLoading";
 import path from "path";
+import { v4 as uuidv4 } from "uuid"
 import * as FS from "domain/filesystem";
 
 const Newton = () => {
@@ -50,6 +51,8 @@ const Newton = () => {
     leaveProjectSyncRoom,
     changeCurrentProjectRoot,
     parentDirStore,
+    isModified,
+    setIsModified,
   } = useFileStore((state) => ({
     filepath: state.filepath,
     setMainFile: state.setMainFile,
@@ -61,6 +64,8 @@ const Newton = () => {
     leaveProjectSyncRoom: state.leaveProjectSyncRoom,
     changeCurrentProjectRoot: state.changeCurrentProjectRoot,
     parentDirStore: state.parentDir,
+    isModified: state.isModified,
+    setIsModified: state.setIsModified,
   }));
 
   useLayoutEffect(() => {
@@ -220,6 +225,21 @@ const Newton = () => {
 
   const [loadingProject, setLoadingProject] = useState(true);
 
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      if(isModified) {
+        const snapshotId = uuidv4();
+        const creationTime = Date.now();
+        const snapshotName = `Snapshot_${new Date().toISOString()}`;
+        saveSnapshot({snapshotName, creationTime, snapshotId});
+        setIsModified(false);
+      }
+    }, 10 * 60 * 1000);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [isModified]);
   const getInfo = async () => {
     const projectInfo = await getProjectInfo(currentProjectRoot);
     const project = projectInfo?.["project_name"];
