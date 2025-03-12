@@ -259,15 +259,25 @@ const Newton = () => {
     if(yDoc) {
       //snapshotSyncClass need token
       const snapshotSyncClass = new snapshotSync(currentProjectRoot, user.id);
-      snapshotSyncClass.loadSnapshot(snapshotId, yDoc);
+      await snapshotSyncClass.loadSnapshot(snapshotId, yDoc);
       await syncProject(projectSyncClass);
     }
   }
   
+  const renameSnapshot = async (snapshotId, newName) => {
+    const { project, roomId, token, position, parentDir } = await getInfo();
+    if(token == null) {
+      console.log("token is null")
+      return;
+    }
+    const snapshotSyncClass = new snapshotSync(currentProjectRoot, user.id);
+    await snapshotSyncClass.renameSnapshot(snapshotId, newName);
+  }
+
   const syncProject = async (projectSyncClass) => {
     setLoading(true);
-    projectSyncClass.updateAllFile();
-    changeMainFile(currentProjectRoot)
+    await projectSyncClass.updateAllFile();
+    await changeMainFile(currentProjectRoot);
     setLoading(false);
   }
   const deleteSnapshot = async (snapshotId) => {
@@ -310,6 +320,7 @@ const Newton = () => {
         loadSnapshot={loadSnapshot}
         deleteSnapshot={deleteSnapshot}
         getSnapshotInfo={getSnapshotInfo}
+        renameSnapshot={renameSnapshot}
       />
       <Layout
         left={<FileSystem />}

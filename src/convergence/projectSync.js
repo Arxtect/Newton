@@ -392,61 +392,69 @@ class ProjectSync {
 
   async updateAllFile() {
     const yMap = await this.getMap();
-    let fileTree = yMap.get(this.folderMapName);
-    let folderList = fileTree.map((item) => {
-      if (item.children) {
-        return path.join(this.parentDir, item.filepath);
-      }
-    });
-  
-    console.log(folderList, "fileTree22");
-  
-    const deleteExtraFiles = async (fileTree) => {
-      const localFiles = await FS.getFilesRecursively(this.parentDir);
-      for (const localFile of localFiles) {
-        const relativePath = path.relative(this.parentDir, localFile);
-        const isFileInTree = fileTree.some((file) => file.filepath === relativePath);
-        if (!isFileInTree) {
-          console.log(`Deleting extra file: ${localFile}`);
-          await FS.unlink(localFile); 
+    const fileTreeFromYjs = yMap.get(this.folderMapName);
+    const getAllFiles = (fileTree) => {
+      return fileTree.flatMap( (item) => {
+        if(item.children) {
+          return getAllFiles(item.children);
         }
-      }
-  
-      for (const folder of fileTree) {
-        const folderPath = path.join(this.parentDir, folder.filepath);
-        if (folder.children) {
-          const isFolderInTree = fileTree.some((file) => file.filepath === folder.filepath);
-          if (!isFolderInTree) {
-            console.log(`Deleting extra folder: ${folderPath}`);
-            await FS.removeDirectory(folderPath); 
-          } else {
-            await deleteExtraFiles(folder.children);
-          }
-        }
-      }
+        else return path.join(this.parentDir, item.filepath);
+      })
     };
-    const createFolder = async (tree) => {
-      for (const file of tree) {
-        const filePath = path.join(this.parentDir, file.filepath);
-        if (!file.children) {
-          const content = this.yMap.get(file.filepath);
-          if (content?._delete) {
+
+    const getAllFolders = (fileTree) => {
+      return fileTree.flatMap((item) => {
+        if (item.children) {
+          const fullPath = path.join(this.parentDir, item.filepath);
+          return [fullPath, ...getAllFolders(item.children)];
+        }
+        return [];
+      });
+    };
+
+    const folderListFromYjs = getAllFolders(fileTreeFromYjs)
+    const fileListFromYjs = getAllFiles(fileTreeFromYjs);
+    const createItems = async (tree) => {
+      for (const item of tree) {
+        const itemPath = path.join(this.parentDir, item.filepath);
+        if(!item.children) {
+          const content = yMap.get(itemPath);
+          if(content?.delete) {
             continue;
           }
-          console.log(content, file.filepath, "updateAllFile");
-          await FS.writeFile(filePath, content ?? ""); 
-          continue;
+          await FS.writeFile(itemPath, content);
         }
-        let isExistPath = await FS.existsPath(filePath);
-        if (!isExistPath) {
-          await FS.ensureDir(filePath); 
+        else {
+          let isExistPath = await FS.existsPath(itemPath);
+          if(!isExistPath) {
+            await FS.ensureDir(itemPath);
+          }
+          await createItems(item.children);
         }
-        await createFolder(file.children);
       }
-    };
-    await deleteExtraFiles(fileTree);
-    await createFolder(fileTree);
-    startUpdate();
+    }
+    const deleteItems = async (tree) => {
+      for (const item of tree) {
+        const itemPath = path.join(this.parentDir, item.filepath);
+        if(item.children) {
+          if(!folderListFromYjs.includes(itemPath)) {
+            await FS.removeDirectory(itemPath);
+          }
+          else {
+            await deleteItems(item.children);
+          }
+        }
+        else {
+          if(!fileListFromYjs.includes(itemPath)) {
+            await FS.unlink(itemPath);
+          }
+        }
+      }
+    }
+    await createItems(fileTreeFromYjs);
+    const fileTreeFromLocal = await FS.readFileTree(this.currenProjectDir, false, this.parentDir);
+    await deleteItems(fileTreeFromLocal);
+    useFileStore.getState().repoChanged();
   }
   // Yjs Map 观察者处理函数
   async yMapObserveHandler(event) {
@@ -661,9 +669,7 @@ class ProjectSyncDownload {
 
   // download all file into local
   async downloadAllFile() {
-    // let fileTree = this.yMap.get(this.folderMapName);
-    const yMap = await this.getMap();
-    let fileTree = yMap.get(this.folderMapName);
+    let fileTree = this.yMap.get(this.folderMapName);
     let folderList = fileTree.map((item) => {
       if (item.children) {
         return path.join(this.parentDir, item.filepath);

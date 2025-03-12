@@ -69,6 +69,14 @@ class snapshotSync {
         copyYtext(snapshotDoc, originYdoc, this.namespace);
     }
 
+    async renameSnapshot(snapshotId, newName) {
+        this.yDoc.transact(async () => {
+            const yMap = await this.getMap();
+            if (yMap.has(snapshotId))  {
+                yMap.set(snapshotId, { ...yMap.get(snapshotId), snapshotName: newName });
+            }
+        });
+    }
     async deleteSnapshot(snapshotId) {
         this.yDoc.transact(async () => {
             const yMap = await this.getMap();

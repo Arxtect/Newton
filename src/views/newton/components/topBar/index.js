@@ -62,7 +62,7 @@ const RenameTextInput = ({
   />
 );
 
-const TopBar = ({ saveSnapshot, loadSnapshot, deleteSnapshot, getSnapshotInfo }) => {
+const TopBar = ({ saveSnapshot, loadSnapshot, deleteSnapshot, getSnapshotInfo, renameSnapshot }) => {
   const { user } = useUserStore((state) => ({
     user: state.user,
   }));
@@ -286,6 +286,7 @@ const TopBar = ({ saveSnapshot, loadSnapshot, deleteSnapshot, getSnapshotInfo })
                 loadSnapshot={loadSnapshot}
                 deleteSnapshot={deleteSnapshot}
                 getSnapshotInfo = {getSnapshotInfo}
+                renameSnapshot={renameSnapshot}
               />;
             }
             return (
