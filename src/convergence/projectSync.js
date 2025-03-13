@@ -21,6 +21,7 @@ import { toast } from "react-toastify";
 import { LatexSyncToYText, YTextManager } from "./latexSyncToYText";
 import { startUpdate } from "../store/useFileStore";
 import { move } from "fs-extra";
+// import { from } from "core-js/core/array";
 
 const host = window.location.hostname;
 const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
@@ -424,10 +425,11 @@ class ProjectSync {
       for (const item of tree) {
         const itemPath = path.join(this.parentDir, item.filepath);
         if(!item.children) {
-          const content = yMap.get(itemPath);
+          let content = yMap.get(itemPath);
           if(content?.delete) {
             continue;
           }
+          content = content || "";
           console.log("Writing file:", itemPath, content);
           await FS.writeFile(itemPath, content);
         }
@@ -477,7 +479,7 @@ class ProjectSync {
       destYtext.delete(0, destYtext.length);
       destYtext.insert(0, fromYtext.toString());
       fromYtext.delete(0, fromYtext.length);
-      this.updateAllFile();
+      await this.updateAllFile();
     }
     async moveFolder(fromPath, destPath) {
       console.log(`moveFolder from ${fromPath} to ${destPath}`)
@@ -496,7 +498,7 @@ class ProjectSync {
           fromYText.delete(0, fromYText.length);
         }
       }
-      this.updateAllFile();
+      await this.updateAllFile();
     }
   // Yjs Map 观察者处理函数
   async yMapObserveHandler(event) {

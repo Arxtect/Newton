@@ -25,6 +25,8 @@ const ViewSnapshot = ({
   const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false)
   const [snapshotToRename, setSnapshotToRename] = useState(null)
   const [newSnapshotName, setNewSnapshotName] = useState("")
+  const [isRestoreDialogOpen, setIsRestoreDialogOpen] = useState(false)
+  const [snapshotToRestore, setSnapshotToRestore] = useState(null)
 
   useEffect(() => {
     const fetchSnapshots = async () => {
@@ -45,9 +47,24 @@ const ViewSnapshot = ({
     setSnapshots([newSnapshot, ...snapshots])
   }
 
-  const restoreSnapshot = async (snapshot) => {
-    loadSnapshot(snapshot.id)
+  const funcRenameSnapshot = async (snapshotId, newName) => {
+    renameSnapshot(snapshotId, newName)
+    setSnapshots(snapshots.map((snapshot) => (snapshot.id === snapshotId ? { ...snapshot, name: newName } : snapshot)))
   }
+
+  const handleRestoreClick = (snapshot) => {
+    setSnapshotToRestore(snapshot)
+    setIsRestoreDialogOpen(true)
+  }
+
+  const confirmRestore = () => {
+    if (snapshotToRestore) {
+      loadSnapshot(snapshotToRestore.id)
+      setIsRestoreDialogOpen(false)
+      setSnapshotToRestore(null)
+    }
+  }
+
   const handleDeleteClick = (snapshot) => {
     setSnapshotToDelete(snapshot)
     setIsDeleteDialogOpen(true)
@@ -70,8 +87,7 @@ const ViewSnapshot = ({
 
   const confirmRename = () => {
     if (snapshotToRename && newSnapshotName.trim()) {
-      renameSnapshot(snapshotToRename.id, newSnapshotName)
-      setSnapshots(snapshots.map((snapshot) => (snapshot.id === snapshotToRename.id ? { ...snapshot, name: newSnapshotName } : snapshot)))
+      funcRenameSnapshot(snapshotToRename.id, newSnapshotName)
       setIsRenameDialogOpen(false)
       setSnapshotToRename(null)
       setNewSnapshotName("")
@@ -165,7 +181,7 @@ const ViewSnapshot = ({
 
                   <button
                     className="snapshot-item__restore w-full mt-2 text-sm py-1.5 bg-green-50 text-green-700 hover:bg-green-100 rounded border border-green-200 transition-colors"
-                    onClick={() => restoreSnapshot(snapshot)}
+                    onClick={() => handleRestoreClick(snapshot)}
                   >
                     Restore this version
                   </button>
@@ -254,6 +270,39 @@ const ViewSnapshot = ({
                   disabled={!newSnapshotName.trim()}
                 >
                   Rename
+                </button>
+              </div>
+            </div>
+          </Dialog>
+          <Dialog
+            open={isRestoreDialogOpen}
+            onClose={() => setIsRestoreDialogOpen(false)}
+            PaperProps={{
+              sx: {
+                borderRadius: "8px",
+                width: "400px",
+                padding: "16px",
+              },
+            }}
+          >
+            <div className="p-4">
+              <h3 className="text-lg font-medium text-gray-800 mb-3">Confirm Restore</h3>
+              <p className="text-gray-600 mb-4">
+                Are you sure you want to restore the snapshot "{snapshotToRestore?.name}"? This will replace your
+                current project state.
+              </p>
+              <div className="flex justify-end space-x-2">
+                <button
+                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors"
+                  onClick={() => setIsRestoreDialogOpen(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors"
+                  onClick={confirmRestore}
+                >
+                  Restore
                 </button>
               </div>
             </div>

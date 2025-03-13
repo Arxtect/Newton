@@ -479,6 +479,7 @@ export const useFileStore = create()(
         if (mainFileDirPath === fromDirPath) {
           get().changeMainFile(get().currentProjectRoot);
         }
+        await get().syncFileTreeToYMap();
         if(type === 'file') {
           const projectSync = get().projectSync;
           await projectSync.moveFile(fromPath, destPath);
@@ -487,7 +488,6 @@ export const useFileStore = create()(
           const projectSync = get().projectSync;
           await projectSync.moveFolder(fromPath, destPath);
         }
-        get().syncFileTreeToYMap();
       },
       startRenaming: ({ pathname }) => {
         set({ renamingPathname: pathname });
