@@ -403,7 +403,11 @@ class ProjectSync {
         if(item.children) {
           return getAllFiles(item.children);
         }
-        else return path.join(this.parentDir, item.filepath);
+        else {
+          const filepath = path.join(this.parentDir, item.filepath)
+          if(!yMap.get(filepath)?._delete) return filepath;
+          else return [];
+        }
       })
     };
 
@@ -426,7 +430,7 @@ class ProjectSync {
         const itemPath = path.join(this.parentDir, item.filepath);
         if(!item.children) {
           let content = yMap.get(itemPath);
-          if(content?.delete) {
+          if(content?._delete) {
             continue;
           }
           content = content || "";

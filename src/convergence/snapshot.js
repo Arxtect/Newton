@@ -7,9 +7,10 @@ const wsUrl = `ws://network.jancsitech.net:5913`;
 class snapshotSync {
     constructor(projectRoot, userId, token) {
         this.yDoc = new Y.Doc();
-        this.namespace = projectRoot + userId;
-        this.roomId = "snapshot-" + this.namespace;
+        this.roomId = projectRoot + userId;
         this.dbName = `snap-${projectRoot}`;
+        this.snapshotSpace = `snapshot_${projectRoot}_${userId}`;
+        this.storeSpace = projectRoot + userId;
         this.idbPersistence = new IndexeddbPersistence(this.dbName, this.yDoc);
         this.websocketProvider = new WebsocketProvider(
               wsUrl,
@@ -18,7 +19,8 @@ class snapshotSync {
               { params: { yauth: token } },
             );
         this.onsyncCount = 0; 
-        this.yMap = this.yDoc.getMap(this.namespace);
+        this.storeYMap = this.yDoc.getMap(this.storeSpace);
+        this.snapshotYMap = this.yDoc.getMap(this.snapshotSpace);
         this.saveSnapshot = this.saveSnapshot.bind(this);
         this.loadSnapshot = this.loadSnapshot.bind(this);
         this.deleteSnapshot = this.deleteSnapshot.bind(this);
@@ -35,11 +37,24 @@ class snapshotSync {
         });
     }
 
-    getMap() {
+    getStoreMap() {
         return new Promise((resolve, reject) => {
             const checkSync = () => {
                 if (this.onsyncCount === 2) {
-                    resolve(this.yMap);
+                    resolve(this.storeYMap);
+                } else {
+                    console.log("Waiting for sync...");
+                    setTimeout(checkSync, 50);
+                }
+            };
+            checkSync();
+        });
+    }
+    getSnapshotMap() {
+        return new Promise((resolve, reject) => {
+            const checkSync = () => {
+                if (this.onsyncCount === 2) {
+                    resolve(this.snapshotYMap);
                 } else {
                     console.log("Waiting for sync...");
                     setTimeout(checkSync, 50);
@@ -66,30 +81,30 @@ class snapshotSync {
     async saveSnapshot({ yDoc, snapshotName, creationTime, snapshotId }) {
         const snapshotUpdate = Y.encodeStateAsUpdate(yDoc);
         this.yDoc.transact(async () => {
-            const yMap = await this.getMap();
+            const yMap = await this.getSnapshotMap();
             yMap.set(snapshotId, { snapshotName, snapshotUpdate, creationTime, snapshotId });
         });
     }
 
     async loadSnapshot(snapshotId, originYdoc) {
-        const snapshotDoc = new Y.Doc();
-        const yMap = await this.getMap();
+        const yMap = await this.getSnapshotMap();
         const snapshotUpdate = yMap.get(snapshotId).snapshotUpdate;
+        const snapshotDoc = new Y.Doc();
         Y.applyUpdate(snapshotDoc, snapshotUpdate);
         const currentStateVector = Y.encodeStateVector(originYdoc);
         const snapshotStateVector = Y.encodeStateVector(snapshotDoc);
         const changesSinceSnapshotUpdate = Y.encodeStateAsUpdate(originYdoc, snapshotStateVector);
-        const undoManager = new Y.UndoManager(snapshotDoc.getMap(this.namespace));
+        const undoManager = new Y.UndoManager(snapshotDoc.getMap(this.storeSpace));
         Y.applyUpdate(snapshotDoc, changesSinceSnapshotUpdate)
         undoManager.undo();
         const revertChangesSinceSnapshotUpdate = Y.encodeStateAsUpdate(snapshotDoc, currentStateVector);
         Y.applyUpdate(originYdoc, revertChangesSinceSnapshotUpdate);
-        copyYtext(snapshotDoc, originYdoc, this.namespace);
+        copyYtext(snapshotDoc, originYdoc, this.storeSpace);
     }
 
     async renameSnapshot(snapshotId, newName) {
         this.yDoc.transact(async () => {
-            const yMap = await this.getMap();
+            const yMap = await this.getSnapshotMap();
             if (yMap.has(snapshotId))  {
                 yMap.set(snapshotId, { ...yMap.get(snapshotId), snapshotName: newName });
             }
@@ -97,7 +112,7 @@ class snapshotSync {
     }
     async deleteSnapshot(snapshotId) {
         this.yDoc.transact(async () => {
-            const yMap = await this.getMap();
+            const yMap = await this.getSnapshotMap();
             if (yMap.has(snapshotId))  {
                 yMap.delete(snapshotId);
             }
@@ -105,7 +120,7 @@ class snapshotSync {
     }
 
     async getSnapshotList() {
-        const yMap = await this.getMap();
+        const yMap = await this.getSnapshotMap();
         const snapshotList = [];
         yMap.forEach((value, key) => {
             snapshotList.push({
