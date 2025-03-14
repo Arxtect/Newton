@@ -314,7 +314,12 @@ const Newton = () => {
   }
 
   const getSnapshotInfo = async () => {
-      const snapshotSyncClass = new snapshotSync(currentProjectRoot, user.id);
+    const { project, roomId, token, position, parentDir } = await getInfo();
+    if(token == null) {
+      console.log("token is null")
+      return;
+    }
+      const snapshotSyncClass = new snapshotSync(currentProjectRoot, user.id, token);
       const snapshotList = await snapshotSyncClass.getSnapshotList();
       return snapshotList;
   }
