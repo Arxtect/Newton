@@ -198,10 +198,12 @@ const Newton = () => {
     }
   }, [filepath, projectSync, editor]);
 
+  const [snapshotReady, setSnapshotReady] = useState(false);
   useEffect(() => {
     if (!currentProjectRoot) return;
     initShareProject()
       .then(() => {
+        setSnapshotReady(true);
         changeMainFile(currentProjectRoot);
         setLoading(false);
       })
@@ -323,9 +325,10 @@ const Newton = () => {
     }
   };
 
-  return !loading && !loadingProject ? (
+  return !loading && !loadingProject && snapshotReady ? (
     <React.Fragment>
       <TopBar
+        snapshotSyncRef={snapshotSyncRef}
         saveSnapshot={saveSnapshot}
         loadSnapshot={loadSnapshot}
         deleteSnapshot={deleteSnapshot}

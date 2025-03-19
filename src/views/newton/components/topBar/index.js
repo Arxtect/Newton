@@ -62,7 +62,7 @@ const RenameTextInput = ({
   />
 );
 
-const TopBar = ({ saveSnapshot, loadSnapshot, deleteSnapshot, getSnapshotInfo, renameSnapshot }) => {
+const TopBar = ({ saveSnapshot, loadSnapshot, deleteSnapshot, getSnapshotInfo, renameSnapshot, snapshotSyncRef }) => {
   const { user } = useUserStore((state) => ({
     user: state.user,
   }));
@@ -281,6 +281,7 @@ const TopBar = ({ saveSnapshot, loadSnapshot, deleteSnapshot, getSnapshotInfo, r
             }
             if (button.key === "Snapshot") { 
               return <ViewSnapshot 
+                snapshotSyncRef = {snapshotSyncRef}
                 currentProject = {currentProjectRoot} 
                 saveSnapshot={saveSnapshot}
                 loadSnapshot={loadSnapshot}

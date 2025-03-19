@@ -9,6 +9,7 @@ import { v4 as uuidv4 } from "uuid"
 import { formatDistanceToNow } from "date-fns"
 
 const ViewSnapshot = ({
+  snapshotSyncRef,
   currentProject,
   saveSnapshot,
   loadSnapshot,
@@ -28,13 +29,28 @@ const ViewSnapshot = ({
   const [isRestoreDialogOpen, setIsRestoreDialogOpen] = useState(false)
   const [snapshotToRestore, setSnapshotToRestore] = useState(null)
 
+  const [ymap, setYmap] = useState(null);
   useEffect(() => {
+    const initYMap = async () => {
+      const map = await snapshotSyncRef.current.getSnapshotMap();
+      setYmap(map);
+    };
+    initYMap();
+  }, [snapshotSyncRef]);
+
+  useEffect(() => {
+    if (!ymap) return;
     const fetchSnapshots = async () => {
       const snapshots = await getSnapshotInfo();
       setSnapshots(snapshots);
     };
     fetchSnapshots();
-  }, []);
+    ymap.observe(fetchSnapshots); 
+  
+    return () => {
+      ymap.unobserve(fetchSnapshots);
+    };
+  }, [ymap]);
   const funcSaveSnapshot = async (snapshotName) => {
     const snapshotId = uuidv4();
     const creationTime = Date.now();
