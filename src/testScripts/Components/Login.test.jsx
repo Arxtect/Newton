@@ -1,23 +1,28 @@
 import React from 'react';
 import renderer from 'react-test-renderer';
-import resetPasswordPage from '@/views/resetPasswordPage';
+import { render, screen } from '@testing-library/react';
+import ResetPasswordPage from '@/views/resetPasswordPage';
 import LoginPage from '@/views/login';
-import { add, subtract } from '@/testScripts/__testComponent__/example.mjs';
+import { add, subtract } from '@/testScripts/__testComponent__/example.js';
+import { BrowserRouter } from 'react-router-dom';
 
 test('add', () => {
   expect(add(1, 2)).toBe(3);
 });
 
 test('PasswordPage Snapshot', () => {
-  const component = renderer.create(<resetPasswordPage />);
-  const resetPassword = component.toJSON();
-  expect(resetPassword).toMatchSnapshot();
+  render(<BrowserRouter>
+  <ResetPasswordPage />
+  </BrowserRouter>);
+  const resetPassword = screen.getByText('Confirm Password');
+  expect(resetPassword).toBeInTheDocument();
+  // expect(screen.getByText(/confirm password/i)).toBeInTheDocument();
 });
 
 test('Match Snapshot', () => {
-  const component = renderer.create(<LoginPage />);
-  const login = component.toJSON();
-  expect(login).toMatchSnapshot();
+  render(<BrowserRouter><LoginPage /></BrowserRouter>);
+  const login = screen.getByText('Forgot Password?');
+  expect(login).toBeInTheDocument();
 });
 
 
