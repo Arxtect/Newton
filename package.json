@@ -143,7 +143,7 @@
   "scripts": {
     "start": "cross-env NODE_ENV=development GENERATE_SOURCEMAP=true node scripts/start.js",
     "build": "cross-env NODE_ENV=production GENERATE_SOURCEMAP=true node scripts/build.js",
-    "test": "cross-env NODE_ENV=test node scripts/test.js"
+    "test": "cross-env NODE_ENV=test node --experimental-vm-modules $(yarn bin jest)"
   },
   "eslintConfig": {
     "extends": [
@@ -164,9 +164,12 @@
     ]
   },
   "devDependencies": {
+    "@types/react-test-renderer": "^19.1.0",
     "copy-webpack-plugin": "^11.0.0",
     "postcss": "^8.4.14",
     "react-app-rewired": "^2.2.1",
+    "react-test-renderer": "18.3.1",
+    "@babel/plugin-proposal-private-property-in-object": "^7.22.5",
     "wasm-loader": "^1.3.0"
   },
   "jest": {
@@ -194,13 +197,29 @@
       "^(?!.*\\.(js|jsx|mjs|cjs|ts|tsx|css|json)$)": "<rootDir>/config/jest/fileTransform.js"
     },
     "transformIgnorePatterns": [
-      "[/\\\\]node_modules[/\\\\].+\\.(js|jsx|mjs|cjs|ts|tsx)$",
+      "[/\\\\]node_modules[/\\\\](?!(pdfjs-dist|react-pdf|lib0|yjs|y-protocols|y-prosemirror|y-websocket|y-indexeddb)/).+\\.(js|jsx|mjs|cjs|ts|tsx)$",
       "^.+\\.module\\.(css|sass|scss)$"
     ],
     "modulePaths": [],
     "moduleNameMapper": {
       "^react-native$": "react-native-web",
-      "^.+\\.module\\.(css|sass|scss)$": "identity-obj-proxy"
+      "^.+\\.module\\.(css|sass|scss)$": "identity-obj-proxy",
+      "^@/(.*)$": "<rootDir>/src/$1",
+      "^services(.*)$": "<rootDir>/src/services$1",
+      "^components(.*)$": "<rootDir>/src/components$1",
+      "^utils(.*)$": "<rootDir>/src/utils$1",
+      "^hooks(.*)$": "<rootDir>/src/hooks$1",
+      "^pages(.*)$": "<rootDir>/src/pages$1",
+      "^assets(.*)$": "<rootDir>/src/assets$1",
+      "^styles(.*)$": "<rootDir>/src/styles$1",
+      "^store(.*)$": "<rootDir>/src/store$1",
+      "^domain(.*)$": "<rootDir>/src/domain$1",
+      "^lib0/mutex.js$": "<rootDir>/src/__mocks__/lib0/mutex.js",
+      "^yjs$": "<rootDir>/src/__mocks__/yjs.js",
+      "^y-protocols/awareness.js$": "<rootDir>/src/__mocks__/y-protocols/awareness.js",
+      "^y-prosemirror$": "<rootDir>/src/__mocks__/y-prosemirror.js",
+      "^y-websocket$": "<rootDir>/src/__mocks__/y-websocket.js",
+      "^y-indexeddb$": "<rootDir>/src/__mocks__/y-indexeddb.js"
     },
     "moduleFileExtensions": [
       "web.js",
@@ -218,6 +237,10 @@
       "jest-watch-typeahead/filename",
       "jest-watch-typeahead/testname"
     ],
-    "resetMocks": true
+    "resetMocks": true,
+    "resolutions": {
+      "canvas": "2.11.2",
+      "postcss": "^8.4.14"
+    }
   }
 }
